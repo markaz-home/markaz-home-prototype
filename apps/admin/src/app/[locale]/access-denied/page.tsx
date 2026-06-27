@@ -1,28 +1,26 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@markaz/ui';
 import { ShieldAlert } from 'lucide-react';
-import { Link } from '@/i18n/navigation';
+import { AdminAuthShell, AdminHeading } from '@/components/auth/admin-auth-shell';
 import { AdminSignOut } from '@/components/admin-sign-out';
 
 export default async function AccessDeniedPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('admin');
+  const webUrl = process.env.NEXT_PUBLIC_WEB_URL ?? 'http://localhost:3000';
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-muted/30 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <ShieldAlert className="h-6 w-6 text-destructive" aria-hidden />
-          <CardTitle>{t('accessDeniedTitle')}</CardTitle>
-          <CardDescription>{t('accessDeniedBody')}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex items-center gap-3">
-          <Link href="/login" className="text-sm font-medium text-primary underline-offset-4 hover:underline">
-            {t('backToLogin')}
-          </Link>
+    <AdminAuthShell>
+      <div className="space-y-5">
+        <ShieldAlert className="h-9 w-9 text-destructive" aria-hidden />
+        <AdminHeading title={t('deniedTitle')} description={t('deniedBody')} />
+        <p className="text-sm text-muted-foreground">{t('deniedHelp')}</p>
+        <div className="flex flex-col gap-3 pt-2">
           <AdminSignOut variant="outline" />
-        </CardContent>
-      </Card>
-    </div>
+          <a href={webUrl} className="text-center text-sm text-muted-foreground hover:text-foreground">
+            {t('returnHome')}
+          </a>
+        </div>
+      </div>
+    </AdminAuthShell>
   );
 }

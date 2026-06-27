@@ -22,13 +22,13 @@ export const fullNameSchema = z
   .string()
   .trim()
   .min(2, 'full_name_too_short')
-  .max(120, 'full_name_too_long');
+  .max(100, 'full_name_too_long');
 
 // --- Password policy ---------------------------------------------------------
-// Min 8, upper, lower, number, special. Max 72 = the provider's bcrypt-safe limit
-// (not an arbitrary low cap). Pasting is supported (plain string field).
+// Min 8, upper, lower, number, special. Max 128 (design spec §10.5). Pasting is
+// supported (plain string field).
 export const PASSWORD_MIN = 8;
-export const PASSWORD_MAX = 72;
+export const PASSWORD_MAX = 128;
 
 export interface PasswordRequirements {
   minLength: boolean;
@@ -53,14 +53,14 @@ export function passwordMeetsPolicy(password: string): boolean {
   return r.minLength && r.uppercase && r.lowercase && r.number && r.special;
 }
 
-/** 0–4 coarse strength score for the meter (UX only, not a security control). */
-export function passwordStrength(password: string): 0 | 1 | 2 | 3 | 4 {
+/**
+ * 3-level strength (design spec §10.7), restrained and supplementary:
+ *   0 = empty (hidden) · 1 = incomplete · 2 = meets (all met, 8–11) · 3 = strong (all met, 12+).
+ */
+export function passwordStrength(password: string): 0 | 1 | 2 | 3 {
   if (!password) return 0;
-  const r = checkPasswordRequirements(password);
-  let score = [r.uppercase, r.lowercase, r.number, r.special].filter(Boolean).length;
-  if (password.length >= 12) score = Math.min(4, score + 1);
-  if (!r.minLength) score = Math.min(score, 1);
-  return Math.max(0, Math.min(4, score)) as 0 | 1 | 2 | 3 | 4;
+  if (!passwordMeetsPolicy(password)) return 1;
+  return password.length >= 12 ? 3 : 2;
 }
 
 export const passwordSchema = z

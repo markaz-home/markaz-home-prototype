@@ -23,11 +23,11 @@ beforeEach(() => {
   replace.mockReset();
 });
 
-describe('AdminSignInFlow (email/password)', () => {
-  it('renders the isolated admin login (English) with no sign-up link', () => {
+describe('AdminSignInFlow (Operations)', () => {
+  it('renders the Operations sign-in with no Create account', () => {
     renderWithIntl(<AdminSignInFlow />);
-    expect(screen.getByText('Admin sign in')).toBeInTheDocument();
-    expect(screen.getByText('MARKAZ Admin')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Sign in to Operations' })).toBeInTheDocument();
+    expect(screen.getAllByText('MARKAZ Operations').length).toBeGreaterThan(0);
     expect(screen.getByLabelText(/^Password/)).toBeInTheDocument();
     expect(screen.queryByText('Create account')).not.toBeInTheDocument();
   });
@@ -59,6 +59,6 @@ describe('AdminSignInFlow (email/password)', () => {
 
   it('renders Arabic admin login', () => {
     renderWithIntl(<AdminSignInFlow />, 'ar');
-    expect(screen.getByText('تسجيل دخول الإدارة')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'تسجيل الدخول إلى بوابة العمليات' })).toBeInTheDocument();
   });
 });

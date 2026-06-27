@@ -18,7 +18,7 @@ export function SignOutButton({ asMenuItem = false }: { asMenuItem?: boolean }) 
     await audit.mutateAsync({ action: 'CUSTOMER_SIGNED_OUT' }).catch(() => {});
     const supabase = createSupabaseBrowserClient();
     await supabase.auth.signOut();
-    router.replace('/sign-in');
+    router.replace('/signed-out');
     router.refresh();
   }
 

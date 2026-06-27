@@ -2,6 +2,22 @@
 
 **Milestone: Authentication & Onboarding Hardening**
 
+> **Design-fidelity update.** After the auth/onboarding design spec
+> (`docs/design/auth-onboarding-design-spec.md`) was approved, the UI and two
+> decisions were brought into line with it:
+> - **Password recovery now uses the official Supabase recovery LINK** (the 6-digit
+>   code is for email verification only). Forgot → email link → `/auth/confirm`
+>   verifies → `/reset-password` (recovery session) → `updateUser` → sign out → sign in.
+> - **Password max length is 128** (was 72).
+> - The auth/onboarding screens were rebuilt to the spec: split **AuthShell**
+>   (header w/ language switcher + footer + support panel), **3-step progress**,
+>   **6-cell verification code**, and the full screen inventory (Check Email, Email
+>   Verified, Recovery Email Sent, Password Updated, Signed Out, Session Expired,
+>   provider/error panels); deep-blue **Operations shell** for admin; i18n keys
+>   restructured to the spec namespaces (en exact, ar drafted + flagged).
+> Sections below describe the initial Week-1.5 build; where they conflict, this note
+> and ADR-0009's revision govern.
+
 ## Scope
 
 Replace the Week 1 **passwordless email-OTP** sign-in with **email + password**,

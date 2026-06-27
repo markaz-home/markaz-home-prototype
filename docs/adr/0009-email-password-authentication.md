@@ -3,6 +3,32 @@
 - **Status:** Accepted
 - **Date:** 2026-06
 
+## Revision — design-fidelity pass (supersedes two earlier decisions below)
+
+After the auth/onboarding design spec (`docs/design/auth-onboarding-design-spec.md`)
+was approved, two decisions in this ADR were changed:
+
+1. **Password recovery uses the official Supabase recovery LINK, not a code.** The
+   6-digit code is now used for **email verification only**. Forgot Password calls
+   `resetPasswordForEmail(email, { redirectTo: <app>/auth/confirm })`; the recovery
+   email contains a link; the `/auth/confirm` route handler runs
+   `verifyOtp({ type: 'recovery', token_hash })` (establishing the recovery session
+   in secure cookies) and forwards to `/reset-password`; the page renders only with a
+   valid recovery session, then `updateUser({ password })` → **sign out → fresh
+   sign-in** (rationale unchanged). The recovery token is handled by the auth library
+   and never displayed or logged.
+2. **Password max length is 128** (design spec §10.5), not 72. The full policy is
+   enforced in the client + zod schema; the pinned local Supabase CLI rejects
+   password-policy config keys, so the deployed platform owns the server-side policy.
+
+The auth/onboarding UI was also refactored to the spec: split AuthShell (header with
+language switcher + footer + support panel), 3-step progress, a 6-cell verification
+code (one logical accessible input), and the full screen inventory (Check Email,
+Email Verified, Recovery Email Sent, Password Updated, Signed Out, Session Expired,
+provider/error panels), with a deep-blue Operations shell for admin. The sections
+below describe the original Week-1.5 code-based recovery and 72-char cap and are kept
+for history; where they conflict, this revision governs.
+
 ## Context
 
 Week 1 shipped **passwordless email OTP** as the primary sign-in: a customer

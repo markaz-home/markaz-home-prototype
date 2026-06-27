@@ -20,10 +20,17 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
 - **Customers can never self-promote to ADMIN** (DB trigger + RLS enforce it).
 - **A customer can never offer on a listing they own** (DB trigger + RLS + API).
 - **Never** use the Supabase service-role/secret key for customer-scoped requests.
-- **Auth is email + password** (Supabase `signInWithPassword`). 6-digit email
-  codes are used **only** to verify a new account (`verifyOtp type:signup`) and to
-  recover a password (`verifyOtp type:recovery`). **Never** build, store, or log
-  any code, password hash, or token — Supabase Auth owns them all (ADR-0009).
+- **Auth is email + password** (Supabase `signInWithPassword`). A **6-digit email
+  code** verifies a new account (`verifyOtp type:signup`); **password recovery uses
+  the official Supabase LINK** (`resetPasswordForEmail` → email link → `/auth/confirm`
+  route handler runs `verifyOtp({ type:'recovery', token_hash })` → reset-password →
+  `updateUser` → sign out → fresh sign-in). **Never** build, store, or log any code,
+  password hash, or token — Supabase Auth owns them all (ADR-0009).
+- **Auth/onboarding UI follows `docs/design/auth-onboarding-design-spec.md`**: split
+  AuthShell (header w/ language switcher + footer + support panel), 3-step progress,
+  6-cell verification code (one logical input), the full screen inventory (check-email,
+  verify success, recovery-sent, password-updated, signed-out, session-expired, error
+  panels), and the Operations shell for admin. Reuse `components/auth/*`.
 - **Routing gates on email verification first**: `resolvePostAuthDestination({
   emailVerified, profile })` → verify-email → profile-setup (fallback) → uae-pass
   → dashboard; unverified/incomplete customers never reach the dashboard.
@@ -31,10 +38,11 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
 - **No public admin sign-up.** Admins are created **only** by `pnpm db:setup`
   (Supabase Admin API); the admin app requires `account_type === 'ADMIN'` or shows
   access-denied.
-- **Password policy:** min 8; upper, lower, number, special; max 72 — enforced in
-  the client form and the zod schema (`packages/domain/src/auth.ts`). The pinned
-  local Supabase CLI rejects password-policy config keys, so the deployed platform
-  owns the server-side GoTrue policy.
+- **Password policy:** min 8; upper, lower, number, special; **max 128** (design
+  spec §10.5) — enforced in the client form and the zod schema
+  (`packages/domain/src/auth.ts`). The pinned local Supabase CLI rejects
+  password-policy config keys, so the deployed platform owns the server-side GoTrue
+  policy.
 - **Duplicate-email is anti-enumeration:** `signUp` for a confirmed email returns
   empty `identities[]`/no error → show safe Sign In / Forgot Password copy. No
   existence query, no enumeration endpoint, no raw DB errors. Bad sign-in

@@ -9,6 +9,6 @@ export default async function ProfileOnboardingPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  await requireCustomerStep(locale, ['profile-setup']);
-  return <ProfileSetupForm />;
+  const session = await requireCustomerStep(locale, ['profile-setup']);
+  return <ProfileSetupForm email={session.email} />;
 }

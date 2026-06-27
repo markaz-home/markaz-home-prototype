@@ -13,6 +13,7 @@ vi.mock('@markaz/auth/browser', () => ({
 }));
 vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({ replace, refresh: vi.fn() }),
+  usePathname: () => '/verify-email',
   Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
 }));
 vi.mock('next/navigation', () => ({
@@ -31,25 +32,25 @@ beforeEach(() => {
 });
 
 describe('VerifyEmailForm', () => {
-  it('renders the verification screen', () => {
+  it('renders the verification screen with a code input', () => {
     renderWithIntl(<VerifyEmailForm />);
     expect(screen.getByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
-    expect(screen.getByLabelText(/6-digit code/i)).toBeInTheDocument();
+    expect(screen.getByLabelText('Verification code')).toBeInTheDocument();
   });
 
   it('rejects a non-6-digit code client-side', async () => {
     const user = userEvent.setup();
     renderWithIntl(<VerifyEmailForm />);
-    await user.type(screen.getByLabelText(/6-digit code/i), '123');
+    await user.type(screen.getByLabelText('Verification code'), '123');
     await user.click(screen.getByRole('button', { name: 'Verify email' }));
-    expect(await screen.findByText("That code isn't right. Check it and try again.")).toBeInTheDocument();
+    expect(await screen.findByText('Enter all six digits.')).toBeInTheDocument();
     expect(verifyOtp).not.toHaveBeenCalled();
   });
 
-  it('verifies a valid code and routes onward', async () => {
+  it('verifies a valid code and routes to the success screen', async () => {
     const user = userEvent.setup();
     renderWithIntl(<VerifyEmailForm />);
-    await user.type(screen.getByLabelText(/6-digit code/i), '123456');
+    await user.type(screen.getByLabelText('Verification code'), '123456');
     await user.click(screen.getByRole('button', { name: 'Verify email' }));
     await waitFor(() =>
       expect(verifyOtp).toHaveBeenCalledWith({
@@ -58,15 +59,17 @@ describe('VerifyEmailForm', () => {
         type: 'signup',
       }),
     );
-    await waitFor(() => expect(replace).toHaveBeenCalledWith('/dashboard'));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/verify-email/success'));
   });
 
   it('shows an expired-code error from the provider', async () => {
     verifyOtp.mockResolvedValue({ error: { message: 'Token has expired' } });
     const user = userEvent.setup();
     renderWithIntl(<VerifyEmailForm />);
-    await user.type(screen.getByLabelText(/6-digit code/i), '654321');
+    await user.type(screen.getByLabelText('Verification code'), '654321');
     await user.click(screen.getByRole('button', { name: 'Verify email' }));
-    expect(await screen.findByText('That code has expired. Request a new one.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('This code has expired. Request a new code to continue.'),
+    ).toBeInTheDocument();
   });
 });

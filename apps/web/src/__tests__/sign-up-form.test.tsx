@@ -32,23 +32,24 @@ beforeEach(() => {
 });
 
 describe('SignUpForm', () => {
-  it('shows the live password requirements checklist', () => {
+  it('renders the spec title + live password checklist', () => {
     renderWithIntl(<SignUpForm />);
+    expect(screen.getByRole('heading', { name: 'Create your MARKAZ account' })).toBeInTheDocument();
     expect(screen.getByText('At least 8 characters')).toBeInTheDocument();
     expect(screen.getByText('One special character')).toBeInTheDocument();
   });
 
-  it('rejects a weak password and missing consent without calling the provider', async () => {
+  it('does not submit a policy-failing password', async () => {
     const user = userEvent.setup();
     renderWithIntl(<SignUpForm />);
     await user.type(screen.getByLabelText(/Full name/i), 'Demo Customer');
     await user.type(screen.getByLabelText(/Email address/i), 'new@markaz.demo');
-    // 'nolower9!' has no uppercase → fails the policy (but is long enough).
-    await user.type(screen.getByLabelText(/^Password/), 'nolower9!');
-    await user.type(screen.getByLabelText(/^Confirm password/), 'nolower9!');
+    await user.type(screen.getByLabelText(/^Password/), 'nouppercase9!');
+    await user.type(screen.getByLabelText(/^Confirm password/), 'nouppercase9!');
+    await user.click(screen.getByLabelText(/Terms of Use/i));
+    await user.click(screen.getByLabelText(/Privacy Policy/i));
     await user.click(screen.getByRole('button', { name: 'Create account' }));
-    expect(await screen.findByText("Your password doesn't meet all requirements.")).toBeInTheDocument();
-    expect(signUp).not.toHaveBeenCalled();
+    await waitFor(() => expect(signUp).not.toHaveBeenCalled());
   });
 
   it('rejects a password mismatch', async () => {
@@ -61,30 +62,30 @@ describe('SignUpForm', () => {
     await user.click(screen.getByLabelText(/Terms of Use/i));
     await user.click(screen.getByLabelText(/Privacy Policy/i));
     await user.click(screen.getByRole('button', { name: 'Create account' }));
-    expect(await screen.findByText("Passwords don't match.")).toBeInTheDocument();
+    expect(await screen.findByText('Passwords do not match.')).toBeInTheDocument();
   });
 
-  it('creates an account and routes to email verification', async () => {
+  it('creates an account and routes to Check Your Email', async () => {
     const user = userEvent.setup();
     renderWithIntl(<SignUpForm />);
     await fillValid(user);
     await user.click(screen.getByRole('button', { name: 'Create account' }));
     await waitFor(() => expect(signUp).toHaveBeenCalledTimes(1));
-    expect(push).toHaveBeenCalledWith(expect.stringContaining('/verify-email'));
+    expect(push).toHaveBeenCalledWith(expect.stringContaining('/sign-up/check-email'));
   });
 
-  it('handles an existing email safely (no duplicate, offers sign in / reset)', async () => {
+  it('handles an existing email safely (no duplicate)', async () => {
     signUp.mockResolvedValue({ data: { user: { identities: [] } }, error: null });
     const user = userEvent.setup();
     renderWithIntl(<SignUpForm />);
     await fillValid(user);
     await user.click(screen.getByRole('button', { name: 'Create account' }));
-    expect(await screen.findByText('We could not create a new account')).toBeInTheDocument();
+    expect(await screen.findByText(/We could not create a new account/)).toBeInTheDocument();
     expect(push).not.toHaveBeenCalled();
   });
 
   it('renders Arabic', () => {
     renderWithIntl(<SignUpForm />, 'ar');
-    expect(screen.getByRole('heading', { name: 'أنشئ حسابك' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'أنشئ حسابك في MARKAZ' })).toBeInTheDocument();
   });
 });

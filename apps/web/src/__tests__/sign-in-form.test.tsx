@@ -26,9 +26,9 @@ beforeEach(() => {
 });
 
 describe('SignInForm', () => {
-  it('renders the sign-in screen (English)', () => {
+  it('renders "Welcome back" with email + password', () => {
     renderWithIntl(<SignInForm />);
-    expect(screen.getByRole('heading', { name: 'Sign in' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
     expect(screen.getByLabelText(/Email address/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Password/)).toBeInTheDocument();
   });
@@ -74,6 +74,6 @@ describe('SignInForm', () => {
 
   it('renders Arabic', () => {
     renderWithIntl(<SignInForm />, 'ar');
-    expect(screen.getByRole('heading', { name: 'تسجيل الدخول' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'مرحبًا بعودتك' })).toBeInTheDocument();
   });
 });

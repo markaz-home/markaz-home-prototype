@@ -8,46 +8,42 @@ import { signInSchema, mapAuthError, type SignInInput } from '@markaz/domain';
 import { Alert, Button, FormField, Input } from '@markaz/ui';
 import { createSupabaseBrowserClient } from '@markaz/auth/browser';
 import { Link, useRouter } from '@/i18n/navigation';
-import { AuthCard } from '@/components/auth/auth-card';
+import { AuthShell, AuthHeading } from '@/components/auth/auth-shell';
+import { CustomerSupportPanel } from '@/components/auth/support-panel';
 import { PasswordField } from '@/components/auth/password-field';
 import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
 
 export function SignInForm() {
-  const t = useTranslations('auth');
+  const t = useTranslations('signin');
+  const tv = useTranslations('validation');
+  const ta = useTranslations('auth');
+  const ts = useTranslations('session');
+  const tf = useTranslations('signup');
   const router = useRouter();
   const params = useSearchParams();
   const [supabase] = useState(() => createSupabaseBrowserClient());
   const [formError, setFormError] = useState<string | null>(null);
-  const passwordUpdated = params.get('reset') === '1';
-  const sessionExpired = params.get('expired') === '1';
+  const sessionExpired = params.get('notice') === 'session-expired';
 
   const {
     register,
     handleSubmit,
     getValues,
     formState: { errors, isSubmitting },
-  } = useForm<SignInInput>({
-    resolver: zodResolver(signInSchema),
-    defaultValues: { email: '', password: '' },
-  });
+  } = useForm<SignInInput>({ resolver: zodResolver(signInSchema), defaultValues: { email: '', password: '' } });
 
-  const fe = (code?: string) => (code ? t(FIELD_ERROR_KEYS[code] ?? 'errGeneric') : undefined);
+  const fe = (code?: string) => (code ? tv(FIELD_ERROR_KEYS[code] ?? 'unexpectedError') : undefined);
 
   async function onSubmit(data: SignInInput) {
     setFormError(null);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
+    const { error } = await supabase.auth.signInWithPassword({ email: data.email, password: data.password });
     if (error) {
       const key = mapAuthError(error);
-      // Unverified email → route to verification rather than a dead end.
       if (key === 'email_not_confirmed') {
         router.push(`/verify-email?email=${encodeURIComponent(getValues('email'))}`);
         return;
       }
-      // Generic for credentials — never reveal which field/account was wrong.
-      setFormError(t(AUTH_ERROR_KEYS[key === 'invalid_credentials' ? 'invalid_credentials' : key]));
+      setFormError(key === 'invalid_credentials' ? t('incorrect') : tv(AUTH_ERROR_KEYS[key]));
       return;
     }
     router.replace('/dashboard');
@@ -55,37 +51,40 @@ export function SignInForm() {
   }
 
   return (
-    <AuthCard
-      title={t('signInTitle')}
-      description={t('signInSubtitle')}
-      footer={
-        <span>
-          {t('noAccount')}{' '}
-          <Link href="/sign-up" className="font-medium text-primary underline-offset-4 hover:underline">
-            {t('createAccount')}
-          </Link>
-        </span>
-      }
-    >
-      {passwordUpdated ? <Alert variant="success">{t('passwordUpdated')}</Alert> : null}
-      {sessionExpired ? <Alert variant="warning">{t('sessionExpired')}</Alert> : null}
-      {formError ? <Alert variant="destructive">{formError}</Alert> : null}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-        <FormField id="email" label={t('emailLabel')} error={fe(errors.email?.message)} required>
-          <Input id="email" type="email" inputMode="email" autoComplete="email" dir="ltr" placeholder={t('emailPlaceholder')} aria-invalid={!!errors.email} {...register('email')} />
-        </FormField>
-        <FormField id="password" label={t('passwordLabel')} error={fe(errors.password?.message)} required>
-          <PasswordField id="password" autoComplete="current-password" dir="ltr" toggleLabel={t('showPassword')} aria-invalid={!!errors.password} {...register('password')} />
-        </FormField>
-        <div className="flex justify-end">
-          <Link href="/forgot-password" className="text-sm font-medium text-primary underline-offset-4 hover:underline">
-            {t('forgotPassword')}
-          </Link>
-        </div>
-        <Button type="submit" className="w-full" loading={isSubmitting}>
-          {isSubmitting ? t('signingIn') : t('signInCta')}
-        </Button>
-      </form>
-    </AuthCard>
+    <AuthShell support={<CustomerSupportPanel />} narrow>
+      <div className="space-y-6">
+        {sessionExpired ? (
+          <Alert variant="warning" title={ts('expiredTitle')}>
+            {ts('expiredBody')}
+          </Alert>
+        ) : null}
+        <AuthHeading title={t('title')} description={t('description')} />
+        {formError ? <Alert variant="destructive">{formError}</Alert> : null}
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+          <FormField id="email" label={tf('email')} error={fe(errors.email?.message)} required>
+            <Input id="email" type="email" inputMode="email" autoComplete="email" dir="ltr" placeholder={tf('emailPlaceholder')} aria-invalid={!!errors.email} {...register('email')} />
+          </FormField>
+          <FormField id="password" label={tf('password')} error={fe(errors.password?.message)} required>
+            <PasswordField id="password" autoComplete="current-password" dir="ltr" placeholder={t('passwordPlaceholder')} aria-invalid={!!errors.password} {...register('password')} />
+          </FormField>
+          <div className="flex justify-end">
+            <Link href="/forgot-password" className="text-sm font-medium text-primary underline-offset-4 hover:underline">
+              {t('forgot')}
+            </Link>
+          </div>
+          <Button type="submit" className="w-full" loading={isSubmitting}>
+            {isSubmitting ? t('submitting') : t('submit')}
+          </Button>
+          <p className="text-center text-sm text-muted-foreground">
+            {t('new')}{' '}
+            <Link href="/sign-up" className="font-medium text-primary underline-offset-4 hover:underline">
+              {ta('createAccount')}
+            </Link>
+          </p>
+          <p className="text-center text-xs text-muted-foreground">{t('security')}</p>
+        </form>
+      </div>
+    </AuthShell>
   );
 }

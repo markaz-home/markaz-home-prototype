@@ -1,24 +1,22 @@
 import { test, expect, type Page } from '@playwright/test';
 
 /**
- * Email/password auth (Week 1.5) end-to-end via the local Mailpit inbox.
- * Requires: pnpm supabase:start && pnpm supabase:reset && pnpm db:setup, both
- * apps running. Skipped automatically if Mailpit is not reachable. Never uses a
- * public inbox.
+ * Email/password auth (Week 1.5, design-spec fidelity) end-to-end via local Mailpit.
+ * Requires: pnpm supabase:start && pnpm supabase:reset && pnpm db:setup, both apps
+ * running. Skipped automatically if Mailpit is not reachable. Never a public inbox.
  */
 const MAILPIT = 'http://127.0.0.1:54324';
 const STRONG_PASSWORD = 'Markaz!Demo1';
 
 async function mailpitReachable(): Promise<boolean> {
   try {
-    const r = await fetch(`${MAILPIT}/api/v1/messages?limit=1`);
-    return r.ok;
+    return (await fetch(`${MAILPIT}/api/v1/messages?limit=1`)).ok;
   } catch {
     return false;
   }
 }
 
-async function latestCodeFor(email: string): Promise<string> {
+async function latestMessageBody(email: string): Promise<string> {
   for (let i = 0; i < 24; i++) {
     const res = await fetch(`${MAILPIT}/api/v1/search?query=${encodeURIComponent(`to:${email}`)}`);
     if (res.ok) {
@@ -29,14 +27,17 @@ async function latestCodeFor(email: string): Promise<string> {
           Text?: string;
           HTML?: string;
         };
-        const code = `${msg.Text ?? ''} ${msg.HTML ?? ''}`.match(/\b(\d{6})\b/)?.[1];
-        if (code) return code;
+        return `${msg.Text ?? ''} ${msg.HTML ?? ''}`;
       }
     }
     await new Promise((r) => setTimeout(r, 500));
   }
-  throw new Error(`No verification code found in Mailpit for ${email}`);
+  throw new Error(`No email found in Mailpit for ${email}`);
 }
+
+const codeFrom = (body: string) => body.match(/\b(\d{6})\b/)?.[1];
+const linkFrom = (body: string) =>
+  body.match(/https?:\/\/[^"'\s>]*token_hash=[^"'\s>]+/)?.[0]?.replace(/&amp;/g, '&');
 
 async function signIn(page: Page, email: string, password: string) {
   await page.goto('/en/sign-in');
@@ -50,30 +51,34 @@ test.describe('email/password authentication', () => {
     test.skip(!(await mailpitReachable()), 'Local Supabase/Mailpit not running');
   });
 
-  test('new customer: sign up → verify email → simulated UAE PASS → dashboard', async ({ page }) => {
+  test('new customer: sign up → check email → verify → demo identity → dashboard', async ({ page }) => {
     const email = `new-${Date.now()}@markaz.demo`;
     await page.goto('/en/sign-up');
     await page.getByLabel(/Full name/i).fill('Test Customer');
     await page.getByLabel(/Email address/i).fill(email);
     await page.getByLabel(/^Password/).fill(STRONG_PASSWORD);
     await page.getByLabel(/^Confirm password/).fill(STRONG_PASSWORD);
-    await page.getByText('I accept the Terms of Use.').click();
-    await page.getByText('I accept the Privacy Policy.').click();
+    await page.getByText('I agree to the Terms of Use.').click();
+    await page.getByText('I agree to the Privacy Policy.').click();
     await page.getByRole('button', { name: 'Create account' }).click();
 
+    await expect(page).toHaveURL(/\/en\/sign-up\/check-email/);
+    await page.getByRole('link', { name: /Enter verification code/i }).click();
     await expect(page).toHaveURL(/\/en\/verify-email/);
-    const code = await latestCodeFor(email);
-    await page.getByLabel(/6-digit code/i).fill(code);
+
+    const code = codeFrom(await latestMessageBody(email));
+    await page.getByLabel('Verification code').fill(code!);
     await page.getByRole('button', { name: 'Verify email' }).click();
 
-    // Profile is complete (from sign-up metadata) → straight to UAE PASS.
+    await expect(page).toHaveURL(/\/en\/verify-email\/success/);
+    await page.getByRole('link', { name: /Continue to demo identity/i }).click();
     await expect(page).toHaveURL(/\/en\/onboarding\/uae-pass/);
-    await page.getByRole('button', { name: /Start demo verification/i }).click();
-    await page.getByRole('button', { name: /Approve demo verification/i }).click();
+    await page.getByRole('button', { name: 'Start demo verification' }).click();
+    await page.getByRole('button', { name: 'Approve demo verification' }).click();
     await expect(page).toHaveURL(/\/en\/dashboard/);
   });
 
-  test('returning customer signs in with password and reaches the dashboard', async ({ page }) => {
+  test('returning customer signs in and reaches the dashboard', async ({ page }) => {
     await signIn(page, 'customer-a@markaz.demo', STRONG_PASSWORD);
     await expect(page).toHaveURL(/\/en\/dashboard/);
   });
@@ -89,34 +94,33 @@ test.describe('email/password authentication', () => {
     await page.getByLabel(/Email address/i).fill('customer-a@markaz.demo');
     await page.getByLabel(/^Password/).fill(STRONG_PASSWORD);
     await page.getByLabel(/^Confirm password/).fill(STRONG_PASSWORD);
-    await page.getByText('I accept the Terms of Use.').click();
-    await page.getByText('I accept the Privacy Policy.').click();
+    await page.getByText('I agree to the Terms of Use.').click();
+    await page.getByText('I agree to the Privacy Policy.').click();
     await page.getByRole('button', { name: 'Create account' }).click();
-    await expect(page.getByText('We could not create a new account')).toBeVisible();
-    await expect(page).not.toHaveURL(/verify-email/);
+    await expect(page.getByText(/We could not create a new account/)).toBeVisible();
   });
 
-  test('password recovery: forgot → code → reset → sign in with new password', async ({ page }) => {
+  test('password recovery via link → reset → sign in with new password', async ({ page }) => {
     const email = 'customer-b@markaz.demo';
     await page.goto('/en/forgot-password');
     await page.getByLabel(/Email address/i).fill(email);
-    await page.getByRole('button', { name: /Send recovery code/i }).click();
-    await page.getByRole('button', { name: /I have a recovery code/i }).click();
+    await page.getByRole('button', { name: /Send recovery email/i }).click();
+    await expect(page).toHaveURL(/\/en\/forgot-password\/check-email/);
 
-    await expect(page).toHaveURL(/\/en\/reset-password/);
-    const code = await latestCodeFor(email);
+    const link = linkFrom(await latestMessageBody(email));
+    expect(link, 'recovery link present in email').toBeTruthy();
+    await page.goto(link!); // /auth/confirm → verifies → /reset-password
+    await expect(page).toHaveURL(/\/reset-password/);
+
     const newPassword = 'NewMarkaz!2';
-    await page.getByLabel(/6-digit code/i).fill(code);
     await page.getByLabel(/^New password/).fill(newPassword);
     await page.getByLabel(/^Confirm new password/).fill(newPassword);
     await page.getByRole('button', { name: /Update password/i }).click();
 
-    await expect(page).toHaveURL(/\/en\/sign-in/);
-    await expect(page.getByText(/Password updated/i)).toBeVisible();
+    await expect(page).toHaveURL(/\/reset-password\/success/);
+    await page.getByRole('link', { name: 'Sign in' }).click();
     await signIn(page, email, newPassword);
     await expect(page).toHaveURL(/\/en\/dashboard/);
-    // restore the seeded password for re-runs
-    await page.goto('/en/dashboard');
   });
 
   test('a customer cannot reach the admin application', async ({ page }) => {
