@@ -1,0 +1,5 @@
+{
+  "extends": "@markaz/config/tsconfig/react-library",
+  "compilerOptions": { "types": ["node"] },
+  "include": ["src"]
+}

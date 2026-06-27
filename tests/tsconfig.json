@@ -1,0 +1,4 @@
+{
+  "extends": "@markaz/config/tsconfig/node-library",
+  "include": ["integration", "*.ts"]
+}

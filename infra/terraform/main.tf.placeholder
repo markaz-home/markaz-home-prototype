@@ -1,0 +1,22 @@
+################################################################################
+# PLACEHOLDER — NOT TERRAFORM, NOT APPLIED
+#
+# This file intentionally has a `.placeholder` extension (not `.tf`) so no tool
+# treats it as real Terraform. Terraform for MARKAZ Home is OWNED BY THE
+# PLATFORM-ENGINEERING TEAM and is NOT authored in this application repository.
+#
+# AWS is NOT provisioned here. Self-hosted Supabase on RDS is NOT validated
+# (see ../../docs/adr/0006-self-hosted-supabase-rds-validation.md and
+# ../supabase/rds-compatibility-checklist.md).
+#
+# Intended resources (authored elsewhere by platform), region me-central-1:
+#   VPC, RDS for PostgreSQL (Multi-AZ), RDS Proxy (pooled app path only),
+#   ECS Fargate, ALB, S3, SES, ElastiCache, ECR, Secrets Manager, KMS,
+#   Route 53, ACM, CloudWatch.
+#
+# Topology rules:
+#   - App/API query paths  -> RDS Proxy (pooled)
+#   - Supabase Realtime    -> DIRECT RDS endpoint (never behind RDS Proxy)
+#   - Migrations / admin   -> DIRECT
+#   - Graphile Worker      -> direct or a separately-validated pool
+################################################################################

@@ -1,0 +1,40 @@
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# builds
+.next
+out
+dist
+build
+*.tsbuildinfo
+.turbo
+
+# test / coverage
+coverage
+playwright-report
+test-results
+.nyc_output
+
+# env — never commit real secrets
+.env
+.env.*
+!.env.example
+
+# supabase local
+supabase/.branches
+supabase/.temp
+supabase/.env
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# os / editor
+.DS_Store
+.idea
+.vscode/*
+!.vscode/extensions.json
+*.swp

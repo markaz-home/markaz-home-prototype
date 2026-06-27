@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * MARKAZ neutral, replaceable design tokens (§6A.8).
+ * No approved brand yet — restrained neutral palette, easy to swap in one place.
+ * HSL channels (shadcn convention). RTL handled via logical properties + dir attr.
+ */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 22% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 22% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 22% 12%;
+
+    --primary: 215 50% 23%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 16% 95%;
+    --secondary-foreground: 222 22% 18%;
+
+    --muted: 215 16% 95%;
+    --muted-foreground: 215 12% 42%;
+
+    --accent: 200 18% 92%;
+    --accent-foreground: 222 22% 18%;
+
+    --destructive: 0 70% 42%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 45% 32%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 80% 42%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 215 16% 88%;
+    --input: 215 16% 85%;
+    --ring: 215 50% 35%;
+
+    --radius: 0.625rem;
+
+    --font-sans: var(--font-inter, ui-sans-serif), system-ui, sans-serif;
+    --font-arabic: var(--font-noto-arabic, var(--font-inter)), system-ui, sans-serif;
+  }
+
+  .dark {
+    --background: 222 24% 9%;
+    --foreground: 210 16% 92%;
+    --card: 222 24% 11%;
+    --card-foreground: 210 16% 92%;
+    --popover: 222 24% 11%;
+    --popover-foreground: 210 16% 92%;
+    --primary: 210 60% 70%;
+    --primary-foreground: 222 24% 9%;
+    --secondary: 217 18% 18%;
+    --secondary-foreground: 210 16% 92%;
+    --muted: 217 18% 18%;
+    --muted-foreground: 215 14% 62%;
+    --accent: 217 18% 20%;
+    --accent-foreground: 210 16% 92%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 40% 45%;
+    --success-foreground: 222 24% 9%;
+    --warning: 38 70% 55%;
+    --warning-foreground: 222 24% 9%;
+    --border: 217 18% 22%;
+    --input: 217 18% 24%;
+    --ring: 210 60% 60%;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+  [dir='rtl'] body {
+    font-family: var(--font-arabic);
+  }
+}

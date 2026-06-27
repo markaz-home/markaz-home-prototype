@@ -1,0 +1,17 @@
+**/node_modules
+**/.next
+**/dist
+**/.turbo
+**/coverage
+**/.git
+**/.env
+**/.env.*
+!**/.env.example
+**/playwright-report
+**/test-results
+**/*.log
+**/.DS_Store
+README.md
+docs
+tests
+infra/terraform

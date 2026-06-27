@@ -1,0 +1,88 @@
+# MARKAZ Home — local Supabase stack (Supabase CLI).
+# `pnpm supabase:start` brings up Postgres, Auth, Realtime, Storage, Kong,
+# Studio, and Inbucket (local email/OTP inbox). No AWS credentials required.
+project_id = "markaz-home"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[db.pooler]
+enabled = false
+port = 54329
+pool_mode = "transaction"
+
+[realtime]
+enabled = true
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1:54321"
+
+# Local email inbox — captured OTP codes are viewable here (no real email sent).
+[inbucket]
+enabled = true
+port = 54324
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[storage.buckets.ownership-documents]
+public = false
+
+[storage.buckets.listing-photos]
+public = true
+
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:3001",
+]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+enable_signup = true
+enable_anonymous_sign_ins = false
+
+# Real email OTP. The 6-digit token lands in Inbucket locally.
+[auth.email]
+enable_signup = true
+double_confirm_changes = false
+enable_confirmations = false
+otp_length = 6
+otp_expiry = 3600
+
+# Send the 6-digit OTP code ({{ .Token }}) instead of a magic link, so the
+# code-entry UI works. Covers both returning (magic_link) and new (confirmation) users.
+[auth.email.template.magic_link]
+subject = "Your MARKAZ verification code"
+content_path = "./supabase/templates/magic_link.html"
+
+[auth.email.template.confirmation]
+subject = "Your MARKAZ verification code"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.email_change]
+subject = "Your MARKAZ verification code"
+content_path = "./supabase/templates/email_change.html"
+
+# We never send SMS in this prototype.
+[auth.sms]
+enable_signup = false
+
+[analytics]
+enabled = false

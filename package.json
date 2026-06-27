@@ -1,0 +1,35 @@
+{
+  "name": "markaz-home",
+  "private": true,
+  "version": "0.1.0",
+  "description": "MARKAZ Home — UAE real estate marketplace prototype (Week 1 application foundation)",
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "db:generate": "pnpm --filter @markaz/db generate",
+    "db:migrate": "supabase migration up",
+    "db:seed": "pnpm --filter @markaz/db seed",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:reset": "supabase db reset",
+    "supabase:status": "supabase status"
+  },
+  "devDependencies": {
+    "@markaz/config": "workspace:*",
+    "prettier": "^3.4.2",
+    "supabase": "^2.6.8",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  }
+}

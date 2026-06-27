@@ -1,0 +1,16 @@
+{
+  "name": "@markaz/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "echo '[worker] Documented placeholder — durable jobs arrive in a later milestone.'",
+    "build": "echo '[worker] no build (placeholder)'",
+    "lint": "echo 'no-op'",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@markaz/config": "workspace:*",
+    "typescript": "^5.7.2"
+  }
+}
