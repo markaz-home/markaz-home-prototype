@@ -11,6 +11,7 @@ export const profileSchema = z.object({
   identityVerificationStatus: identityStatusSchema,
   termsAcceptedAt: z.string().datetime().nullable(),
   privacyAcceptedAt: z.string().datetime().nullable(),
+  onboardingCompletedAt: z.string().datetime().nullable(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });

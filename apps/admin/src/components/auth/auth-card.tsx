@@ -1,0 +1,36 @@
+import { ShieldCheck } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@markaz/ui';
+
+/** Centred shell for admin auth screens (isolated from the customer app). */
+export function AuthCard({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  const t = useTranslations('admin');
+  return (
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-muted/30 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <ShieldCheck className="h-4 w-4 text-primary" aria-hidden /> {t('appName')}
+          </span>
+          <CardTitle className="font-display text-2xl text-brand-900">{title}</CardTitle>
+          {description ? <CardDescription>{description}</CardDescription> : null}
+        </CardHeader>
+        <CardContent className="space-y-4">{children}</CardContent>
+      </Card>
+    </div>
+  );
+}
+
+export function maskEmail(email: string): string {
+  const [local, domain] = email.split('@');
+  if (!local || !domain) return email;
+  return `${local.slice(0, 1)}${'*'.repeat(Math.max(1, local.length - 1))}@${domain}`;
+}

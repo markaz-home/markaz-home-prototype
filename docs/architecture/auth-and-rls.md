@@ -2,38 +2,94 @@
 
 ## Authentication flow
 
-Authentication is **real Supabase email OTP** (6-digit). Codes are captured by
-**Inbucket** locally (http://127.0.0.1:54324) and delivered via **SES** in
-deployed demos. OTP codes are **never built, stored, or logged by app code**.
-Sessions are `@supabase/ssr` **secure cookies** — tokens are never hand-stored.
+Authentication is **email + password** via Supabase Auth (ADR 0009). 6-digit
+email codes are retained **only** for verifying a new account and for password
+recovery — never as the sign-in credential, and never for SMS. Codes are
+generated and validated by Supabase Auth and are **never built, stored, or logged
+by app code**. Sessions are `@supabase/ssr` **secure cookies** — tokens are never
+hand-stored. Locally, codes land in **Mailpit** (http://127.0.0.1:54324; Inbucket
+on older CLIs); SES delivers in deployed demos.
 
-### New customer
+### New customer (sign-up + verification)
 
-landing → email → **OTP** → profile setup → **simulated UAE PASS** → dashboard.
+`/[locale]/sign-up` (full name, email, password, confirm, Terms, Privacy) →
+`signUp({ email, password, options:{ data:{ full_name, terms_accepted,
+privacy_accepted } } })` → `/[locale]/verify-email` (6-digit `confirmation` code)
+→ `verifyOtp({ type:'signup' })` → **simulated UAE PASS** → dashboard.
 
-The UAE PASS step is simulated and sets identity status to `VERIFIED_DEMO`.
+The UAE PASS step is simulated and sets identity status to `VERIFIED_DEMO`. The
+normal path hydrates `full_name` + consent from Auth metadata via
+`handle_new_user`, so **profile-setup is a fallback only**.
 
-### Returning verified customer
+### Returning customer (sign-in)
 
-A returning customer whose **profile is complete** and whose identity status is
-`VERIFIED_DEMO` **skips onboarding** and goes straight to the dashboard.
+`/[locale]/sign-in` (email + password) → `signInWithPassword`. Bad credentials
+return a **single generic** message — "The email or password is incorrect." —
+that never reveals which field was wrong, whether the account exists, or whether
+it is an admin. `email_not_confirmed` is the one case acted on: it routes to
+`verify-email`. A returning verified customer (`VERIFIED_DEMO` + complete profile)
+skips onboarding and goes straight to the dashboard.
+
+### Password recovery
+
+`/[locale]/forgot-password` → `resetPasswordForEmail` → **always** the generic
+"If an account exists…" message (anti-enumeration). `/[locale]/reset-password`
+(6-digit `recovery` code + new password) → `verifyOtp({ type:'recovery' })` →
+`updateUser({ password })` → **sign out → fresh sign-in** at `/sign-in?reset=1`
+("Password updated"). Legacy passwordless accounts set their first password this
+way. Sign-out-after-reset is deliberate (ADR 0009).
+
+### Duplicate-email safety
+
+`signUp` for an already-confirmed email returns a user with **empty
+`identities[]`** and no error; `isLikelyExistingAccount` shows safe copy + Sign In
+/ Forgot Password. No profiles-existence query, no enumeration endpoint, no raw DB
+errors. Profile creation is idempotent (`handle_new_user`, `on conflict do
+nothing`).
+
+### Password policy
+
+Min 8; requires upper, lower, number, special; max 72 (provider bcrypt-safe
+limit). Enforced client-side, in the zod schema (`packages/domain/src/auth.ts`),
+and in `supabase/config.toml`.
 
 ### Admin
 
-The admin app uses the **same OTP provider**. After authentication it **loads the
-profile and requires `account_type === 'ADMIN'`**; otherwise it shows an
-**access-denied** screen (ADR 0008).
+The admin app uses **email + password** with **no public sign-up**
+(`/login`, `/forgot-password`, `/reset-password`). After sign-in it **requires
+`account_type === 'ADMIN'`**; otherwise it shows an **access-denied** screen
+(ADR 0008) and emits an `ADMIN_ACCESS_DENIED` audit event. Admins are created
+only by the provisioning script (`pnpm db:setup`, Supabase Admin API).
 
 ### Routing decision
 
-The post-auth destination is decided by **`resolvePostAuthDestination`** in
-`@markaz/domain` (single source of truth for new-vs-returning-vs-admin routing).
+The post-auth destination is decided by **`resolvePostAuthDestination({
+emailVerified, profile })`** in `@markaz/domain` (single source of truth). It
+gates on **email verification first**: `verify-email → profile-setup (fallback) →
+uae-pass (resumes NOT_STARTED/PENDING/FAILED) → dashboard`. Unverified or
+incomplete customers can **never** reach the dashboard. `requireCustomerStep`
+(`apps/web/src/server/session.ts`) enforces the same order server-side.
+
+### Data ownership (Auth vs profiles)
+
+Supabase **Auth** owns credentials, the bcrypt password hash, email-confirmation
+state, and all OTP/recovery codes + tokens. **`profiles`** owns `full_name`,
+`account_type`, identity status, consent timestamps, and `onboarding_completed_at`
+— **no secrets**. RLS on `profiles` is unchanged.
+
+### Audit events
+
+Server-side: `ACCOUNT_PROFILE_COMPLETED`, `DEMO_IDENTITY_STARTED/VERIFIED/FAILED`.
+Client-emitted via the allow-listed `audit.record` tRPC procedure: `EMAIL_VERIFIED`,
+`CUSTOMER_SIGNED_OUT`, `ADMIN_ACCESS_DENIED`. Generic metadata only — never
+passwords, codes, or tokens.
 
 ## Session handling
 
 `@supabase/ssr` manages secure cookies on the server and client. The app never
 stores raw access/refresh tokens itself. Server components and tRPC read the
-session from cookies to establish `ctx.user`.
+session from cookies to establish `ctx.user`. Session-expiry is surfaced
+best-effort via a `?expired=1` hint on the sign-in route.
 
 ## RLS identity strategy (ADR 0004)
 

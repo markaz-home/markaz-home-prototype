@@ -23,12 +23,20 @@ cp .env.example .env
 # 3. Start the local Supabase stack (Docker)
 pnpm supabase:start
 
-# 4. Apply the canonical migrations + seed
+# 4. Apply the canonical migrations + (minimal) seed
 pnpm supabase:reset
 
-# 5. Run both apps
+# 5. Provision demo Auth users + demo data via the Supabase Admin API
+pnpm db:setup
+
+# 6. Run both apps
 pnpm dev
 ```
+
+> `pnpm db:setup` creates the demo accounts (Customer A / B / Admin) and seeds
+> demo domain data. Demo Auth users are **not** created by SQL seed — see
+> `database-reset.md` and `demo-runbook.md`. Demo credentials live in
+> `demo-runbook.md`.
 
 `pnpm dev` runs the customer app on **:3000** and the admin app on **:3001**.
 
@@ -41,7 +49,7 @@ pnpm dev
 | Supabase API (Kong) | http://127.0.0.1:54321 |
 | Postgres database | 127.0.0.1:54322 |
 | Supabase Studio | http://127.0.0.1:54323 |
-| Inbucket (email/OTP inbox) | http://127.0.0.1:54324 |
+| Mail inbox (verification/recovery codes) — Mailpit, or Inbucket on older CLIs | http://127.0.0.1:54324 |
 
 ## Environment variables
 
@@ -68,7 +76,8 @@ pnpm test:e2e       # Playwright (needs the local Supabase stack running)
 
 pnpm db:generate    # drizzle-kit generate (REVIEW only; fold into canonical SQL)
 pnpm db:migrate     # apply migrations
-pnpm db:seed        # run supabase/seed.sql
+pnpm db:seed        # run supabase/seed.sql (minimal; no Auth users)
+pnpm db:setup       # provision demo Auth users (Admin API) + demo data
 
 pnpm supabase:start   # start Docker stack
 pnpm supabase:stop    # stop Docker stack
@@ -86,4 +95,6 @@ pnpm supabase:status  # show local service status/URLs
   with `pnpm supabase:stop`.
 - **Schema looks stale / out of sync** — run `pnpm supabase:reset` to rebuild
   from migrations + seed (see `database-reset.md`).
-- **Cannot log in** — see `authentication.md` (OTP via Inbucket at :54324).
+- **Cannot log in** — see `authentication.md` (email + password; verification /
+  recovery codes via the mail inbox at :54324). Make sure you ran `pnpm db:setup`
+  so the demo accounts exist.

@@ -26,6 +26,9 @@ importers:
 
   apps/admin:
     dependencies:
+      '@hookform/resolvers':
+        specifier: ^3.9.1
+        version: 3.10.0(react-hook-form@7.80.0(react@19.2.7))
       '@markaz/api':
         specifier: workspace:*
         version: link:../../packages/api
@@ -80,6 +83,9 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.7(react@19.2.7)
+      react-hook-form:
+        specifier: ^7.54.2
+        version: 7.80.0(react@19.2.7)
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -384,6 +390,9 @@ importers:
       '@markaz/observability':
         specifier: workspace:*
         version: link:../observability
+      '@supabase/supabase-js':
+        specifier: ^2.47.10
+        version: 2.108.2
       drizzle-orm:
         specifier: ^0.38.3
         version: 0.38.4(@types/react@19.2.17)(postgres@3.4.9)(react@19.2.7)
@@ -394,6 +403,9 @@ importers:
       '@markaz/config':
         specifier: workspace:*
         version: link:../config
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.6.1
       drizzle-kit:
         specifier: ^0.30.1
         version: 0.30.6

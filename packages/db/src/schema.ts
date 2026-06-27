@@ -79,6 +79,7 @@ export const profiles = pgTable(
       .default('NOT_STARTED'),
     termsAcceptedAt: timestamp('terms_accepted_at', { withTimezone: true }),
     privacyAcceptedAt: timestamp('privacy_accepted_at', { withTimezone: true }),
+    onboardingCompletedAt: timestamp('onboarding_completed_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },

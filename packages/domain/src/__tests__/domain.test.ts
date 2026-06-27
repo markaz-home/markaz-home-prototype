@@ -7,6 +7,14 @@ import {
 import { canTransitionIdentity, isIdentityVerified } from '../identity';
 import { isProfileComplete } from '../profile';
 import { resolvePostAuthDestination } from '../routing';
+import {
+  normalizeEmail,
+  passwordMeetsPolicy,
+  checkPasswordRequirements,
+  signUpSchema,
+  mapAuthError,
+  isLikelyExistingAccount,
+} from '../auth';
 import { canTransitionListing, isPubliclyVisible } from '../listing';
 import { canSubmitOffer, isBelowThreshold, canTransitionOffer } from '../offer';
 import { canAdvanceTransaction, nextStage } from '../transaction';
@@ -48,23 +56,82 @@ describe('profile completeness + post-auth routing', () => {
     expect(isProfileComplete({ ...complete, termsAcceptedAt: null })).toBe(false);
   });
 
-  it('routes a brand-new user to profile setup', () => {
-    expect(resolvePostAuthDestination(null)).toBe('profile-setup');
-  });
-  it('routes an incomplete profile to profile setup', () => {
+  it('routes an unverified email to verify-email first', () => {
     expect(
-      resolvePostAuthDestination({ ...complete, fullName: null, identityVerificationStatus: 'NOT_STARTED' }),
+      resolvePostAuthDestination({
+        emailVerified: false,
+        profile: { ...complete, identityVerificationStatus: 'VERIFIED_DEMO' },
+      }),
+    ).toBe('verify-email');
+  });
+  it('routes a verified user with no profile to profile setup', () => {
+    expect(resolvePostAuthDestination({ emailVerified: true, profile: null })).toBe('profile-setup');
+  });
+  it('routes a verified incomplete profile to profile setup', () => {
+    expect(
+      resolvePostAuthDestination({
+        emailVerified: true,
+        profile: { ...complete, fullName: null, identityVerificationStatus: 'NOT_STARTED' },
+      }),
     ).toBe('profile-setup');
   });
-  it('routes a complete-but-unverified profile to UAE PASS', () => {
-    expect(
-      resolvePostAuthDestination({ ...complete, identityVerificationStatus: 'NOT_STARTED' }),
-    ).toBe('uae-pass');
+  it('routes complete-but-unverified-identity to UAE PASS (incl. PENDING/FAILED resume)', () => {
+    for (const s of ['NOT_STARTED', 'PENDING', 'FAILED_DEMO'] as const) {
+      expect(
+        resolvePostAuthDestination({
+          emailVerified: true,
+          profile: { ...complete, identityVerificationStatus: s },
+        }),
+      ).toBe('uae-pass');
+    }
   });
-  it('routes a verified returning customer straight to the dashboard', () => {
+  it('routes a fully-onboarded customer to the dashboard', () => {
     expect(
-      resolvePostAuthDestination({ ...complete, identityVerificationStatus: 'VERIFIED_DEMO' }),
+      resolvePostAuthDestination({
+        emailVerified: true,
+        profile: { ...complete, identityVerificationStatus: 'VERIFIED_DEMO' },
+      }),
     ).toBe('dashboard');
+  });
+});
+
+describe('auth helpers', () => {
+  it('normalises emails', () => {
+    expect(normalizeEmail('  Tania@Example.COM ')).toBe('tania@example.com');
+  });
+  it('enforces the password policy', () => {
+    expect(passwordMeetsPolicy('Weakpass1')).toBe(false); // no special
+    expect(passwordMeetsPolicy('short1!A')).toBe(true);
+    expect(passwordMeetsPolicy('nouppercase1!')).toBe(false);
+    expect(passwordMeetsPolicy('Aa1!aaaa')).toBe(true);
+    const r = checkPasswordRequirements('Aa1!aaaa');
+    expect(r).toEqual({ minLength: true, uppercase: true, lowercase: true, number: true, special: true });
+  });
+  it('validates the sign-up schema incl. confirm + consent', () => {
+    const base = {
+      fullName: 'محمد علي',
+      email: 'New@Markaz.Demo',
+      password: 'Aa1!aaaa',
+      confirmPassword: 'Aa1!aaaa',
+      acceptTerms: true,
+      acceptPrivacy: true,
+    };
+    const ok = signUpSchema.safeParse(base);
+    expect(ok.success).toBe(true);
+    if (ok.success) expect(ok.data.email).toBe('new@markaz.demo'); // normalised, Arabic name allowed
+    expect(signUpSchema.safeParse({ ...base, confirmPassword: 'different' }).success).toBe(false);
+    expect(signUpSchema.safeParse({ ...base, acceptTerms: false }).success).toBe(false);
+  });
+  it('maps provider errors to safe, non-enumerating keys', () => {
+    expect(mapAuthError({ message: 'Invalid login credentials' })).toBe('invalid_credentials');
+    expect(mapAuthError({ message: 'Email not confirmed' })).toBe('email_not_confirmed');
+    expect(mapAuthError({ status: 429 })).toBe('rate_limited');
+    expect(mapAuthError({ message: 'Token has expired' })).toBe('expired_code');
+  });
+  it('detects the anti-enumeration existing-account signal', () => {
+    expect(isLikelyExistingAccount({ identities: [] })).toBe(true);
+    expect(isLikelyExistingAccount({ identities: [{ id: 'x' }] })).toBe(false);
+    expect(isLikelyExistingAccount(null)).toBe(false);
   });
 });
 

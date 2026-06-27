@@ -14,7 +14,8 @@ Realtime proof, and the documentation set.
 - Two apps: customer/public (`apps/web`) and a separate admin app (`apps/admin`).
 - Shared `@markaz/*` packages (config, ui, i18n, domain, db, auth, api, realtime,
   observability).
-- **Real Supabase email OTP** auth + onboarding routing.
+- **Email + password** auth (Supabase) + onboarding routing. Email 6-digit codes
+  are used **only** for account verification and password recovery (ADR 0009).
 - Profiles + marketplace schema with a full **RLS policy set** and an
   integration-test gate.
 - Storage buckets (private + public) with boundary tests.
@@ -47,7 +48,7 @@ markaz-home-prototype/
 ├─ docs/
 │  ├─ adr/                # Architecture Decision Records
 │  ├─ architecture/       # Overview, auth & RLS, realtime
-│  └─ runbooks/           # local-development, authentication, database-reset
+│  └─ runbooks/           # local-development, authentication, database-reset, demo
 ├─ infra/                 # Boundary contracts/placeholders (AWS NOT provisioned)
 ├─ tests/
 ├─ .env.example
@@ -79,13 +80,14 @@ pnpm install
 cp .env.example .env
 pnpm supabase:start    # start the local Supabase Docker stack (Docker engine must be running)
 # Copy the keys printed by `supabase start` into .env (see "Supabase keys" below)
-pnpm supabase:reset    # apply canonical migrations + seed
+pnpm supabase:reset    # apply canonical migrations + (minimal) seed
+pnpm db:setup          # provision demo Auth users (Admin API) + demo data
 pnpm dev               # web on :3000, admin on :3001
 ```
 
 See `docs/runbooks/local-development.md` for ports and troubleshooting, and the
 **Troubleshooting** section at the bottom of this file for the common
-Docker-engine / Supabase-key / OTP-email gotchas.
+Docker-engine / Supabase-key / verification-email gotchas.
 
 ### Supabase keys
 
@@ -109,7 +111,7 @@ All variables are enumerated in **`.env.example`** (copy to `.env`). Public
 `infra/environment-contract.md` for which connection path uses the pooler vs the
 direct endpoint.
 
-## Supabase local setup & OTP testing
+## Supabase local setup & auth testing
 
 The local stack runs in Docker. Service URLs (after `pnpm supabase:start`):
 
@@ -118,26 +120,33 @@ The local stack runs in Docker. Service URLs (after `pnpm supabase:start`):
 | Supabase API | http://127.0.0.1:54321 |
 | Postgres | 127.0.0.1:54322 |
 | Studio | http://127.0.0.1:54323 |
-| **Mail inbox** (OTP codes) — Inbucket or Mailpit depending on CLI version | http://127.0.0.1:54324 |
+| **Mail inbox** (verification/recovery codes) — Mailpit, or Inbucket on older CLIs | http://127.0.0.1:54324 |
 
-Authentication is **real email OTP**. Locally, no real email is sent — request a
-code in the app, then read the **6-digit code** from the local mail inbox
-(http://127.0.0.1:54324). `supabase/templates/*.html` force the email to contain
-the OTP token (`{{ .Token }}`) rather than a magic link, so the code-entry UI
-works. OTP codes are never built, stored, or logged by app code. See
-`docs/runbooks/authentication.md`.
+Authentication is **email + password**. 6-digit email codes are used **only** to
+verify a new account and to recover a password — never as the sign-in credential
+(ADR 0009). Locally, no real email is sent — read the code from the local mail
+inbox (http://127.0.0.1:54324). `supabase/templates/confirmation.html` and
+`recovery.html` force the email to contain the code (`{{ .Token }}`). Codes are
+never built, stored, or logged by app code. See `docs/runbooks/authentication.md`.
 
-Seeded fictional demo accounts: `customer-a@markaz.demo` (seller),
-`customer-b@markaz.demo` (buyer), `admin@markaz.demo` (admin).
+Demo accounts (fictional, local-only): `customer-a@markaz.demo`,
+`customer-b@markaz.demo` (both CUSTOMER), `admin@markaz.demo` (ADMIN). Provision
+them with `pnpm db:setup`. Credentials and the production guard live in
+`docs/runbooks/demo-runbook.md`.
 
 ## Database: migrate, seed, reset
 
 ```bash
-pnpm supabase:reset    # drop + re-apply all migrations + seed (deterministic)
+pnpm supabase:reset    # drop + re-apply all migrations + (minimal) seed
+pnpm db:setup          # provision demo Auth users (Admin API) + demo data
 pnpm db:migrate        # apply pending migrations
-pnpm db:seed           # run supabase/seed.sql
+pnpm db:seed           # run supabase/seed.sql (minimal; no Auth users)
 pnpm db:generate       # drizzle-kit generate (REVIEW only; fold into canonical SQL)
 ```
+
+`supabase/seed.sql` is intentionally minimal — demo **Auth users** and demo data
+come from `pnpm db:setup` (Supabase Admin API), not SQL. The local reset flow is
+`pnpm supabase:reset && pnpm db:setup`.
 
 Schema is a **single ordered SQL history** in `supabase/migrations/`; Drizzle is
 the typed mirror and generated SQL is reviewed in, never applied separately. See
@@ -169,9 +178,11 @@ pnpm test:e2e   # end-to-end (Playwright)
 - [ADR 0006 — Self-hosted Supabase on RDS (validation pending)](docs/adr/0006-self-hosted-supabase-rds-validation.md)
 - [ADR 0007 — Demo-auth fallback (disabled)](docs/adr/0007-demo-auth-fallback.md)
 - [ADR 0008 — Separate admin application](docs/adr/0008-separate-admin-application.md)
+- [ADR 0009 — Email + password authentication](docs/adr/0009-email-password-authentication.md)
 
 See also `docs/architecture/` (overview, auth & RLS, realtime) and
-`docs/runbooks/`.
+`docs/runbooks/` (local-development, authentication, database-reset, demo).
+The Week 1.5 milestone report is in `WEEK-1.5.md`.
 
 ## Platform workstream boundary
 
@@ -193,6 +204,10 @@ demo-only environments.
 
 ## Known limitations
 
+- **Session-expired detection is best-effort** — surfaced via a `?expired=1` hint
+  on the sign-in route, not a guaranteed server signal (ADR 0009).
+- **Demo Auth users have random UUIDs** — they are created via the Admin API, so
+  integration tests resolve them by email, not by a fixed ID.
 - **Demo-auth one-click fallback is DISABLED** — only the env contract and docs
   exist; the blocker is a supported, secure server-side session-minting mechanism
   (ADR 0007).
@@ -232,10 +247,13 @@ it finish. Subsequent starts are fast (images are cached).
 `Restarting`). It's an unrelated leftover — remove it: `docker rm -f <name>`
 (removes only the container, not data volumes).
 
-**The OTP email shows a sign-in *link* instead of a code.** The email templates
-weren't picked up. They live in `supabase/templates/` and are wired in
-`supabase/config.toml` under `[auth.email.template.*]`. Restart the stack
-(`pnpm supabase:stop && pnpm supabase:start`) and request a **fresh** code.
+**The verification/recovery email shows a *link* instead of a code.** The email
+templates weren't picked up. `confirmation.html` and `recovery.html` live in
+`supabase/templates/` and are wired in `supabase/config.toml` under
+`[auth.email.template.*]`. Restart the stack
+(`pnpm supabase:stop && pnpm supabase:start`) and request a **fresh** code. Note:
+6-digit codes are now used **only** for account verification and password
+recovery — sign-in is email + password.
 
 **Auth fails after the keys look set.** Make sure you copied the keys your CLI
 actually printed into `.env` (newer CLIs print `sb_publishable_…` / `sb_secret_…`

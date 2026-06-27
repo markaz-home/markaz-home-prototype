@@ -1,58 +1,95 @@
-# Runbook: Authentication (Local OTP via Inbucket)
+# Runbook: Authentication (Email + Password; codes via Mailpit)
 
-Authentication is **real Supabase email OTP** (6-digit). Locally, no real email is
-sent — Supabase delivers it to **Inbucket**, a local test inbox.
+Authentication is **email + password** via Supabase Auth (ADR 0009). 6-digit
+email codes are used **only** to (a) verify a new account and (b) recover a
+password — never as the sign-in credential. Locally, no real email is sent:
+Supabase delivers codes to the local mail inbox. On newer Supabase CLIs that is
+**Mailpit** (older CLIs ship **Inbucket**) at **http://127.0.0.1:54324**.
 
-## Request and retrieve an OTP
+Codes are **never built, stored, or logged by app code** — read them from the
+inbox only.
 
-1. Open the customer app at http://localhost:3000 (or admin at
-   http://localhost:3001).
-2. Enter an email address and request the code.
-3. Open **Inbucket** at **http://127.0.0.1:54324**.
-4. Open the inbox for the email you used; open the newest message.
-5. Copy the **6-digit code** and enter it in the app.
+## Sign up (new customer)
 
-OTP codes are **never built, stored, or logged by app code** — read them from
-Inbucket only.
+1. Open the customer app at http://localhost:3000 and go to **Sign up**.
+2. Enter full name, email, password, confirm password, and accept **Terms** and
+   **Privacy**. The password must meet the policy (min 8; upper, lower, number,
+   special; max 72) — a live checklist and strength meter guide you.
+3. You are routed to **verify-email**. Open the inbox at
+   **http://127.0.0.1:54324**, open the newest message for your email, copy the
+   **6-digit code**, and enter it.
+4. Continue through the **simulated UAE PASS** step → dashboard. The normal path
+   skips profile-setup (it is hydrated from sign-up metadata).
 
-## New vs returning behavior
+### Retrieving a code from Mailpit (manual)
 
-- **New customer:** landing → email → OTP → profile setup → **simulated UAE PASS**
-  → dashboard. The UAE PASS step is simulated and sets identity status to
-  `VERIFIED_DEMO`.
-- **Returning verified customer** (profile complete + identity `VERIFIED_DEMO`):
-  skips onboarding, goes straight to the dashboard.
-- **Admin:** same OTP flow in the admin app. After auth the app loads the profile
-  and requires `account_type === 'ADMIN'`; otherwise it shows an **access-denied**
-  screen.
+Open http://127.0.0.1:54324, find the inbox for the email you used, open the
+newest message, and read the 6-digit code. e2e tests do this via the Mailpit API
+(`GET /api/v1/search?query=to:<email>` → `GET /api/v1/message/<id>`).
 
-Routing is decided by `resolvePostAuthDestination` in `@markaz/domain`.
+## Sign in (returning customer)
 
-## Demo accounts (fictional, seeded)
+Enter **email + password**. Wrong credentials show a single generic message —
+"The email or password is incorrect." — that never reveals which field was wrong
+or whether the account exists. If the email is unverified you are routed back to
+**verify-email**.
 
-| Account | Email | Role |
-| --- | --- | --- |
-| Customer A | customer-a@markaz.demo | CUSTOMER (seller in seed data) |
-| Customer B | customer-b@markaz.demo | CUSTOMER (buyer in seed data) |
-| Admin | admin@markaz.demo | ADMIN |
+## Forgot / reset password
 
-All seed accounts and data are clearly fictional. Request a code for any of these
-emails and retrieve it from Inbucket.
+1. **Forgot password** → enter your email. You always see the generic "If an
+   account exists…" message (this is intentional; it does not confirm whether the
+   email exists).
+2. Open the inbox and copy the **6-digit recovery code**.
+3. **Reset password** → enter the code + a new password. On success you are
+   **signed out** and sent to `/sign-in?reset=1`, which shows "Password updated".
+   Sign in with the new password.
+
+Legacy passwordless accounts (from Week 1) set their **first** password through
+this same Forgot Password flow.
+
+## Admin
+
+The admin app (http://localhost:3001) uses **email + password** with **no public
+sign-up** (`/login`, `/forgot-password`, `/reset-password`). After sign-in it
+requires `account_type === 'ADMIN'`; otherwise it shows an **access-denied**
+screen. Admins are created only by `pnpm db:setup` (Supabase Admin API).
+
+Routing is decided by `resolvePostAuthDestination` in `@markaz/domain` — it gates
+on email verification first, so unverified/incomplete customers never reach the
+dashboard.
+
+## Demo accounts (fictional)
+
+| Account | Email | Local password | Type |
+| --- | --- | --- | --- |
+| Customer A | `customer-a@markaz.demo` | `Markaz!Demo1` | CUSTOMER (`VERIFIED_DEMO`) |
+| Customer B | `customer-b@markaz.demo` | `Markaz!Demo1` | CUSTOMER (`VERIFIED_DEMO`) |
+| Admin | `admin@markaz.demo` | `Markaz!Admin1` | ADMIN |
+
+These are **local-only** credentials. Provision them with
+`pnpm supabase:reset && pnpm db:setup`. Both customers are seeded `VERIFIED_DEMO`
+(returning; skip onboarding). Full details, env overrides, and the production
+guard are in **`demo-runbook.md`**.
 
 ## Demo-auth fallback
 
 The one-click demo-auth fallback is **DISABLED** (ADR 0007). Only the env contract
 exists (`DEMO_ENVIRONMENT`, `DEMO_AUTH_FALLBACK`, `DEMO_AUTH_ALLOWLIST`). Use the
-real OTP flow via Inbucket.
+real email/password flow.
 
 ## Troubleshooting
 
-- **No email in Inbucket** — confirm the Supabase stack is running
-  (`pnpm supabase:status`) and that Inbucket is reachable at :54324; re-request
-  the code.
-- **Auth provider unavailable** — restart the stack (`pnpm supabase:stop` then
-  `pnpm supabase:start`).
-- **Rate limit** — Supabase rate-limits OTP requests; wait before re-requesting
+- **No email in the inbox** — confirm the stack is running
+  (`pnpm supabase:status`) and the inbox is reachable at :54324; re-request.
+- **Code email shows a link, not a code** — the email templates weren't picked up.
+  They live in `supabase/templates/` (`confirmation.html`, `recovery.html`, both
+  carrying `{{ .Token }}`) and are wired in `supabase/config.toml`. Restart the
+  stack and request a **fresh** code.
+- **"Email not confirmed" on sign-in** — verify the account first (the app routes
+  you to verify-email); read the `confirmation` code from the inbox.
+- **Rate limit** — Supabase rate-limits email sends; wait before re-requesting
   rather than spamming the button.
 - **Admin access-denied** — the account's `account_type` is not `ADMIN`; use
-  `admin@markaz.demo` or promote via a trusted server op (never self-promotion).
+  `admin@markaz.demo` or provision via `pnpm db:setup` (never self-promotion).
+- **Auth provider unavailable** — restart the stack (`pnpm supabase:stop` then
+  `pnpm supabase:start`).

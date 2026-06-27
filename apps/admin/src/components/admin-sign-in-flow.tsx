@@ -1,150 +1,75 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
-import { z } from 'zod';
-import { ShieldCheck } from 'lucide-react';
-import {
-  Alert,
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  FormField,
-  Input,
-} from '@markaz/ui';
+import { signInSchema, mapAuthError, type SignInInput } from '@markaz/domain';
+import { Alert, Button, FormField, Input } from '@markaz/ui';
 import { createSupabaseBrowserClient } from '@markaz/auth/browser';
-import { useRouter } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
+import { AuthCard } from '@/components/auth/auth-card';
+import { PasswordField } from '@/components/auth/password-field';
+import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
 
-type Step = 'email' | 'otp';
-type AuthError = 'invalidCode' | 'expiredCode' | 'rateLimited' | 'providerUnavailable' | null;
-
-const emailSchema = z.string().email();
-
-function classify(err: { message?: string; status?: number } | null): AuthError {
-  if (!err) return null;
-  if (err.status === 429) return 'rateLimited';
-  const m = (err.message ?? '').toLowerCase();
-  if (m.includes('expired')) return 'expiredCode';
-  if (m.includes('invalid') || m.includes('token')) return 'invalidCode';
-  return 'providerUnavailable';
-}
-
+/**
+ * Admin email/password sign-in (no public sign-up). On success the portal guard
+ * checks account_type === 'ADMIN'; a CUSTOMER lands on the access-denied screen.
+ */
 export function AdminSignInFlow() {
   const t = useTranslations('auth');
   const ta = useTranslations('admin');
   const router = useRouter();
+  const params = useSearchParams();
   const [supabase] = useState(() => createSupabaseBrowserClient());
-  const [step, setStep] = useState<Step>('email');
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState<string | null>(null);
-  const [code, setCode] = useState('');
-  const [authError, setAuthError] = useState<AuthError>(null);
-  const [busy, setBusy] = useState(false);
-  const [resendIn, setResendIn] = useState(0);
+  const [formError, setFormError] = useState<string | null>(null);
+  const passwordUpdated = params.get('reset') === '1';
 
-  useEffect(() => {
-    if (resendIn <= 0) return;
-    const id = setTimeout(() => setResendIn((s) => s - 1), 1000);
-    return () => clearTimeout(id);
-  }, [resendIn]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignInInput>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: { email: '', password: '' },
+  });
 
-  async function send(e: React.FormEvent) {
-    e.preventDefault();
-    setEmailError(null);
-    const parsed = emailSchema.safeParse(email.trim());
-    if (!parsed.success) return setEmailError(t('emailInvalid'));
-    setBusy(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email: parsed.data,
-      options: { shouldCreateUser: false },
+  const fe = (code?: string) => (code ? t(FIELD_ERROR_KEYS[code] ?? 'errGeneric') : undefined);
+
+  async function onSubmit(data: SignInInput) {
+    setFormError(null);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
     });
-    setBusy(false);
-    if (error) return setAuthError(classify(error));
-    setStep('otp');
-    setResendIn(30);
-  }
-
-  async function verify(e: React.FormEvent) {
-    e.preventDefault();
-    setAuthError(null);
-    if (!/^\d{6}$/.test(code)) return setAuthError('invalidCode');
-    setBusy(true);
-    const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'email' });
-    setBusy(false);
-    if (error) return setAuthError(classify(error));
+    if (error) {
+      setFormError(t(AUTH_ERROR_KEYS[mapAuthError(error)]));
+      return;
+    }
     router.replace('/overview');
     router.refresh();
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-muted/30 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-            <ShieldCheck className="h-4 w-4 text-primary" aria-hidden /> {ta('appName')}
-          </span>
-          <CardTitle>{ta('loginTitle')}</CardTitle>
-          <CardDescription>{ta('loginSubtitle')}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {authError ? (
-            <Alert variant={authError === 'rateLimited' ? 'warning' : 'destructive'}>
-              {t(authError)}
-            </Alert>
-          ) : null}
-          {step === 'email' ? (
-            <form onSubmit={send} className="space-y-4" noValidate>
-              <FormField id="email" label={t('emailLabel')} error={emailError ?? undefined} required>
-                <Input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder={t('emailPlaceholder')}
-                  value={email}
-                  aria-invalid={!!emailError}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </FormField>
-              <Button type="submit" className="w-full" loading={busy}>
-                {busy ? t('sending') : t('sendCode')}
-              </Button>
-            </form>
-          ) : (
-            <form onSubmit={verify} className="space-y-4" noValidate>
-              <FormField id="code" label={t('codeLabel')} required>
-                <Input
-                  id="code"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  maxLength={6}
-                  placeholder="••••••"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                  className="text-center text-lg tracking-[0.5em]"
-                />
-              </FormField>
-              <Button type="submit" className="w-full" loading={busy}>
-                {busy ? t('verifying') : t('verify')}
-              </Button>
-              <div className="flex items-center justify-between text-sm">
-                <button type="button" className="text-muted-foreground hover:text-foreground" onClick={() => setStep('email')}>
-                  {t('changeEmail')}
-                </button>
-                <button
-                  type="button"
-                  className="text-primary disabled:text-muted-foreground"
-                  disabled={resendIn > 0 || busy}
-                  onClick={() => send(new Event('submit') as unknown as React.FormEvent)}
-                >
-                  {resendIn > 0 ? t('resendIn', { seconds: resendIn }) : t('resend')}
-                </button>
-              </div>
-            </form>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+    <AuthCard title={ta('loginTitle')} description={ta('loginSubtitle')}>
+      {passwordUpdated ? <Alert variant="success">{t('passwordUpdated')}</Alert> : null}
+      {formError ? <Alert variant="destructive">{formError}</Alert> : null}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <FormField id="email" label={t('emailLabel')} error={fe(errors.email?.message)} required>
+          <Input id="email" type="email" inputMode="email" autoComplete="email" dir="ltr" placeholder={t('emailPlaceholder')} aria-invalid={!!errors.email} {...register('email')} />
+        </FormField>
+        <FormField id="password" label={t('passwordLabel')} error={fe(errors.password?.message)} required>
+          <PasswordField id="password" autoComplete="current-password" dir="ltr" toggleLabel={t('showPassword')} aria-invalid={!!errors.password} {...register('password')} />
+        </FormField>
+        <div className="flex justify-end">
+          <Link href="/forgot-password" className="text-sm font-medium text-primary underline-offset-4 hover:underline">
+            {t('forgotPassword')}
+          </Link>
+        </div>
+        <Button type="submit" className="w-full" loading={isSubmitting}>
+          {isSubmitting ? t('signingIn') : t('signInCta')}
+        </Button>
+      </form>
+    </AuthCard>
   );
 }

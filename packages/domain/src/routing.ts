@@ -2,33 +2,38 @@ import { isProfileComplete, type Profile } from './profile';
 import { isIdentityVerified } from './identity';
 
 /** Logical post-authentication destinations (locale prefix added by the app). */
-export type PostAuthDestination = 'profile-setup' | 'uae-pass' | 'dashboard';
+export type PostAuthDestination = 'verify-email' | 'profile-setup' | 'uae-pass' | 'dashboard';
 
 export const POST_AUTH_PATHS: Record<PostAuthDestination, string> = {
+  'verify-email': '/verify-email',
   'profile-setup': '/onboarding/profile',
   'uae-pass': '/onboarding/uae-pass',
   dashboard: '/dashboard',
 };
 
-/**
- * Decide where an authenticated CUSTOMER should land.
- *
- * New customer        → profile setup → simulated UAE PASS → dashboard.
- * Returning customer  → (skip completed steps) → dashboard.
- *
- * A returning customer whose profile is complete and whose identity status is
- * VERIFIED_DEMO skips both onboarding screens. Pure + fully unit-tested.
- */
-export function resolvePostAuthDestination(
+export interface PostAuthState {
+  /** Whether the Supabase Auth email is confirmed (user.email_confirmed_at). */
+  emailVerified: boolean;
   profile: Pick<
     Profile,
     'fullName' | 'termsAcceptedAt' | 'privacyAcceptedAt' | 'identityVerificationStatus'
-  > | null,
-): PostAuthDestination {
-  // No profile row yet (brand-new auth user) → must complete setup.
-  if (!profile) return 'profile-setup';
-  if (!isProfileComplete(profile)) return 'profile-setup';
-  if (!isIdentityVerified(profile.identityVerificationStatus)) return 'uae-pass';
+  > | null;
+}
+
+/**
+ * Decide where an authenticated user should land. Centralised + fully tested.
+ *
+ *   email not verified            → verify-email
+ *   verified, profile incomplete  → profile-setup (fallback; normal path fills it at sign-up)
+ *   verified, complete, identity NOT_STARTED/PENDING/FAILED_DEMO → uae-pass (resumes sub-state)
+ *   verified, complete, VERIFIED_DEMO → dashboard
+ *
+ * Unverified or incomplete customers can never reach the dashboard.
+ */
+export function resolvePostAuthDestination(state: PostAuthState): PostAuthDestination {
+  if (!state.emailVerified) return 'verify-email';
+  if (!state.profile || !isProfileComplete(state.profile)) return 'profile-setup';
+  if (!isIdentityVerified(state.profile.identityVerificationStatus)) return 'uae-pass';
   return 'dashboard';
 }
 

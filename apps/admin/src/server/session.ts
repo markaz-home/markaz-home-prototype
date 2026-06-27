@@ -35,6 +35,13 @@ export async function requireAdmin(locale: string): Promise<AdminSession> {
   if (!user) redirect(`/${locale}/login`);
   const profile = await loadProfile();
   if (!profile || profile.accountType !== 'ADMIN') {
+    // Best-effort audit of a non-admin attempt (never blocks the redirect).
+    try {
+      const api = await getServerApi();
+      await api.audit.record({ action: 'ADMIN_ACCESS_DENIED' });
+    } catch {
+      /* ignore */
+    }
     redirect(`/${locale}/access-denied`);
   }
   return { userId: user.id, email: user.email ?? null, profile };

@@ -20,7 +20,25 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
 - **Customers can never self-promote to ADMIN** (DB trigger + RLS enforce it).
 - **A customer can never offer on a listing they own** (DB trigger + RLS + API).
 - **Never** use the Supabase service-role/secret key for customer-scoped requests.
-- **Never** build, store, or log OTP codes. Auth is real Supabase email OTP.
+- **Auth is email + password** (Supabase `signInWithPassword`). 6-digit email
+  codes are used **only** to verify a new account (`verifyOtp type:signup`) and to
+  recover a password (`verifyOtp type:recovery`). **Never** build, store, or log
+  any code, password hash, or token — Supabase Auth owns them all (ADR-0009).
+- **Routing gates on email verification first**: `resolvePostAuthDestination({
+  emailVerified, profile })` → verify-email → profile-setup (fallback) → uae-pass
+  → dashboard; unverified/incomplete customers never reach the dashboard.
+  `requireCustomerStep` enforces it server-side.
+- **No public admin sign-up.** Admins are created **only** by `pnpm db:setup`
+  (Supabase Admin API); the admin app requires `account_type === 'ADMIN'` or shows
+  access-denied.
+- **Password policy:** min 8; upper, lower, number, special; max 72 — enforced in
+  the client form and the zod schema (`packages/domain/src/auth.ts`). The pinned
+  local Supabase CLI rejects password-policy config keys, so the deployed platform
+  owns the server-side GoTrue policy.
+- **Duplicate-email is anti-enumeration:** `signUp` for a confirmed email returns
+  empty `identities[]`/no error → show safe Sign In / Forgot Password copy. No
+  existence query, no enumeration endpoint, no raw DB errors. Bad sign-in
+  credentials get one generic message.
 
 ## Architecture you must preserve
 - **RLS is the security boundary.** Client/route guards are UX only.
@@ -35,7 +53,11 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   schema: write/adjust the SQL migration **and** the Drizzle schema to match;
   `drizzle-kit generate` output (in `packages/db/drizzle/`) is for **review only**,
   fold it into the canonical SQL — never apply a second migration mechanism.
-  Seed (`supabase/seed.sql`) runs **after** migrations. See ADR-0003.
+  Seed (`supabase/seed.sql`) runs **after** migrations and is **minimal** — demo
+  **Auth users + demo data** are provisioned by `pnpm db:setup` (Supabase Admin
+  API; `setup-demo.ts`), not SQL (writing Auth tables via SQL is unsupported).
+  Local flow: `pnpm supabase:reset && pnpm db:setup`. The script is idempotent and
+  refuses to run in production. See ADR-0003 / ADR-0009.
 - **Realtime connects directly to the DB**, never behind a pooler (ADR-0005).
 - **i18n:** all user-facing copy goes through `next-intl` (`packages/i18n/messages/
   {en,ar}.json`). Support RTL via logical CSS properties + the `dir` attribute.
@@ -63,7 +85,7 @@ Path alias `@/*` → `src/*` in each app. Internal deps use `workspace:*`.
 ## Commands
 ```
 pnpm dev | build | lint | typecheck | test | test:e2e
-pnpm db:generate | db:migrate | db:seed
+pnpm db:generate | db:migrate | db:seed | db:setup
 pnpm supabase:start | supabase:stop | supabase:reset | supabase:status
 ```
 Before declaring work done, run: `pnpm typecheck && pnpm lint && pnpm test && pnpm build`.
@@ -82,9 +104,10 @@ Before declaring work done, run: `pnpm typecheck && pnpm lint && pnpm test && pn
   too). Newer Supabase CLIs use **Mailpit** (not Inbucket) at :54324 and the new
   **`sb_publishable_` / `sb_secret_`** key format — map them to
   `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY`.
-- OTP emails are forced to contain the 6-digit code via `supabase/templates/*.html`
-  (wired in `config.toml [auth.email.template.*]`). Changing them needs a stack
-  restart.
+- Verification/recovery emails are forced to contain the 6-digit code via
+  `supabase/templates/{confirmation,recovery}.html` (wired in
+  `config.toml [auth.email.template.*]`); `enable_confirmations = true`. Changing
+  them needs a stack restart. Tests read codes from the Mailpit API.
 - `.env` lives at the repo root; both apps load it via `dotenv` in `next.config.mjs`.
 
 ## Out of scope this milestone

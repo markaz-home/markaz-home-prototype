@@ -4,6 +4,7 @@ import { profileRouter } from './routers/profile';
 import { authContextRouter } from './routers/auth-context';
 import { adminOverviewRouter } from './routers/admin-overview';
 import { realtimeRouter } from './routers/realtime';
+import { auditRouter } from './routers/audit';
 
 export const appRouter = router({
   health: healthRouter,
@@ -11,6 +12,7 @@ export const appRouter = router({
   authContext: authContextRouter,
   adminOverview: adminOverviewRouter,
   realtime: realtimeRouter,
+  audit: auditRouter,
 });
 
 export type AppRouter = typeof appRouter;
