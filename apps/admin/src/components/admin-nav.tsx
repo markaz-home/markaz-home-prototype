@@ -32,9 +32,9 @@ export function AdminNav({ email }: { email: string | null }) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-60 shrink-0 flex-col border-e bg-card">
-      <div className="flex h-16 items-center gap-2 border-b px-4 font-semibold">
-        <ShieldCheck className="h-5 w-5 text-primary" aria-hidden />
+    <aside className="flex w-60 shrink-0 flex-col bg-brand-900 text-brand-100">
+      <div className="flex h-16 items-center gap-2 border-b border-brand-800 px-4 font-semibold text-white">
+        <ShieldCheck className="h-5 w-5 text-brand-300" aria-hidden />
         {t('appName')}
       </div>
       <nav className="flex-1 space-y-1 p-2" aria-label="Admin">
@@ -47,8 +47,8 @@ export function AdminNav({ email }: { email: string | null }) {
               className={cn(
                 'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                 active
-                  ? 'bg-secondary text-secondary-foreground'
-                  : 'text-muted-foreground hover:text-foreground',
+                  ? 'bg-brand-700 text-white'
+                  : 'text-brand-300 hover:bg-brand-800 hover:text-white',
               )}
             >
               <Icon className="h-4 w-4" aria-hidden />
@@ -57,8 +57,8 @@ export function AdminNav({ email }: { email: string | null }) {
           );
         })}
       </nav>
-      <div className="space-y-2 border-t p-3">
-        <p className="truncate px-1 text-xs text-muted-foreground">{email}</p>
+      <div className="space-y-2 border-t border-brand-800 p-3 text-brand-100">
+        <p className="truncate px-1 text-xs text-brand-300">{email}</p>
         <div className="flex items-center justify-between">
           <LanguageSwitcher />
           <AdminSignOut />

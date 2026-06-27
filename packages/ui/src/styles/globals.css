@@ -3,75 +3,89 @@
 @tailwind utilities;
 
 /*
- * MARKAZ neutral, replaceable design tokens (§6A.8).
- * No approved brand yet — restrained neutral palette, easy to swap in one place.
- * HSL channels (shadcn convention). RTL handled via logical properties + dir attr.
+ * MARKAZ Home design tokens — "Architectural Blue, Quiet Editorial Intelligence"
+ * (docs/design/markaz-design-foundation.md, §10 colour, §11 type, §12 radius).
+ * Tokens are HSL channels (shadcn convention) so the palette swaps in one place.
+ * Brand blue creates hierarchy and confidence — it never dominates by weight
+ * (target ~65–75% white/off-white, 15–25% blue, §10.2). RTL-safe.
  */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 22% 12%;
+    /* Brand blue scale (§10.1) */
+    --brand-900: 209 64% 16%; /* #0F2A44 Deep Architectural Blue */
+    --brand-800: 208 61% 22%; /* #163A5A Ocean Ink */
+    --brand-700: 206 58% 29%; /* #1F4E73 Clear Blue */
+    --brand-500: 209 31% 41%; /* #486A8A Slate Blue */
+    --brand-300: 208 37% 77%; /* #AFC6DA Mist Blue */
+    --brand-100: 204 44% 94%; /* #EAF2F7 Pale Blue */
 
+    /* Surfaces & text */
+    --background: 216 38% 97%; /* #F6F8FB Cool Off-White canvas */
+    --foreground: 210 43% 14%; /* #142332 Blue Black */
     --card: 0 0% 100%;
-    --card-foreground: 222 22% 12%;
+    --card-foreground: 210 43% 14%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 22% 12%;
+    --popover-foreground: 210 43% 14%;
 
-    --primary: 215 50% 23%;
+    /* Primary = Clear Blue (buttons, links, active controls) */
+    --primary: 206 58% 29%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 16% 95%;
-    --secondary-foreground: 222 22% 18%;
+    /* Secondary / muted / accent = Pale Blue family */
+    --secondary: 204 44% 94%;
+    --secondary-foreground: 209 64% 16%;
+    --muted: 204 44% 94%;
+    --muted-foreground: 208 13% 45%; /* #647482 Slate */
+    --accent: 204 44% 94%;
+    --accent-foreground: 209 64% 16%;
 
-    --muted: 215 16% 95%;
-    --muted-foreground: 215 12% 42%;
-
-    --accent: 200 18% 92%;
-    --accent-foreground: 222 22% 18%;
-
-    --destructive: 0 70% 42%;
+    /* Semantic (§10.3) — never colour alone; always pair with label/icon */
+    --destructive: 4 76% 40%;
     --destructive-foreground: 0 0% 100%;
-
-    --success: 152 45% 32%;
+    --success: 146 61% 30%;
     --success-foreground: 0 0% 100%;
-
-    --warning: 38 80% 42%;
+    --warning: 26 90% 37%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 215 16% 88%;
-    --input: 215 16% 85%;
-    --ring: 215 50% 35%;
+    /* Lines & focus */
+    --border: 205 29% 88%; /* #D9E3EA Blue Grey */
+    --input: 205 29% 88%;
+    --ring: 206 58% 29%;
 
-    --radius: 0.625rem;
+    --radius: 0.625rem; /* 10px — inputs/buttons 8–10, cards 10–12 (§12.4) */
 
-    --font-sans: var(--font-inter, ui-sans-serif), system-ui, sans-serif;
-    --font-arabic: var(--font-noto-arabic, var(--font-inter)), system-ui, sans-serif;
+    /* Typography (§11): Manrope interface, Source Serif 4 display */
+    --font-sans: 'Manrope', var(--font-inter, ui-sans-serif), system-ui, sans-serif;
+    --font-display: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    --font-arabic: 'Noto Sans Arabic', var(--font-sans);
   }
 
+  /* Dark surface (used by the admin operations portal, §8.2) */
   .dark {
-    --background: 222 24% 9%;
-    --foreground: 210 16% 92%;
-    --card: 222 24% 11%;
-    --card-foreground: 210 16% 92%;
-    --popover: 222 24% 11%;
-    --popover-foreground: 210 16% 92%;
-    --primary: 210 60% 70%;
-    --primary-foreground: 222 24% 9%;
-    --secondary: 217 18% 18%;
-    --secondary-foreground: 210 16% 92%;
-    --muted: 217 18% 18%;
-    --muted-foreground: 215 14% 62%;
-    --accent: 217 18% 20%;
-    --accent-foreground: 210 16% 92%;
-    --destructive: 0 62% 50%;
+    --brand-900: 209 64% 16%;
+    --background: 209 60% 11%;
+    --foreground: 204 44% 94%;
+    --card: 208 55% 14%;
+    --card-foreground: 204 44% 94%;
+    --popover: 208 55% 14%;
+    --popover-foreground: 204 44% 94%;
+    --primary: 208 50% 62%;
+    --primary-foreground: 209 64% 12%;
+    --secondary: 208 40% 20%;
+    --secondary-foreground: 204 44% 94%;
+    --muted: 208 40% 20%;
+    --muted-foreground: 208 24% 70%;
+    --accent: 208 40% 22%;
+    --accent-foreground: 204 44% 94%;
+    --destructive: 4 64% 52%;
     --destructive-foreground: 0 0% 100%;
-    --success: 152 40% 45%;
-    --success-foreground: 222 24% 9%;
-    --warning: 38 70% 55%;
-    --warning-foreground: 222 24% 9%;
-    --border: 217 18% 22%;
-    --input: 217 18% 24%;
-    --ring: 210 60% 60%;
+    --success: 146 45% 45%;
+    --success-foreground: 209 64% 12%;
+    --warning: 26 78% 52%;
+    --warning-foreground: 209 64% 12%;
+    --border: 208 35% 24%;
+    --input: 208 35% 26%;
+    --ring: 208 50% 56%;
   }
 
   * {
@@ -80,8 +94,19 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
   [dir='rtl'] body {
     font-family: var(--font-arabic);
+  }
+  /* Reduced-motion support (§4.10 / §20) */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

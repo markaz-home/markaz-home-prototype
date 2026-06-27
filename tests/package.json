@@ -12,7 +12,8 @@
     "@markaz/db": "workspace:*",
     "@markaz/domain": "workspace:*",
     "drizzle-orm": "^0.38.3",
-    "postgres": "^3.4.5"
+    "postgres": "^3.4.5",
+    "@supabase/supabase-js": "^2.47.10"
   },
   "devDependencies": {
     "@markaz/config": "workspace:*",

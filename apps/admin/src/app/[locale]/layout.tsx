@@ -30,6 +30,14 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={getDirection(locale)} suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap"
+        />
+      </head>
       <body className="min-h-dvh bg-background text-foreground antialiased">
         <NextIntlClientProvider messages={messages}>
           <TRPCProvider>{children}</TRPCProvider>

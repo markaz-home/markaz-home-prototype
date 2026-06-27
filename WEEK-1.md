@@ -32,8 +32,10 @@ provisioned here. Section 6A of the technical plan governs.
 - **`apps/worker`** — documented placeholder (durable jobs are a later milestone).
 
 ### Packages
-`config` (eslint/tsconfig/tailwind presets) · `ui` (neutral, replaceable tokens +
-RTL-safe shadcn/Radix component set) · `i18n` (next-intl en/ar, RTL, AED
+`config` (eslint/tsconfig/tailwind presets) · `ui` (RTL-safe shadcn/Radix component
+set implementing the approved **MARKAZ "Architectural Blue" design foundation** —
+brand-blue scale, Clear-Blue primary, Cool-Off-White canvas, Manrope + Source
+Serif 4, dark-blue admin sidebar) · `i18n` (next-intl en/ar, RTL, AED
 formatting) · `domain` (types + state machines + zod + `resolvePostAuthDestination`)
 · `db` (Drizzle schema + dual app/direct clients + the RLS-context helper) · `auth`
 (Supabase SSR clients + RBAC) · `api` (tRPC) · `realtime` · `observability` (pino).

@@ -41,8 +41,14 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   {en,ar}.json`). Support RTL via logical CSS properties + the `dir` attribute.
   Don't hardcode strings or left/right. Arabic legal/transactional copy is
   unreviewed — flag it, don't claim it's approved.
-- **Design tokens** live in `packages/ui` (neutral, replaceable). Don't scatter
-  one-off colors/spacing; add/extend `@markaz/ui` components.
+- **Design tokens** live in `packages/ui/src/styles/globals.css` and implement the
+  approved **MARKAZ "Architectural Blue" foundation** (`docs/design/
+  markaz-design-foundation.md`): brand blue scale (`brand-900…100`), Clear Blue
+  primary, Cool Off-White canvas, Manrope (interface) + Source Serif 4 (display,
+  use `font-display` for hero/public headings), 10px radius, minimal shadows. The
+  admin portal uses the dark-blue sidebar. Don't scatter one-off colors/spacing;
+  use the tokens and `@markaz/ui` components. Blue is for hierarchy, not weight
+  (~65–75% white/off-white).
 
 ## Layout
 ```

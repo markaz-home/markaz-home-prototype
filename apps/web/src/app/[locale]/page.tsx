@@ -34,14 +34,19 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
       </header>
 
       <main className="container flex-1 py-16">
-        <section className="mx-auto max-w-2xl text-center">
-          <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+        <section className="mx-auto max-w-3xl text-center">
+          <h1 className="text-balance font-display text-4xl font-medium leading-[1.08] tracking-tight text-brand-900 sm:text-5xl md:text-6xl">
             {t('title')}
           </h1>
-          <p className="mt-5 text-pretty text-lg text-muted-foreground">{t('subtitle')}</p>
-          <div className="mt-8 flex justify-center gap-3">
+          <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg text-muted-foreground">
+            {t('subtitle')}
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button asChild size="lg">
-              <Link href="/sign-in">{t('getStarted')}</Link>
+              <Link href="/sign-in">{t('ctaBrowse')}</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link href="/sign-in">{t('ctaList')}</Link>
             </Button>
           </div>
         </section>

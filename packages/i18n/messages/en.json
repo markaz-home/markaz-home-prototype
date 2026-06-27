@@ -15,10 +15,12 @@
     "comingSoon": "This area is part of the next milestone."
   },
   "landing": {
-    "title": "Buy and sell property in the UAE, on one account",
-    "subtitle": "Browse listings, make offers, and track your purchase — or list your own property and manage offers. One account does both.",
+    "title": "A clearer way to buy and sell property in the UAE.",
+    "subtitle": "Transparent information. Guided processes. Confidence from listing to handover.",
     "getStarted": "Get started",
     "signIn": "Sign in",
+    "ctaBrowse": "Browse properties",
+    "ctaList": "List a property",
     "pointBrowseTitle": "Browse properties",
     "pointBrowseBody": "Search listings, compare investment data, save favourites, and make non-binding offers.",
     "pointListTitle": "List your property",

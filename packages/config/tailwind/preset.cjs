@@ -18,6 +18,14 @@ module.exports = {
     },
     extend: {
       colors: {
+        brand: {
+          900: 'hsl(var(--brand-900))',
+          800: 'hsl(var(--brand-800))',
+          700: 'hsl(var(--brand-700))',
+          500: 'hsl(var(--brand-500))',
+          300: 'hsl(var(--brand-300))',
+          100: 'hsl(var(--brand-100))',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -67,6 +75,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'Georgia', 'serif'],
         arabic: ['var(--font-arabic)', 'var(--font-sans)', 'system-ui', 'sans-serif'],
       },
       keyframes: {
