@@ -18,7 +18,8 @@ import { SignOutButton } from './sign-out-button';
 
 const NAV_ITEMS = [
   { href: '/dashboard', key: 'dashboard' },
-  { href: '/browse', key: 'browse' },
+  { href: '/properties', key: 'browse' },
+  { href: '/saved-properties', key: 'saved' },
   { href: '/sell', key: 'myListings' },
   { href: '/offers', key: 'offers' },
   { href: '/transactions', key: 'transactions' },
@@ -39,7 +40,7 @@ export function CustomerNav({ displayName }: { displayName: string | null }) {
           </Link>
           <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
             {NAV_ITEMS.map((item) => {
-              const active = pathname === item.href;
+              const active = item.href === '/properties' ? pathname.startsWith('/properties') : pathname === item.href;
               return (
                 <Link
                   key={item.href}

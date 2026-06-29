@@ -43,7 +43,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button asChild size="lg">
-              <Link href="/sign-in">{t('ctaBrowse')}</Link>
+              <Link href="/properties">{t('ctaBrowse')}</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
               <Link href="/sign-in">{t('ctaList')}</Link>

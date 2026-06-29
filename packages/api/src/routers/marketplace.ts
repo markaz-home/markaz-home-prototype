@@ -108,15 +108,17 @@ export const marketplaceRouter = router({
     const [row] = await ctx.tx.select().from(mv).where(eq(mv.publicId, input.publicId)).limit(1);
     if (!row) return null; // unified unavailable state (anti-enumeration)
     let isOwner = false;
+    let manageListingId: string | null = null;
     if (ctx.user) {
-      const owned = await ctx.tx
+      const [owned] = await ctx.tx
         .select({ id: listings.id })
         .from(listings)
         .where(and(eq(listings.publicId, input.publicId), eq(listings.ownerId, ctx.user.id)))
         .limit(1);
-      isOwner = owned.length > 0;
+      isOwner = !!owned;
+      manageListingId = owned?.id ?? null; // owner-only: deep-link to manage their own listing
     }
-    return { ...toPublicDetail(toRow(row)), isOwner };
+    return { ...toPublicDetail(toRow(row)), isOwner, manageListingId };
   }),
 
   /** Distinct public facet values for filter menus (LIVE only). */
@@ -128,6 +130,15 @@ export const marketplaceRouter = router({
       communities: uniq(rows.map((r) => r.community)),
       propertyTypes: uniq(rows.map((r) => r.type)),
     };
+  }),
+
+  /** The viewer's OWN live listing public ids (so grid cards show "Your listing"). */
+  myLivePublicIds: customerProcedure.query(async ({ ctx }) => {
+    const rows = await ctx.tx
+      .select({ publicId: listings.publicId })
+      .from(listings)
+      .where(and(eq(listings.ownerId, ctx.user.id), eq(listings.state, 'LIVE')));
+    return rows.map((r) => r.publicId).filter((id): id is string => !!id);
   }),
 
   saved: router({
@@ -152,6 +163,15 @@ export const marketplaceRouter = router({
       await ctx.tx.delete(savedProperties).where(and(eq(savedProperties.id, input.savedId), eq(savedProperties.customerId, ctx.user.id)));
       return { removed: true as const };
     }),
+    /** The set of LIVE public ids the current customer has saved (for grid heart state). */
+    publicIds: customerProcedure.query(async ({ ctx }) => {
+      const rows = await ctx.tx
+        .select({ publicId: listings.publicId })
+        .from(savedProperties)
+        .innerJoin(listings, eq(listings.id, savedProperties.listingId))
+        .where(and(eq(savedProperties.customerId, ctx.user.id), eq(listings.state, 'LIVE')));
+      return rows.map((r) => r.publicId).filter((id): id is string => !!id);
+    }),
     isSaved: customerProcedure.input(z.object({ publicId: z.string().max(40) })).query(async ({ ctx, input }) => {
       const [l] = await ctx.tx.select({ id: listings.id }).from(listings).where(eq(listings.publicId, input.publicId)).limit(1);
       if (!l) return { saved: false };
@@ -169,7 +189,10 @@ export const marketplaceRouter = router({
         .from(savedProperties)
         .where(eq(savedProperties.customerId, ctx.user.id))
         .orderBy(desc(savedProperties.createdAt));
-      const items: Array<Record<string, unknown>> = [];
+      type SavedItem =
+        | { kind: 'available'; savedId: string; savedAt: string; card: ReturnType<typeof toPublicCard> }
+        | { kind: 'unavailable'; savedId: string; savedAt: string };
+      const items: SavedItem[] = [];
       for (const s of saves) {
         const [row] = await ctx.tx
           .select()

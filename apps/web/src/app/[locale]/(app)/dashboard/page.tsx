@@ -45,7 +45,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
           </CardHeader>
           <CardContent>
             <Button asChild>
-              <Link href="/browse">
+              <Link href="/properties">
                 {t('browseCta')}
                 <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden />
               </Link>

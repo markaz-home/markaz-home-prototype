@@ -17,7 +17,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
             <Link href="/sign-in">{ta('signIn')}</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/browse">{t('browse')}</Link>
+            <Link href="/properties">{t('browse')}</Link>
           </Button>
         </div>
       </SuccessPanel>
