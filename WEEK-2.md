@@ -95,10 +95,16 @@ columns); investment_cases gets owner+admin policies. Money is stored as precise
 
 ## 6. Autosave, uploads, simulations, investment
 
-- **Autosave**: Save-and-continue performs a blocking save per step; the header
-  autosave indicator shows `Saving…` / `Saved just now` / `Couldn't save changes`
-  (no toast on success). Browser refresh / sign-out / direct link restore server
-  state (each step refetches authoritative `listing.get`).
+- **Autosave**: the editable form steps (**Property Details**, **Listing
+  Settings**) autosave partial changes via a **debounced** `listing.saveDraft`
+  (800ms after the last edit; flushed on navigate/unmount). The header indicator
+  shows `Saving…` / `Saved just now` / `Couldn't save changes` (no toast on
+  success). **Optimistic concurrency**: each save carries the listing `version`;
+  a mismatch (another tab/device saved first) returns `CONFLICT` and surfaces as
+  the save-error state. Save-and-continue additionally validates the whole step
+  and transitions state. The action-driven steps (uploads, simulations, photos,
+  review) persist on their explicit action. Browser refresh / sign-out / direct
+  link restore server state (each step refetches authoritative `listing.get`).
 - **Uploads**: documents → private `ownership-documents`; draft photos → private
   `listing-photos-draft` — both uploaded with the **customer's own session**
   (RLS), read via **short-lived signed URLs**. No service-role key for
@@ -137,7 +143,7 @@ Validated against a clean local stack (`pnpm supabase:reset && pnpm db:setup`).
 | &nbsp;&nbsp;`@markaz/auth` | 5 |
 | &nbsp;&nbsp;`@markaz/i18n` | 6 |
 | &nbsp;&nbsp;`@markaz/tests` (integration, live stack) | 26 — RLS 9, storage 3, provisioning 3, listing-journey 6, listing-privacy 5 |
-| `pnpm test:e2e` (Playwright, live stack + Mailpit) | ✅ **13** — auth 6, foundation 4, listing 3 |
+| `pnpm test:e2e` (Playwright, live stack + Mailpit) | ✅ **21** — auth 6, foundation 4, listing-journey 3, listing-quality 8 |
 | `pnpm build` | ✅ web + admin compiled |
 
 - **Skipped:** none (integration + e2e ran against the active stack).
@@ -151,33 +157,42 @@ draft + ready privacy incl. private bucket (`integration/listing-privacy.test.ts
 full browser journey to `READY_TO_PUBLISH` + cross-customer isolation
 (`e2e/listing-journey.spec.ts`).
 
-## 9. Manual / browser verification
+## 9. Browser verification (e2e) + accessibility / localisation / responsive
 
-The e2e suite drives the real browser end-to-end: My Listings (seeded drafts),
-create → Property Details → fictional document upload → simulated verification →
-settings → skip Investment Case → simulated Form A → photo upload + cover →
-simulated Trakheesi (approved) → Review → **Ready** — and cross-customer access is
-denied. Localisation (en/ar + RTL toggle) and landing accessibility (axe) covered
-by the foundation suite. Auth, admin isolation, and recovery remain green.
+- **Full journey** (`listing-journey.spec.ts`): My Listings (seeded drafts) →
+  create → Property Details → fictional document upload → simulated verification →
+  settings → skip Investment Case → simulated Form A → photo upload + cover →
+  simulated Trakheesi (approved) → Review → **Ready**; cross-customer access denied.
+- **Accessibility** (`listing-quality.spec.ts`, axe `wcag2a`+`wcag2aa`): **no
+  serious/critical violations** on **Property Details**, **Ownership Document**,
+  **Property Photos**, **Review**, and **Ready to Publish**.
+- **Arabic RTL**: a listing step renders with `dir="rtl"`, the localized heading,
+  and AED currency inputs kept LTR/bidi-isolated inside the RTL page.
+- **Mobile** (390×844): the `Step X of 9` progress, the sticky action bar, and a
+  core control render and are usable.
+- **Photo ordering**: non-drag `Move earlier/later` + `Set as cover` controls are
+  real, focusable buttons (drag is not the only method).
+- Auth, admin isolation, recovery, and landing accessibility remain green.
 
 ## 10. Known limitations
 
 - **Arabic copy is a flagged draft** (`_meta.reviewRequired`); not legally
   reviewed — do not represent as approved.
-- **Per-field validation copy on Property Details** uses an error summary with
-  stable keys rather than fully-localized per-field messages for every field
-  (settings/investment have localized messages); a polish item.
 - **Simulation timing** is resolve-on-poll (no durable job queue — out of scope);
   believable PENDING → result without slowing tests.
 - **Production server-side password policy** remains a platform follow-up (Week
   1.5 / ADR-0009), unaffected here.
-- Component tests for individual listing screens are light relative to the backend
-  + e2e coverage; the journey is covered end-to-end by integration + e2e.
+- Listing-screen **component tests** (Vitest) are light relative to the backend +
+  e2e coverage; the journey, accessibility (axe), RTL, and mobile are covered by
+  the Playwright suite.
 
 ## 11. Acceptance status
 
 - [x] My Listings functional; create draft; data persists; resume; direct owned
       links; cross-customer access denied.
+- [x] **Debounced autosave** (Property Details + Settings) with Saving…/Saved/
+      save-failure indicator and **stale-version (optimistic-concurrency)
+      protection**; Save-and-Continue validates + advances.
 - [x] Property Details; ownership-document upload (private); simulated ownership
       verification (incl. failure/retry).
 - [x] Listing & offer settings (asking + threshold validation, threshold ≤ asking).
@@ -188,7 +203,8 @@ by the foundation suite. Auth, admin isolation, and recovery remain green.
       `READY_TO_PUBLISH`; never `LIVE`.
 - [x] Owner-only preview excludes private data (tested projection mapper).
 - [x] RLS + storage-boundary tests pass; audit events created; en/ar/RTL;
-      desktop/mobile; existing Week 1/1.5 tests green.
+      desktop/mobile; **axe (no serious/critical) on the major listing screens**;
+      existing Week 1/1.5 tests green.
 - [x] Integration + e2e run against the active stack; lint, typecheck, web build,
       admin build pass. No real sensitive documents; no secrets committed.
 

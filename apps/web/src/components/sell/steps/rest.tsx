@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ShieldCheck, ShieldAlert, Loader2, UploadCloud, Star, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import { listingSettingsSchema, investmentCaseSchema } from '@markaz/domain';
@@ -15,7 +15,6 @@ import {
   SectionBadge,
   formatAed,
   type WizardListing,
-  type AutosaveState,
 } from '../wizard';
 import {
   OWNERSHIP_BUCKET,
@@ -24,6 +23,12 @@ import {
   uploadObject,
   getSignedUrls,
 } from '@/lib/listing-storage';
+import { useAutosave } from '../use-autosave';
+
+const numOrNull = (v: string) => {
+  const n = Number(v.replace(/,/g, ''));
+  return v.trim() === '' || Number.isNaN(n) ? null : n;
+};
 
 import type { ListingDetail } from '@/trpc/types';
 type GetData = ListingDetail;
@@ -32,7 +37,7 @@ const supabase = () => createSupabaseBrowserClient();
 function useListing(listingId: string) {
   // Always refetch on mount: wizard data changes via mutations + simulation polls,
   // so each step must reflect the authoritative server state (incl. readiness).
-  return trpc.listing.get.useQuery({ listingId }, { staleTime: 0, refetchOnMount: 'always' });
+  return trpc.listing.get.useQuery({ listingId }, { staleTime: 0 });
 }
 function StepHeader({ ns }: { ns: 'ownership' | 'verification' | 'settings' | 'investment' | 'formA' | 'photos' | 'permit' | 'review' }) {
   const t = useTranslations(ns);
@@ -208,10 +213,21 @@ function SettingsInner({ listingId, data }: { listingId: string; data: GetData }
   const [asking, setAsking] = useState(data.askingPriceAed != null ? String(data.askingPriceAed) : '');
   const [minNotif, setMinNotif] = useState(data.minNotificationPriceAed != null ? String(data.minNotificationPriceAed) : '');
   const [error, setError] = useState<string | null>(null);
-  const [autosave, setAutosave] = useState<AutosaveState>('idle');
+  const autosave = useAutosave(listingId, data.version);
+  const firstRender = useRef(true);
+
+  // Debounced autosave of the (partial) price fields.
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    autosave.schedule({ askingPriceAed: numOrNull(asking), minNotificationPriceAed: numOrNull(minNotif) });
+  }, [asking, minNotif, autosave.schedule]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    autosave.cancel();
     setError(null);
     const parsed = listingSettingsSchema.safeParse({ askingPriceAed: Number(asking.replace(/,/g, '')), minNotificationPriceAed: Number(minNotif.replace(/,/g, '')) });
     if (!parsed.success) {
@@ -219,18 +235,16 @@ function SettingsInner({ listingId, data }: { listingId: string; data: GetData }
       setError(code === 'notification_above_asking' ? t('errMinAboveAsking') : code === 'asking_price_too_high' ? t('errAskingTooHigh') : t('errAskingInvalid'));
       return;
     }
-    setAutosave('saving');
     try {
       await save.mutateAsync({ listingId, ...parsed.data });
-      setAutosave('saved');
       router.push(`/sell/listings/${listingId}/investment-case`);
     } catch {
-      setAutosave('error');
+      setError(t('errAskingInvalid'));
     }
   }
 
   return (
-    <WizardShell listing={data as unknown as WizardListing} current="settings" autosave={autosave}>
+    <WizardShell listing={data as unknown as WizardListing} current="settings" autosave={autosave.state}>
       <form onSubmit={onSubmit} className="space-y-6">
         <StepHeader ns="settings" />
         {error ? <Alert variant="destructive">{error}</Alert> : null}

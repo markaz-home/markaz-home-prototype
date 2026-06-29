@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   propertyDetailsSchema,
@@ -13,7 +13,38 @@ import {
 import { Alert, Button, FormField, Input, cn } from '@markaz/ui';
 import { trpc } from '@/trpc/react';
 import { useRouter } from '@/i18n/navigation';
-import { WizardShell, WizardLoading, ListingUnavailable, type WizardListing, type AutosaveState } from '../wizard';
+import { WizardShell, WizardLoading, ListingUnavailable, type WizardListing } from '../wizard';
+import { useAutosave } from '../use-autosave';
+
+const numOrNull = (v: string) => {
+  if (v === '') return null;
+  const n = Number(v);
+  return Number.isNaN(n) ? null : n;
+};
+
+// zod error code → `details.err.*` i18n key (design spec §24 exact copy).
+const ERR_KEY: Record<string, string> = {
+  property_type_required: 'propertyType',
+  emirate_unsupported: 'emirate',
+  community_required: 'community',
+  community_too_long: 'community',
+  building_required: 'building',
+  building_too_long: 'building',
+  unit_identifier_required: 'unit',
+  unit_identifier_too_long: 'unit',
+  bedrooms_required: 'bedrooms',
+  bedrooms_invalid: 'bedrooms',
+  bathrooms_required: 'bathrooms',
+  bathrooms_invalid: 'bathrooms',
+  size_invalid: 'size',
+  furnishing_required: 'furnishing',
+  occupancy_required: 'occupancy',
+  completion_required: 'completion',
+  parking_invalid: 'parking',
+  description_too_short: 'descriptionShort',
+  description_too_long: 'descriptionLong',
+  amenities_too_many: 'amenities',
+};
 
 import type { ListingDetail } from '@/trpc/types';
 
@@ -22,7 +53,7 @@ const BATHROOM_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 type GetData = ListingDetail;
 
 export function DetailsStep({ listingId }: { listingId: string }) {
-  const get = trpc.listing.get.useQuery({ listingId }, { staleTime: 0, refetchOnMount: 'always' });
+  const get = trpc.listing.get.useQuery({ listingId }, { staleTime: 0 });
   if (get.error) return <ListingUnavailable />;
   if (!get.data) return <WizardLoading />;
   return <DetailsForm key={listingId} listingId={listingId} data={get.data} />;
@@ -34,8 +65,11 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
   const tv = useTranslations('validation');
   const router = useRouter();
   const save = trpc.listing.saveDetails.useMutation();
-  const [autosave, setAutosave] = useState<AutosaveState>('idle');
-  const [errors, setErrors] = useState<string[]>([]);
+  const autosave = useAutosave(listingId, data.version);
+  const firstRender = useRef(true);
+  // Localized per-field errors, keyed by field (the ERR_KEY value).
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const p = data.property;
   const [form, setForm] = useState({
@@ -61,9 +95,36 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
     setForm((f) => ({ ...f, features: f.features.includes(a) ? f.features.filter((x) => x !== a) : [...f.features, a] }));
   }
 
+  // Debounced autosave: persist partial details 800ms after the last edit.
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    autosave.schedule({
+      property: {
+        propertyType: form.propertyType || null,
+        community: form.community || null,
+        buildingOrProject: form.buildingOrProject || null,
+        unitIdentifier: form.unitIdentifier || null,
+        bedrooms: form.bedrooms,
+        bathrooms: form.bathrooms,
+        sizeSqft: numOrNull(form.sizeSqft),
+        furnishingStatus: form.furnishingStatus || null,
+        occupancyStatus: form.occupancyStatus || null,
+        completionStatus: form.completionStatus || null,
+        parkingSpaces: numOrNull(form.parkingSpaces),
+        features: form.features,
+      },
+      description: form.description || null,
+    });
+  }, [form, autosave.schedule]);
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setErrors([]);
+    autosave.cancel(); // the explicit save below supersedes any pending autosave
+    setFieldErrors({});
+    setSaveError(null);
     const parsed = propertyDetailsSchema.safeParse({
       propertyType: form.propertyType,
       emirate: 'DUBAI',
@@ -81,23 +142,26 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
       features: form.features,
     });
     if (!parsed.success) {
-      setErrors(parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`));
+      const fe: Record<string, string> = {};
+      for (const issue of parsed.error.issues) {
+        const key = ERR_KEY[String(issue.message)] ?? 'generic';
+        if (!fe[key]) fe[key] = t(`err.${key}`);
+      }
+      setFieldErrors(fe);
       return;
     }
-    setAutosave('saving');
     try {
       await save.mutateAsync({ listingId, ...(parsed.data as PropertyDetailsInput) });
-      setAutosave('saved');
       router.push(`/sell/listings/${listingId}/ownership`);
     } catch {
-      setAutosave('error');
+      setSaveError(t('err.generic'));
     }
   }
 
   const selectCls = 'h-10 w-full rounded-md border border-input bg-background px-3 text-sm';
 
   return (
-    <WizardShell listing={data as unknown as WizardListing} current="details" autosave={autosave}>
+    <WizardShell listing={data as unknown as WizardListing} current="details" autosave={autosave.state}>
       <div className="space-y-6">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('stepLabel')}</p>
@@ -105,18 +169,19 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
           <p className="mt-1 text-muted-foreground">{t('description')}</p>
         </div>
 
-        {errors.length > 0 ? (
+        {Object.keys(fieldErrors).length > 0 || saveError ? (
           <Alert variant="destructive" title={tv('errorSummaryTitle')}>
             <ul className="mt-1 list-inside list-disc text-sm">
-              {errors.map((e) => (
-                <li key={e}>{e}</li>
+              {Object.entries(fieldErrors).map(([k, m]) => (
+                <li key={k}>{m}</li>
               ))}
+              {saveError ? <li>{saveError}</li> : null}
             </ul>
           </Alert>
         ) : null}
 
         <form onSubmit={onSubmit} className="space-y-5" noValidate>
-          <FormField id="propertyType" label={t('propertyType')} required>
+          <FormField id="propertyType" label={t('propertyType')} error={fieldErrors.propertyType} required>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {PROPERTY_TYPES.map((pt) => (
                 <button
@@ -138,41 +203,41 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
           </FormField>
 
           <div className="grid gap-5 sm:grid-cols-2">
-            <FormField id="community" label={t('community')} required>
+            <FormField id="community" label={t("community")} error={fieldErrors.community} required>
               <Input id="community" value={form.community} onChange={(e) => set('community', e.target.value)} placeholder={t('communityPlaceholder')} />
             </FormField>
-            <FormField id="building" label={t('building')}>
+            <FormField id="building" label={t("building")} error={fieldErrors.building}>
               <Input id="building" value={form.buildingOrProject} onChange={(e) => set('buildingOrProject', e.target.value)} placeholder={t('buildingPlaceholder')} />
             </FormField>
           </div>
 
-          <FormField id="unit" label={t('unit')} required>
+          <FormField id="unit" label={t("unit")} error={fieldErrors.unit} required>
             <Input id="unit" value={form.unitIdentifier} onChange={(e) => set('unitIdentifier', e.target.value)} placeholder={t('unitPlaceholder')} />
             <p className="mt-1 text-xs text-muted-foreground">{t('unitHelp')}</p>
           </FormField>
 
           <div className="grid gap-5 sm:grid-cols-3">
-            <FormField id="bedrooms" label={t('bedrooms')} required>
+            <FormField id="bedrooms" label={t("bedrooms")} error={fieldErrors.bedrooms} required>
               <select id="bedrooms" className={selectCls} value={form.bedrooms} onChange={(e) => set('bedrooms', Number(e.target.value))}>
                 {BEDROOM_OPTIONS.map((n) => (
                   <option key={n} value={n}>{n === 0 ? t('studio') : n}</option>
                 ))}
               </select>
             </FormField>
-            <FormField id="bathrooms" label={t('bathrooms')} required>
+            <FormField id="bathrooms" label={t("bathrooms")} error={fieldErrors.bathrooms} required>
               <select id="bathrooms" className={selectCls} value={form.bathrooms} onChange={(e) => set('bathrooms', Number(e.target.value))}>
                 {BATHROOM_OPTIONS.map((n) => (
                   <option key={n} value={n}>{n}</option>
                 ))}
               </select>
             </FormField>
-            <FormField id="size" label={t('size')} required>
+            <FormField id="size" label={t("size")} error={fieldErrors.size} required>
               <Input id="size" type="number" inputMode="numeric" value={form.sizeSqft} onChange={(e) => set('sizeSqft', e.target.value)} placeholder={t('sizePlaceholder')} />
             </FormField>
           </div>
 
           <div className="grid gap-5 sm:grid-cols-3">
-            <FormField id="furnishing" label={t('furnishing')} required>
+            <FormField id="furnishing" label={t("furnishing")} error={fieldErrors.furnishing} required>
               <select id="furnishing" className={selectCls} value={form.furnishingStatus} onChange={(e) => set('furnishingStatus', e.target.value)}>
                 <option value="" disabled>—</option>
                 {FURNISHING_STATUSES.map((s) => (
@@ -180,7 +245,7 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
                 ))}
               </select>
             </FormField>
-            <FormField id="occupancy" label={t('occupancy')} required>
+            <FormField id="occupancy" label={t("occupancy")} error={fieldErrors.occupancy} required>
               <select id="occupancy" className={selectCls} value={form.occupancyStatus} onChange={(e) => set('occupancyStatus', e.target.value)}>
                 <option value="" disabled>—</option>
                 {OCCUPANCY_STATUSES.map((s) => (
@@ -188,7 +253,7 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
                 ))}
               </select>
             </FormField>
-            <FormField id="completion" label={t('completion')} required>
+            <FormField id="completion" label={t("completion")} error={fieldErrors.completion} required>
               <select id="completion" className={selectCls} value={form.completionStatus} onChange={(e) => set('completionStatus', e.target.value)}>
                 <option value="" disabled>—</option>
                 {COMPLETION_STATUSES.map((s) => (
@@ -198,11 +263,11 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
             </FormField>
           </div>
 
-          <FormField id="parking" label={t('parking')}>
+          <FormField id="parking" label={t("parking")} error={fieldErrors.parking}>
             <Input id="parking" type="number" inputMode="numeric" value={form.parkingSpaces} onChange={(e) => set('parkingSpaces', e.target.value)} placeholder={t('parkingPlaceholder')} className="max-w-[160px]" />
           </FormField>
 
-          <FormField id="description" label={t('descriptionLabel')} required>
+          <FormField id="description" label={t("descriptionLabel")} error={fieldErrors.descriptionShort ?? fieldErrors.descriptionLong} required>
             <textarea
               id="description"
               value={form.description}
@@ -215,7 +280,7 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
             <p className="mt-1 text-xs text-muted-foreground">{form.description.length} / 2000 · {t('descriptionHelp')}</p>
           </FormField>
 
-          <FormField id="features" label={t('amenities')}>
+          <FormField id="features" label={t("amenities")} error={fieldErrors.amenities}>
             <p className="mb-2 text-xs text-muted-foreground">{t('amenitiesHelp')}</p>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {AMENITIES.map((a) => (

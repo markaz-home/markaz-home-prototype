@@ -312,6 +312,69 @@ export const listingRouter = router({
       return { ok: true as const };
     }),
 
+  /**
+   * Debounced autosave for editable form steps (Property Details, Settings).
+   * Persists whatever partial, valid fields are present WITHOUT validating step
+   * completeness or transitioning state. Optimistic concurrency: the caller sends
+   * the version it last saw; a mismatch means another tab/device saved first →
+   * CONFLICT (the UI prompts a refresh). Bumps version on success.
+   */
+  saveDraft: customerProcedure
+    .input(
+      z.object({
+        listingId: z.string().uuid(),
+        version: z.number().int(),
+        property: z
+          .object({
+            propertyType: z.string().nullish(),
+            community: z.string().nullish(),
+            buildingOrProject: z.string().nullish(),
+            unitIdentifier: z.string().nullish(),
+            bedrooms: z.number().int().nullish(),
+            bathrooms: z.number().int().nullish(),
+            sizeSqft: z.number().nullish(),
+            furnishingStatus: z.string().nullish(),
+            occupancyStatus: z.string().nullish(),
+            completionStatus: z.string().nullish(),
+            parkingSpaces: z.number().int().nullish(),
+            features: z.array(z.string()).nullish(),
+          })
+          .optional(),
+        description: z.string().nullish(),
+        askingPriceAed: z.number().nullish(),
+        minNotificationPriceAed: z.number().nullish(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const listing = await loadOwned(ctx.tx, input.listingId);
+      if (listing.version !== input.version) {
+        throw new TRPCError({ code: 'CONFLICT', message: 'This listing was updated elsewhere.' });
+      }
+      if (input.property && listing.propertyId) {
+        const p = input.property;
+        const set: Partial<typeof properties.$inferInsert> = {};
+        if (p.propertyType !== undefined) set.propertyType = p.propertyType ?? null;
+        if (p.community !== undefined) set.community = p.community ?? null;
+        if (p.buildingOrProject !== undefined) set.buildingOrProject = p.buildingOrProject ?? null;
+        if (p.unitIdentifier !== undefined) set.unitIdentifier = p.unitIdentifier ?? null;
+        if (p.bedrooms !== undefined) set.bedrooms = p.bedrooms ?? null;
+        if (p.bathrooms !== undefined) set.bathrooms = p.bathrooms ?? null;
+        if (p.sizeSqft !== undefined) set.sizeSqft = p.sizeSqft == null ? null : String(p.sizeSqft);
+        if (p.furnishingStatus !== undefined) set.furnishingStatus = p.furnishingStatus ?? null;
+        if (p.occupancyStatus !== undefined) set.occupancyStatus = p.occupancyStatus ?? null;
+        if (p.completionStatus !== undefined) set.completionStatus = p.completionStatus ?? null;
+        if (p.parkingSpaces !== undefined) set.parkingSpaces = p.parkingSpaces ?? null;
+        if (p.features !== undefined) set.features = p.features ?? [];
+        if (Object.keys(set).length > 0) await ctx.tx.update(properties).set(set).where(eq(properties.id, listing.propertyId));
+      }
+      const lset: Partial<typeof listings.$inferInsert> = { version: listing.version + 1 };
+      if (input.description !== undefined) lset.description = input.description ?? null;
+      if (input.askingPriceAed !== undefined) lset.askingPrice = input.askingPriceAed == null ? null : String(input.askingPriceAed);
+      if (input.minNotificationPriceAed !== undefined) lset.minNotificationPrice = input.minNotificationPriceAed == null ? null : String(input.minNotificationPriceAed);
+      await ctx.tx.update(listings).set(lset).where(eq(listings.id, input.listingId));
+      return { version: listing.version + 1 };
+    }),
+
   /** Save Listing & Offer Settings. Invalidates Form A / permit downstream. */
   saveSettings: customerProcedure
     .input(listingSettingsSchema.and(z.object({ listingId: z.string().uuid() })))

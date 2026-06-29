@@ -503,7 +503,25 @@
     "amenities": "Features and amenities",
     "amenitiesHelp": "Choose up to 15.",
     "saving": "Saving property details…",
-    "saved": "Property details saved."
+    "saved": "Property details saved.",
+    "err": {
+      "propertyType": "Select a property type.",
+      "emirate": "This prototype currently supports Dubai listings.",
+      "community": "Enter the area or community.",
+      "building": "Enter the building or project name.",
+      "unit": "Enter a private unit or property identifier.",
+      "bedrooms": "Select the number of bedrooms.",
+      "bathrooms": "Select the number of bathrooms.",
+      "size": "Enter a property size between 200 and 50,000 sq ft.",
+      "furnishing": "Select the furnishing status.",
+      "occupancy": "Select the occupancy status.",
+      "completion": "Select the completion status.",
+      "parking": "Enter a number from 0 to 10.",
+      "descriptionShort": "Add at least 80 characters describing the property.",
+      "descriptionLong": "Description must be 2,000 characters or fewer.",
+      "amenities": "Choose up to 15 features and amenities.",
+      "generic": "We could not save your changes. Check the highlighted fields and try again."
+    }
   },
   "ownership": {
     "stepLabel": "Step 2 of 9 · Ownership document",
