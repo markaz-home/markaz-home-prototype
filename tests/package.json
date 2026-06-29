@@ -9,8 +9,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@markaz/api": "workspace:*",
     "@markaz/db": "workspace:*",
     "@markaz/domain": "workspace:*",
+    "@markaz/observability": "workspace:*",
     "drizzle-orm": "^0.38.3",
     "postgres": "^3.4.5",
     "@supabase/supabase-js": "^2.47.10"

@@ -564,12 +564,18 @@ importers:
 
   tests:
     dependencies:
+      '@markaz/api':
+        specifier: workspace:*
+        version: link:../packages/api
       '@markaz/db':
         specifier: workspace:*
         version: link:../packages/db
       '@markaz/domain':
         specifier: workspace:*
         version: link:../packages/domain
+      '@markaz/observability':
+        specifier: workspace:*
+        version: link:../packages/observability
       '@supabase/supabase-js':
         specifier: ^2.47.10
         version: 2.108.2
