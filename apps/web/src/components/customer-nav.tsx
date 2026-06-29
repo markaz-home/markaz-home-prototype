@@ -19,7 +19,7 @@ import { SignOutButton } from './sign-out-button';
 const NAV_ITEMS = [
   { href: '/dashboard', key: 'dashboard' },
   { href: '/browse', key: 'browse' },
-  { href: '/listings', key: 'myListings' },
+  { href: '/sell', key: 'myListings' },
   { href: '/offers', key: 'offers' },
   { href: '/transactions', key: 'transactions' },
 ] as const;

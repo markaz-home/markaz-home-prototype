@@ -59,7 +59,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
           </CardHeader>
           <CardContent>
             <Button asChild variant="secondary">
-              <Link href="/listings">
+              <Link href="/sell">
                 {t('listCta')}
                 <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden />
               </Link>
