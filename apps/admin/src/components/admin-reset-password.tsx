@@ -25,6 +25,8 @@ export function AdminResetPassword() {
   });
   const password = watch('password') ?? '';
   const fe = (c?: string) => (c ? tv(FIELD_ERROR_KEYS[c] ?? 'unexpectedError') : undefined);
+  // Surface the max-length (128) error under the field (design spec §2194).
+  const passwordFieldError = errors.password?.message === 'password_too_long' ? fe('password_too_long') : undefined;
 
   async function onSubmit(data: ResetPasswordInput) {
     setError(null);
@@ -40,7 +42,7 @@ export function AdminResetPassword() {
         <AdminHeading title={t('resetTitle')} description={t('resetBody')} />
         {error ? <Alert variant="destructive">{error}</Alert> : null}
         <form onSubmit={handleSubmit(onSubmit, () => setSubmitted(true))} className="space-y-5" noValidate>
-          <FormField id="password" label={tr('newPassword')} required>
+          <FormField id="password" label={tr('newPassword')} error={passwordFieldError} required>
             <PasswordField id="password" autoComplete="new-password" dir="ltr" aria-invalid={!!errors.password} {...register('password')} />
           </FormField>
           <PasswordChecklist password={password} submitted={submitted} />

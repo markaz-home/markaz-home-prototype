@@ -69,13 +69,20 @@ enable_confirmations = true
 secure_password_change = false
 otp_length = 6
 otp_expiry = 3600
-# NOTE: the password policy (min 8 + upper/lower/number/special) is enforced in
-# the app (client + zod schema in packages/domain/src/auth.ts). The pinned local
-# Supabase CLI does not accept password-policy keys here; the platform sets the
-# server-side GoTrue policy in the deployed environment.
+# NOTE: the application password policy (min 8; upper/lower/number/special; max
+# 128 — ADR-0009) is enforced in the app at two layers: the client form (live
+# checklist + strength meter) and the shared zod schema
+# (packages/domain/src/auth.ts) used by every form. The pinned local Supabase CLI
+# does NOT accept password-policy keys here, so this file does NOT enforce the full
+# policy. Production server-side enforcement is a platform-team responsibility:
+# configure + validate the deployed GoTrue password policy (see the platform
+# checklist in infra/supabase/rds-compatibility-checklist.md).
 
-# All email templates carry the 6-digit token ({{ .Token }}) so the code-entry
-# UI works for verification (confirmation), recovery, and email change.
+# New-account verification uses a 6-digit code: the confirmation (and email-change)
+# templates carry {{ .Token }} for the code-entry UI. Password RECOVERY uses the
+# official Supabase LINK instead — recovery.html links to
+# {{ .RedirectTo }}/auth/confirm?token_hash=…&type=recovery&next=/reset-password
+# (verified server-side; no code is shown). See ADR-0009.
 [auth.email.template.confirmation]
 subject = "Verify your MARKAZ Home email"
 content_path = "./supabase/templates/confirmation.html"

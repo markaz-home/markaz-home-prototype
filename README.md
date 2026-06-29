@@ -120,14 +120,16 @@ The local stack runs in Docker. Service URLs (after `pnpm supabase:start`):
 | Supabase API | http://127.0.0.1:54321 |
 | Postgres | 127.0.0.1:54322 |
 | Studio | http://127.0.0.1:54323 |
-| **Mail inbox** (verification/recovery codes) — Mailpit, or Inbucket on older CLIs | http://127.0.0.1:54324 |
+| **Mail inbox** (verification code + recovery link) — Mailpit, or Inbucket on older CLIs | http://127.0.0.1:54324 |
 
-Authentication is **email + password**. 6-digit email codes are used **only** to
-verify a new account and to recover a password — never as the sign-in credential
-(ADR 0009). Locally, no real email is sent — read the code from the local mail
-inbox (http://127.0.0.1:54324). `supabase/templates/confirmation.html` and
-`recovery.html` force the email to contain the code (`{{ .Token }}`). Codes are
-never built, stored, or logged by app code. See `docs/runbooks/authentication.md`.
+Authentication is **email + password** (ADR 0009). A 6-digit email code is used
+**only** for **new-account email verification**; **password recovery uses the
+official Supabase recovery LINK** (Forgot Password → email link → `/auth/confirm`
+→ Reset Password). Neither is the sign-in credential. Locally, no real email is
+sent — read the **code** (`confirmation.html`, `{{ .Token }}`) or click the
+**recovery link** (`recovery.html`) in the local mail inbox
+(http://127.0.0.1:54324). Codes, links, and tokens are never built, stored, or
+logged by app code. See `docs/runbooks/authentication.md`.
 
 Demo accounts (fictional, local-only): `customer-a@markaz.demo`,
 `customer-b@markaz.demo` (both CUSTOMER), `admin@markaz.demo` (ADMIN). Provision
@@ -247,13 +249,15 @@ it finish. Subsequent starts are fast (images are cached).
 `Restarting`). It's an unrelated leftover — remove it: `docker rm -f <name>`
 (removes only the container, not data volumes).
 
-**The verification/recovery email shows a *link* instead of a code.** The email
-templates weren't picked up. `confirmation.html` and `recovery.html` live in
+**The *verification* email shows a link instead of a 6-digit code.** Only the
+`confirmation.html` template wasn't picked up. Templates live in
 `supabase/templates/` and are wired in `supabase/config.toml` under
-`[auth.email.template.*]`. Restart the stack
-(`pnpm supabase:stop && pnpm supabase:start`) and request a **fresh** code. Note:
-6-digit codes are now used **only** for account verification and password
-recovery — sign-in is email + password.
+`[auth.email.template.*]`: `confirmation.html` carries the **code**
+(`{{ .Token }}`), while `recovery.html` intentionally carries the **link**
+(`{{ .RedirectTo }}/auth/confirm?token_hash=…&type=recovery`). A **recovery**
+email containing a link is **correct** — recovery uses the official Supabase link,
+not a code (ADR 0009). Restart the stack
+(`pnpm supabase:stop && pnpm supabase:start`) and request a **fresh** email.
 
 **Auth fails after the keys look set.** Make sure you copied the keys your CLI
 actually printed into `.env` (newer CLIs print `sb_publishable_…` / `sb_secret_…`

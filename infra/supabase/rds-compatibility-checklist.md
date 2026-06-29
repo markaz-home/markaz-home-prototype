@@ -25,6 +25,15 @@ available for demo-only environments.
       any others Supabase components depend on).
 - [ ] **Auth schema** — the `auth.*` schema installs and operates (GoTrue),
       including the `handle_new_user()` trigger on `auth.users`.
+- [ ] **Server-side password policy** — configure the deployed GoTrue password
+      policy to match the application policy (min 8; upper/lower/number/special;
+      **max 128** — ADR-0009). The pinned local Supabase CLI rejects password-policy
+      config keys, so locally the policy is enforced only by the client form + the
+      shared zod schema (`packages/domain/src/auth.ts`). Platform must: (a) confirm
+      which policy keys the **deployed** GoTrue version supports, (b) set them, and
+      (c) **independently verify** that production **rejects** a non-compliant
+      password server-side (client bypassed), with **no silent truncation** of long
+      passwords.
 - [ ] **Storage schema** — the `storage.*` schema installs and operates; bucket
       and `storage.objects` RLS behave as in local.
 - [ ] **Realtime / logical replication** — works on the **direct** RDS endpoint:

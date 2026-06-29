@@ -5,9 +5,10 @@ test.describe('foundation', () => {
   test('landing renders and routes to sign-in', async ({ page }) => {
     await page.goto('/en');
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    await page.getByRole('link', { name: /Get started/i }).click();
+    // Landing routes every primary CTA to sign-in (design foundation); use the header link.
+    await page.getByRole('link', { name: 'Sign in' }).first().click();
     await expect(page).toHaveURL(/\/en\/sign-in/);
-    await expect(page.getByText('Sign in or create your account')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
   });
 
   test('language switch toggles to Arabic and sets RTL direction', async ({ page }) => {

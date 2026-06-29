@@ -36,6 +36,9 @@ export function ResetPasswordForm() {
 
   const password = watch('password') ?? '';
   const fe = (c?: string) => (c ? tv(FIELD_ERROR_KEYS[c] ?? 'unexpectedError') : undefined);
+  // Surface the max-length (128) error under the field (design spec §2194); the
+  // checklist already covers min-length + policy. Never a silent truncation.
+  const passwordFieldError = errors.password?.message === 'password_too_long' ? fe('password_too_long') : undefined;
   const errorList = (['password', 'confirmPassword'] as const).filter((k) => errors[k]).map((k) => ({ id: k, message: fe(errors[k]?.message) ?? '' }));
 
   async function onSubmit(data: ResetPasswordInput) {
@@ -58,7 +61,7 @@ export function ResetPasswordForm() {
         <ErrorSummary errors={errorList} />
         {error ? <Alert variant="destructive">{error}</Alert> : null}
         <form onSubmit={handleSubmit(onSubmit, () => setSubmitted(true))} className="space-y-5" noValidate>
-          <FormField id="password" label={t('newPassword')} required>
+          <FormField id="password" label={t('newPassword')} error={passwordFieldError} required>
             <PasswordField id="password" autoComplete="new-password" dir="ltr" aria-invalid={!!errors.password} {...register('password')} />
           </FormField>
           <PasswordChecklist password={password} submitted={submitted} />

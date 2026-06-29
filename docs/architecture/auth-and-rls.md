@@ -2,12 +2,13 @@
 
 ## Authentication flow
 
-Authentication is **email + password** via Supabase Auth (ADR 0009). 6-digit
-email codes are retained **only** for verifying a new account and for password
-recovery — never as the sign-in credential, and never for SMS. Codes are
-generated and validated by Supabase Auth and are **never built, stored, or logged
-by app code**. Sessions are `@supabase/ssr` **secure cookies** — tokens are never
-hand-stored. Locally, codes land in **Mailpit** (http://127.0.0.1:54324; Inbucket
+Authentication is **email + password** via Supabase Auth (ADR 0009). A 6-digit
+email code is retained **only** for **new-account email verification**; password
+recovery uses the **official Supabase recovery LINK** (not a code). Neither is the
+sign-in credential, and SMS is never used. Codes, links, and tokens are generated
+and validated by Supabase Auth and are **never built, stored, or logged by app
+code**. Sessions are `@supabase/ssr` **secure cookies** — tokens are never
+hand-stored. Locally, mail lands in **Mailpit** (http://127.0.0.1:54324; Inbucket
 on older CLIs); SES delivers in deployed demos.
 
 ### New customer (sign-up + verification)
@@ -32,12 +33,16 @@ skips onboarding and goes straight to the dashboard.
 
 ### Password recovery
 
-`/[locale]/forgot-password` → `resetPasswordForEmail` → **always** the generic
-"If an account exists…" message (anti-enumeration). `/[locale]/reset-password`
-(6-digit `recovery` code + new password) → `verifyOtp({ type:'recovery' })` →
-`updateUser({ password })` → **sign out → fresh sign-in** at `/sign-in?reset=1`
-("Password updated"). Legacy passwordless accounts set their first password this
-way. Sign-out-after-reset is deliberate (ADR 0009).
+`/[locale]/forgot-password` → `resetPasswordForEmail(email, { redirectTo:
+<app>/auth/confirm })` → **always** the generic "If an account exists…" message
+(anti-enumeration). The recovery email contains a **link**; the top-level
+`/auth/confirm` route handler runs `verifyOtp({ type:'recovery', token_hash })`
+(establishing the recovery session in secure cookies) and forwards to
+`/[locale]/reset-password`. That page renders **only** with a valid recovery
+session (otherwise it shows an invalid-link panel); it asks for a **new password
+only — no code field** → `updateUser({ password })` → **sign out → fresh
+sign-in** at `/reset-password/success` → `/sign-in`. Legacy passwordless accounts
+set their first password this way. Sign-out-after-reset is deliberate (ADR 0009).
 
 ### Duplicate-email safety
 
@@ -49,9 +54,14 @@ nothing`).
 
 ### Password policy
 
-Min 8; requires upper, lower, number, special; max 72 (provider bcrypt-safe
-limit). Enforced client-side, in the zod schema (`packages/domain/src/auth.ts`),
-and in `supabase/config.toml`.
+Min 8; requires upper, lower, number, special; **max 128** (design spec §10.5).
+Passwords longer than 128 produce a clear validation error — never a silent
+truncation. Enforced at two layers today: the **client form** (live checklist +
+strength meter) and the **shared zod schema** (`packages/domain/src/auth.ts`) used
+by every auth form. The pinned local Supabase CLI rejects password-policy config
+keys, so `supabase/config.toml` does **not** enforce the full policy; production
+**server-side GoTrue** policy configuration and validation is a **platform-team**
+follow-up (see `infra/supabase/rds-compatibility-checklist.md`).
 
 ### Admin
 
@@ -72,8 +82,8 @@ incomplete customers can **never** reach the dashboard. `requireCustomerStep`
 
 ### Data ownership (Auth vs profiles)
 
-Supabase **Auth** owns credentials, the bcrypt password hash, email-confirmation
-state, and all OTP/recovery codes + tokens. **`profiles`** owns `full_name`,
+Supabase **Auth** owns credentials, the password hash, email-confirmation
+state, and all verification/recovery codes, links, and tokens. **`profiles`** owns `full_name`,
 `account_type`, identity status, consent timestamps, and `onboarding_completed_at`
 — **no secrets**. RLS on `profiles` is unchanged.
 

@@ -55,6 +55,9 @@ export function SignUpForm() {
 
   const password = watch('password') ?? '';
   const fe = (code?: string) => (code ? tv(FIELD_ERROR_KEYS[code] ?? 'unexpectedError') : undefined);
+  // The live checklist covers min-length + policy; surface the max-length (128)
+  // error under the field too (design spec §2194 — never a silent truncation).
+  const passwordFieldError = errors.password?.message === 'password_too_long' ? fe('password_too_long') : undefined;
   const errorList = FIELDS.filter((k) => errors[k]).map((k) => ({
     id: k,
     message: fe(errors[k]?.message as string | undefined) ?? '',
@@ -123,7 +126,7 @@ export function SignUpForm() {
             <Input id="email" type="email" inputMode="email" autoComplete="email" dir="ltr" placeholder={t('emailPlaceholder')} aria-invalid={!!errors.email} {...register('email')} />
           </FormField>
 
-          <FormField id="password" label={t('password')} required>
+          <FormField id="password" label={t('password')} error={passwordFieldError} required>
             <PasswordField id="password" autoComplete="new-password" dir="ltr" placeholder={t('passwordPlaceholder')} aria-invalid={!!errors.password} {...register('password')} />
           </FormField>
           <PasswordChecklist password={password} submitted={submitted} />

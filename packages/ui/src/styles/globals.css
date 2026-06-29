@@ -35,7 +35,7 @@
     --secondary: 204 44% 94%;
     --secondary-foreground: 209 64% 16%;
     --muted: 204 44% 94%;
-    --muted-foreground: 208 13% 45%; /* #647482 Slate */
+    --muted-foreground: 208 15% 41%; /* #59697A Slate — darkened to clear WCAG AA 4.5:1 on the off-white canvas */
     --accent: 204 44% 94%;
     --accent-foreground: 209 64% 16%;
 

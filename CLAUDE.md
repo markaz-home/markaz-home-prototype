@@ -43,10 +43,12 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   (`packages/domain/src/auth.ts`). The pinned local Supabase CLI rejects
   password-policy config keys, so the deployed platform owns the server-side GoTrue
   policy.
-- **Duplicate-email is anti-enumeration:** `signUp` for a confirmed email returns
-  empty `identities[]`/no error → show safe Sign In / Forgot Password copy. No
-  existence query, no enumeration endpoint, no raw DB errors. Bad sign-in
-  credentials get one generic message.
+- **Duplicate-email is anti-enumeration:** handle BOTH provider behaviours —
+  `isLikelyExistingAccount` (signUp returns empty `identities[]`/no error) AND
+  `isExistingAccountError` (an explicit 422 `user_already_exists`, which this
+  GoTrue returns). Either → show safe Sign In / Forgot Password copy. No existence
+  query, no enumeration endpoint, no raw DB errors. Bad sign-in credentials get one
+  generic message.
 
 ## Architecture you must preserve
 - **RLS is the security boundary.** Client/route guards are UX only.
@@ -80,6 +82,26 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   use the tokens and `@markaz/ui` components. Blue is for hierarchy, not weight
   (~65–75% white/off-white).
 
+## Auth flow architecture (routes, layouts, sessions — keep it stable)
+- **Route groups + persistent chrome.** Auth/onboarding screens live under
+  `apps/web/src/app/[locale]/(auth)/` with a **shared layout** that renders the
+  chrome ONCE (header + language switcher + footer; admin: the deep-blue Operations
+  band). The dashboard/app lives under `[locale]/(app)/` (CustomerNav). Route groups
+  don't change URLs. `AuthShell`/`AdminAuthShell` render ONLY inner content — do NOT
+  re-add per-page header/footer or a full-screen `[locale]/loading.tsx` spinner;
+  both caused the "glitch on every screen". (`(app)` keeps its skeleton loading.)
+- **Session loading is lean + request-deduped.** Use `getSession()` (web) /
+  `getAdminSession()` (admin) from `src/server/session.ts` — they're wrapped in
+  React `cache()` and read the profile directly under RLS via
+  `loadOwnProfileRow` (`@markaz/db`). Do NOT load the session through the tRPC stack
+  and do NOT call it redundantly (layout guard + page share one auth check + one
+  query per request). `requireCustomerStep`/`requireAdmin` are the page guards.
+- **No `router.refresh()` after a navigation.** `router.replace`/`push` to a dynamic
+  route already reads fresh cookies; an extra `refresh()` forces a second full render
+  (visible flicker). Only refresh when staying on the same route.
+- Recovery uses the **link** flow; `/auth/confirm` route handlers (top-level, outside
+  `[locale]`) verify the token. Middleware excludes `/auth` from locale routing.
+
 ## Layout
 ```
 apps/{web,admin,worker}        web=customer/public, admin=separate, worker=placeholder
@@ -112,10 +134,13 @@ Before declaring work done, run: `pnpm typecheck && pnpm lint && pnpm test && pn
   too). Newer Supabase CLIs use **Mailpit** (not Inbucket) at :54324 and the new
   **`sb_publishable_` / `sb_secret_`** key format — map them to
   `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY`.
-- Verification/recovery emails are forced to contain the 6-digit code via
-  `supabase/templates/{confirmation,recovery}.html` (wired in
-  `config.toml [auth.email.template.*]`); `enable_confirmations = true`. Changing
-  them needs a stack restart. Tests read codes from the Mailpit API.
+- Email templates are split by purpose (wired in `config.toml
+  [auth.email.template.*]`): `confirmation.html` forces the **6-digit code**
+  (`{{ .Token }}`) for new-account verification; `recovery.html` forces the
+  **official recovery link** (`{{ .RedirectTo }}/auth/confirm?token_hash=…&type=recovery`)
+  for Forgot/Reset password. `enable_confirmations = true`. Changing templates
+  needs a stack restart. Tests read the **code** (verification) and the **link**
+  (recovery) from the Mailpit API.
 - `.env` lives at the repo root; both apps load it via `dotenv` in `next.config.mjs`.
 
 ## Out of scope this milestone

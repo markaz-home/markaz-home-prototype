@@ -26,7 +26,7 @@
     "pointListTitle": "List your property",
     "pointListBody": "Create a listing, complete the demo verification steps, publish, and manage offers.",
     "pointSecureTitle": "Real, secure foundation",
-    "pointSecureBody": "Email one-time-code sign-in, in-country data, and server-enforced access control."
+    "pointSecureBody": "Email and password sign-in, in-country data, and server-enforced access control."
   },
   "auth": {
     "signIn": "Sign in",
@@ -324,7 +324,7 @@
   "admin": {
     "appName": "MARKAZ Admin",
     "loginTitle": "Admin sign in",
-    "loginSubtitle": "Operations portal. Enter your email to receive a one-time code.",
+    "loginSubtitle": "Operations portal. Sign in with your email and password.",
     "overviewTitle": "Overview",
     "accessDeniedTitle": "Access denied",
     "accessDeniedBody": "This portal is for MARKAZ administrators only. Your account doesn't have access.",

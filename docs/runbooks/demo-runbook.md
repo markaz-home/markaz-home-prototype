@@ -72,5 +72,6 @@ duplicates.
 - The Admin account can be created **only** by this script; there is no public
   admin sign-up.
 - Sign in to the demo accounts with the credentials above (email + password). To
-  exercise sign-up / verification / recovery manually, use a fresh email and read
-  the 6-digit code from the local mail inbox — see `authentication.md`.
+  exercise sign-up / verification / recovery manually, use a fresh email and the
+  local mail inbox: read the **6-digit code** for new-account verification, and
+  click the **recovery link** for Forgot/Reset password — see `authentication.md`.

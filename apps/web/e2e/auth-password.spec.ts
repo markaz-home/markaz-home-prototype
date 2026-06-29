@@ -75,6 +75,9 @@ test.describe('email/password authentication', () => {
     await expect(page).toHaveURL(/\/en\/onboarding\/uae-pass/);
     await page.getByRole('button', { name: 'Start demo verification' }).click();
     await page.getByRole('button', { name: 'Approve demo verification' }).click();
+    // The success screen does not auto-redirect (design spec §16.6); the customer
+    // confirms with "Go to dashboard".
+    await page.getByRole('button', { name: 'Go to dashboard' }).click();
     await expect(page).toHaveURL(/\/en\/dashboard/);
   });
 
@@ -112,13 +115,22 @@ test.describe('email/password authentication', () => {
     await page.goto(link!); // /auth/confirm → verifies → /reset-password
     await expect(page).toHaveURL(/\/reset-password/);
 
-    const newPassword = 'NewMarkaz!2';
+    // Unique per run so a re-run never sets the same password twice (GoTrue
+    // rejects "new password == current"), keeping the recovery test idempotent.
+    const newPassword = `NewMarkaz!${Date.now() % 1000000}`;
     await page.getByLabel(/^New password/).fill(newPassword);
     await page.getByLabel(/^Confirm new password/).fill(newPassword);
     await page.getByRole('button', { name: /Update password/i }).click();
 
     await expect(page).toHaveURL(/\/reset-password\/success/);
     await page.getByRole('link', { name: 'Sign in' }).click();
+
+    // The old password (the demo default in a clean run) no longer works.
+    await signIn(page, email, STRONG_PASSWORD);
+    await expect(page.getByText('The email or password is incorrect.')).toBeVisible();
+    await expect(page).not.toHaveURL(/\/en\/dashboard/);
+
+    // The new password works.
     await signIn(page, email, newPassword);
     await expect(page).toHaveURL(/\/en\/dashboard/);
   });

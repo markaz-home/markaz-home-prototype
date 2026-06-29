@@ -49,7 +49,7 @@ pnpm dev
 | Supabase API (Kong) | http://127.0.0.1:54321 |
 | Postgres database | 127.0.0.1:54322 |
 | Supabase Studio | http://127.0.0.1:54323 |
-| Mail inbox (verification/recovery codes) — Mailpit, or Inbucket on older CLIs | http://127.0.0.1:54324 |
+| Mail inbox (verification code + recovery link) — Mailpit, or Inbucket on older CLIs | http://127.0.0.1:54324 |
 
 ## Environment variables
 
@@ -95,6 +95,6 @@ pnpm supabase:status  # show local service status/URLs
   with `pnpm supabase:stop`.
 - **Schema looks stale / out of sync** — run `pnpm supabase:reset` to rebuild
   from migrations + seed (see `database-reset.md`).
-- **Cannot log in** — see `authentication.md` (email + password; verification /
-  recovery codes via the mail inbox at :54324). Make sure you ran `pnpm db:setup`
-  so the demo accounts exist.
+- **Cannot log in** — see `authentication.md` (email + password; the new-account
+  verification **code** and the password-recovery **link** arrive in the mail
+  inbox at :54324). Make sure you ran `pnpm db:setup` so the demo accounts exist.
