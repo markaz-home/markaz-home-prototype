@@ -166,6 +166,64 @@ async function main() {
       select ${idA}, 'IN_APP', 'OFFER_RECEIVED', '{"listing":"Dubai Marina"}'::jsonb
       where not exists (select 1 from public.notifications where recipient_id = ${idA} and kind = 'OFFER_RECEIVED')`;
 
+    // --- Week 2 listing-journey draft scenarios (fictional; idempotent) ------
+    // Customer A: an incomplete DRAFT, a verification-pending draft, and a
+    // READY_TO_PUBLISH listing; Customer B: a separate draft (isolation tests).
+    await sql`
+      insert into public.properties
+        (id, owner_id, emirate, community, building_or_project, unit_identifier, property_type,
+         bedrooms, bathrooms, size_sqft, furnishing_status, occupancy_status, completion_status, parking_spaces, features) values
+        ('00000000-0000-0000-0000-0000000011a1', ${idA}, 'Dubai', 'Jumeirah Village Circle', null, null, 'APARTMENT',
+         1, null, null, null, null, null, null, '{}'),
+        ('00000000-0000-0000-0000-0000000011a2', ${idA}, 'Dubai', 'Business Bay', 'Executive Towers', 'Unit 1203', 'APARTMENT',
+         2, 2, 1100.00, 'FURNISHED', 'VACANT', 'READY', 1, '{BALCONY,GYM}'),
+        ('00000000-0000-0000-0000-0000000011a3', ${idA}, 'Dubai', 'Dubai Marina', 'Marina Gate 2', 'Unit 2205', 'APARTMENT',
+         2, 3, 1284.00, 'FURNISHED', 'VACANT', 'READY', 1, '{BALCONY,SEA_VIEW,GYM}'),
+        ('00000000-0000-0000-0000-0000000011b1', ${idB}, 'Dubai', 'Dubai Hills Estate', null, null, 'VILLA',
+         3, null, null, null, null, null, null, '{}')
+      on conflict (id) do nothing`;
+
+    await sql`
+      insert into public.listings
+        (id, property_id, owner_id, title, state, current_step, currency, asking_price, min_notification_price,
+         description, investment_case_visible, investment_case_skipped, review_confirmed_at) values
+        ('00000000-0000-0000-0000-0000000021a1', '00000000-0000-0000-0000-0000000011a1', ${idA}, 'Untitled property', 'DRAFT', 'details', 'AED', null, null, null, false, false, null),
+        ('00000000-0000-0000-0000-0000000021a2', '00000000-0000-0000-0000-0000000011a2', ${idA}, 'Executive Towers, Unit 1203', 'OWNERSHIP_REVIEW', 'verification', 'AED', null, null,
+         'A bright, well-maintained two-bedroom apartment in Business Bay with an open-plan living area, fitted kitchen, built-in wardrobes, and a balcony overlooking the community. Prepared as a fictional sample for this prototype.', false, false, null),
+        ('00000000-0000-0000-0000-0000000021a3', '00000000-0000-0000-0000-0000000011a3', ${idA}, 'Marina Gate 2, Unit 2205', 'READY_TO_PUBLISH', 'ready', 'AED', 2100000, 1950000,
+         'A furnished two-bedroom apartment in Marina Gate 2 with sea views, an open living and dining area, built-in wardrobes, and a covered parking space. Prepared as a fictional sample listing for this prototype.', true, false, now())
+        ,('00000000-0000-0000-0000-0000000021b1', '00000000-0000-0000-0000-0000000011b1', ${idB}, 'Untitled property', 'DRAFT', 'details', 'AED', null, null, null, false, false, null)
+      on conflict (id) do nothing`;
+
+    await sql`
+      insert into public.ownership_documents (id, listing_id, owner_id, document_type, storage_path, original_name, active, status) values
+        ('00000000-0000-0000-0000-0000000041a2', '00000000-0000-0000-0000-0000000021a2', ${idA}, 'TITLE_DEED', 'ownership-documents/demo/fictional-title-deed-1203.pdf', 'Fictional_Title_Deed_1203.pdf', true, 'PENDING'),
+        ('00000000-0000-0000-0000-0000000041a3', '00000000-0000-0000-0000-0000000021a3', ${idA}, 'TITLE_DEED', 'ownership-documents/demo/fictional-title-deed-2205.pdf', 'Fictional_Title_Deed_2205.pdf', true, 'VERIFIED_DEMO')
+      on conflict (id) do nothing`;
+    await sql`
+      insert into public.verifications (id, listing_id, kind, status, result) values
+        ('00000000-0000-0000-0000-0000000042a2', '00000000-0000-0000-0000-0000000021a2', 'OWNERSHIP', 'PENDING', '{"decided":"SUCCESS"}'::jsonb),
+        ('00000000-0000-0000-0000-0000000042a3', '00000000-0000-0000-0000-0000000021a3', 'OWNERSHIP', 'VERIFIED_DEMO', '{"decided":"SUCCESS"}'::jsonb)
+      on conflict (id) do nothing`;
+    await sql`
+      insert into public.form_a_records (id, listing_id, status, confirmed_by, listing_price_at_confirmation, signed_at) values
+        ('00000000-0000-0000-0000-0000000043a3', '00000000-0000-0000-0000-0000000021a3', 'VERIFIED_DEMO', ${idA}, 2100000, now())
+      on conflict (id) do nothing`;
+    await sql`
+      insert into public.permit_records (id, listing_id, permit_type, permit_number, status, approved_at) values
+        ('00000000-0000-0000-0000-0000000044a3', '00000000-0000-0000-0000-0000000021a3', 'TRAKHEESI', 'DEMO-TRK-00000000', 'VERIFIED_DEMO', now())
+      on conflict (id) do nothing`;
+    await sql`
+      insert into public.property_photos (id, listing_id, storage_path, original_name, is_cover, sort_order) values
+        ('00000000-0000-0000-0000-0000000031a3', '00000000-0000-0000-0000-0000000021a3', 'listing-photos-draft/demo/marina-2205-cover.jpg', 'cover.jpg', true, 0),
+        ('00000000-0000-0000-0000-0000000031a4', '00000000-0000-0000-0000-0000000021a3', 'listing-photos-draft/demo/marina-2205-living.jpg', 'living.jpg', false, 1)
+      on conflict (id) do nothing`;
+    await sql`
+      insert into public.investment_cases
+        (id, listing_id, original_purchase_price, purchase_date, renovation_costs, total_invested, estimated_gain, estimated_roi_pct, estimated_annualised_return_pct, price_per_sqft, visible) values
+        ('00000000-0000-0000-0000-0000000045a3', '00000000-0000-0000-0000-0000000021a3', 1750000, '2022-06-29', 50000, 1800000, 300000, 16.7, 3.9, 1636, true)
+      on conflict (id) do nothing`;
+
     console.log('  ✓ Demo domain data seeded');
   } finally {
     await sql.end({ timeout: 5 });

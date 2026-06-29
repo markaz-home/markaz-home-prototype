@@ -12,6 +12,10 @@ export const DEMO_EMAILS = {
 export const LISTING_IDS = {
   live: '00000000-0000-0000-0000-0000000020a1',
   review: '00000000-0000-0000-0000-0000000020a3',
+  // Week-2 seeded scenarios (Customer A).
+  readyToPublish: '00000000-0000-0000-0000-0000000021a3',
+  verificationPending: '00000000-0000-0000-0000-0000000021a2',
+  incompleteDraft: '00000000-0000-0000-0000-0000000021a1',
 } as const;
 
 export interface DemoIds {
