@@ -66,6 +66,12 @@ export const verificationStatus = pgEnum('verification_status', [
   'VERIFIED_DEMO',
   'FAILED_DEMO',
 ]);
+export const publicationRequestStatus = pgEnum('publication_request_status', [
+  'NOT_SUBMITTED',
+  'PENDING',
+  'APPROVED_DEMO',
+  'REJECTED_DEMO',
+]);
 
 // --- Profiles ----------------------------------------------------------------
 export const profiles = pgTable(
@@ -137,6 +143,11 @@ export const listings = pgTable(
     investmentCaseSkipped: boolean('investment_case_skipped').notNull().default(false),
     reviewConfirmedAt: timestamp('review_confirmed_at', { withTimezone: true }),
     version: integer('version').notNull().default(1),
+    publicId: text('public_id'), // opaque public URL id (≠ uuid)
+    publicSlug: text('public_slug'),
+    pausedAt: timestamp('paused_at', { withTimezone: true }),
+    publicUpdatedAt: timestamp('public_updated_at', { withTimezone: true }),
+    publicationVersion: integer('publication_version').notNull().default(1),
     publishedAt: timestamp('published_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
@@ -144,6 +155,7 @@ export const listings = pgTable(
   (t) => ({
     ownerIdx: index('listings_owner_idx').on(t.ownerId),
     stateIdx: index('listings_state_idx').on(t.state),
+    publicIdKey: uniqueIndex('listings_public_id_key').on(t.publicId),
   }),
 );
 
@@ -217,6 +229,7 @@ export const propertyPhotos = pgTable(
       .notNull()
       .references(() => listings.id, { onDelete: 'cascade' }),
     storagePath: text('storage_path').notNull(),
+    publicPath: text('public_path'), // opaque path in the public bucket once published
     originalName: text('original_name'),
     contentType: text('content_type'),
     sizeBytes: integer('size_bytes'),
@@ -250,6 +263,25 @@ export const investmentCases = pgTable('investment_cases', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const listingPublicationRequests = pgTable(
+  'listing_publication_requests',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    listingId: uuid('listing_id')
+      .notNull()
+      .references(() => listings.id, { onDelete: 'cascade' }),
+    sellerUserId: uuid('seller_user_id').references(() => profiles.id, { onDelete: 'set null' }),
+    status: publicationRequestStatus('status').notNull().default('NOT_SUBMITTED'),
+    outcomeCategory: text('outcome_category'),
+    submittedAt: timestamp('submitted_at', { withTimezone: true }),
+    resolvedAt: timestamp('resolved_at', { withTimezone: true }),
+    supersededAt: timestamp('superseded_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ listingIdx: index('publication_requests_listing_idx').on(t.listingId) }),
+);
 
 export const savedProperties = pgTable(
   'saved_properties',
@@ -378,6 +410,7 @@ export const schema = {
   permitRecords,
   propertyPhotos,
   investmentCases,
+  listingPublicationRequests,
   savedProperties,
   savedSearches,
   offers,

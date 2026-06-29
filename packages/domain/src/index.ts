@@ -7,5 +7,7 @@ export * from './listing';
 export * from './listing-progress';
 export * from './listing-validation';
 export * from './investment';
+export * from './publication';
+export * from './marketplace';
 export * from './offer';
 export * from './transaction';
