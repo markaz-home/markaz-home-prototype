@@ -35,6 +35,9 @@ importers:
       '@markaz/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@markaz/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@markaz/domain':
         specifier: workspace:*
         version: link:../../packages/domain

@@ -40,7 +40,6 @@ export function AdminSignInFlow() {
       return;
     }
     router.replace('/overview');
-    router.refresh();
   }
 
   return (

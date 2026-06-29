@@ -19,7 +19,6 @@ export function AdminSignOut({ variant = 'ghost' }: { variant?: 'ghost' | 'outli
         setBusy(true);
         await createSupabaseBrowserClient().auth.signOut();
         router.replace('/signed-out');
-        router.refresh();
       }}
     >
       <LogOut className="h-4 w-4" aria-hidden />

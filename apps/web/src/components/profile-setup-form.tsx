@@ -31,7 +31,6 @@ export function ProfileSetupForm({ email }: { email?: string | null }) {
   const mutation = trpc.profile.completeSetup.useMutation({
     onSuccess: () => {
       router.replace('/onboarding/uae-pass');
-      router.refresh();
     },
     onError: () => setSaveError(tv('unexpectedError')),
   });

@@ -49,7 +49,6 @@ export function ResetPasswordForm() {
     // Spec §14.4: end the recovery session; require a fresh sign-in.
     await supabase.auth.signOut();
     router.replace('/reset-password/success');
-    router.refresh();
   }
 
   return (

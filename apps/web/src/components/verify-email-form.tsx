@@ -67,7 +67,6 @@ export function VerifyEmailForm() {
     }
     await audit.mutateAsync({ action: 'EMAIL_VERIFIED' }).catch(() => {});
     router.replace('/verify-email/success');
-    router.refresh();
   }
 
   async function resend() {

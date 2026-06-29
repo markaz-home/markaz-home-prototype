@@ -32,7 +32,6 @@ export function AdminResetPassword() {
     if (err) { setError(tv(AUTH_ERROR_KEYS[mapAuthError(err)])); return; }
     await supabase.auth.signOut();
     router.replace('/reset-password/success');
-    router.refresh();
   }
 
   return (

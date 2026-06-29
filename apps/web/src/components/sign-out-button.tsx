@@ -19,7 +19,6 @@ export function SignOutButton({ asMenuItem = false }: { asMenuItem?: boolean }) 
     const supabase = createSupabaseBrowserClient();
     await supabase.auth.signOut();
     router.replace('/signed-out');
-    router.refresh();
   }
 
   return (

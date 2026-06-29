@@ -19,12 +19,9 @@ export function UaePassFlow({ initialStatus }: { initialStatus: IdentityVerifica
   const [error, setError] = useState<string | null>(null);
 
   const mutation = trpc.profile.setIdentityStatus.useMutation({
-    onSuccess: (profile) => {
-      setStatus(profile.identityVerificationStatus);
-      if (profile.identityVerificationStatus === 'VERIFIED_DEMO') {
-        router.refresh();
-      }
-    },
+    // Just reflect the new status; the success screen shows "Go to dashboard"
+    // (spec §16.6) rather than auto-redirecting.
+    onSuccess: (profile) => setStatus(profile.identityVerificationStatus),
     onError: () => setError(t('failureBody')),
   });
 
@@ -124,13 +121,7 @@ export function UaePassFlow({ initialStatus }: { initialStatus: IdentityVerifica
                 {t('successTitle')}
               </span>
             </Alert>
-            <Button
-              className="w-full"
-              onClick={() => {
-                router.replace('/dashboard');
-                router.refresh();
-              }}
-            >
+            <Button className="w-full" onClick={() => router.replace('/dashboard')}>
               {t('dashboard')}
             </Button>
           </>
