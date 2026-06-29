@@ -21,7 +21,6 @@ interface PropertyCardProps {
  * detail page; the Save control sits above it without nesting interactions. */
 export function PropertyCard({ card, isAuthenticated, saved, owned }: PropertyCardProps) {
   const t = useTranslations('property');
-  const tf = useTranslations('filters');
   const locale = useLocale();
   const href = `/properties/${card.publicId}/${card.slug ?? ''}`;
   const returnPath = `/${locale}/properties/${card.publicId}/${card.slug ?? ''}`;
@@ -64,9 +63,7 @@ export function PropertyCard({ card, isAuthenticated, saved, owned }: PropertyCa
           <p className="text-lg font-semibold">{formatAed(card.askingPriceAed, locale)}</p>
           <p className="line-clamp-2 text-sm font-medium text-foreground">{card.headline}</p>
           <p className="text-sm text-muted-foreground">
-            {[card.community, card.emirate ? tf(`emirate${card.emirate}` as 'emirateDUBAI') : null]
-              .filter(Boolean)
-              .join(' · ')}
+            {[card.community, card.emirate].filter(Boolean).join(' · ')}
           </p>
 
           <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-2 text-sm text-muted-foreground">

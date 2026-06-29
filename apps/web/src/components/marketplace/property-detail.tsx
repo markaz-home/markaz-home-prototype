@@ -84,7 +84,7 @@ export function PropertyDetail({
           <p className="text-3xl font-semibold">{formatAed(detail.askingPriceAed, locale)}</p>
           <h1 className="mt-1 text-xl font-medium">{detail.headline}</h1>
           <p className="mt-1 text-muted-foreground">
-            {[detail.community, detail.emirate ? tf(`emirate${detail.emirate}` as 'emirateDUBAI') : null].filter(Boolean).join(' · ')}
+            {[detail.community, detail.emirate].filter(Boolean).join(' · ')}
           </p>
         </div>
         <div className="flex items-center gap-2">
