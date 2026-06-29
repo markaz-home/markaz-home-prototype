@@ -155,8 +155,27 @@ readiness is server-computed (ADR-0010). Draft photos use the **private**
 `docs/architecture/property-listing.md` / `listing-state-machine.md` /
 `listing-storage.md`.
 
+## Publication + marketplace (Week 3 — built)
+`READY_TO_PUBLISH → simulated review → atomic LIVE` (then `LIVE ↔ PAUSED`) plus a
+public customer marketplace. Publication review is a **separate**
+`listing_publication_requests` table (NOT a listing-enum state); the §4.4 gate is
+re-validated at resolve time and the LIVE flip is atomic (sets the opaque
+`public_id`/`public_slug`). Public photos are copied draft→public by the **one**
+service-role-isolated operation (`packages/db/src/storage-admin.ts`), all-or-nothing
+(ADR-0012). The marketplace reads **only** the security-barrier
+`marketplace_listings` view (the sole public source; §37 allowlist), never the raw
+tables; `publicTxProcedure` serves anon-or-authed via `withAnonContext`/
+`withUserContext`; a `public_id is not null` guard keeps half-published rows out
+(ADR-0013). Public DTOs are built by **explicit allow-list mapping**
+(`packages/api/src/public-projection.ts`) — never delete-fields-from-a-row. UI:
+`(public)/properties` (browse + `[publicId]/[slug]` detail), `(app)/saved-properties`,
+and `(app)/sell/listings/[id]/{publish,publication,manage}`; anonymous Save uses a
+short-lived sessionStorage intent + post-auth return (§28). Material vs non-material
+live edits per §17.4. See `WEEK-3.md`, `docs/design/publication-design-spec.md`, and
+`docs/architecture/{marketplace,public-listing-projection,publication-flow}.md`.
+
 ## Out of scope (next milestone+)
-Publishing to `LIVE`, marketplace/browse, public property pages, offers/counter-
-offers UX, transactions UX, durable jobs, full admin surface, any AWS provisioning,
+Offers/counter-offers UX, transactions UX, durable jobs, full admin surface, any AWS
+provisioning, real DLD/Trakheesi/Madmoun/payment integrations, messaging, map search,
 the demo-auth fallback (disabled by default — ADR-0007). The full plan is in the
 technical plan document; section 6A corrections govern.
