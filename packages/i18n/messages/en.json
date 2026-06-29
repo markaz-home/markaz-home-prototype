@@ -174,7 +174,11 @@
     "failureTitle": "Demo verification was not completed",
     "failureBody": "No official identity check was performed. Try the simulation again to continue.",
     "failureStatus": "Unsuccessful · Demo",
-    "retry": "Try again"
+    "retry": "Try again",
+    "whatHappensTitle": "In this demo, we will:",
+    "whatHappens1": "Start a simulated identity check",
+    "whatHappens2": "Show a pending state",
+    "whatHappens3": "Record a demo result"
   },
   "session": {
     "expiredTitle": "Your session has expired",
@@ -225,7 +229,9 @@
     "expiredRecoverySession": "The link may have expired or already been used. Request a new recovery email to continue.",
     "sessionExpired": "Your session has expired. Sign in again to continue.",
     "adminAccessDenied": "This account does not have permission to access MARKAZ Operations.",
-    "unexpectedError": "We could not complete this request. Try again."
+    "unexpectedError": "We could not complete this request. Try again.",
+    "passwordPolicy": "Your password does not meet all requirements.",
+    "errorSummaryTitle": "Please fix the following:"
   },
   "uaePass": {
     "title": "Verify your identity",
@@ -370,5 +376,19 @@
     "notFoundTitle": "Page not found",
     "notFoundBody": "We couldn't find that page.",
     "partialError": "Some content couldn't be loaded."
+  },
+  "authPanel": {
+    "title": "One account. Every property journey.",
+    "subtitle": "Browse, make offers, list your property, and follow each step in one place.",
+    "point1": "Clear account setup",
+    "point2": "Secure email verification",
+    "point3": "Guided demo identity step"
+  },
+  "progress": {
+    "stepAccount": "Account details",
+    "stepEmail": "Email verification",
+    "stepIdentity": "Demo identity",
+    "actionRequired": "Action required",
+    "stepOf": "Step {current} of {total} · {label}"
   }
 }

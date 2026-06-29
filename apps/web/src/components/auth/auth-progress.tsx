@@ -1,10 +1,10 @@
 'use client';
 import { Check } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@markaz/ui';
 
-/** 3-step onboarding progress (design spec §9.7). Labels per spec. */
+/** 3-step onboarding progress (design spec §9.7). */
 export type StepStatus = 'complete' | 'current' | 'upcoming' | 'action';
-const STEPS = ['Account details', 'Email verification', 'Demo identity'] as const;
 
 export function AuthProgress({
   current,
@@ -13,6 +13,8 @@ export function AuthProgress({
   current: 0 | 1 | 2;
   statuses?: StepStatus[];
 }) {
+  const t = useTranslations('progress');
+  const STEPS = [t('stepAccount'), t('stepEmail'), t('stepIdentity')] as const;
   const resolved: StepStatus[] =
     statuses ??
     STEPS.map((_, i) => (i < current ? 'complete' : i === current ? 'current' : 'upcoming'));
@@ -41,7 +43,7 @@ export function AuthProgress({
               </span>
               <span className={cn(s === 'upcoming' ? 'text-muted-foreground' : 'text-foreground')}>
                 {label}
-                {s === 'action' ? <span className="text-warning"> · Action required</span> : null}
+                {s === 'action' ? <span className="text-warning"> · {t('actionRequired')}</span> : null}
               </span>
               {i < 2 ? <span className="mx-1 h-px w-6 bg-border" aria-hidden /> : null}
             </li>
@@ -50,7 +52,7 @@ export function AuthProgress({
       </ol>
       <div className="sm:hidden">
         <p className="text-xs font-medium text-muted-foreground">
-          Step {current + 1} of 3 · {STEPS[current]}
+          {t('stepOf', { current: current + 1, total: 3, label: STEPS[current] })}
         </p>
         <div className="mt-1.5 h-1 w-full rounded-full bg-border" aria-hidden>
           <div

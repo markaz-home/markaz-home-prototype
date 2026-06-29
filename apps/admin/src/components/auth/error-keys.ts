@@ -9,7 +9,7 @@ export const FIELD_ERROR_KEYS: Record<string, string> = {
   password_required: 'passwordEmpty',
   password_too_short: 'passwordTooShort',
   password_too_long: 'passwordTooLong',
-  password_policy: 'passwordTooShort', // checklist is authoritative; rarely surfaced
+  password_policy: 'passwordPolicy',
   password_mismatch: 'passwordMismatch',
   terms_required: 'termsRequired',
   privacy_required: 'privacyRequired',

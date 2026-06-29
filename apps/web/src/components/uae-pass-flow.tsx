@@ -45,11 +45,11 @@ export function UaePassFlow({ initialStatus }: { initialStatus: IdentityVerifica
           <>
             <AuthHeading title={t('introTitle')} description={t('introBody')} />
             <div className="rounded-lg border border-dashed bg-brand-100/50 p-4 text-sm">
-              <p className="font-medium">In this demo, we will:</p>
+              <p className="font-medium">{t('whatHappensTitle')}</p>
               <ul className="mt-2 list-disc space-y-1 ps-5 text-muted-foreground">
-                <li>Start a simulated identity check</li>
-                <li>Show a pending state</li>
-                <li>Record a demo result</li>
+                <li>{t('whatHappens1')}</li>
+                <li>{t('whatHappens2')}</li>
+                <li>{t('whatHappens3')}</li>
               </ul>
             </div>
             <Button className="w-full" loading={pending} onClick={() => go('PENDING')}>

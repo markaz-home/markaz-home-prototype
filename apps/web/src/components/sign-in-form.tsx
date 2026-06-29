@@ -11,6 +11,7 @@ import { Link, useRouter } from '@/i18n/navigation';
 import { AuthShell, AuthHeading } from '@/components/auth/auth-shell';
 import { CustomerSupportPanel } from '@/components/auth/support-panel';
 import { PasswordField } from '@/components/auth/password-field';
+import { ErrorSummary } from '@/components/auth/error-summary';
 import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
 
 export function SignInForm() {
@@ -33,6 +34,7 @@ export function SignInForm() {
   } = useForm<SignInInput>({ resolver: zodResolver(signInSchema), defaultValues: { email: '', password: '' } });
 
   const fe = (code?: string) => (code ? tv(FIELD_ERROR_KEYS[code] ?? 'unexpectedError') : undefined);
+  const errorList = (['email', 'password'] as const).filter((k) => errors[k]).map((k) => ({ id: k, message: fe(errors[k]?.message) ?? '' }));
 
   async function onSubmit(data: SignInInput) {
     setFormError(null);
@@ -59,6 +61,7 @@ export function SignInForm() {
           </Alert>
         ) : null}
         <AuthHeading title={t('title')} description={t('description')} />
+        <ErrorSummary errors={errorList} />
         {formError ? <Alert variant="destructive">{formError}</Alert> : null}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>

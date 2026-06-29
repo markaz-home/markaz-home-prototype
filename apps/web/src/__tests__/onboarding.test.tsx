@@ -44,7 +44,8 @@ describe('ProfileSetupForm', () => {
     const user = userEvent.setup();
     renderWithIntl(<ProfileSetupForm />);
     await user.click(screen.getByRole('button', { name: 'Save and continue' }));
-    expect(await screen.findByText('Enter at least 2 characters.')).toBeInTheDocument();
+    // Appears in both the field error and the error summary.
+    expect((await screen.findAllByText('Enter at least 2 characters.')).length).toBeGreaterThan(0);
     expect(completeSetupMutate).not.toHaveBeenCalled();
   });
 

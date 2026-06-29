@@ -9,6 +9,7 @@ import { trpc } from '@/trpc/react';
 import { useRouter } from '@/i18n/navigation';
 import { AuthShell, AuthHeading } from '@/components/auth/auth-shell';
 import { AuthProgress, type StepStatus } from '@/components/auth/auth-progress';
+import { ErrorSummary } from '@/components/auth/error-summary';
 import { FIELD_ERROR_KEYS } from '@/components/auth/error-keys';
 
 export function ProfileSetupForm({ email }: { email?: string | null }) {
@@ -36,6 +37,7 @@ export function ProfileSetupForm({ email }: { email?: string | null }) {
   });
 
   const fe = (c?: string) => (c ? tv(FIELD_ERROR_KEYS[c] ?? 'unexpectedError') : undefined);
+  const errorList = (['fullName', 'acceptTerms', 'acceptPrivacy'] as const).filter((k) => errors[k]).map((k) => ({ id: k, message: fe(errors[k]?.message) ?? '' }));
   // Setup-status resume variant (spec §9.7): account details needs attention.
   const statuses: StepStatus[] = ['action', 'complete', 'upcoming'];
 
@@ -47,6 +49,7 @@ export function ProfileSetupForm({ email }: { email?: string | null }) {
           description={t('descriptionOne')}
           progress={<AuthProgress current={0} statuses={statuses} />}
         />
+        <ErrorSummary errors={errorList} />
         {saveError ? <Alert variant="destructive">{saveError}</Alert> : null}
 
         {email ? (
@@ -71,12 +74,12 @@ export function ProfileSetupForm({ email }: { email?: string | null }) {
           </FormField>
 
           <label className="flex items-start gap-3 text-sm">
-            <input type="checkbox" className="mt-1 h-4 w-4" {...register('acceptTerms')} />
+            <input id="acceptTerms" type="checkbox" className="mt-1 h-4 w-4" {...register('acceptTerms')} />
             <span>{ts('terms')}</span>
           </label>
           {errors.acceptTerms ? <p role="alert" className="text-xs font-medium text-destructive">{fe(errors.acceptTerms.message)}</p> : null}
           <label className="flex items-start gap-3 text-sm">
-            <input type="checkbox" className="mt-1 h-4 w-4" {...register('acceptPrivacy')} />
+            <input id="acceptPrivacy" type="checkbox" className="mt-1 h-4 w-4" {...register('acceptPrivacy')} />
             <span>{ts('privacy')}</span>
           </label>
           {errors.acceptPrivacy ? <p role="alert" className="text-xs font-medium text-destructive">{fe(errors.acceptPrivacy.message)}</p> : null}

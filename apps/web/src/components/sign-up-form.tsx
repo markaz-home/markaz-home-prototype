@@ -18,7 +18,10 @@ import { CustomerSupportPanel } from '@/components/auth/support-panel';
 import { AuthProgress } from '@/components/auth/auth-progress';
 import { PasswordField } from '@/components/auth/password-field';
 import { PasswordChecklist } from '@/components/auth/password-checklist';
+import { ErrorSummary } from '@/components/auth/error-summary';
 import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
+
+const FIELDS = ['fullName', 'email', 'password', 'confirmPassword', 'acceptTerms', 'acceptPrivacy'] as const;
 
 export function SignUpForm() {
   const t = useTranslations('signup');
@@ -51,6 +54,10 @@ export function SignUpForm() {
 
   const password = watch('password') ?? '';
   const fe = (code?: string) => (code ? tv(FIELD_ERROR_KEYS[code] ?? 'unexpectedError') : undefined);
+  const errorList = FIELDS.filter((k) => errors[k]).map((k) => ({
+    id: k,
+    message: fe(errors[k]?.message as string | undefined) ?? '',
+  }));
 
   async function onSubmit(data: SignUpInput) {
     setFormError(null);
@@ -79,6 +86,8 @@ export function SignUpForm() {
           description={t('description')}
           progress={<AuthProgress current={0} />}
         />
+
+        <ErrorSummary errors={errorList} />
 
         {existing ? (
           <Alert variant="warning" title={tv('existingAccount')}>
@@ -118,12 +127,12 @@ export function SignUpForm() {
 
           <div className="space-y-2">
             <label className="flex items-start gap-3 text-sm">
-              <input type="checkbox" className="mt-1 h-4 w-4" {...register('acceptTerms')} />
+              <input id="acceptTerms" type="checkbox" className="mt-1 h-4 w-4" {...register('acceptTerms')} />
               <span>{t('terms')}</span>
             </label>
             {errors.acceptTerms ? <p role="alert" className="text-xs font-medium text-destructive">{fe(errors.acceptTerms.message)}</p> : null}
             <label className="flex items-start gap-3 text-sm">
-              <input type="checkbox" className="mt-1 h-4 w-4" {...register('acceptPrivacy')} />
+              <input id="acceptPrivacy" type="checkbox" className="mt-1 h-4 w-4" {...register('acceptPrivacy')} />
               <span>{t('privacy')}</span>
             </label>
             {errors.acceptPrivacy ? <p role="alert" className="text-xs font-medium text-destructive">{fe(errors.acceptPrivacy.message)}</p> : null}
