@@ -181,10 +181,13 @@ pnpm test:e2e   # end-to-end (Playwright)
 - [ADR 0007 — Demo-auth fallback (disabled)](docs/adr/0007-demo-auth-fallback.md)
 - [ADR 0008 — Separate admin application](docs/adr/0008-separate-admin-application.md)
 - [ADR 0009 — Email + password authentication](docs/adr/0009-email-password-authentication.md)
+- [ADR 0010 — Listing state-machine retry & invalidation](docs/adr/0010-listing-state-machine-retry.md)
+- [ADR 0011 — Draft-photo privacy](docs/adr/0011-draft-photo-privacy.md)
 
-See also `docs/architecture/` (overview, auth & RLS, realtime) and
-`docs/runbooks/` (local-development, authentication, database-reset, demo).
-The Week 1.5 milestone report is in `WEEK-1.5.md`.
+See also `docs/architecture/` (overview, auth & RLS, realtime, property-listing,
+listing-state-machine, listing-storage) and `docs/runbooks/` (local-development,
+authentication, database-reset, demo). Milestone reports: `WEEK-1.md`,
+`WEEK-1.5.md`, `WEEK-2.md`.
 
 ## Platform workstream boundary
 
@@ -197,8 +200,9 @@ demo-only environments.
 
 ## Deferred functionality
 
-- The full property-**listing wizard** (see next milestone).
-- The live **marketplace / browse**.
+- **Publishing** a listing to `LIVE` and the live **marketplace / browse**
+  (the listing-creation wizard `DRAFT → READY_TO_PUBLISH` is complete — see
+  `WEEK-2.md` and `docs/architecture/property-listing.md`).
 - **Offers** and counter-offers UX.
 - **Transactions** UX.
 - **Durable background jobs** (`apps/worker`).

@@ -143,8 +143,20 @@ Before declaring work done, run: `pnpm typecheck && pnpm lint && pnpm test && pn
   (recovery) from the Mailpit API.
 - `.env` lives at the repo root; both apps load it via `dotenv` in `next.config.mjs`.
 
-## Out of scope this milestone
-Listing wizard, marketplace/browse, offers/counter-offers UX, transactions UX,
-durable jobs, full admin surface, any AWS provisioning, the demo-auth fallback
-(disabled by default — ADR-0007). The full plan is in the technical plan document;
-section 6A corrections govern.
+## Listing journey (Week 2 — built)
+The customer listing wizard `DRAFT → READY_TO_PUBLISH` is implemented under
+`apps/web/[locale]/(app)/sell/*` (My Listings + 9 steps + ready + owner preview),
+backed by `packages/api` `listing` router + `services/simulation.ts`, domain logic
+in `packages/domain` (`listing.ts`/`listing-progress.ts`/`investment.ts`/
+`listing-validation.ts`), and migration `…0700`. It must **not** publish to `LIVE`.
+Failures keep the listing recoverable (record `FAILED_DEMO`; never `REJECTED`);
+readiness is server-computed (ADR-0010). Draft photos use the **private**
+`listing-photos-draft` bucket + signed URLs (ADR-0011). See `WEEK-2.md` and
+`docs/architecture/property-listing.md` / `listing-state-machine.md` /
+`listing-storage.md`.
+
+## Out of scope (next milestone+)
+Publishing to `LIVE`, marketplace/browse, public property pages, offers/counter-
+offers UX, transactions UX, durable jobs, full admin surface, any AWS provisioning,
+the demo-auth fallback (disabled by default — ADR-0007). The full plan is in the
+technical plan document; section 6A corrections govern.

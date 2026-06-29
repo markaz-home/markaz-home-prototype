@@ -65,6 +65,15 @@ pnpm supabase:reset && pnpm db:setup
 `pnpm db:setup` without a reset is also safe — it reconciles rather than
 duplicates.
 
+## Week 2 listing scenarios (seeded)
+
+`pnpm db:setup` also seeds fictional listing-journey drafts for the wizard
+(`/sell`): Customer A has an **incomplete draft**, a **verification-pending**
+draft, and a **`READY_TO_PUBLISH`** listing (full simulated records + Investment
+Case); Customer B has a separate draft used by isolation tests. All assets are
+fictional; storage paths are placeholders (no real files). Reset with
+`pnpm supabase:reset && pnpm db:setup`.
+
 ## Notes
 
 - Both customers are **CUSTOMER** type; there is no demo seller/buyer _role_ —
