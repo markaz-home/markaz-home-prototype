@@ -4,6 +4,7 @@ import { Briefcase, Home, ShieldCheck } from 'lucide-react';
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { BrandLogo } from '@/components/brand-logo';
 
 export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -20,10 +21,9 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
     <div className="flex min-h-dvh flex-col">
       <header className="border-b">
         <div className="container flex h-16 items-center justify-between">
-          <span className="flex items-center gap-2 font-semibold">
-            <Home className="h-5 w-5 text-primary" aria-hidden />
-            MARKAZ Home
-          </span>
+          <Link href="/" aria-label="MARKAZ Home" className="flex items-center">
+            <BrandLogo />
+          </Link>
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
             <Button asChild variant="ghost" size="sm">

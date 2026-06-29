@@ -1,8 +1,8 @@
 'use client';
-import { Home } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { BrandLogo } from '@/components/brand-logo';
 
 const LEGAL = { terms: '#terms', privacy: '#privacy' };
 
@@ -23,8 +23,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </a>
       <header className="border-b bg-card">
         <div className="container flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 font-semibold text-brand-900">
-            <Home className="h-5 w-5 text-primary" aria-hidden /> MARKAZ Home
+          <Link href="/" className="flex items-center" aria-label="MARKAZ Home">
+            <BrandLogo />
           </Link>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
