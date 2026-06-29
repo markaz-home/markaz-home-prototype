@@ -470,7 +470,9 @@
       "FORM_A_COMPLETE": "اكتمل نموذج A التجريبي",
       "PHOTOS_COMPLETE": "اكتملت الصور",
       "PERMIT_PENDING": "تصريح تجريبي قيد التنفيذ",
-      "READY_TO_PUBLISH": "جاهز للنشر"
+      "READY_TO_PUBLISH": "جاهز للنشر",
+      "LIVE": "منشور",
+      "PAUSED": "متوقف مؤقتًا"
     }
   },
   "details": {

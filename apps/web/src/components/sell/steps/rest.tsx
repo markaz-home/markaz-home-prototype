@@ -658,25 +658,24 @@ export function ReviewStep({ listingId }: { listingId: string }) {
 // --- Ready ------------------------------------------------------------------
 export function ReadyScreen({ listingId }: { listingId: string }) {
   const t = useTranslations('ready');
+  const tpub = useTranslations('publication');
   const router = useRouter();
   const get = useListing(listingId);
   if (get.error) return <ListingUnavailable />;
   return (
     <div className="mx-auto max-w-xl py-8 text-center">
       <ShieldCheck className="mx-auto h-12 w-12 text-success" aria-hidden />
-      <h1 className="mt-4 font-display text-3xl font-medium text-brand-900">{t('title')}</h1>
-      <p className="mt-2 text-muted-foreground">{t('description')}</p>
+      <h1 className="mt-4 font-display text-3xl font-medium text-brand-900">{tpub('readyTitle')}</h1>
+      <p className="mt-2 text-muted-foreground">{tpub('readyBody')}</p>
       <div className="mx-auto mt-4 inline-flex flex-col items-center gap-2">
-        <Badge variant="success">{t('statusChip')}</Badge>
-        <span className="rounded-md bg-brand-100 px-3 py-1 text-xs text-brand-900">{t('privateNote')}</span>
+        <Badge variant="success">{tpub('readyStatus')}</Badge>
       </div>
-      <p className="mt-4 text-sm text-muted-foreground">{t('note')}</p>
+      <p className="mt-4 text-sm text-muted-foreground">{tpub('privacy')}</p>
       <div className="mt-6 flex flex-col items-center gap-2">
-        <Button onClick={() => router.push(`/sell/listings/${listingId}/preview`)}>{t('viewPreview')}</Button>
-        <Button variant="outline" onClick={() => router.push('/sell')}>{t('backToListings')}</Button>
+        <Button onClick={() => router.push(`/sell/listings/${listingId}/publish`)}>{tpub('publish')}</Button>
+        <Button variant="outline" onClick={() => router.push(`/sell/listings/${listingId}/preview`)}>{tpub('preview')}</Button>
         <Button variant="ghost" onClick={() => router.push(`/sell/listings/${listingId}/details`)}>{t('editListing')}</Button>
       </div>
-      <p className="mt-6 text-xs text-muted-foreground">{t('nextStage')} — {t('nextStageBody')}</p>
     </div>
   );
 }

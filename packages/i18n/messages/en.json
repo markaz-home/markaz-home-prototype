@@ -467,7 +467,9 @@
       "FORM_A_COMPLETE": "Simulated Form A complete",
       "PHOTOS_COMPLETE": "Photos complete",
       "PERMIT_PENDING": "Demo permit in progress",
-      "READY_TO_PUBLISH": "Ready to publish"
+      "READY_TO_PUBLISH": "Ready to publish",
+      "LIVE": "Live",
+      "PAUSED": "Paused"
     }
   },
   "details": {

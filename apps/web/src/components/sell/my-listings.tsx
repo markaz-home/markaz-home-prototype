@@ -33,6 +33,7 @@ function nextStepLabel(t: (k: string) => string, next: string): string {
 
 export function MyListings() {
   const t = useTranslations('listing');
+  const tpub = useTranslations('publication');
   const router = useRouter();
   const utils = trpc.useUtils();
   const list = trpc.listing.list.useQuery();
@@ -118,15 +119,32 @@ export function MyListings() {
                   <p className="text-sm text-muted-foreground">
                     {t('sectionsProgress', { done: l.completedRequired as number, total: l.totalRequired as number })}
                   </p>
-                  {!l.ready ? (
+                  {l.state === 'LIVE' || l.state === 'PAUSED' ? (
+                    <p className="text-sm font-medium text-muted-foreground">{t(`stateLabel.${l.state as string}` as never)}</p>
+                  ) : !l.ready ? (
                     <p className="text-sm">{t('nextAction', { step: nextStepLabel(t, l.nextStep as string) })}</p>
                   ) : (
                     <p className="text-sm font-medium text-success">{t('stateLabel.READY_TO_PUBLISH')}</p>
                   )}
-                  <div className="pt-1">
-                    <Button variant="outline" size="sm" onClick={() => router.push(`/sell/listings/${l.id}`)}>
-                      {t('continue')}
-                    </Button>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {l.state === 'LIVE' || l.state === 'PAUSED' ? (
+                      <Button variant="outline" size="sm" onClick={() => router.push(`/sell/listings/${l.id}/manage`)}>
+                        {tpub('manage')}
+                      </Button>
+                    ) : l.ready ? (
+                      <>
+                        <Button size="sm" onClick={() => router.push(`/sell/listings/${l.id}/publish`)}>
+                          {tpub('publish')}
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => router.push(`/sell/listings/${l.id}`)}>
+                          {t('edit')}
+                        </Button>
+                      </>
+                    ) : (
+                      <Button variant="outline" size="sm" onClick={() => router.push(`/sell/listings/${l.id}`)}>
+                        {t('continue')}
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
