@@ -30,7 +30,9 @@ type GetData = ListingDetail;
 const supabase = () => createSupabaseBrowserClient();
 
 function useListing(listingId: string) {
-  return trpc.listing.get.useQuery({ listingId });
+  // Always refetch on mount: wizard data changes via mutations + simulation polls,
+  // so each step must reflect the authoritative server state (incl. readiness).
+  return trpc.listing.get.useQuery({ listingId }, { staleTime: 0, refetchOnMount: 'always' });
 }
 function StepHeader({ ns }: { ns: 'ownership' | 'verification' | 'settings' | 'investment' | 'formA' | 'photos' | 'permit' | 'review' }) {
   const t = useTranslations(ns);
@@ -235,14 +237,14 @@ function SettingsInner({ listingId, data }: { listingId: string; data: GetData }
         <FormField id="asking" label={t('askingPrice')} required>
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">AED</span>
-            <Input id="asking" inputMode="numeric" dir="ltr" value={asking} onChange={(e) => setAsking(e.target.value)} placeholder={t('askingPlaceholder')} aria-label="Amount in UAE dirhams" />
+            <Input id="asking" inputMode="numeric" dir="ltr" value={asking} onChange={(e) => setAsking(e.target.value)} placeholder={t('askingPlaceholder')} />
           </div>
           <p className="mt-1 text-xs text-muted-foreground">{t('askingHelp')}</p>
         </FormField>
         <FormField id="minNotif" label={t('minNotification')} required>
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">AED</span>
-            <Input id="minNotif" inputMode="numeric" dir="ltr" value={minNotif} onChange={(e) => setMinNotif(e.target.value)} placeholder={t('minPlaceholder')} aria-label="Amount in UAE dirhams" />
+            <Input id="minNotif" inputMode="numeric" dir="ltr" value={minNotif} onChange={(e) => setMinNotif(e.target.value)} placeholder={t('minPlaceholder')} />
           </div>
           <p className="mt-1 text-xs text-muted-foreground">{t('minExplanation')}</p>
           <p className="mt-1 text-xs text-muted-foreground">{t('demoNote')}</p>

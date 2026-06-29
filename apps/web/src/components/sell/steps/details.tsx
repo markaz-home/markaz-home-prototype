@@ -22,7 +22,7 @@ const BATHROOM_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 type GetData = ListingDetail;
 
 export function DetailsStep({ listingId }: { listingId: string }) {
-  const get = trpc.listing.get.useQuery({ listingId });
+  const get = trpc.listing.get.useQuery({ listingId }, { staleTime: 0, refetchOnMount: 'always' });
   if (get.error) return <ListingUnavailable />;
   if (!get.data) return <WizardLoading />;
   return <DetailsForm key={listingId} listingId={listingId} data={get.data} />;
