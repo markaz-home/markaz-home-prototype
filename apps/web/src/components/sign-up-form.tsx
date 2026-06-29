@@ -7,6 +7,7 @@ import {
   signUpSchema,
   buildSignupMetadata,
   isLikelyExistingAccount,
+  isExistingAccountError,
   mapAuthError,
   type SignUpInput,
 } from '@markaz/domain';
@@ -68,6 +69,12 @@ export function SignUpForm() {
       options: { data: buildSignupMetadata(data) },
     });
     if (error) {
+      // Some GoTrue configs return an explicit 422 user_already_exists instead
+      // of the obfuscated empty-identities response — treat it as existing too.
+      if (isExistingAccountError(error)) {
+        setExisting(true);
+        return;
+      }
       setFormError(tv(AUTH_ERROR_KEYS[mapAuthError(error)]));
       return;
     }

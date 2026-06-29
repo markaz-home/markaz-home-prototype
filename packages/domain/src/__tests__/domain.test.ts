@@ -14,6 +14,7 @@ import {
   signUpSchema,
   mapAuthError,
   isLikelyExistingAccount,
+  isExistingAccountError,
 } from '../auth';
 import { canTransitionListing, isPubliclyVisible } from '../listing';
 import { canSubmitOffer, isBelowThreshold, canTransitionOffer } from '../offer';
@@ -132,6 +133,13 @@ describe('auth helpers', () => {
     expect(isLikelyExistingAccount({ identities: [] })).toBe(true);
     expect(isLikelyExistingAccount({ identities: [{ id: 'x' }] })).toBe(false);
     expect(isLikelyExistingAccount(null)).toBe(false);
+  });
+  it('detects an explicit user_already_exists / email_exists error', () => {
+    expect(isExistingAccountError({ code: 'user_already_exists', status: 422 })).toBe(true);
+    expect(isExistingAccountError({ code: 'email_exists' })).toBe(true);
+    expect(isExistingAccountError({ message: 'User already registered' })).toBe(true);
+    expect(isExistingAccountError({ message: 'Invalid login credentials' })).toBe(false);
+    expect(isExistingAccountError(null)).toBe(false);
   });
 });
 

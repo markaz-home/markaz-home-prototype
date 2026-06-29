@@ -27,7 +27,8 @@ describe('AdminSignInFlow (Operations)', () => {
   it('renders the Operations sign-in with no Create account', () => {
     renderWithIntl(<AdminSignInFlow />);
     expect(screen.getByRole('heading', { name: 'Sign in to Operations' })).toBeInTheDocument();
-    expect(screen.getAllByText('MARKAZ Operations').length).toBeGreaterThan(0);
+    // "MARKAZ Operations" branding now lives in the persistent (auth) layout.
+    expect(screen.getByText('Authorised access only')).toBeInTheDocument();
     expect(screen.getByLabelText(/^Password/)).toBeInTheDocument();
     expect(screen.queryByText('Create account')).not.toBeInTheDocument();
   });

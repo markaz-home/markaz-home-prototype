@@ -148,3 +148,18 @@ export function mapAuthError(err: { message?: string; status?: number; code?: st
 export function isLikelyExistingAccount(user: { identities?: unknown[] | null } | null | undefined): boolean {
   return !!user && Array.isArray(user.identities) && user.identities.length === 0;
 }
+
+/**
+ * Some GoTrue versions/configs return an explicit `user_already_exists`/
+ * `email_exists` error (HTTP 422) for a duplicate sign-up instead of the
+ * obfuscated empty-identities response. Treat that as the existing-account case
+ * too (the provider has explicitly confirmed it — design spec §10.9).
+ */
+export function isExistingAccountError(
+  err: { message?: string; code?: string; status?: number } | null | undefined,
+): boolean {
+  if (!err) return false;
+  if (err.code === 'user_already_exists' || err.code === 'email_exists') return true;
+  const m = (err.message ?? '').toLowerCase();
+  return m.includes('already registered') || m.includes('already been registered');
+}
