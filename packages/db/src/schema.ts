@@ -1,6 +1,7 @@
 import {
   pgEnum,
   pgTable,
+  pgView,
   uuid,
   text,
   timestamp,
@@ -399,6 +400,37 @@ export const auditEvents = pgTable('audit_events', {
   metadata: jsonb('metadata').notNull().default({}),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+/**
+ * Public marketplace view (migration 08.1) — the ONLY public data source. Maps
+ * the §37 allowlist for LIVE listings; private columns are absent by construction.
+ */
+export const marketplaceListings = pgView('marketplace_listings', {
+  publicId: text('public_id'),
+  publicSlug: text('public_slug'),
+  state: text('state'),
+  askingPrice: numeric('asking_price', { precision: 14, scale: 2 }),
+  description: text('description'),
+  publishedAt: timestamp('published_at', { withTimezone: true }),
+  publicUpdatedAt: timestamp('public_updated_at', { withTimezone: true }),
+  propertyType: text('property_type'),
+  emirate: text('emirate'),
+  community: text('community'),
+  buildingOrProject: text('building_or_project'),
+  bedrooms: integer('bedrooms'),
+  bathrooms: integer('bathrooms'),
+  sizeSqft: numeric('size_sqft', { precision: 10, scale: 2 }),
+  furnishingStatus: text('furnishing_status'),
+  completionStatus: text('completion_status'),
+  parkingSpaces: integer('parking_spaces'),
+  features: text('features').array(),
+  icVisible: boolean('ic_visible'),
+  icRoi: numeric('ic_roi', { precision: 7, scale: 1 }),
+  icAnnualised: numeric('ic_annualised', { precision: 7, scale: 1 }),
+  icPricePerSqft: numeric('ic_price_per_sqft', { precision: 14, scale: 2 }),
+  coverPublicPath: text('cover_public_path'),
+  photoPublicPaths: text('photo_public_paths').array(),
+}).existing();
 
 export const schema = {
   profiles,

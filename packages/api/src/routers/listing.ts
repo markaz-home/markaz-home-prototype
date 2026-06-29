@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull } from 'drizzle-orm';
+import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import {
@@ -10,6 +10,7 @@ import {
   permitRecords,
   propertyPhotos,
   investmentCases,
+  savedProperties,
   auditEvents,
   type Tx,
 } from '@markaz/db';
@@ -22,6 +23,11 @@ import {
   resolveNextStep,
   listingStageIndex,
   canRewindListing,
+  publicationChecklist,
+  isPublicationEligible,
+  classifyLiveEdit,
+  canPause,
+  canResume,
   type ListingProgressInput,
 } from '@markaz/domain';
 import { router, customerProcedure } from '../trpc';
@@ -31,6 +37,8 @@ import {
   PermitService,
   type DemoOutcome,
 } from '../services/simulation';
+import { PublicationReviewService } from '../services/publication';
+import { buildHeadline } from '../public-projection';
 
 const demoOutcome = z.enum(['SUCCESS', 'FAILURE']).optional();
 
@@ -661,6 +669,109 @@ export const listingRouter = router({
       return { ok: true as const, state: 'READY_TO_PUBLISH' as const };
     }),
   }),
+
+  // --- Publication (§12–§16) ------------------------------------------------
+  publication: router({
+    /** Publication checklist + eligibility for a READY_TO_PUBLISH listing. */
+    checklist: customerProcedure.input(z.object({ listingId: z.string().uuid() })).query(async ({ ctx, input }) => {
+      const snap = await buildSnapshot(ctx.tx, input.listingId);
+      const asking = num(snap.listing.askingPrice);
+      return {
+        items: publicationChecklist(snap.progress, asking),
+        eligible: isPublicationEligible(snap.progress, asking),
+        listingState: snap.listing.state,
+      };
+    }),
+    /** Submit for simulated publication review (server re-validates eligibility). */
+    submit: customerProcedure
+      .input(z.object({ listingId: z.string().uuid(), confirm: z.literal(true), demoOutcome: z.enum(['SUCCESS', 'FAILURE']).optional() }))
+      .mutation(async ({ ctx, input }) => {
+        const snap = await buildSnapshot(ctx.tx, input.listingId);
+        if (snap.listing.state !== 'READY_TO_PUBLISH') throw new TRPCError({ code: 'BAD_REQUEST', message: 'Listing is not ready to publish.' });
+        if (!isPublicationEligible(snap.progress, num(snap.listing.askingPrice))) throw new TRPCError({ code: 'BAD_REQUEST', message: 'Publication checklist is incomplete.' });
+        const req = await PublicationReviewService.submit({ tx: ctx.tx, userId: ctx.user.id, listingId: input.listingId }, input.demoOutcome as DemoOutcome | undefined);
+        return { status: req.status };
+      }),
+    /** Resolve the pending request (prepare public photos → atomic LIVE, or return). */
+    status: customerProcedure.input(z.object({ listingId: z.string().uuid() })).query(async ({ ctx, input }) => {
+      await loadOwned(ctx.tx, input.listingId);
+      const req = await PublicationReviewService.resolve({ tx: ctx.tx, userId: ctx.user.id, listingId: input.listingId });
+      const [l] = await ctx.tx.select({ state: listings.state, publicId: listings.publicId, slug: listings.publicSlug }).from(listings).where(eq(listings.id, input.listingId)).limit(1);
+      return { status: req?.status ?? 'NOT_SUBMITTED', outcomeCategory: req?.outcomeCategory ?? null, listingState: l?.state ?? null, publicId: l?.publicId ?? null, slug: l?.slug ?? null };
+    }),
+    /** Resubmit after a returned review. */
+    retry: customerProcedure
+      .input(z.object({ listingId: z.string().uuid(), demoOutcome: z.enum(['SUCCESS', 'FAILURE']).optional() }))
+      .mutation(async ({ ctx, input }) => {
+        const snap = await buildSnapshot(ctx.tx, input.listingId);
+        if (!isPublicationEligible(snap.progress, num(snap.listing.askingPrice))) throw new TRPCError({ code: 'BAD_REQUEST', message: 'Publication checklist is incomplete.' });
+        const req = await PublicationReviewService.submit({ tx: ctx.tx, userId: ctx.user.id, listingId: input.listingId }, input.demoOutcome as DemoOutcome | undefined);
+        return { status: req.status };
+      }),
+  }),
+
+  /** Live / paused management summary (owner-only). */
+  manage: customerProcedure.input(z.object({ listingId: z.string().uuid() })).query(async ({ ctx, input }) => {
+    const snap = await buildSnapshot(ctx.tx, input.listingId);
+    const l = snap.listing;
+    const savedRows = await ctx.tx
+      .select({ savedCount: sql<number>`count(*)::int` })
+      .from(savedProperties)
+      .where(eq(savedProperties.listingId, input.listingId));
+    const savedCount = savedRows[0]?.savedCount ?? 0;
+    return {
+      state: l.state,
+      publicId: l.publicId,
+      slug: l.publicSlug,
+      headline: buildHeadline({ bedrooms: snap.property?.bedrooms ?? null, propertyType: snap.property?.propertyType ?? null, buildingOrProject: snap.property?.buildingOrProject ?? null, community: snap.property?.community ?? null }),
+      askingPriceAed: num(l.askingPrice),
+      publishedAt: l.publishedAt?.toISOString() ?? null,
+      pausedAt: l.pausedAt?.toISOString() ?? null,
+      savedCount: Number(savedCount ?? 0),
+    };
+  }),
+
+  /** Pause a LIVE listing (§18). Removes it from the public marketplace. */
+  pause: customerProcedure.input(z.object({ listingId: z.string().uuid() })).mutation(async ({ ctx, input }) => {
+    const listing = await loadOwned(ctx.tx, input.listingId);
+    if (!canPause(listing.state)) throw new TRPCError({ code: 'BAD_REQUEST', message: 'Only a live listing can be paused.' });
+    await ctx.tx.update(listings).set({ state: 'PAUSED', pausedAt: new Date() }).where(eq(listings.id, input.listingId));
+    await audit(ctx.tx, ctx.user.id, 'LISTING_PAUSED', input.listingId);
+    return { state: 'PAUSED' as const };
+  }),
+
+  /** Resume a PAUSED listing back to LIVE, re-validating readiness (§18.3). */
+  resume: customerProcedure.input(z.object({ listingId: z.string().uuid() })).mutation(async ({ ctx, input }) => {
+    const snap = await buildSnapshot(ctx.tx, input.listingId);
+    if (!canResume(snap.listing.state)) throw new TRPCError({ code: 'BAD_REQUEST', message: 'Only a paused listing can be resumed.' });
+    if (!isPublicationEligible(snap.progress, num(snap.listing.askingPrice))) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'This listing needs publication review before it can become live again.' });
+    }
+    await ctx.tx.update(listings).set({ state: 'LIVE', pausedAt: null, publicUpdatedAt: new Date() }).where(eq(listings.id, input.listingId));
+    await audit(ctx.tx, ctx.user.id, 'LISTING_RESUMED', input.listingId);
+    return { state: 'LIVE' as const };
+  }),
+
+  /** Classify a proposed live edit as non-material (stays LIVE) or material (§17.4). */
+  classifyEdit: customerProcedure.input(z.object({ field: z.string().max(60) })).query(({ input }) => {
+    return { classification: classifyLiveEdit(input.field) };
+  }),
+
+  /** Apply an approved non-material edit to a LIVE listing and refresh its public projection. */
+  applyNonMaterialEdit: customerProcedure
+    .input(z.object({ listingId: z.string().uuid(), description: z.string().max(2000).optional(), features: z.array(z.string()).max(15).optional(), investmentCaseVisible: z.boolean().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const listing = await loadOwned(ctx.tx, input.listingId);
+      if (listing.state !== 'LIVE') throw new TRPCError({ code: 'BAD_REQUEST', message: 'This edit applies to a live listing.' });
+      if (input.description !== undefined) await ctx.tx.update(listings).set({ description: input.description }).where(eq(listings.id, input.listingId));
+      if (input.features !== undefined && listing.propertyId) await ctx.tx.update(properties).set({ features: input.features }).where(eq(properties.id, listing.propertyId));
+      if (input.investmentCaseVisible !== undefined) {
+        await ctx.tx.update(listings).set({ investmentCaseVisible: input.investmentCaseVisible }).where(eq(listings.id, input.listingId));
+        await ctx.tx.update(investmentCases).set({ visible: input.investmentCaseVisible }).where(eq(investmentCases.listingId, input.listingId));
+      }
+      await ctx.tx.update(listings).set({ publicUpdatedAt: new Date() }).where(eq(listings.id, input.listingId));
+      return { ok: true as const };
+    }),
 
   /** Owner-only public-projection preview (excludes all private fields). */
   preview: customerProcedure.input(z.object({ listingId: z.string().uuid() })).query(async ({ ctx, input }) => {

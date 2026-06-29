@@ -6,6 +6,7 @@ import { adminOverviewRouter } from './routers/admin-overview';
 import { realtimeRouter } from './routers/realtime';
 import { auditRouter } from './routers/audit';
 import { listingRouter } from './routers/listing';
+import { marketplaceRouter } from './routers/marketplace';
 
 export const appRouter = router({
   health: healthRouter,
@@ -15,6 +16,7 @@ export const appRouter = router({
   realtime: realtimeRouter,
   audit: auditRouter,
   listing: listingRouter,
+  marketplace: marketplaceRouter,
 });
 
 export type AppRouter = typeof appRouter;

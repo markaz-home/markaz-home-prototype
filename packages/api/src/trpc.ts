@@ -1,7 +1,7 @@
 import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
 import { ZodError } from 'zod';
-import { withUserContext, type Tx } from '@markaz/db';
+import { withUserContext, withAnonContext, type Tx } from '@markaz/db';
 import type { Context, AuthenticatedUser } from './context';
 
 const t = initTRPC.context<Context>().create({
@@ -66,5 +66,26 @@ export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
   }
   return next();
 });
+
+/**
+ * Public marketplace procedure: runs the resolver inside an RLS-scoped tx as the
+ * authenticated user when present, or as `anon` otherwise. Either way RLS only
+ * exposes LIVE public data — anonymous browsing never needs the service-role key
+ * (§37.3, ADR-0013). Resolvers must still filter `state = 'LIVE'` explicitly.
+ */
+const publicWithRls = middleware(async ({ ctx, next }) => {
+  if (ctx.user) {
+    const user: AuthenticatedUser = ctx.user;
+    return withUserContext(
+      ctx.db,
+      { userId: user.id, email: user.email, accountType: user.accountType },
+      (tx) => next({ ctx: { ...ctx, tx } }),
+    );
+  }
+  return withAnonContext(ctx.db, (tx) => next({ ctx: { ...ctx, tx } }));
+});
+
+/** Anonymous-or-authenticated procedure with an RLS tx (`ctx.tx`). */
+export const publicTxProcedure = publicProcedure.use(publicWithRls);
 
 export type { Tx };
