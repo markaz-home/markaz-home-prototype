@@ -41,13 +41,11 @@ describe('public photo Storage boundary (migration 08.3)', () => {
   const PUBLIC_PATH = 'integration/published-cover.txt';
   let service: SupabaseClient | null = null;
   let authed: SupabaseClient | null = null;
-  let anon: SupabaseClient | null = null;
   let available = false;
 
   beforeAll(async () => {
     if (!url || !anonKey || !serviceKey || !ids) return;
     service = createClient(url, serviceKey, { auth: { persistSession: false } });
-    anon = createClient(url, anonKey, { auth: { persistSession: false } });
     authed = createClient(url, anonKey, { auth: { persistSession: false } });
     const signIn = await authed.auth.signInWithPassword({ email: 'customer-a@markaz.demo', password: DEMO_PASSWORD });
     if (signIn.error) return;

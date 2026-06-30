@@ -71,6 +71,15 @@ async function uploadPublicPhoto(path: string, label: string, color: string): Pr
   if (error) throw error;
 }
 
+/** A real DRAFT object (private bucket) so a seeded READY listing can actually be
+ * published through the real photo-copy pipeline in demos/e2e. */
+async function uploadDraftPhoto(path: string, label: string, color: string): Promise<void> {
+  const { error } = await admin.storage
+    .from('listing-photos-draft')
+    .upload(path, svgPlaceholder(label, color), { contentType: 'image/svg+xml', upsert: true });
+  if (error) throw error;
+}
+
 async function findUserIdByEmail(email: string): Promise<string | null> {
   for (let page = 1; page <= 20; page++) {
     const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 200 });
@@ -269,6 +278,25 @@ async function main() {
     await sql`update public.property_photos set public_path = 'demo/public/marina-cover.svg' where id = '00000000-0000-0000-0000-0000000030a1'`;
     await sql`update public.property_photos set public_path = 'demo/public/downtown-cover.svg' where id = '00000000-0000-0000-0000-0000000030a2'`;
 
+    // Give the Marina LIVE listing (20a1) the full readiness records a published
+    // listing has, so pause → resume re-validates the §4.4 gate and succeeds.
+    await sql`
+      insert into public.ownership_documents (id, listing_id, owner_id, document_type, storage_path, original_name, active, status) values
+        ('00000000-0000-0000-0000-0000000040a2', '00000000-0000-0000-0000-0000000020a1', ${idA}, 'TITLE_DEED', 'ownership-documents/demo/fictional-title-marina.pdf', 'Deed_Marina.pdf', true, 'VERIFIED_DEMO')
+      on conflict (id) do nothing`;
+    await sql`
+      insert into public.verifications (id, listing_id, kind, status, result) values
+        ('00000000-0000-0000-0000-0000000042a1', '00000000-0000-0000-0000-0000000020a1', 'OWNERSHIP', 'VERIFIED_DEMO', '{"decided":"SUCCESS"}'::jsonb)
+      on conflict (id) do nothing`;
+    await sql`
+      insert into public.form_a_records (id, listing_id, status, confirmed_by, listing_price_at_confirmation, signed_at) values
+        ('00000000-0000-0000-0000-0000000043a1', '00000000-0000-0000-0000-0000000020a1', 'VERIFIED_DEMO', ${idA}, 2650000, now())
+      on conflict (id) do nothing`;
+    await sql`
+      insert into public.permit_records (id, listing_id, permit_type, permit_number, status, approved_at) values
+        ('00000000-0000-0000-0000-0000000044a1', '00000000-0000-0000-0000-0000000020a1', 'TRAKHEESI', 'DEMO-TRK-000020a1', 'VERIFIED_DEMO', now())
+      on conflict (id) do nothing`;
+
     // A LIVE listing owned by Customer B (so Customer A can save it) + a PAUSED one.
     await sql`
       insert into public.properties
@@ -305,6 +333,75 @@ async function main() {
       insert into public.saved_properties (id, customer_id, listing_id) values
         ('00000000-0000-0000-0000-0000000070a1', ${idA}, '00000000-0000-0000-0000-0000000020b1'),
         ('00000000-0000-0000-0000-0000000070a2', ${idA}, '00000000-0000-0000-0000-0000000020b2')
+      on conflict (customer_id, listing_id) do nothing`;
+
+    // --- Week 3 publication e2e fixtures ------------------------------------
+    // Make the READY listing (21a3) genuinely publishable: real draft objects at
+    // prefix-less paths so the photo-copy pipeline succeeds in the browser flow.
+    await uploadDraftPhoto(`${idA}/21a3/cover.svg`, 'Marina Gate 2', '#1f4e79');
+    await uploadDraftPhoto(`${idA}/21a3/living.svg`, 'Marina living room', '#27496d');
+    await sql`update public.property_photos set storage_path = ${`${idA}/21a3/cover.svg`}, content_type = 'image/svg+xml' where id = '00000000-0000-0000-0000-0000000031a3'`;
+    await sql`update public.property_photos set storage_path = ${`${idA}/21a3/living.svg`}, content_type = 'image/svg+xml' where id = '00000000-0000-0000-0000-0000000031a4'`;
+
+    // A second PUBLIC photo for the JBR LIVE listing (gallery keyboard e2e).
+    await uploadPublicPhoto('demo/public/jbr-balcony.svg', 'JBR balcony', '#5a3d7a');
+    await sql`
+      insert into public.property_photos (id, listing_id, storage_path, public_path, original_name, is_cover, sort_order) values
+        ('00000000-0000-0000-0000-0000000030b2', '00000000-0000-0000-0000-0000000020b1', 'listing-photos/demo/jbr-balcony.svg', 'demo/public/jbr-balcony.svg', 'balcony.svg', false, 1)
+      on conflict (id) do nothing`;
+
+    // Two READY listings owned by Customer A whose publication review was RETURNED
+    // (changes required) and PHOTO_PROCESSING_FAILED — for the publication-status e2e.
+    await sql`
+      insert into public.properties
+        (id, owner_id, emirate, community, building_or_project, unit_identifier, property_type,
+         bedrooms, bathrooms, size_sqft, furnishing_status, occupancy_status, completion_status, parking_spaces, features) values
+        ('00000000-0000-0000-0000-0000000011a4', ${idA}, 'Dubai', 'Jumeirah Village Circle', 'Belgravia', 'Unit 504', 'APARTMENT',
+         1, 1, 720.00, 'FURNISHED', 'VACANT', 'READY', 1, '{BALCONY,GYM}'),
+        ('00000000-0000-0000-0000-0000000011a5', ${idA}, 'Dubai', 'Business Bay', 'Merano Tower', 'Unit 1102', 'APARTMENT',
+         2, 2, 1050.00, 'FURNISHED', 'VACANT', 'READY', 1, '{BALCONY,POOL}')
+      on conflict (id) do nothing`;
+    await sql`
+      insert into public.listings
+        (id, property_id, owner_id, title, state, current_step, currency, asking_price, min_notification_price, description, investment_case_visible, investment_case_skipped, review_confirmed_at) values
+        ('00000000-0000-0000-0000-0000000021a4', '00000000-0000-0000-0000-0000000011a4', ${idA}, 'Belgravia, Unit 504', 'READY_TO_PUBLISH', 'ready', 'AED', 950000, 880000,
+         'A furnished one-bedroom apartment in Jumeirah Village Circle. Fictional sample listing for this prototype.', false, true, now()),
+        ('00000000-0000-0000-0000-0000000021a5', '00000000-0000-0000-0000-0000000011a5', ${idA}, 'Merano Tower, Unit 1102', 'READY_TO_PUBLISH', 'ready', 'AED', 1450000, 1350000,
+         'A furnished two-bedroom apartment in Business Bay. Fictional sample listing for this prototype.', false, true, now())
+      on conflict (id) do nothing`;
+    // Prerequisites (ownership/verification/Form A/permit/photos) so the §4.4 gate
+    // passes and a retry can succeed. 21a4 gets a REAL draft object (retry → LIVE);
+    // 21a5 keeps a metadata-only photo (retry re-fails → photo-failure state).
+    await uploadDraftPhoto(`${idA}/21a4/cover.svg`, 'Belgravia', '#3d5a80');
+    await sql`
+      insert into public.ownership_documents (id, listing_id, owner_id, document_type, storage_path, original_name, active, status) values
+        ('00000000-0000-0000-0000-0000000041a4', '00000000-0000-0000-0000-0000000021a4', ${idA}, 'TITLE_DEED', 'ownership-documents/demo/fictional-title-504.pdf', 'Deed_504.pdf', true, 'VERIFIED_DEMO'),
+        ('00000000-0000-0000-0000-0000000041a5', '00000000-0000-0000-0000-0000000021a5', ${idA}, 'TITLE_DEED', 'ownership-documents/demo/fictional-title-1102.pdf', 'Deed_1102.pdf', true, 'VERIFIED_DEMO')
+      on conflict (id) do nothing`;
+    await sql`
+      insert into public.verifications (id, listing_id, kind, status, result) values
+        ('00000000-0000-0000-0000-0000000042a4', '00000000-0000-0000-0000-0000000021a4', 'OWNERSHIP', 'VERIFIED_DEMO', '{"decided":"SUCCESS"}'::jsonb),
+        ('00000000-0000-0000-0000-0000000042a5', '00000000-0000-0000-0000-0000000021a5', 'OWNERSHIP', 'VERIFIED_DEMO', '{"decided":"SUCCESS"}'::jsonb)
+      on conflict (id) do nothing`;
+    await sql`
+      insert into public.form_a_records (id, listing_id, status, confirmed_by, listing_price_at_confirmation, signed_at) values
+        ('00000000-0000-0000-0000-0000000043a4', '00000000-0000-0000-0000-0000000021a4', 'VERIFIED_DEMO', ${idA}, 950000, now()),
+        ('00000000-0000-0000-0000-0000000043a5', '00000000-0000-0000-0000-0000000021a5', 'VERIFIED_DEMO', ${idA}, 1450000, now())
+      on conflict (id) do nothing`;
+    await sql`
+      insert into public.permit_records (id, listing_id, permit_type, permit_number, status, approved_at) values
+        ('00000000-0000-0000-0000-0000000044a4', '00000000-0000-0000-0000-0000000021a4', 'TRAKHEESI', 'DEMO-TRK-000021a4', 'VERIFIED_DEMO', now()),
+        ('00000000-0000-0000-0000-0000000044a5', '00000000-0000-0000-0000-0000000021a5', 'TRAKHEESI', 'DEMO-TRK-000021a5', 'VERIFIED_DEMO', now())
+      on conflict (id) do nothing`;
+    await sql`
+      insert into public.property_photos (id, listing_id, storage_path, content_type, original_name, is_cover, sort_order) values
+        ('00000000-0000-0000-0000-0000000031a5', '00000000-0000-0000-0000-0000000021a4', ${`${idA}/21a4/cover.svg`}, 'image/svg+xml', 'cover.svg', true, 0),
+        ('00000000-0000-0000-0000-0000000031a6', '00000000-0000-0000-0000-0000000021a5', 'demo/missing/cover.jpg', 'image/jpeg', 'cover.jpg', true, 0)
+      on conflict (id) do nothing`;
+    await sql`
+      insert into public.listing_publication_requests (id, listing_id, seller_user_id, status, outcome_category, submitted_at, resolved_at) values
+        ('00000000-0000-0000-0000-0000000080a4', '00000000-0000-0000-0000-0000000021a4', ${idA}, 'REJECTED_DEMO', 'DEMO_REVIEW_RETURNED', now() - interval '10 minutes', now() - interval '9 minutes'),
+        ('00000000-0000-0000-0000-0000000080a5', '00000000-0000-0000-0000-0000000021a5', ${idA}, 'REJECTED_DEMO', 'PHOTO_PROCESSING_FAILED', now() - interval '10 minutes', now() - interval '9 minutes')
       on conflict (id) do nothing`;
 
     console.log('  ✓ Demo domain data seeded');

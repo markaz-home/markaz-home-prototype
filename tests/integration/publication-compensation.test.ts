@@ -94,8 +94,8 @@ describe('publication compensation + idempotency', () => {
     const s = await snapshot(listingId);
     expect(s.state).toBe('READY_TO_PUBLISH'); // never LIVE
     expect(s.publicPaths.every((p) => p === null)).toBe(true); // no staged public paths
-    expect(s.request.status).toBe('REJECTED_DEMO');
-    expect(s.request.outcome_category).toBe('PHOTO_PROCESSING_FAILED');
+    expect(s.request?.status).toBe('REJECTED_DEMO');
+    expect(s.request?.outcome_category).toBe('PHOTO_PROCESSING_FAILED');
     expect(await publicObjectCount(s.publicId!)).toBe(0); // first copy removed
   });
 
@@ -108,7 +108,7 @@ describe('publication compensation + idempotency', () => {
     expect(s.state).toBe('READY_TO_PUBLISH'); // not LIVE
     expect(s.publicPaths.every((p) => p === null)).toBe(true); // no stale public_path
     expect(await publicObjectCount(s.publicId!)).toBe(0); // objects cleaned up
-    expect(s.request.status).toBe('PENDING'); // retryable
+    expect(s.request?.status).toBe('PENDING'); // retryable
 
     await resolve(listingId); // retry, no fault
     s = await snapshot(listingId);
