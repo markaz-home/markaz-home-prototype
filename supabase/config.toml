@@ -36,12 +36,10 @@ port = 54324
 [storage]
 enabled = true
 file_size_limit = "50MiB"
-
-[storage.buckets.ownership-documents]
-public = false
-
-[storage.buckets.listing-photos]
-public = true
+# Buckets (ownership-documents, listing-photos, listing-photos-draft) are created
+# by the canonical SQL migrations (04 + 07), not here. Declaring them in config.toml
+# too made `supabase db reset` prompt "Bucket … already exists. Overwrite? [Y/n]",
+# which blocked non-interactive resets. One source of truth = the migrations.
 
 [auth]
 enabled = true
