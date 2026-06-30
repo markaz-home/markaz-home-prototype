@@ -33,7 +33,11 @@ Emitted by the `marketplace_listings` view (`…0801`/`…0802`) and the mappers
 **Photos**
 
 - `cover_public_path` and `photo_public_paths[]` — **only** `public_path` values,
-  resolved to **unsigned public-bucket URLs** (`publicPhotoUrl`)
+  resolved to **unsigned public-bucket URLs** (`publicPhotoUrl`). `public_path` is
+  server-only: the `guard_public_photo_path` trigger (migration 08.3) blocks
+  `authenticated`/`anon` roles from setting or changing this column; only the
+  publication service writes it (via an elevated `postgres` connection). The public
+  bucket (`listing-photos`) is customer read-only — no customer write policies exist.
 
 **Investment Case — public METRICS only, and only when visible**
 

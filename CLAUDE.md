@@ -156,23 +156,34 @@ readiness is server-computed (ADR-0010). Draft photos use the **private**
 `listing-storage.md`.
 
 ## Publication + marketplace (Week 3 — built)
-`READY_TO_PUBLISH → simulated review → atomic LIVE` (then `LIVE ↔ PAUSED`) plus a
-public customer marketplace. Publication review is a **separate**
-`listing_publication_requests` table (NOT a listing-enum state); the §4.4 gate is
-re-validated at resolve time and the LIVE flip is atomic (sets the opaque
-`public_id`/`public_slug`). Public photos are copied draft→public by the **one**
-service-role-isolated operation (`packages/db/src/storage-admin.ts`), all-or-nothing
-(ADR-0012). The marketplace reads **only** the security-barrier
-`marketplace_listings` view (the sole public source; §37 allowlist), never the raw
-tables; `publicTxProcedure` serves anon-or-authed via `withAnonContext`/
-`withUserContext`; a `public_id is not null` guard keeps half-published rows out
-(ADR-0013). Public DTOs are built by **explicit allow-list mapping**
-(`packages/api/src/public-projection.ts`) — never delete-fields-from-a-row. UI:
-`(public)/properties` (browse + `[publicId]/[slug]` detail), `(app)/saved-properties`,
-and `(app)/sell/listings/[id]/{publish,publication,manage}`; anonymous Save uses a
-short-lived sessionStorage intent + post-auth return (§28). Material vs non-material
-live edits per §17.4. See `WEEK-3.md`, `docs/design/publication-design-spec.md`, and
-`docs/architecture/{marketplace,public-listing-projection,publication-flow}.md`.
+`READY_TO_PUBLISH → simulated review → LIVE` (then `LIVE ↔ PAUSED`) plus a public
+customer marketplace. Review is a **separate** `listing_publication_requests` table
+(NOT a listing-enum state). **Publication is an idempotent, compensated workflow —
+Storage and Postgres do NOT share one cross-system transaction:** a stable
+`public_id` is fixed at submit (deterministic photo keys `${publicId}/${photoId}`);
+the §4.4 gate is re-validated at resolve; Phase 1 copies+verifies public photos
+(service-role) with **compensation** on failure (remove objects, clear `public_path`,
+`PHOTO_PROCESSING_FAILED`, retryable); Phase 2 is the **atomic database LIVE
+transition** (one Postgres tx); a DB failure after Phase 1 compensates and leaves the
+request retryable. Retries re-copy to the same keys (no dupes); re-resolve after
+success is a no-op (ADR-0012). **Public-photo writes are server-only:** the public
+`listing-photos` bucket is customer **read-only** (writes only via the service-role
+pipeline `packages/db/src/storage-admin.ts`); `property_photos.public_path` is
+trigger-guarded (`guard_public_photo_path` blocks `authenticated`/`anon`) and written
+only via the elevated `postgres` connection — never customer-supplied (migration
+`…0803`). **Self-save / non-LIVE-save / cross-user saves are blocked by RLS**
+(`saved_properties` per-command `WITH CHECK` requires LIVE + `owner_id <> auth.uid()`),
+not API-only. The marketplace reads **only** the security-barrier `marketplace_listings`
+view (sole public source; §37 allowlist), never raw tables; `publicTxProcedure` serves
+anon-or-authed via `withAnonContext`/`withUserContext`; a `public_id is not null` guard
+keeps half-published rows out (ADR-0013). Public DTOs use **explicit allow-list
+mapping** (`packages/api/src/public-projection.ts`) — never delete-fields-from-a-row.
+UI: `(public)/properties` (browse + `[publicId]/[slug]` detail), `(app)/saved-properties`,
+`(app)/sell/listings/[id]/{publish,publication,manage}`; anonymous Save uses a
+short-lived sessionStorage intent + post-auth return (§28). Publication, save, pause,
+and resume are **persisted writes** (the marketplace is not read-only). Material vs
+non-material live edits per §17.4. See `WEEK-3.md`, `docs/design/publication-design-spec.md`,
+`docs/architecture/{marketplace,public-listing-projection,publication-flow,listing-storage}.md`.
 
 ## Out of scope (next milestone+)
 Offers/counter-offers UX, transactions UX, durable jobs, full admin surface, any AWS

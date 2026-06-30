@@ -183,11 +183,13 @@ pnpm test:e2e   # end-to-end (Playwright)
 - [ADR 0009 — Email + password authentication](docs/adr/0009-email-password-authentication.md)
 - [ADR 0010 — Listing state-machine retry & invalidation](docs/adr/0010-listing-state-machine-retry.md)
 - [ADR 0011 — Draft-photo privacy](docs/adr/0011-draft-photo-privacy.md)
+- [ADR 0012 — Public-photo pipeline](docs/adr/0012-public-photo-pipeline.md)
+- [ADR 0013 — Anonymous + authenticated marketplace access](docs/adr/0013-anonymous-marketplace-access.md)
 
 See also `docs/architecture/` (overview, auth & RLS, realtime, property-listing,
-listing-state-machine, listing-storage) and `docs/runbooks/` (local-development,
-authentication, database-reset, demo). Milestone reports: `WEEK-1.md`,
-`WEEK-1.5.md`, `WEEK-2.md`.
+listing-state-machine, listing-storage, marketplace, public-listing-projection,
+publication-flow) and `docs/runbooks/` (local-development, authentication,
+database-reset, demo). Milestone reports: `WEEK-1.md`, `WEEK-1.5.md`, `WEEK-2.md`.
 
 ## Platform workstream boundary
 
@@ -200,9 +202,6 @@ demo-only environments.
 
 ## Deferred functionality
 
-- **Publishing** a listing to `LIVE` and the live **marketplace / browse**
-  (the listing-creation wizard `DRAFT → READY_TO_PUBLISH` is complete — see
-  `WEEK-2.md` and `docs/architecture/property-listing.md`).
 - **Offers** and counter-offers UX.
 - **Transactions** UX.
 - **Durable background jobs** (`apps/worker`).
@@ -223,16 +222,21 @@ demo-only environments.
   (`infra/supabase/rds-compatibility-checklist.md`, ADR 0006) must pass before any
   production claim.
 
-## Next milestone: the property-listing journey
+## Built milestones
 
-A state-machine-driven listing wizard:
+**Week 2** — the listing wizard (`DRAFT → READY_TO_PUBLISH`): property details,
+ownership upload + simulated verification, investment case, photos, simulated Form A
+and Trakheesi permit, and a full readiness checklist. See `WEEK-2.md` and
+`docs/architecture/property-listing.md`.
 
-`DRAFT → Property Details → Ownership Upload → Ownership Verification (sim) →
-Listing & Offer Settings → Investment Case → Form A (sim) → Photos →
-Trakheesi (sim) → Review → READY_TO_PUBLISH`
-
-Steps marked **(sim)** are simulated in the demo (ownership verification, Form A,
-and Trakheesi permit).
+**Week 3** — publication and marketplace: the simulated publication review
+(`READY_TO_PUBLISH → LIVE`), an idempotent compensated photo-copy pipeline (draft
+bucket → public bucket), pause/resume, material vs non-material live edits, the
+anonymous + authenticated marketplace browse and detail pages, saved properties, and
+the save-intent interception for anonymous visitors. Regulatory review is simulated.
+No real government, legal, payment, or transaction integration is performed. See
+`docs/architecture/{marketplace,publication-flow,public-listing-projection}.md` and
+ADR-0012 / ADR-0013.
 
 ## Troubleshooting
 

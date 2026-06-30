@@ -76,6 +76,13 @@ copy, ADR-0012).
   reads `marketplace_listings`; the view + mappers are the privacy boundary
   (`docs/architecture/public-listing-projection.md`).
 - Anonymous and authenticated reads share one code path and one RLS-scoped tx.
+- Saved-property integrity (self-save, non-`LIVE` save, cross-user rows) is enforced
+  at the database boundary by per-command RLS `WITH CHECK` policies on
+  `saved_properties` (migration 08.3): `saved_properties_insert` and
+  `saved_properties_update` both require `customer_id = auth.uid()` **and** that
+  the referenced listing is `LIVE` and not owned by the caller — mirroring the
+  existing `offers_insert_own` rule. The API-level `BAD_REQUEST` is belt-and-braces
+  on top of this database boundary.
 - Privacy is covered by the publication→marketplace integration test (asserts no
   unit id, owner id, or draft path in any public response) and the projection's own
   allow-list mapper shape.

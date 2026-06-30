@@ -70,7 +70,10 @@ change); the prev/next buttons pass `resetPage = false`. The list query uses
 - **`saved.*`** (`customerProcedure`): `save` (idempotent; LIVE only; **owner cannot
   save own** → `BAD_REQUEST`), `remove`, `removeById`, `publicIds` (heart state),
   `isSaved`, and `list` (LIVE saves → cards; everything else → safe **unavailable**
-  stubs, §29).
+  stubs, §29). Self-save, non-`LIVE` save, and cross-user rows are enforced at the
+  **database boundary** by per-command RLS `WITH CHECK` policies on
+  `saved_properties` (migration 08.3) — the API-level `BAD_REQUEST` is belt-and-braces
+  on top.
 
 All reads go through the `marketplace_listings` view; `saved.*` joins back to
 `listings` only to resolve ownership/state for the current customer.

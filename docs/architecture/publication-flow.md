@@ -44,30 +44,51 @@ The checklist (`publicationChecklist`, §13.2) derives item statuses
 investmentVisibility`) purely from `computeReadiness` + the asking price — the
 client never decides eligibility.
 
-## Resolve = the §4.4 atomic-LIVE gate
+## Resolve = the §4.4 LIVE gate (compensated, idempotent workflow)
 
 `listing.publication.status` → `PublicationReviewService.resolve` re-validates at
-**resolve time** (state may have drifted since submit):
+**resolve time** (state may have drifted since submit). **Supabase Storage and
+PostgreSQL do NOT participate in one cross-system transaction.** Public-photo
+preparation and the database LIVE transition form an idempotent, compensated
+publication workflow with two distinct phases:
 
 1. **Re-validate**: state still `READY_TO_PUBLISH`, ≥1 photo, a cover photo,
    `asking_price > 0`, and a non-superseded permit with `status = 'VERIFIED_DEMO'`.
    Any miss → `REJECTED_DEMO` with category `CHECKLIST_INCOMPLETE` (a forced demo
    failure returns `DEMO_REVIEW_RETURNED`). The listing stays `READY_TO_PUBLISH` —
    it never moves to `REJECTED`.
-2. **Mint identity**: an opaque `public_id` (`mkz-…`, set once and preserved across
-   re-publication) and a cosmetic public slug from public fields only.
-3. **Prepare public photos** — copy draft → public, **all-or-nothing** (ADR-0012).
-   On failure: remove prepared objects, null every `public_path`, return
-   `REJECTED_DEMO` / `PHOTO_PROCESSING_FAILED`.
-4. **Atomic LIVE transition** (one transaction): set `state = 'LIVE'`, `public_id`,
-   `public_slug`, `published_at` (first time only), `public_updated_at`,
-   `paused_at = null`, bump `publication_version`; mark the request `APPROVED_DEMO`.
-   Audit: `LISTING_PUBLIC_PHOTOS_PREPARED`, `LISTING_PUBLICATION_APPROVED_DEMO`,
-   `LISTING_PUBLISHED`.
+2. **Fix stable identity**: an opaque `public_id` (`mkz-…`, set once at submit and
+   preserved across re-publication) and a cosmetic public slug from public fields
+   only. Fixing `public_id` at submit makes photo object keys deterministic, so a
+   retry never creates duplicate public objects.
+3. **Phase 1 — prepare public photos** (service role; compensable): copy each draft
+   photo to the public bucket at the deterministic key `${publicId}/${photoId}`
+   (upsert → idempotent); record `public_path` via `setPublicPhotoPath` (elevated
+   `postgres` connection, outside the RLS transaction); verify every object exists.
+   On any failure: compensate (`removePublicPhotos` + `clearPublicPhotoPaths`), keep
+   the listing non-`LIVE`, return `REJECTED_DEMO` / `PHOTO_PROCESSING_FAILED`
+   (retryable). See ADR-0012.
+4. **Phase 2 — atomic database LIVE transition** (one PostgreSQL transaction): set
+   `state = 'LIVE'`, `public_id`, `public_slug`, `published_at` (first time only),
+   `public_updated_at`, `paused_at = null`, bump `publication_version`; mark the
+   request `APPROVED_DEMO`. Audit: `LISTING_PUBLIC_PHOTOS_PREPARED`,
+   `LISTING_PUBLICATION_APPROVED_DEMO`, `LISTING_PUBLISHED`. **The database
+   transition to LIVE is atomic.**
+5. **If Phase 2 fails after Phase 1 succeeded**: compensate (Storage cleanup), keep
+   the listing non-`LIVE`, leave the request `PENDING` (retryable). A later retry
+   re-copies to the same deterministic keys — no duplicate objects are created. A
+   re-resolve after a successful LIVE transition is a no-op (the request is no longer
+   `PENDING`).
 
-Because identity + photos + `LIVE` commit together, and the marketplace view
-additionally requires `public_id is not null` (migration 08.2), a listing is never
-half-published. The review never claims an official/government/legal decision.
+Because the marketplace view additionally requires `public_id is not null` (migration
+08.2), a listing that is mid-transition can never surface. The review never claims an
+official/government/legal decision. Regulatory review is simulated. No real government,
+legal, payment, or transaction integration is performed.
+
+**Non-production fault-injection seams** (`PublicationFault`): `photoFailAt` (throw
+while copying photo at a given index) and `dbTxFail` (throw before the atomic DB
+transition) are available for compensation and retry tests; both are no-ops in
+production.
 
 ## Returned review + retry
 

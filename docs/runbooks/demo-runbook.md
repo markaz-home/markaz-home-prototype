@@ -67,11 +67,30 @@ duplicates.
 
 ## Week 2 listing scenarios (seeded)
 
-`pnpm db:setup` also seeds fictional listing-journey drafts for the wizard
-(`/sell`): Customer A has an **incomplete draft**, a **verification-pending**
-draft, and a **`READY_TO_PUBLISH`** listing (full simulated records + Investment
-Case); Customer B has a separate draft used by isolation tests. All assets are
-fictional; storage paths are placeholders (no real files). Reset with
+`pnpm db:setup` seeds fictional listing-journey drafts for the wizard (`/sell`):
+Customer A has an **incomplete draft**, a **verification-pending** draft, and a
+**`READY_TO_PUBLISH`** listing (full simulated records + Investment Case); Customer B
+has a separate draft used by isolation tests. All assets are fictional; storage paths
+are placeholders (no real files). Reset with `pnpm supabase:reset && pnpm db:setup`.
+
+## Week 3 publication and marketplace scenarios (seeded)
+
+`pnpm db:setup` also seeds Week 3 publication and marketplace fixtures:
+
+- **LIVE listings** — Customer A has at least one listing that has passed the
+  publication pipeline and is in `state = 'LIVE'`, visible in the marketplace.
+- **Paused listing** — one of Customer A's LIVE listings is `PAUSED`, absent from
+  the marketplace browse and treated as unavailable by saved-property stubs.
+- **Saved properties** — Customer B has saved listings covering both the
+  **available** (LIVE) and **unavailable** (PAUSED / non-LIVE) cases for the saved
+  list view (§29).
+- **Returned / photo-failure publication** — a publication request seeded as
+  `REJECTED_DEMO` with `outcome_category = 'DEMO_REVIEW_RETURNED'` and one with
+  `PHOTO_PROCESSING_FAILED` so the retry and failure-recovery screens can be
+  exercised.
+
+All publication fixtures are **simulated** — no real regulatory review, government,
+legal, payment, or transaction integration is performed. Reset with
 `pnpm supabase:reset && pnpm db:setup`.
 
 ## Notes
