@@ -9,6 +9,10 @@ import {
   auditEvents,
   copyDraftPhotoToPublic,
   removePublicPhotos,
+  verifyPublicPhotos,
+  setPublicPhotoPath,
+  clearPublicPhotoPaths,
+  publicPhotoKey,
   type Tx,
 } from '@markaz/db';
 import { buildListingSlug, formatPublicId, type PublicationResultCategory } from '@markaz/domain';
@@ -20,6 +24,16 @@ const isProd = () =>
 function forcedFailure(force?: DemoOutcome): boolean {
   return !isProd() && force === 'FAILURE';
 }
+
+/** Non-production fault injection for compensation/retry tests (ignored in prod). */
+export interface PublicationFault {
+  photoFailAt?: number; // throw while copying the photo at this index
+  dbTxFail?: boolean; // throw just before the atomic DB LIVE transition
+}
+function fault(inject?: PublicationFault): PublicationFault {
+  return isProd() ? {} : (inject ?? {});
+}
+
 async function audit(tx: Tx, actorId: string, action: string, entityId: string, metadata: Record<string, unknown> = {}) {
   await tx.insert(auditEvents).values({ actorId, action, entityType: 'listing', entityId, metadata });
 }
@@ -41,18 +55,40 @@ async function currentRequest(tx: Tx, listingId: string) {
 }
 
 /**
- * Simulated publication review (design spec §5, §15). Validates eligibility,
- * persists a PENDING request, prepares public photos, and performs the ATOMIC
- * LIVE transition only after approval + photo readiness (§4.4). Never claims an
- * official/government/legal review. Idempotent; `demoOutcome` forces a return.
+ * Simulated publication review (design spec §5, §15). NOT a real regulatory,
+ * legal, government, or payment integration.
+ *
+ * Publication is an IDEMPOTENT, COMPENSATED workflow — Supabase Storage and
+ * PostgreSQL do NOT share one cross-system transaction:
+ *
+ *   1. Validate eligibility (§4.4 gate).
+ *   2. Prepare every public photo (service-role copy draft→public at the stable
+ *      key `${publicId}/${photoId}`) and verify each object exists.
+ *   3. On any photo failure: compensate (remove the public objects + clear the
+ *      staged public_path), keep the listing non-LIVE, return a RETRYABLE failure.
+ *   4. ATOMIC database LIVE transition (one PostgreSQL transaction): flip to LIVE
+ *      + set publication metadata + approve the request.
+ *   5. If the database transition fails after photos were prepared: compensate
+ *      (Storage cleanup), keep the listing non-LIVE, leave the request PENDING
+ *      (retryable). A later retry re-copies to the SAME keys (no duplicates).
+ *
+ * The public photo path is written ONLY here, via the service role — a customer
+ * can never supply or change it (guard_public_photo_path trigger, migration 08.3).
  */
 export const PublicationReviewService = {
-  /** Submit for review: supersede any prior request, create a fresh PENDING one. */
+  /** Submit for review: supersede any prior request, persist a stable public id,
+   * create a fresh PENDING one. The public id stays non-public until LIVE (the
+   * marketplace view requires state = LIVE), but fixing it now makes the photo
+   * keys deterministic so a retry never creates duplicate public objects. */
   async submit({ tx, userId, listingId }: PubCtx, force?: DemoOutcome) {
     const existing = await currentRequest(tx, listingId);
     if (existing && existing.status === 'PENDING') return existing; // idempotent (§5.2)
     if (existing) {
       await tx.update(listingPublicationRequests).set({ supersededAt: new Date() }).where(eq(listingPublicationRequests.id, existing.id));
+    }
+    const [l] = await tx.select({ publicId: listings.publicId }).from(listings).where(eq(listings.id, listingId)).limit(1);
+    if (l && !l.publicId) {
+      await tx.update(listings).set({ publicId: formatPublicId(randomBytes(6).toString('hex')) }).where(eq(listings.id, listingId));
     }
     const [req] = await tx
       .insert(listingPublicationRequests)
@@ -62,11 +98,13 @@ export const PublicationReviewService = {
     return req!;
   },
 
-  /** Resolve a PENDING request: re-validate, prepare public photos, flip LIVE or return. */
-  async resolve({ tx, userId, listingId }: PubCtx) {
+  /** Resolve a PENDING request: re-validate, prepare public photos, then perform
+   * the atomic DB LIVE transition — with compensation on either failure path. */
+  async resolve({ tx, userId, listingId }: PubCtx, inject?: PublicationFault) {
     const req = await currentRequest(tx, listingId);
-    if (!req || req.status !== 'PENDING') return req;
+    if (!req || req.status !== 'PENDING') return req; // idempotent: already resolved
 
+    const f = fault(inject);
     const reject = async (category: PublicationResultCategory, action: string) => {
       await tx
         .update(listingPublicationRequests)
@@ -77,12 +115,12 @@ export const PublicationReviewService = {
       return updated ?? null;
     };
 
-    // Forced demo failure (tests).
+    // Forced demo return (existing simulation control).
     if (req.outcomeCategory === 'DEMO_REVIEW_RETURNED') {
       return reject('DEMO_REVIEW_RETURNED', 'LISTING_PUBLICATION_RETURNED_DEMO');
     }
 
-    // Re-validate the atomic-LIVE gate (§4.4).
+    // Re-validate the §4.4 gate at resolve time.
     const [listing] = await tx.select().from(listings).where(eq(listings.id, listingId)).limit(1);
     if (!listing || listing.state !== 'READY_TO_PUBLISH') return reject('CHECKLIST_INCOMPLETE', 'LISTING_PUBLICATION_RETURNED_DEMO');
     const photos = await tx.select().from(propertyPhotos).where(eq(propertyPhotos.listingId, listingId)).orderBy(propertyPhotos.sortOrder);
@@ -98,55 +136,69 @@ export const PublicationReviewService = {
       return reject('CHECKLIST_INCOMPLETE', 'LISTING_PUBLICATION_RETURNED_DEMO');
     }
 
-    // Stable opaque public id (set once; preserved across re-publication).
     const publicId = listing.publicId ?? formatPublicId(randomBytes(6).toString('hex'));
-    const [property] = listing.propertyId ? await tx.select().from(properties).where(eq(properties.id, listing.propertyId)).limit(1) : [null];
-    const slug = buildListingSlug({
-      bedrooms: property?.bedrooms ?? null,
-      propertyType: property?.propertyType ?? null,
-      community: property?.community ?? null,
-      buildingOrProject: property?.buildingOrProject ?? null,
-    });
+    const photoIds = photos.map((p) => p.id);
+    const compensate = async () => {
+      await removePublicPhotos(photoIds.map((id) => publicPhotoKey(publicId, id)));
+      await clearPublicPhotoPaths(listingId);
+    };
 
-    // Prepare PUBLIC photos (copy draft → public). All-or-nothing.
-    const prepared: string[] = [];
+    // --- Phase 1: prepare + verify public photos (service-role; compensable) ---
     try {
-      for (const photo of photos) {
-        const publicPath = `${publicId}/${photo.id}`;
-        await copyDraftPhotoToPublic(photo.storagePath, publicPath, photo.contentType ?? undefined);
-        await tx.update(propertyPhotos).set({ publicPath }).where(eq(propertyPhotos.id, photo.id));
-        prepared.push(publicPath);
+      for (let i = 0; i < photos.length; i++) {
+        if (f.photoFailAt === i) throw new Error('injected photo-copy failure');
+        const photo = photos[i]!;
+        const key = publicPhotoKey(publicId, photo.id);
+        await copyDraftPhotoToPublic(photo.storagePath, key, photo.contentType ?? undefined);
+        await setPublicPhotoPath(photo.id, key);
       }
+      if (!(await verifyPublicPhotos(publicId, photoIds))) throw new Error('public photo verification failed');
     } catch {
-      await removePublicPhotos(prepared);
-      await tx.update(propertyPhotos).set({ publicPath: null }).where(eq(propertyPhotos.listingId, listingId));
+      await compensate();
       return reject('PHOTO_PROCESSING_FAILED', 'LISTING_PUBLIC_PHOTOS_FAILED');
     }
-    await audit(tx, userId, 'LISTING_PUBLIC_PHOTOS_PREPARED', listingId, { count: prepared.length });
+    await audit(tx, userId, 'LISTING_PUBLIC_PHOTOS_PREPARED', listingId, { count: photoIds.length });
 
-    // Atomic LIVE transition.
-    const now = new Date();
-    await tx
-      .update(listings)
-      .set({
-        state: 'LIVE',
-        publicId,
-        publicSlug: slug,
-        publishedAt: listing.publishedAt ?? now,
-        publicUpdatedAt: now,
-        pausedAt: null,
-        publicationVersion: listing.publicationVersion + 1,
-      })
-      .where(eq(listings.id, listingId));
-    await tx
-      .update(listingPublicationRequests)
-      .set({ status: 'APPROVED_DEMO', resolvedAt: now, outcomeCategory: null })
-      .where(eq(listingPublicationRequests.id, req.id));
-    await audit(tx, userId, 'LISTING_PUBLICATION_APPROVED_DEMO', listingId);
-    await audit(tx, userId, 'LISTING_PUBLISHED', listingId, { publicId });
-
-    const [updated] = await tx.select().from(listingPublicationRequests).where(eq(listingPublicationRequests.id, req.id)).limit(1);
-    return updated ?? null;
+    // --- Phase 2: ATOMIC database LIVE transition --------------------------------
+    try {
+      if (f.dbTxFail) throw new Error('injected database transition failure');
+      const slug = await (async () => {
+        const [property] = listing.propertyId ? await tx.select().from(properties).where(eq(properties.id, listing.propertyId)).limit(1) : [null];
+        return buildListingSlug({
+          bedrooms: property?.bedrooms ?? null,
+          propertyType: property?.propertyType ?? null,
+          community: property?.community ?? null,
+          buildingOrProject: property?.buildingOrProject ?? null,
+        });
+      })();
+      const now = new Date();
+      await tx
+        .update(listings)
+        .set({
+          state: 'LIVE',
+          publicId,
+          publicSlug: slug,
+          publishedAt: listing.publishedAt ?? now,
+          publicUpdatedAt: now,
+          pausedAt: null,
+          publicationVersion: listing.publicationVersion + 1,
+        })
+        .where(eq(listings.id, listingId));
+      await tx
+        .update(listingPublicationRequests)
+        .set({ status: 'APPROVED_DEMO', resolvedAt: now, outcomeCategory: null })
+        .where(eq(listingPublicationRequests.id, req.id));
+      await audit(tx, userId, 'LISTING_PUBLICATION_APPROVED_DEMO', listingId);
+      await audit(tx, userId, 'LISTING_PUBLISHED', listingId, { publicId });
+      const [updated] = await tx.select().from(listingPublicationRequests).where(eq(listingPublicationRequests.id, req.id)).limit(1);
+      return updated ?? null;
+    } catch {
+      // Database transition failed AFTER Storage preparation → compensate and keep
+      // the request PENDING (retryable). The listing is never left LIVE with
+      // partial/missing public photos.
+      await compensate();
+      return req; // still PENDING
+    }
   },
 
   /** Supersede a pending request after an invalidating edit (§5.2). */
