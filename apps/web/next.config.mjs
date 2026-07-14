@@ -13,6 +13,10 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // ESLint (incl. the @next/eslint-plugin-next rules) runs as its own `pnpm lint`
+  // step and in CI; Next's build-time lint is redundant here and, with flat config,
+  // emits a spurious "plugin not detected" warning. Lint is NOT skipped overall.
+  eslint: { ignoreDuringBuilds: true },
   transpilePackages: [
     '@markaz/ui',
     '@markaz/i18n',
