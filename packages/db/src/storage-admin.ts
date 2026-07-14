@@ -1,6 +1,7 @@
+import 'server-only';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { eq } from 'drizzle-orm';
-import { getAppDb } from './client';
+import { getDirectDb } from './client';
 import { propertyPhotos } from './schema';
 
 /**
@@ -59,17 +60,19 @@ export async function removePublicPhotos(publicPaths: string[]): Promise<void> {
  * Set property_photos.public_path via the app's elevated `postgres` connection —
  * the only path the `guard_public_photo_path` trigger permits (an `authenticated`
  * customer connection cannot set or change a public path; migration 08.3). This
- * runs OUTSIDE the caller's RLS transaction; the value is server-derived
- * (`${publicId}/${photoId}`) and never customer-supplied.
+ * runs OUTSIDE the caller's RLS transaction on the DIRECT (privileged) connection —
+ * the trigger permits it only from the elevated role, never an `authenticated`
+ * customer connection. The value is server-derived (`${publicId}/${photoId}`) and
+ * never customer-supplied.
  */
 export async function setPublicPhotoPath(photoId: string, publicPath: string): Promise<void> {
-  await getAppDb().update(propertyPhotos).set({ publicPath }).where(eq(propertyPhotos.id, photoId));
+  await getDirectDb().update(propertyPhotos).set({ publicPath }).where(eq(propertyPhotos.id, photoId));
 }
 
 /** Clear public_path for every photo of a listing (compensation). Idempotent and
- * safe to call repeatedly; runs as the elevated `postgres` role. */
+ * safe to call repeatedly; runs on the DIRECT (elevated) connection. */
 export async function clearPublicPhotoPaths(listingId: string): Promise<void> {
-  await getAppDb().update(propertyPhotos).set({ publicPath: null }).where(eq(propertyPhotos.listingId, listingId));
+  await getDirectDb().update(propertyPhotos).set({ publicPath: null }).where(eq(propertyPhotos.listingId, listingId));
 }
 
 // --- Week 5: private transaction documents (participant-scoped; ADR-0023) --------

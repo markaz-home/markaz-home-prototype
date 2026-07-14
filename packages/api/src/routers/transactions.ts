@@ -16,7 +16,7 @@ import {
   ALLOWED_DOCUMENT_MIME,
   MAX_DOCUMENT_BYTES,
 } from '@markaz/domain';
-import { transactionDocumentSignedUrl, removeTransactionDocument } from '@markaz/db';
+import { transactionDocumentSignedUrl, removeTransactionDocument } from '@markaz/db/storage-admin';
 import { router, customerProcedure } from '../trpc';
 import {
   toTransactionDetail,

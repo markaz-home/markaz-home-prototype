@@ -13,9 +13,9 @@ import {
   verifications,
   adminNotes,
   auditEvents,
-  adminPrivateSignedUrl,
   type Tx,
 } from '@markaz/db';
+import { adminPrivateSignedUrl } from '@markaz/db/storage-admin';
 import {
   adminNoteCategorySchema,
   restrictReasonSchema,

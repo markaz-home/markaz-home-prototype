@@ -7,14 +7,16 @@ import {
   permitRecords,
   listingPublicationRequests,
   auditEvents,
+  type Tx,
+} from '@markaz/db';
+import {
   copyDraftPhotoToPublic,
   removePublicPhotos,
   verifyPublicPhotos,
   setPublicPhotoPath,
   clearPublicPhotoPaths,
   publicPhotoKey,
-  type Tx,
-} from '@markaz/db';
+} from '@markaz/db/storage-admin';
 import { buildListingSlug, formatPublicId, type PublicationResultCategory } from '@markaz/domain';
 import type { DemoOutcome } from './simulation';
 

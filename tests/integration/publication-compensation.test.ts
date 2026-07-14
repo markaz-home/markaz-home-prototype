@@ -3,7 +3,8 @@ import { sql } from 'drizzle-orm';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { appRouter, createCallerFactory, PublicationReviewService, type Context } from '@markaz/api';
 import { logger } from '@markaz/observability';
-import { withUserContext, getAppDb, removePublicPhotos, clearPublicPhotoPaths, publicPhotoKey, closeConnections } from '@markaz/db';
+import { withUserContext, getAppDb, closeConnections } from '@markaz/db';
+import { removePublicPhotos, clearPublicPhotoPaths, publicPhotoKey } from '@markaz/db/storage-admin';
 import { resolveDemoIds, type DemoIds } from './helpers';
 
 /**
