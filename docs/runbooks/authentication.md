@@ -73,18 +73,19 @@ Routing is decided by `resolvePostAuthDestination` in `@markaz/domain` — it ga
 on email verification first, so unverified/incomplete customers never reach the
 dashboard.
 
-## Demo accounts (fictional)
+## Accounts
 
-| Account    | Email                    | Local password  | Type                       |
-| ---------- | ------------------------ | --------------- | -------------------------- |
-| Customer A | `customer-a@markaz.demo` | `Markaz!Demo1`  | CUSTOMER (`VERIFIED_DEMO`) |
-| Customer B | `customer-b@markaz.demo` | `Markaz!Demo1`  | CUSTOMER (`VERIFIED_DEMO`) |
-| Admin      | `admin@markaz.demo`      | `Markaz!Admin1` | ADMIN                      |
+There is **no demo-customer seed** (the hardcoded-password seed was removed — it
+violated the sign-up rules). **Customers sign up through the app** (email + password +
+6-digit verification); the `handle_new_user` trigger creates each `profiles` row. The
+single **ADMIN** is created by the env-driven bootstrap (admins can never self-sign-up):
 
-These are **local-only** credentials. Provision them with
-`pnpm supabase:reset && pnpm db:setup`. Both customers are seeded `VERIFIED_DEMO`
-(returning; skip onboarding). Full details, env overrides, and the production
-guard are in **`demo-runbook.md`**.
+```bash
+BOOTSTRAP_ADMIN_EMAIL=you@example.com BOOTSTRAP_ADMIN_PASSWORD='<strong>' pnpm db:setup
+```
+
+Automated tests **self-provision** their own accounts via the Supabase Admin API in the
+e2e/integration helpers — they do not rely on a seed. See **`demo-runbook.md`**.
 
 ## Demo-auth fallback
 

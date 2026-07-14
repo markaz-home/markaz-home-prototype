@@ -43,8 +43,10 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const DB_URL = process.env.DIRECT_DATABASE_URL ?? process.env.DATABASE_URL;
 
-const ADMIN_EMAIL = process.env.BOOTSTRAP_ADMIN_EMAIL ?? process.env.DEMO_ADMIN_EMAIL;
-const ADMIN_PASSWORD = process.env.BOOTSTRAP_ADMIN_PASSWORD ?? process.env.DEMO_ADMIN_PASSWORD;
+// Only the BOOTSTRAP_ADMIN_* contract — the legacy DEMO_ADMIN_* fallbacks were removed
+// (review #5) so there is one explicit, unambiguous way to bootstrap the admin.
+const ADMIN_EMAIL = process.env.BOOTSTRAP_ADMIN_EMAIL;
+const ADMIN_PASSWORD = process.env.BOOTSTRAP_ADMIN_PASSWORD;
 const ADMIN_NAME = process.env.BOOTSTRAP_ADMIN_NAME ?? 'MARKAZ Operations';
 
 async function main() {
