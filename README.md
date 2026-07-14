@@ -185,11 +185,17 @@ pnpm test:e2e   # end-to-end (Playwright)
 - [ADR 0011 — Draft-photo privacy](docs/adr/0011-draft-photo-privacy.md)
 - [ADR 0012 — Public-photo pipeline](docs/adr/0012-public-photo-pipeline.md)
 - [ADR 0013 — Anonymous + authenticated marketplace access](docs/adr/0013-anonymous-marketplace-access.md)
+- [ADR 0014 — Offer thread + immutable proposal model](docs/adr/0014-offer-thread-immutable-proposal-model.md)
+- [ADR 0015 — Single-accepted-offer enforcement](docs/adr/0015-single-accepted-offer-enforcement.md)
+- [ADR 0016 — Derived UNDER_OFFER availability](docs/adr/0016-derived-under-offer-availability.md)
+- [ADR 0017 — Offer expiry processing](docs/adr/0017-offer-expiry-processing.md)
+- [ADR 0018 — Offer realtime channel security](docs/adr/0018-offer-realtime-channel-security.md)
 
 See also `docs/architecture/` (overview, auth & RLS, realtime, property-listing,
 listing-state-machine, listing-storage, marketplace, public-listing-projection,
-publication-flow) and `docs/runbooks/` (local-development, authentication,
-database-reset, demo). Milestone reports: `WEEK-1.md`, `WEEK-1.5.md`, `WEEK-2.md`.
+publication-flow, offers, offer-state-machine, offer-realtime, offer-security) and
+`docs/runbooks/` (local-development, authentication, database-reset, demo). Milestone
+reports: `WEEK-1.md`, `WEEK-1.5.md`, `WEEK-2.md`, `WEEK-3.md`, `WEEK-4.md`.
 
 ## Platform workstream boundary
 

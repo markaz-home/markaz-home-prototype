@@ -736,6 +736,8 @@ export const listingRouter = router({
     const listing = await loadOwned(ctx.tx, input.listingId);
     if (!canPause(listing.state)) throw new TRPCError({ code: 'BAD_REQUEST', message: 'Only a live listing can be paused.' });
     await ctx.tx.update(listings).set({ state: 'PAUSED', pausedAt: new Date() }).where(eq(listings.id, input.listingId));
+    // Pausing closes every active offer negotiation (§28.1); they never auto-resume.
+    await ctx.tx.execute(sql`select public.close_listing_offers(${input.listingId}::uuid, 'LISTING_PAUSED')`);
     await audit(ctx.tx, ctx.user.id, 'LISTING_PAUSED', input.listingId);
     return { state: 'PAUSED' as const };
   }),

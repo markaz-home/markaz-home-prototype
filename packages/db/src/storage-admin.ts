@@ -71,3 +71,31 @@ export async function setPublicPhotoPath(photoId: string, publicPath: string): P
 export async function clearPublicPhotoPaths(listingId: string): Promise<void> {
   await getAppDb().update(propertyPhotos).set({ publicPath: null }).where(eq(propertyPhotos.listingId, listingId));
 }
+
+// --- Week 5: private transaction documents (participant-scoped; ADR-0023) --------
+const TRANSACTION_BUCKET = 'transaction-documents';
+
+/** Short-lived signed URL for a private transaction document. The CALLER must have
+ * already verified (under RLS) that the requester uploaded this document — this only
+ * mints the URL; it does not authorise. Never log the returned URL or the path. */
+export async function transactionDocumentSignedUrl(path: string, expiresInSeconds = 60): Promise<string | null> {
+  const { data, error } = await admin().storage.from(TRANSACTION_BUCKET).createSignedUrl(path, expiresInSeconds);
+  if (error) return null;
+  return data?.signedUrl ?? null;
+}
+
+/** Best-effort delete of a private transaction document object. */
+export async function removeTransactionDocument(path: string): Promise<void> {
+  await admin().storage.from(TRANSACTION_BUCKET).remove([path]).catch(() => {});
+}
+
+/** Week-6 admin document access: short-lived signed URL for ANY private bucket. The CALLER
+ * must have verified admin capability + recorded the access audit event first; this only
+ * mints the URL. Never log the returned URL or the path. Buckets are allow-listed. */
+const ADMIN_READABLE_BUCKETS = new Set(['ownership-documents', 'transaction-documents', 'listing-photos-draft']);
+export async function adminPrivateSignedUrl(bucket: string, path: string, expiresInSeconds = 300): Promise<string | null> {
+  if (!ADMIN_READABLE_BUCKETS.has(bucket)) return null;
+  const { data, error } = await admin().storage.from(bucket).createSignedUrl(path, expiresInSeconds);
+  if (error) return null;
+  return data?.signedUrl ?? null;
+}

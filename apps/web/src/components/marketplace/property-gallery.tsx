@@ -48,35 +48,35 @@ export function PropertyGallery({ photos, headline }: { photos: string[]; headli
 
   return (
     <>
-      <div className="grid gap-2 sm:grid-cols-3">
+      {/* Balanced gallery: large cover (left half) + a 2×2 grid of thumbnails
+          (right half) at equal height on sm+; cover-only on mobile. */}
+      <div className="grid gap-2 sm:h-[360px] sm:grid-cols-4 sm:grid-rows-2 lg:h-[440px]">
         <button
           type="button"
           onClick={() => openAt(0)}
-          className="relative col-span-2 aspect-[4/3] overflow-hidden rounded-lg bg-muted"
+          className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted sm:col-span-2 sm:row-span-2 sm:aspect-auto sm:h-full"
         >
           <PhotoImg src={photos[0]!} alt={`${headline} — 1`} failed={failed.has(0)} onError={() => markFailed(0)} />
         </button>
-        <div className="hidden grid-rows-2 gap-2 sm:grid">
-          {thumbs.map((src, i) => {
-            const realIndex = i + 1;
-            const isLast = i === thumbs.length - 1 && extra > 0;
-            return (
-              <button
-                key={realIndex}
-                type="button"
-                onClick={() => openAt(realIndex)}
-                className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted"
-              >
-                <PhotoImg src={src} alt={`${headline} — ${realIndex + 1}`} failed={failed.has(realIndex)} onError={() => markFailed(realIndex)} />
-                {isLast && (
-                  <span className="absolute inset-0 flex items-center justify-center bg-black/55 text-lg font-semibold text-white">
-                    +{extra + 1}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
+        {thumbs.map((src, i) => {
+          const realIndex = i + 1;
+          const isLast = i === thumbs.length - 1 && extra > 0;
+          return (
+            <button
+              key={realIndex}
+              type="button"
+              onClick={() => openAt(realIndex)}
+              className="relative hidden aspect-[4/3] overflow-hidden rounded-lg bg-muted sm:block sm:aspect-auto sm:h-full"
+            >
+              <PhotoImg src={src} alt={`${headline} — ${realIndex + 1}`} failed={failed.has(realIndex)} onError={() => markFailed(realIndex)} />
+              {isLast && (
+                <span className="absolute inset-0 flex items-center justify-center bg-black/55 text-lg font-semibold text-white">
+                  +{extra + 1}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       <div className="mt-2">

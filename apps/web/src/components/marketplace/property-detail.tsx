@@ -10,6 +10,7 @@ import { formatAed, formatNumber, formatPct } from '@/lib/format';
 import type { RouterOutputs } from '@/trpc/types';
 import { SaveButton } from './save-button';
 import { PropertyGallery } from './property-gallery';
+import { MakeOfferButton } from '@/components/offers/make-offer-button';
 import { readSaveIntent, clearSaveIntent } from '@/lib/save-intent';
 
 type Detail = NonNullable<RouterOutputs['marketplace']['getByPublicId']>;
@@ -24,6 +25,7 @@ export function PropertyDetail({
   initialSaved: boolean;
 }) {
   const t = useTranslations('property');
+  const to = useTranslations('offers');
   const tf = useTranslations('filters');
   const ti = useTranslations('investmentCase');
   const ts = useTranslations('save');
@@ -92,13 +94,21 @@ export function PropertyDetail({
             <>
               <Badge variant="outline">{t('yourListing')}</Badge>
               {detail.manageListingId && (
-                <Button asChild>
-                  <Link href={`/sell/listings/${detail.manageListingId}/manage`}>{t('manage')}</Link>
-                </Button>
+                <>
+                  <Button variant="outline" asChild>
+                    <Link href={`/sell/listings/${detail.manageListingId}/offers`}>{to('cta.viewOffers')}</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link href={`/sell/listings/${detail.manageListingId}/manage`}>{t('manage')}</Link>
+                  </Button>
+                </>
               )}
             </>
           ) : (
-            <SaveButton publicId={detail.publicId ?? ''} isAuthenticated={isAuthenticated} returnPath={returnPath} initialSaved={initialSaved} variant="full" />
+            <>
+              <SaveButton publicId={detail.publicId ?? ''} isAuthenticated={isAuthenticated} returnPath={returnPath} initialSaved={initialSaved} variant="icon" />
+              <MakeOfferButton publicId={detail.publicId ?? ''} slug={detail.slug ?? ''} isAuthenticated={isAuthenticated} />
+            </>
           )}
           <Button variant="outline" onClick={share}>
             <Share2 className="h-4 w-4 me-2" /> {t('share')}

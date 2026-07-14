@@ -30,6 +30,7 @@ export function PublishFlow({ listingId }: { listingId: string }) {
   const [confirmed, setConfirmed] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [checkboxError, setCheckboxError] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   if (checklist.isLoading) return <Skeleton className="h-96 w-full" />;
   if (checklist.isError || !checklist.data) {
@@ -42,8 +43,13 @@ export function PublishFlow({ listingId }: { listingId: string }) {
       setCheckboxError(true);
       return;
     }
-    await submit.mutateAsync({ listingId, confirm: true });
-    router.push(`/sell/listings/${listingId}/publication`);
+    setSubmitError(null);
+    try {
+      await submit.mutateAsync({ listingId, confirm: true });
+      router.push(`/sell/listings/${listingId}/publication`);
+    } catch (e) {
+      setSubmitError((e as { message?: string })?.message ?? t('processingErrorBody'));
+    }
   }
 
   return (
@@ -132,6 +138,7 @@ export function PublishFlow({ listingId }: { listingId: string }) {
             <span>{t('checkbox')}</span>
           </label>
           {checkboxError && <p className="text-sm text-destructive" role="alert">{t('checkboxError')}</p>}
+          {submitError && <Alert variant="destructive"><p className="text-sm">{submitError}</p></Alert>}
 
           <div className="flex flex-wrap gap-3">
             <Button onClick={onSubmit} loading={submit.isPending}>{t('submit')}</Button>

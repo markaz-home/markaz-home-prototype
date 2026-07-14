@@ -15,6 +15,8 @@ import {
 import { Link, usePathname } from '@/i18n/navigation';
 import { LanguageSwitcher } from './language-switcher';
 import { SignOutButton } from './sign-out-button';
+import { NotificationBell, OffersNavBadge } from './offers/notification-bell';
+import { TransactionsNavBadge } from './transactions/shared';
 
 const NAV_ITEMS = [
   { href: '/dashboard', key: 'dashboard' },
@@ -53,6 +55,8 @@ export function CustomerNav({ displayName }: { displayName: string | null }) {
                   )}
                 >
                   {t(item.key)}
+                  {item.key === 'offers' ? <OffersNavBadge /> : null}
+                  {item.key === 'transactions' ? <TransactionsNavBadge /> : null}
                 </Link>
               );
             })}
@@ -60,6 +64,7 @@ export function CustomerNav({ displayName }: { displayName: string | null }) {
         </div>
 
         <div className="flex items-center gap-2">
+          <NotificationBell />
           <LanguageSwitcher />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

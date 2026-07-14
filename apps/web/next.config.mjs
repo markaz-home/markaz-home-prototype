@@ -1,7 +1,11 @@
 import { config as loadEnv } from 'dotenv';
 import createNextIntlPlugin from 'next-intl/plugin';
 
-// Load the shared monorepo-root .env so both apps use one environment contract.
+// Env precedence (Next convention): .env.local (gitignored, local-dev overrides) wins,
+// then the shared monorepo-root .env (the hosted/deploy contract). dotenv keeps the FIRST
+// value it sees for a key, so load .env.local first. Missing .env.local is a silent no-op
+// (e.g. on Vercel, where env comes from the dashboard).
+loadEnv({ path: '../../.env.local' });
 loadEnv({ path: '../../.env' });
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');

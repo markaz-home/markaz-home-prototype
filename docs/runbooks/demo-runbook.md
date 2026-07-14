@@ -1,105 +1,54 @@
-# Runbook: Demo Accounts & Provisioning
+# Runbook: Accounts & Provisioning
 
-Demo accounts and demo domain data are provisioned by a script that uses the
-Supabase **Admin API** — **not** by `supabase/seed.sql`. Writing Auth tables via
-SQL is unsupported, so `seed.sql` is intentionally minimal and the Auth users
-come from `packages/db/src/scripts/setup-demo.ts` (run via `pnpm db:setup`).
+The prototype uses **real accounts**. Customers **sign up through the app** (email +
+password + 6-digit email verification); the `handle_new_user` trigger creates each
+`profiles` row automatically. **No demo customers or demo domain data are seeded**, so a
+deployment works out of the box with real accounts and needs no provisioning step.
 
-## The three demo accounts
+`supabase/seed.sql` is intentionally minimal. `pnpm db:setup`
+(`packages/db/src/scripts/setup-demo.ts`) is now an **optional, env-driven admin
+bootstrap** only — because admins can never self-sign-up (no public admin sign-up).
 
-| Account | Email | Type | State |
-| --- | --- | --- | --- |
-| Customer A | `customer-a@markaz.demo` | CUSTOMER | seeded `VERIFIED_DEMO` (returning; skips onboarding) — seller in demo data |
-| Customer B | `customer-b@markaz.demo` | CUSTOMER | seeded `VERIFIED_DEMO` (returning; skips onboarding) — buyer in demo data |
-| Admin | `admin@markaz.demo` | ADMIN | promoted to `ADMIN` after creation |
+## Create your own accounts (customers)
 
-All three are clearly **fictional**. Their Auth user IDs are **random UUIDs**
-(Admin-API generated), so tests and tooling resolve them **by email**, never by a
-hard-coded ID.
+1. Start the stack + app, open the web app, and use **Sign up**.
+2. Enter any email + a policy-compliant password, then read the **6-digit code** from the
+   local mail inbox (Mailpit, http://127.0.0.1:54324) to verify, and complete onboarding.
+3. Repeat for as many people as you like — each is an independent `CUSTOMER` who can both
+   buy and sell. Buyer/Seller are journeys, not roles.
 
-## Local credentials (local/demo only — never production)
+For Forgot/Reset password, use the **recovery link** from the inbox — see
+`authentication.md`.
 
-| Email | Default password | Env override |
-| --- | --- | --- |
-| `customer-a@markaz.demo` | `Markaz!Demo1` | `DEMO_CUSTOMER_A_PASSWORD` |
-| `customer-b@markaz.demo` | `Markaz!Demo1` | `DEMO_CUSTOMER_B_PASSWORD` |
-| `admin@markaz.demo` | `Markaz!Admin1` | `DEMO_ADMIN_PASSWORD` |
+## Bootstrap an admin (optional)
 
-These are **local development credentials only**. They are safe to document
-because they exist solely on a local/demo stack. **Never** reuse them, or any
-real password, for a production or internet-reachable environment.
-
-## How to provision
+Admins exist only if you create one explicitly:
 
 ```bash
-pnpm supabase:reset    # drop + re-apply migrations + (minimal) seed
-pnpm db:setup          # create demo Auth users via the Admin API + seed demo data
+BOOTSTRAP_ADMIN_EMAIL=you@example.com \
+BOOTSTRAP_ADMIN_PASSWORD='a-strong-password' \
+pnpm db:setup
 ```
 
-`pnpm db:setup` runs `setup-demo.ts`, which:
+This creates (or idempotently updates) one Auth user via the Supabase **Admin API**
+(email pre-confirmed) and promotes its profile to `account_type = 'ADMIN'`. Sign in to the
+admin app (port 3001) with it. With **no** `BOOTSTRAP_ADMIN_EMAIL` set, `pnpm db:setup` is a
+**no-op** and seeds nothing.
 
-1. Creates Customer A, Customer B, and Admin via `auth.admin.createUser`
-   (`email_confirm: true`, passwords from the `DEMO_*` env above with the local
-   defaults, plus profile metadata) — **idempotently** (safe to re-run).
-2. Promotes the admin to `account_type = 'ADMIN'` and marks both customers
-   `VERIFIED_DEMO`.
-3. Seeds the fictional demo domain data (Dubai properties, listings, offers,
-   transactions) via the direct DB connection.
+> Never reuse a real/production password on a local or internet-reachable demo stack.
 
-## Production guard
-
-`setup-demo.ts` **refuses to run** when `DEMO_ENVIRONMENT=production` **or**
-`NODE_ENV=production`. It cannot create demo Auth users or demo data in a
-production-flagged environment.
-
-## How to reset
-
-Re-run the same two commands to get a clean, deterministic state:
+## Reset
 
 ```bash
-pnpm supabase:reset && pnpm db:setup
+pnpm supabase:reset        # drop + re-apply migrations (no seeded accounts)
 ```
 
-`supabase:reset` wipes the database (including the previous demo Auth users);
-`db:setup` recreates everything. Because the script is idempotent, re-running
-`pnpm db:setup` without a reset is also safe — it reconciles rather than
-duplicates.
-
-## Week 2 listing scenarios (seeded)
-
-`pnpm db:setup` seeds fictional listing-journey drafts for the wizard (`/sell`):
-Customer A has an **incomplete draft**, a **verification-pending** draft, and a
-**`READY_TO_PUBLISH`** listing (full simulated records + Investment Case); Customer B
-has a separate draft used by isolation tests. All assets are fictional; storage paths
-are placeholders (no real files). Reset with `pnpm supabase:reset && pnpm db:setup`.
-
-## Week 3 publication and marketplace scenarios (seeded)
-
-`pnpm db:setup` also seeds Week 3 publication and marketplace fixtures:
-
-- **LIVE listings** — Customer A has at least one listing that has passed the
-  publication pipeline and is in `state = 'LIVE'`, visible in the marketplace.
-- **Paused listing** — one of Customer A's LIVE listings is `PAUSED`, absent from
-  the marketplace browse and treated as unavailable by saved-property stubs.
-- **Saved properties** — Customer B has saved listings covering both the
-  **available** (LIVE) and **unavailable** (PAUSED / non-LIVE) cases for the saved
-  list view (§29).
-- **Returned / photo-failure publication** — a publication request seeded as
-  `REJECTED_DEMO` with `outcome_category = 'DEMO_REVIEW_RETURNED'` and one with
-  `PHOTO_PROCESSING_FAILED` so the retry and failure-recovery screens can be
-  exercised.
-
-All publication fixtures are **simulated** — no real regulatory review, government,
-legal, payment, or transaction integration is performed. Reset with
-`pnpm supabase:reset && pnpm db:setup`.
+Then sign up fresh accounts in the app. Re-run the admin bootstrap above only if you want
+an admin again (it is idempotent).
 
 ## Notes
 
-- Both customers are **CUSTOMER** type; there is no demo seller/buyer _role_ —
-  buyer/seller are journeys, not roles.
-- The Admin account can be created **only** by this script; there is no public
-  admin sign-up.
-- Sign in to the demo accounts with the credentials above (email + password). To
-  exercise sign-up / verification / recovery manually, use a fresh email and the
-  local mail inbox: read the **6-digit code** for new-account verification, and
-  click the **recovery link** for Forgot/Reset password — see `authentication.md`.
+- Account types are only `CUSTOMER` and `ADMIN`. Customers can never self-promote to admin
+  (DB trigger + RLS).
+- Nothing here performs real regulatory review, government, legal, payment, or transaction
+  integration — the UAE-PASS / DLD / Trakheesi / publication / offer flows are simulated.

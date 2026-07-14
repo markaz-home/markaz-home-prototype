@@ -145,16 +145,22 @@ Every resolver in these tiers runs inside the RLS-scoped transaction and must us
 | `property_photos` | read photos of **LIVE** listings | read/write own | LIVE only | full |
 | `properties` | — | read/write own | — | full |
 | `ownership_documents` | — | read/write own (private) | denied | read |
-| `offers` | — | offering customer reads own; listing owner reads offers on their listing | denied | full |
-| `counter_offers` | — | parties to the offer | denied | full |
+| `offer_threads` | — | **read** own (buyer **or** listing-owner seller); no direct write | denied | read |
+| `offer_proposals` | — | **read** if participant of the parent thread; no direct write | denied | read |
+| `offer_events` | — | **read** if participant of the parent thread; no direct write | denied | read |
+| `notifications` | — | read/update-read own (recipient) | denied | read |
 | `transactions` | — | buyer **or** seller | denied | full |
 | `transaction_stage_history` | — | parties to the transaction | denied | full |
 | `audit_events` | — | insert-only | insert-only | read |
 
 Key enforced rules baked into the schema/policies:
 
-- **Insert offer** only if `created_by = auth.uid()` **AND** the listing is **not
-  your own** (insert policy + `enforce_offer_not_on_own_listing()` trigger).
+- **Offers are read-only via RLS** (Week 4, ADR-0014). Every offer write goes through a
+  `SECURITY DEFINER` function (`create_offer`, `submit_counter`, `accept_offer`,
+  `reject_offer`, `withdraw_offer`, …) that reads the actor from `auth.uid()` and derives
+  `created_by_side` from membership; a customer cannot create an offer on their own listing
+  (the function rejects `OWN_LISTING`), and only one accepted offer per listing is possible
+  (partial unique index + locked acceptance — ADR-0015).
 - **No self-promotion:** `prevent_account_type_escalation()` blocks a customer
   changing their own `account_type`.
 - `is_admin()` is a SECURITY DEFINER function used by admin policies.

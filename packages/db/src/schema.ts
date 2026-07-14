@@ -21,6 +21,16 @@ import {
 
 // --- Enums -------------------------------------------------------------------
 export const accountType = pgEnum('account_type', ['CUSTOMER', 'ADMIN']);
+export const adminNoteCategory = pgEnum('admin_note_category', [
+  'REVIEW',
+  'CUSTOMER_SUPPORT',
+  'LISTING_INVESTIGATION',
+  'OFFER_INVESTIGATION',
+  'TRANSACTION_ISSUE',
+  'VERIFICATION_ISSUE',
+  'FOLLOW_UP',
+  'CORRECTION',
+]);
 export const identityVerificationStatus = pgEnum('identity_verification_status', [
   'NOT_STARTED',
   'PENDING',
@@ -42,25 +52,101 @@ export const listingState = pgEnum('listing_state', [
   'REJECTED',
   'SOLD_DEMO',
 ]);
-export const offerState = pgEnum('offer_state', [
+// Week 4 offer negotiation enums (migration 08.4). The Week-1 flat `offer_state`
+// enum was retired with the old single-offer tables (ADR-0014).
+export const offerThreadStatus = pgEnum('offer_thread_status', [
   'DRAFT',
-  'SUBMITTED',
-  'UNDER_REVIEW',
-  'COUNTERED',
-  'ACCEPTED_AS_PREFERRED',
+  'AWAITING_SELLER',
+  'AWAITING_BUYER',
+  'ACCEPTED',
+  'REJECTED',
+  'WITHDRAWN',
+  'EXPIRED',
+  'CLOSED_OTHER_ACCEPTED',
+  'CLOSED_LISTING_UNAVAILABLE',
+]);
+export const offerNextActor = pgEnum('offer_next_actor', ['BUYER', 'SELLER', 'NONE']);
+export const offerProposalStatus = pgEnum('offer_proposal_status', [
+  'CURRENT',
+  'SUPERSEDED',
+  'ACCEPTED',
   'REJECTED',
   'EXPIRED',
   'WITHDRAWN',
+  'CLOSED',
 ]);
-export const transactionStage = pgEnum('transaction_stage', [
-  'OFFER',
-  'ACCEPTANCE',
-  'MOU',
+export const offerSide = pgEnum('offer_side', ['BUYER', 'SELLER']);
+export const offerEventType = pgEnum('offer_event_type', [
+  'OFFER_SUBMITTED',
+  'SELLER_COUNTERED',
+  'BUYER_COUNTERED',
+  'OFFER_ACCEPTED',
+  'OFFER_REJECTED',
+  'OFFER_WITHDRAWN',
+  'OFFER_EXPIRED',
+  'OFFER_VIEWED',
+  'LISTING_PAUSED',
+  'LISTING_UNAVAILABLE',
+  'OTHER_OFFER_ACCEPTED',
+]);
+// Week-5 canonical transaction model (supersedes the Week-1 placeholder; ADR-0019).
+export const transactionStatus = pgEnum('transaction_status', [
+  'INITIATED',
+  'CONFIRMATION',
   'DEPOSIT',
-  'NOC',
+  'DOCUMENTS',
+  'DUE_DILIGENCE',
   'TRANSFER',
-  'HANDOVER',
-  'COMPLETE_DEMO',
+  'COMPLETION',
+  'COMPLETED_DEMO',
+  'CANCELLATION_PENDING',
+  'CANCELLED',
+  'FAILED',
+]);
+export const transactionNextActor = pgEnum('transaction_next_actor', ['BUYER', 'SELLER', 'BOTH', 'SYSTEM', 'NONE']);
+export const transactionActor = pgEnum('transaction_actor', ['BUYER', 'SELLER', 'BOTH', 'SYSTEM']);
+export const transactionTaskStatus = pgEnum('transaction_task_status', [
+  'PENDING',
+  'ACTION_REQUIRED',
+  'IN_PROGRESS',
+  'COMPLETED_DEMO',
+  'BLOCKED',
+  'FAILED',
+  'SKIPPED',
+]);
+export const transactionPurchaseRoute = pgEnum('transaction_purchase_route', ['CASH', 'FINANCING']);
+export const transactionFinancingStatus = pgEnum('transaction_financing_status', [
+  'NOT_STARTED',
+  'IN_PROGRESS',
+  'CONFIRMED_DEMO',
+  'UNABLE_TO_PROCEED',
+]);
+export const transactionDocumentStatus = pgEnum('transaction_document_status', [
+  'UPLOADED',
+  'ACCEPTED_DEMO',
+  'NEEDS_REPLACEMENT',
+  'REMOVED',
+]);
+export const transactionEventType = pgEnum('transaction_event_type', [
+  'TRANSACTION_CREATED',
+  'DETAILS_CONFIRMED',
+  'PURCHASE_ROUTE_SELECTED',
+  'FINANCING_STATUS_UPDATED',
+  'DEMO_DEPOSIT_CONFIRMED',
+  'DOCUMENT_UPLOADED',
+  'DOCUMENT_REPLACED',
+  'DOCUMENT_REMOVED',
+  'SUMMARY_REVIEWED',
+  'DUE_DILIGENCE_COMPLETED_DEMO',
+  'TRANSFER_DATE_PROPOSED',
+  'TRANSFER_READINESS_CONFIRMED',
+  'TRANSFER_APPOINTMENT_SIMULATED',
+  'COMPLETION_CONFIRMED',
+  'COMPLETED_DEMO',
+  'CANCELLATION_REQUESTED',
+  'CANCELLATION_DECLINED',
+  'CANCELLED',
+  'FAILED',
 ]);
 export const verificationStatus = pgEnum('verification_status', [
   'PENDING',
@@ -88,6 +174,10 @@ export const profiles = pgTable(
     termsAcceptedAt: timestamp('terms_accepted_at', { withTimezone: true }),
     privacyAcceptedAt: timestamp('privacy_accepted_at', { withTimezone: true }),
     onboardingCompletedAt: timestamp('onboarding_completed_at', { withTimezone: true }),
+    // Week-6 admin restriction (ACTIVE / ACTIONS_RESTRICTED).
+    restrictedAt: timestamp('restricted_at', { withTimezone: true }),
+    restrictionReason: text('restriction_reason'),
+    restrictedBy: uuid('restricted_by'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
@@ -309,75 +399,189 @@ export const savedSearches = pgTable('saved_searches', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const offers = pgTable(
-  'offers',
+// Week 4 offer model (migration 08.4): one thread per (buyer, listing) holding an
+// immutable sequence of proposals. All writes go through SECURITY DEFINER SQL
+// functions; Drizzle is used for reads + calling those functions.
+export const offerThreads = pgTable(
+  'offer_threads',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     listingId: uuid('listing_id')
       .notNull()
       .references(() => listings.id, { onDelete: 'cascade' }),
-    createdBy: uuid('created_by')
+    buyerUserId: uuid('buyer_user_id')
       .notNull()
       .references(() => profiles.id, { onDelete: 'cascade' }),
-    amount: numeric('amount', { precision: 14, scale: 2 }).notNull(),
-    state: offerState('state').notNull().default('SUBMITTED'),
-    belowThreshold: boolean('below_threshold').notNull().default(false),
+    sellerUserId: uuid('seller_user_id')
+      .notNull()
+      .references(() => profiles.id, { onDelete: 'cascade' }),
+    status: offerThreadStatus('status').notNull().default('DRAFT'),
+    nextActor: offerNextActor('next_actor').notNull().default('BUYER'),
+    currentProposalId: uuid('current_proposal_id'),
+    acceptedProposalId: uuid('accepted_proposal_id'),
+    closedReason: text('closed_reason'),
+    rejectReasonCode: text('reject_reason_code'),
     expiresAt: timestamp('expires_at', { withTimezone: true }),
+    buyerSeq: integer('buyer_seq').notNull().default(1),
+    listingVersion: integer('listing_version').notNull().default(1),
+    publicationVersion: integer('publication_version').notNull().default(1),
+    version: integer('version').notNull().default(1),
+    lastActivityAt: timestamp('last_activity_at', { withTimezone: true }).notNull().defaultNow(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
-    listingIdx: index('offers_listing_idx').on(t.listingId),
-    createdByIdx: index('offers_created_by_idx').on(t.createdBy),
+    buyerIdx: index('offer_threads_buyer_idx').on(t.buyerUserId),
+    sellerIdx: index('offer_threads_seller_idx').on(t.sellerUserId),
+    listingIdx: index('offer_threads_listing_idx').on(t.listingId),
+    statusIdx: index('offer_threads_status_idx').on(t.status),
+    activityIdx: index('offer_threads_activity_idx').on(t.lastActivityAt),
   }),
 );
 
-export const counterOffers = pgTable('counter_offers', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  offerId: uuid('offer_id')
-    .notNull()
-    .references(() => offers.id, { onDelete: 'cascade' }),
-  createdBy: uuid('created_by')
-    .notNull()
-    .references(() => profiles.id, { onDelete: 'cascade' }),
-  amount: numeric('amount', { precision: 14, scale: 2 }).notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-});
+export const offerProposals = pgTable(
+  'offer_proposals',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    threadId: uuid('thread_id')
+      .notNull()
+      .references(() => offerThreads.id, { onDelete: 'cascade' }),
+    createdByUserId: uuid('created_by_user_id')
+      .notNull()
+      .references(() => profiles.id, { onDelete: 'cascade' }),
+    createdBySide: offerSide('created_by_side').notNull(),
+    amountAed: numeric('amount_aed', { precision: 14, scale: 2 }).notNull(),
+    status: offerProposalStatus('status').notNull().default('CURRENT'),
+    expiresAt: timestamp('expires_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ threadIdx: index('offer_proposals_thread_idx').on(t.threadId) }),
+);
+
+export const offerEvents = pgTable(
+  'offer_events',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    threadId: uuid('thread_id')
+      .notNull()
+      .references(() => offerThreads.id, { onDelete: 'cascade' }),
+    eventType: offerEventType('event_type').notNull(),
+    actorSide: offerSide('actor_side'),
+    amountAed: numeric('amount_aed', { precision: 14, scale: 2 }),
+    metadata: jsonb('metadata').notNull().default({}),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ threadIdx: index('offer_events_thread_idx').on(t.threadId, t.createdAt) }),
+);
 
 export const transactions = pgTable(
   'transactions',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    offerId: uuid('offer_id').references(() => offers.id, { onDelete: 'set null' }),
+    reference: text('reference').notNull().unique(),
+    offerThreadId: uuid('offer_thread_id')
+      .notNull()
+      .references(() => offerThreads.id, { onDelete: 'cascade' }),
+    acceptedProposalId: uuid('accepted_proposal_id')
+      .notNull()
+      .references(() => offerProposals.id, { onDelete: 'cascade' }),
     listingId: uuid('listing_id')
       .notNull()
       .references(() => listings.id, { onDelete: 'cascade' }),
-    buyerId: uuid('buyer_id')
+    buyerUserId: uuid('buyer_user_id')
       .notNull()
       .references(() => profiles.id, { onDelete: 'cascade' }),
-    sellerId: uuid('seller_id')
+    sellerUserId: uuid('seller_user_id')
       .notNull()
       .references(() => profiles.id, { onDelete: 'cascade' }),
-    stage: transactionStage('stage').notNull().default('ACCEPTANCE'),
-    flagged: boolean('flagged').notNull().default(false),
+    acceptedAmountAed: numeric('accepted_amount_aed', { precision: 14, scale: 2 }).notNull(),
+    status: transactionStatus('status').notNull().default('INITIATED'),
+    nextActor: transactionNextActor('next_actor').notNull().default('BOTH'),
+    purchaseRoute: transactionPurchaseRoute('purchase_route'),
+    financingStatus: transactionFinancingStatus('financing_status'),
+    depositAmountAed: numeric('deposit_amount_aed', { precision: 14, scale: 2 }),
+    depositConfirmedAt: timestamp('deposit_confirmed_at', { withTimezone: true }),
+    transferPreferredDate: date('transfer_preferred_date'),
+    transferAppointmentAt: timestamp('transfer_appointment_at', { withTimezone: true }),
+    cancellationReason: text('cancellation_reason'),
+    cancellationRequestedBy: uuid('cancellation_requested_by').references(() => profiles.id, { onDelete: 'set null' }),
+    failureCategory: text('failure_category'),
+    progressionPausedAt: timestamp('progression_paused_at', { withTimezone: true }),
+    progressionPauseReason: text('progression_pause_reason'),
+    version: integer('version').notNull().default(1),
+    startedAt: timestamp('started_at', { withTimezone: true }),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
-    buyerIdx: index('transactions_buyer_idx').on(t.buyerId),
-    sellerIdx: index('transactions_seller_idx').on(t.sellerId),
+    threadIdx: uniqueIndex('uniq_transaction_per_thread').on(t.offerThreadId),
+    proposalIdx: uniqueIndex('uniq_transaction_per_proposal').on(t.acceptedProposalId),
+    buyerIdx: index('transactions_buyer_idx').on(t.buyerUserId),
+    sellerIdx: index('transactions_seller_idx').on(t.sellerUserId),
   }),
 );
 
-export const transactionStageHistory = pgTable('transaction_stage_history', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  transactionId: uuid('transaction_id')
-    .notNull()
-    .references(() => transactions.id, { onDelete: 'cascade' }),
-  stage: transactionStage('stage').notNull(),
-  note: text('note'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-});
+export const transactionTasks = pgTable(
+  'transaction_tasks',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    transactionId: uuid('transaction_id')
+      .notNull()
+      .references(() => transactions.id, { onDelete: 'cascade' }),
+    code: text('code').notNull(),
+    stage: transactionStatus('stage').notNull(),
+    sequence: integer('sequence').notNull(),
+    assignedActor: transactionActor('assigned_actor').notNull(),
+    required: boolean('required').notNull().default(true),
+    status: transactionTaskStatus('status').notNull().default('PENDING'),
+    startedAt: timestamp('started_at', { withTimezone: true }),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    failureCategory: text('failure_category'),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ txIdx: index('transaction_tasks_tx_idx').on(t.transactionId, t.sequence) }),
+);
+
+export const transactionDocuments = pgTable(
+  'transaction_documents',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    transactionId: uuid('transaction_id')
+      .notNull()
+      .references(() => transactions.id, { onDelete: 'cascade' }),
+    uploadedBy: uuid('uploaded_by')
+      .notNull()
+      .references(() => profiles.id, { onDelete: 'cascade' }),
+    documentType: text('document_type').notNull(),
+    storagePath: text('storage_path').notNull(),
+    fileName: text('file_name').notNull(),
+    mimeType: text('mime_type').notNull(),
+    sizeBytes: integer('size_bytes').notNull(),
+    status: transactionDocumentStatus('status').notNull().default('UPLOADED'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ txIdx: index('transaction_documents_tx_idx').on(t.transactionId) }),
+);
+
+export const transactionEvents = pgTable(
+  'transaction_events',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    transactionId: uuid('transaction_id')
+      .notNull()
+      .references(() => transactions.id, { onDelete: 'cascade' }),
+    eventType: transactionEventType('event_type').notNull(),
+    actor: transactionActor('actor'),
+    metadata: jsonb('metadata').notNull().default({}),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ txIdx: index('transaction_events_tx_idx').on(t.transactionId, t.createdAt) }),
+);
 
 export const notifications = pgTable('notifications', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -432,8 +636,27 @@ export const marketplaceListings = pgView('marketplace_listings', {
   photoPublicPaths: text('photo_public_paths').array(),
 }).existing();
 
+// Week-6 admin notes — append-only, admin-only (RLS), per entity.
+export const adminNotes = pgTable(
+  'admin_notes',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    entityType: text('entity_type').notNull(),
+    entityId: uuid('entity_id').notNull(),
+    category: adminNoteCategory('category').notNull(),
+    body: text('body').notNull(),
+    followUpDate: date('follow_up_date'),
+    createdByAdminId: uuid('created_by_admin_id').references(() => profiles.id, { onDelete: 'set null' }),
+    supersedesNoteId: uuid('supersedes_note_id'),
+    hiddenAt: timestamp('hidden_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ entityIdx: index('admin_notes_entity_idx').on(t.entityType, t.entityId, t.createdAt) }),
+);
+
 export const schema = {
   profiles,
+  adminNotes,
   properties,
   listings,
   ownershipDocuments,
@@ -445,16 +668,25 @@ export const schema = {
   listingPublicationRequests,
   savedProperties,
   savedSearches,
-  offers,
-  counterOffers,
+  offerThreads,
+  offerProposals,
+  offerEvents,
   transactions,
-  transactionStageHistory,
+  transactionTasks,
+  transactionDocuments,
+  transactionEvents,
   notifications,
   auditEvents,
 };
 
 export type Profile = typeof profiles.$inferSelect;
 export type NewProfile = typeof profiles.$inferInsert;
+export type AdminNote = typeof adminNotes.$inferSelect;
 export type Listing = typeof listings.$inferSelect;
-export type Offer = typeof offers.$inferSelect;
+export type OfferThread = typeof offerThreads.$inferSelect;
+export type OfferProposal = typeof offerProposals.$inferSelect;
+export type OfferEvent = typeof offerEvents.$inferSelect;
 export type Transaction = typeof transactions.$inferSelect;
+export type TransactionTask = typeof transactionTasks.$inferSelect;
+export type TransactionDocument = typeof transactionDocuments.$inferSelect;
+export type TransactionEvent = typeof transactionEvents.$inferSelect;

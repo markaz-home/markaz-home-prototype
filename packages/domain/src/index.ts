@@ -10,4 +10,6 @@ export * from './investment';
 export * from './publication';
 export * from './marketplace';
 export * from './offer';
+export * from './notification';
+export * from './admin';
 export * from './transaction';

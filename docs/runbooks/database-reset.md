@@ -6,20 +6,19 @@ The database is rebuilt from a **single ordered SQL history** in
 ## The full local reset flow
 
 ```bash
-pnpm supabase:reset && pnpm db:setup
+pnpm supabase:reset    # rebuild schema; then SIGN UP in the app
 ```
 
-`supabase:reset` rebuilds the schema (and runs the minimal seed);
-`pnpm db:setup` then provisions the demo **Auth users + demo data** via the
-Supabase **Admin API**. You need **both** for a usable local environment — reset
-alone leaves you with no demo accounts.
+`supabase:reset` rebuilds the schema (and runs the minimal seed). **No accounts are
+seeded** — open the web app and sign up. To create an admin (optional, env-driven):
+`BOOTSTRAP_ADMIN_EMAIL=… BOOTSTRAP_ADMIN_PASSWORD=… pnpm db:setup`.
 
 ## Commands
 
 | Command | What it does | When to use |
 | --- | --- | --- |
 | `pnpm supabase:reset` | Drops the DB, re-applies **all migrations in order**, then runs the **(minimal) seed** | The default first step. Clean, deterministic schema (stale schema, after pulling migrations, before a demo). |
-| `pnpm db:setup` | Provisions demo Auth users (Admin API) + demo domain data, **idempotently** | The required second step. Creates Customer A / B / Admin and seeds demo data. |
+| `pnpm db:setup` | **Optional** env-driven admin bootstrap (Admin API), **idempotent**; no-op without `BOOTSTRAP_ADMIN_EMAIL` | Only when you want to create/refresh the single admin account. |
 | `pnpm db:migrate` | Applies pending migrations | Apply new migrations without wiping existing data. |
 | `pnpm db:seed` | Runs `supabase/seed.sql` | Rarely needed directly; the minimal seed runs as part of `supabase:reset`. |
 | `pnpm db:generate` | `drizzle-kit generate` → `packages/db/drizzle` | **Review only.** Produces SQL to read; do **not** apply it directly. |
@@ -41,20 +40,17 @@ alone leaves you with no demo accounts.
 
 ## Seed data and demo provisioning
 
-`supabase/seed.sql` is now **intentionally minimal**: it does **not** create Auth
-users or demo domain data. Writing Supabase Auth tables via SQL is unsupported,
-so the demo accounts (Customer A / Customer B / Admin, `@markaz.demo`) and the
-fictional Dubai properties/listings/offers/transactions are provisioned by
-`pnpm db:setup` (`packages/db/src/scripts/setup-demo.ts`) using the Supabase
-**Admin API** (`auth.admin.createUser`, then admin promotion + `VERIFIED_DEMO` +
-demo data). The script is **idempotent** and **refuses to run** when
-`DEMO_ENVIRONMENT=production` or `NODE_ENV=production`.
+`supabase/seed.sql` is **intentionally minimal**: it does **not** create Auth users or
+domain data. **Customers sign up through the app** (the `handle_new_user` trigger creates
+each `profiles` row), so nothing needs seeding for a usable environment. The only optional
+provisioning is the **env-driven admin bootstrap** `pnpm db:setup`
+(`packages/db/src/scripts/setup-demo.ts`), which — when `BOOTSTRAP_ADMIN_EMAIL` /
+`BOOTSTRAP_ADMIN_PASSWORD` are set — creates one ADMIN via the Supabase **Admin API**
+(`auth.admin.createUser`, then admin promotion). It is **idempotent** and a **no-op** when
+no admin env is set. Writing Supabase Auth tables via SQL is unsupported, hence the Admin
+API.
 
-Because demo Auth users are created via the Admin API, their IDs are **random
-UUIDs** — integration tests resolve them by **email**, not by a fixed ID.
-
-Everything seeded is clearly fictional; no real personal or property documents are
-used. Credentials and details: see `demo-runbook.md`.
+See `demo-runbook.md` for the sign-up + admin-bootstrap steps.
 
 ## Notes
 

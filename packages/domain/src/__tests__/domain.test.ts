@@ -21,8 +21,8 @@ import {
   isExistingAccountError,
 } from '../auth';
 import { canTransitionListing, isPubliclyVisible } from '../listing';
-import { canSubmitOffer, isBelowThreshold, canTransitionOffer } from '../offer';
-import { canAdvanceTransaction, nextStage } from '../transaction';
+import { canSubmitOffer, isBelowThreshold } from '../offer';
+import { depositAmount, requiredTaskCodes, isTerminal, stageIndex } from '../transaction';
 
 describe('account-type rules', () => {
   it('defaults to CUSTOMER', () => {
@@ -193,17 +193,25 @@ describe('offer rules', () => {
     expect(isBelowThreshold(1_200_000, 1_000_000)).toBe(false);
     expect(isBelowThreshold(900_000, null)).toBe(false);
   });
-  it('validates offer transitions', () => {
-    expect(canTransitionOffer('SUBMITTED', 'UNDER_REVIEW')).toBe(true);
-    expect(canTransitionOffer('ACCEPTED_AS_PREFERRED', 'REJECTED')).toBe(false);
-  });
 });
 
-describe('transaction machine', () => {
-  it('advances strictly forward', () => {
-    expect(canAdvanceTransaction('ACCEPTANCE', 'MOU')).toBe(true);
-    expect(canAdvanceTransaction('ACCEPTANCE', 'DEPOSIT')).toBe(false);
-    expect(nextStage('HANDOVER')).toBe('COMPLETE_DEMO');
-    expect(nextStage('COMPLETE_DEMO')).toBeNull();
+describe('transaction (week 5) helpers', () => {
+  it('computes a 10% demo deposit to 2dp', () => {
+    expect(depositAmount(2_000_000)).toBe(200_000);
+    expect(depositAmount(1_234_567)).toBe(123_456.7);
+  });
+  it('includes the financing task only for the financing route', () => {
+    expect(requiredTaskCodes('CASH')).not.toContain('BUYER_FINANCING');
+    expect(requiredTaskCodes('FINANCING')).toContain('BUYER_FINANCING');
+  });
+  it('classifies terminal states', () => {
+    expect(isTerminal('COMPLETED_DEMO')).toBe(true);
+    expect(isTerminal('CANCELLED')).toBe(true);
+    expect(isTerminal('DEPOSIT')).toBe(false);
+  });
+  it('maps status to a stage index', () => {
+    expect(stageIndex('INITIATED')).toBe(0);
+    expect(stageIndex('TRANSFER')).toBe(4);
+    expect(stageIndex('COMPLETED_DEMO')).toBe(6);
   });
 });

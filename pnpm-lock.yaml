@@ -47,6 +47,9 @@ importers:
       '@markaz/observability':
         specifier: workspace:*
         version: link:../../packages/observability
+      '@markaz/realtime':
+        specifier: workspace:*
+        version: link:../../packages/realtime
       '@markaz/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -99,6 +102,9 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
+      '@axe-core/playwright':
+        specifier: ^4.10.1
+        version: 4.12.1(playwright-core@1.61.1)
       '@markaz/config':
         specifier: workspace:*
         version: link:../../packages/config
@@ -138,6 +144,9 @@ importers:
       postcss:
         specifier: ^8.4.49
         version: 8.5.15
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.9
       tailwindcss:
         specifier: ^3.4.17
         version: 3.4.19(tsx@4.22.4)
@@ -268,6 +277,9 @@ importers:
       postcss:
         specifier: ^8.4.49
         version: 8.5.15
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.9
       tailwindcss:
         specifier: ^3.4.17
         version: 3.4.19(tsx@4.22.4)

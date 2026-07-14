@@ -35,9 +35,12 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   emailVerified, profile })` → verify-email → profile-setup (fallback) → uae-pass
   → dashboard; unverified/incomplete customers never reach the dashboard.
   `requireCustomerStep` enforces it server-side.
-- **No public admin sign-up.** Admins are created **only** by `pnpm db:setup`
-  (Supabase Admin API); the admin app requires `account_type === 'ADMIN'` or shows
-  access-denied.
+- **No public admin sign-up.** Admins are created **only** by the env-driven admin
+  bootstrap (`pnpm db:setup` with `BOOTSTRAP_ADMIN_EMAIL`/`BOOTSTRAP_ADMIN_PASSWORD`,
+  Supabase Admin API); the admin app requires `account_type === 'ADMIN'` or shows
+  access-denied. **Customers are never seeded — they sign up through the app** (the
+  `handle_new_user` trigger creates each `profiles` row), so a deployment works with
+  real accounts and needs no demo data.
 - **Password policy:** min 8; upper, lower, number, special; **max 128** (design
   spec §10.5) — enforced in the client form and the zod schema
   (`packages/domain/src/auth.ts`). The pinned local Supabase CLI rejects
@@ -63,11 +66,13 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   schema: write/adjust the SQL migration **and** the Drizzle schema to match;
   `drizzle-kit generate` output (in `packages/db/drizzle/`) is for **review only**,
   fold it into the canonical SQL — never apply a second migration mechanism.
-  Seed (`supabase/seed.sql`) runs **after** migrations and is **minimal** — demo
-  **Auth users + demo data** are provisioned by `pnpm db:setup` (Supabase Admin
-  API; `setup-demo.ts`), not SQL (writing Auth tables via SQL is unsupported).
-  Local flow: `pnpm supabase:reset && pnpm db:setup`. The script is idempotent and
-  refuses to run in production. See ADR-0003 / ADR-0009.
+  Seed (`supabase/seed.sql`) runs **after** migrations and is **minimal**. **No demo
+  customers/data are seeded** — customers sign up through the app. `pnpm db:setup`
+  (`setup-demo.ts`) is an **optional, env-driven admin bootstrap** only: with
+  `BOOTSTRAP_ADMIN_EMAIL`/`BOOTSTRAP_ADMIN_PASSWORD` it creates one ADMIN via the
+  Supabase Admin API (writing Auth tables via SQL is unsupported); with no env it is a
+  no-op. Local flow: `pnpm supabase:reset` (then sign up in the app; run `pnpm db:setup`
+  only if you want an admin). Idempotent. See ADR-0003 / ADR-0009.
 - **Realtime connects directly to the DB**, never behind a pooler (ADR-0005).
 - **i18n:** all user-facing copy goes through `next-intl` (`packages/i18n/messages/
   {en,ar}.json`). Support RTL via logical CSS properties + the `dir` attribute.
@@ -185,8 +190,103 @@ and resume are **persisted writes** (the marketplace is not read-only). Material
 non-material live edits per §17.4. See `WEEK-3.md`, `docs/design/publication-design-spec.md`,
 `docs/architecture/{marketplace,public-listing-projection,publication-flow,listing-storage}.md`.
 
+## Offers + negotiation (Week 4 — built)
+A complete, **non-binding** buyer-offer / seller-offer-management journey between
+`CUSTOMER`s on `LIVE` listings (Buyer/Seller stay *journeys*, not roles). One **thread per
+(buyer, listing)** holds an **immutable chronological sequence of proposals** with an
+explicit `next_actor`; counters create new proposal rows — never overwrite. Migration
+`…0804` **replaced** the Week-1 flat `offers`/`counter_offers` stub (ADR-0014) with
+`offer_threads`/`offer_proposals`/`offer_events`; **reuses** the generic `notifications` +
+`audit_events` tables (no parallel systems). **Customers have read-only RLS on the offer
+tables — every write goes through `SECURITY DEFINER` SQL functions** (`create_offer`,
+`submit_counter`, `accept_offer`, `reject_offer`, `withdraw_offer`, `close_listing_offers`,
+`expire_due_offers`) that derive the actor from `auth.uid()` and `created_by_side` from
+membership; anon has no access; cross-buyer/cross-seller reads denied; missing == forbidden
+("This offer is not available"). **Single accepted offer is DB-enforced** (partial unique
+index + locked `accept_offer` that atomically closes other threads → `CLOSED_OTHER_ACCEPTED`;
+ADR-0015). **`UNDER_OFFER` is derived** from an accepted offer on a still-`LIVE` listing —
+NOT a publication state (ADR-0016). The **seller threshold (`min_notification_price`) stays
+private** — classified server-side; the buyer DTO has no threshold field; below-threshold
+offers persist but raise no prominent notification (§27). Expiry is server-authoritative,
+processed lazily on read (`expire_due_offers`; ADR-0017). Realtime (`useOfferThreadChannel`)
+**refetches authoritative state** on `offer_events`; RLS scopes delivery to participants
+(ADR-0018). Public DTOs use explicit allow-list mapping (`packages/api/src/offer-projection.ts`).
+UI: `(public)/properties/[publicId]/[slug]/offer`, `(app)/offers` (made/received tabs),
+`(app)/offers/[offerThreadId]` (shared perspective-aware thread + semantic timeline, no
+chat), `(app)/sell/listings/[listingId]/offers`; anonymous Make-an-Offer reuses the
+save-intent pattern (`lib/offer-intent.ts`). Acceptance reaches `ACCEPTED` + a **Week-5
+handoff only** — no transaction/payment/legal/contact UI. See `WEEK-4.md`,
+`docs/design/offers-design-spec.md`, `docs/architecture/{offers,offer-state-machine,
+offer-realtime,offer-security}.md`, ADR-0014…0018.
+
+## Transactions (Week 5 — built)
+A **shared, simulated** transaction workspace on an accepted offer. Everything regulated is
+SIMULATED — **no** real payment/escrow/contract/DLD. Migrations `…0808`–`…0811`
+**superseded** the empty Week-1 placeholder (ADR-0019; it had a broken `offer_id → offers` FK)
+with one canonical **transaction per accepted `(offer_thread, accepted_proposal)`** —
+`transactions` + `transaction_tasks` (17 milestones / 6 stages) + `transaction_documents`
+(private) + `transaction_events`. **Immutable identity** (thread/proposal/listing/buyer/seller/
+amount/reference `MKZ-TXN-{yr}-{6}`) via `guard_transaction`; DB-unique per thread AND per
+proposal (idempotent creation). **Customers read-only via RLS — every write goes through
+`SECURITY DEFINER` functions** (`ensure_transaction`, `tx_complete_task`, `tx_select_route`,
+`tx_set_financing`, `tx_confirm_deposit`, `tx_run_due_diligence`, `tx_propose_transfer_date`,
+`tx_create_appointment`, `tx_confirm_completion`, `tx_request_cancellation`,
+`tx_resolve_cancellation`) that derive the actor from `auth.uid()`, validate `expected version`,
+and recompute `status`+`next_actor` from open tasks (`tx_recompute`/`tx_active_stage`). States
+`INITIATED→CONFIRMATION→DEPOSIT→DOCUMENTS→DUE_DILIGENCE→TRANSFER→COMPLETION→COMPLETED_DEMO` +
+`CANCELLATION_PENDING`/`CANCELLED`/`FAILED`. **Deposit = 10% display-only** (no payment fields).
+**Completion is atomic**: both confirm → `COMPLETED_DEMO` + listing **`SOLD_DEMO`**. **Cancellation**
+→ listing **`PAUSED`** (never auto-LIVE); `listing_has_accepted_offer` now excludes cancelled
+transactions so a resumed listing isn't wrongly `UNDER_OFFER`. Reuses `public.notifications`
+(`TRANSACTION_*` kinds, discriminated-union validated) + a participant-scoped `transaction:{id}`
+realtime channel (authoritative refetch). Raw enums never shown — mapped to i18n keys
+(`transactions.*`, EN/AR parity; **Arabic is draft**). Approved simulation wording only — never
+"payment received"/"escrow"/"ownership transferred"/"legally completed". UI: `(app)/transactions`
+(My Transactions) + `(app)/transactions/[transactionId]` (shared perspective-aware workspace);
+"Continue to transaction" handoff on the accepted offer. **Known gaps**: document file-upload
+API/control, Playwright E2E, axe. See `WEEK-5.md`, `docs/design/transaction-tracker-design-spec.md`,
+`docs/architecture/transactions.md`, ADR-0019…0023.
+
+## Admin portal & operational controls (Week 6 — built)
+The **separate** operations portal (`apps/admin`, port 3001) where a single ADMIN oversees
+and, where necessary, **recovers** the marketplace — **never acting as a customer**. Customer
+workflows were **not** redesigned; the admin app reads the same canonical tables through
+**admin RLS** (`public.is_admin()`) and writes **only** through `is_admin()`-gated
+`SECURITY DEFINER` functions. **16 server-authoritative capabilities** (`packages/domain/src/
+admin.ts`); the tRPC tier `adminCapabilityProcedure(cap)` throws `CAPABILITY_REQUIRED` — the UI
+only *reflects* capability, it is never the gate. **Every mutation is capability-gated →
+closed reason-enum (no free-text authority, no hidden default) → SECURITY DEFINER fn that
+re-derives the actor from `auth.uid()`, validates state, writes an `audit_events` row.** Actions
+(migrations `…0812`/`…0813`): restrict/restore customer, pause/resume listing, approve
+(reuses Week-3 `PublicationReviewService.resolve`)/return publication, retry verification, close
+offer thread, pause/resume/retry-step/mark-failed/resolve-cancellation transaction, add note.
+**Restriction** is a two-state `profiles` flag (`ACTIVE`/`ACTIONS_RESTRICTED`, `is_restricted()`
+folded into offer/listing/publication writes → `ACCOUNT_RESTRICTED`) that blocks **new
+consequential actions only** — never sign-in, browsing, or public listings; set only via the
+admin fn (`guard_profile_restriction()`). **Immutability**: proposal/accepted/transaction
+identity stay guarded (Week-4/5 triggers); **`audit_events` is immutable at the grant level**
+(`revoke update, delete, truncate … from authenticated`). **Privacy projections**
+(`admin-projection.ts`) allow-list even admin DTOs — masked emails, audit-metadata allow-list,
+document metadata with **no storage path**; raw enums never render (client maps to i18n key +
+tone). **Private-document access** needs a second capability + purpose + acknowledgement; the audit
+is a truthful **lifecycle** (`…0815`): `ADMIN_DOCUMENT_ACCESS_REQUESTED` before a 300s signed URL is
+minted → `GRANTED`/`FAILED` by outcome (the proc *returns* not throws on failure so FAILED commits;
+URL/path never recorded). **Live queues**: `useAdminQueueChannel` refetches dashboard metrics on
+`listing_publication_requests`/`transactions` changes (payload never trusted; RLS-scoped). UI:
+`apps/admin/[locale]/(portal)`, 8 fixed nav areas = 15 operational routes (Overview + 7 areas ×
+list/detail) + a root redirect, shared kit in `components/admin/` (responsive table→card, status
+badges text+icon, action-dialog+reason-selector, notes/document panels, global search); 454 nested
+`admin.*` i18n keys, EN/AR parity (**Arabic draft**). **Verified (whole monorepo, fresh chain
+0100→0815)**: typecheck 12/12 · lint 11/11 · **258** unit/component/integration · web+admin build ·
+db:setup · **36 E2E (web 21 + admin 15) + 5 axe** — 0 failed/skipped. Four E2E-discovered/closure
+bugs fixed (`…0814` publication-return RLS→SECURITY DEFINER; `…0815` document-audit lifecycle; enum
+i18n coverage; disabled-pagination contrast). Local notes: `supabase db reset` hangs here on `DROP
+DATABASE` (use a fresh `supabase start` on a discarded volume); run root `test:e2e` **serially** on a
+low-RAM Docker. See `WEEK-6.md`, `docs/design/admin-portal-design-spec.md`,
+`docs/architecture/admin-portal.md`, ADR-0024…0029.
+
 ## Out of scope (next milestone+)
-Offers/counter-offers UX, transactions UX, durable jobs, full admin surface, any AWS
-provisioning, real DLD/Trakheesi/Madmoun/payment integrations, messaging, map search,
-the demo-auth fallback (disabled by default — ADR-0007). The full plan is in the
-technical plan document; section 6A corrections govern.
+Durable jobs, any AWS provisioning,
+real DLD/Trakheesi/Madmoun/payment integrations, free-form messaging/chat, contact
+exchange, email/SMS/push delivery, map search, the demo-auth fallback (disabled by default
+— ADR-0007). The full plan is in the technical plan document; section 6A corrections govern.

@@ -364,7 +364,7 @@
     "emptyMetrics": "لا توجد بيانات بعد.",
     "metricsPartialError": "تعذّر تحميل بعض المؤشرات.",
     "sectionPlaceholder": "هذا القسم الإداري جزء من مرحلة لاحقة.",
-    "brand": "عمليات MARKAZ",
+    "brand": "عمليات ماركز",
     "authorised": "الدخول للمصرّح لهم فقط",
     "signinTitle": "تسجيل الدخول إلى بوابة العمليات",
     "signinBody": "استخدم حساب مشرف MARKAZ المصرّح به.",
@@ -382,7 +382,555 @@
     "expiredBody": "من أجل الأمان، سجّل الدخول مجددًا لمتابعة استخدام عمليات MARKAZ.",
     "signedOutTitle": "تم تسجيل خروجك من عمليات MARKAZ",
     "signedOutBody": "انتهت جلسة المشرف الخاصة بك.",
-    "return": "العودة إلى تسجيل دخول المشرف"
+    "return": "العودة إلى تسجيل دخول المشرف",
+    "refresh": "تحديث",
+    "updated": "Updated",
+    "loading": "جارٍ التحميل…",
+    "retry": "إعادة المحاولة",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "back": "رجوع",
+    "view": "عرض",
+    "viewDetail": "عرض التفاصيل",
+    "none": "لا شيء",
+    "na": "—",
+    "actorYou": "You",
+    "required": "Required",
+    "optional": "Optional",
+    "reasonLabel": "السبب",
+    "reasonRequired": "اختر سببًا للمتابعة.",
+    "noteOptional": "Internal note (optional)",
+    "charCount": "{count}/{max}",
+    "paginationRange": "{from}–{to}",
+    "prev": "Previous",
+    "next": "Next",
+    "page": "Page {n}",
+    "simulated": "محاكاة",
+    "simulatedHint": "Regulated integrations are simulated in this environment.",
+    "nav": {
+      "overview": "نظرة عامة",
+      "customers": "العملاء",
+      "listings": "القوائم",
+      "publication": "النشر",
+      "offers": "العروض",
+      "transactions": "المعاملات",
+      "verifications": "عمليات التحقق",
+      "audit": "سجل التدقيق"
+    },
+    "overview": {
+      "title": "نظرة عامة تشغيلية",
+      "description": "مقاييس وقوائم تشغيلية تحتاج إلى اهتمام.",
+      "partialError": "تعذّر تحميل بعض المعلومات التشغيلية.",
+      "recentActions": "Recent admin actions",
+      "recentActionsEmpty": "No recent admin actions.",
+      "metric": {
+        "activeCustomers": "Active customers",
+        "restrictedCustomers": "Restricted customers",
+        "liveListings": "Live listings",
+        "pausedListings": "Paused listings",
+        "soldListings": "Sold (demo) listings",
+        "activeThreads": "Active offer threads",
+        "acceptedOffers": "Accepted offers",
+        "activeTransactions": "Active transactions",
+        "failedTransactions": "Failed transactions",
+        "completedTransactions": "Completed (demo) transactions",
+        "publicationPending": "Publication reviews pending",
+        "publicationFailed": "Publication failures"
+      },
+      "queue": {
+        "title": "Needs attention",
+        "publication": "Publication reviews pending",
+        "publicationFailed": "Publication failures to investigate",
+        "transactions": "Transactions paused or failed",
+        "verifications": "Verification failures",
+        "pausedListings": "Paused listings",
+        "empty": "Nothing needs attention right now."
+      }
+    },
+    "search": {
+      "placeholder": "Search customers, listings, transactions…",
+      "title": "Search results",
+      "hint": "Type at least 2 characters.",
+      "empty": "No matching records.",
+      "groupCustomers": "Customers",
+      "groupListings": "Listings",
+      "groupTransactions": "Transactions"
+    },
+    "customers": {
+      "title": "العملاء",
+      "description": "Every customer account. Emails are partially masked.",
+      "empty": "No customers match these filters.",
+      "unavailable": "This customer record is not available.",
+      "status": {
+        "active": "نشط",
+        "restricted": "الإجراءات مقيّدة"
+      },
+      "filter": {
+        "all": "All",
+        "active": "Active",
+        "restricted": "Restricted",
+        "onboarding": "Onboarding"
+      },
+      "col": {
+        "name": "Customer",
+        "email": "Email",
+        "status": "Status",
+        "listings": "Listings",
+        "offers": "Active offers",
+        "transactions": "Active transactions",
+        "activity": "Last activity"
+      },
+      "identity": "Identity",
+      "joined": "Joined",
+      "onboarded": "Onboarded",
+      "notOnboarded": "Onboarding incomplete",
+      "attention": "Restricted while holding an active transaction.",
+      "restrictedSince": "Restricted since",
+      "restrictionReason": "Restriction reason"
+    },
+    "customer": {
+      "restrictAction": "Restrict actions",
+      "restoreAction": "Restore actions",
+      "restrict": {
+        "title": "Restrict customer actions",
+        "body": "The customer can still sign in and browse, but cannot create offers, listings, or publish while restricted. This is recorded in the audit log.",
+        "submit": "Restrict actions",
+        "reason": {
+          "ACCOUNT_REVIEW": "Account under review",
+          "LISTING_INVESTIGATION": "Listing investigation",
+          "OFFER_INVESTIGATION": "Offer investigation",
+          "TRANSACTION_ISSUE": "Transaction issue",
+          "VERIFICATION_ISSUE": "Verification issue",
+          "OPERATIONAL_FOLLOW_UP": "Operational follow-up",
+          "OTHER": "Other"
+        }
+      },
+      "restore": {
+        "title": "Restore customer actions",
+        "body": "The customer regains the ability to create offers, listings, and publish. This is recorded in the audit log.",
+        "submit": "Restore actions",
+        "reason": {
+          "REVIEW_COMPLETED": "Review completed",
+          "ISSUE_RESOLVED": "Issue resolved",
+          "APPLIED_IN_ERROR": "Restriction applied in error",
+          "OTHER": "Other"
+        }
+      }
+    },
+    "note": {
+      "title": "Admin notes",
+      "subtitle": "Internal only. Never visible to customers.",
+      "add": "Add note",
+      "empty": "No notes yet.",
+      "bodyLabel": "Note",
+      "bodyPlaceholder": "Context for other admins…",
+      "followUpLabel": "Follow-up date (optional)",
+      "categoryLabel": "Category",
+      "submit": "Save note",
+      "privacyWarning": "Notes are internal operational records — do not paste customer secrets or document contents.",
+      "supersedes": "Correction of an earlier note",
+      "category": {
+        "REVIEW": "Review",
+        "CUSTOMER_SUPPORT": "Customer support",
+        "LISTING_INVESTIGATION": "Listing investigation",
+        "OFFER_INVESTIGATION": "Offer investigation",
+        "TRANSACTION_ISSUE": "Transaction issue",
+        "VERIFICATION_ISSUE": "Verification issue",
+        "FOLLOW_UP": "Follow-up",
+        "CORRECTION": "Correction"
+      }
+    },
+    "listings": {
+      "title": "Listings",
+      "description": "Every listing across all states.",
+      "empty": "No listings match these filters.",
+      "unavailable": "This listing is not available.",
+      "searchPlaceholder": "Search by reference or title…",
+      "col": {
+        "title": "Listing",
+        "reference": "Reference",
+        "state": "State",
+        "location": "Location",
+        "activity": "Updated"
+      },
+      "state": {
+        "DRAFT": "Draft",
+        "READY_TO_PUBLISH": "Ready to publish",
+        "LIVE": "Live",
+        "PAUSED": "Paused",
+        "UNDER_OFFER": "Under offer",
+        "SOLD_DEMO": "Sold (demo)",
+        "ARCHIVED": "Archived",
+        "DETAILS_COMPLETE": "Details complete",
+        "DOCUMENT_UPLOADED": "Document uploaded",
+        "OWNERSHIP_REVIEW": "Ownership review",
+        "OWNERSHIP_VERIFIED": "Ownership verified",
+        "FORM_A_COMPLETE": "Form A complete",
+        "PHOTOS_COMPLETE": "Photos complete",
+        "PERMIT_PENDING": "Permit pending",
+        "REJECTED": "Returned"
+      }
+    },
+    "listing": {
+      "publicSection": "Public information",
+      "privateSection": "Owner-only information",
+      "askingPrice": "Asking price",
+      "owner": "Owner",
+      "publication": "Publication",
+      "pausedSince": "Paused since",
+      "field": {
+        "propertyType": "Property type",
+        "community": "Community",
+        "emirate": "Emirate",
+        "buildingOrProject": "Building / project",
+        "bedrooms": "Bedrooms",
+        "bathrooms": "Bathrooms",
+        "unitIdentifier": "Unit identifier",
+        "occupancyStatus": "Occupancy"
+      },
+      "pauseAction": "Pause listing",
+      "resumeAction": "Resume listing",
+      "pause": {
+        "title": "Pause listing availability",
+        "body": "The listing is removed from the public marketplace and the owner is notified. This is recorded in the audit log.",
+        "submit": "Pause listing",
+        "reason": {
+          "CUSTOMER_REQUEST": "Customer request",
+          "INFORMATION_UNDER_REVIEW": "Information under review",
+          "VERIFICATION_ISSUE": "Verification issue",
+          "PUBLICATION_ISSUE": "Publication issue",
+          "OFFER_OR_TRANSACTION_ISSUE": "Offer or transaction issue",
+          "OPERATIONAL_SAFETY": "Operational safety"
+        }
+      },
+      "resume": {
+        "title": "Resume listing availability",
+        "body": "The listing returns to the public marketplace if it remains eligible. This is recorded in the audit log.",
+        "submit": "Resume listing",
+        "reasonPlaceholder": "Reason (recorded in audit log)"
+      }
+    },
+    "publication": {
+      "title": "Publication review",
+      "description": "Listings awaiting a publish decision.",
+      "empty": "No publication reviews in this queue.",
+      "unavailable": "This publication review is not available.",
+      "conflict": "Publication review already completed.",
+      "filter": {
+        "pending": "Pending",
+        "returned": "Returned",
+        "all": "All"
+      },
+      "col": {
+        "title": "Listing",
+        "reference": "Reference",
+        "status": "Status",
+        "submitted": "Submitted"
+      },
+      "checklist": {
+        "title": "Eligibility checklist",
+        "readyToPublish": "Listing is ready to publish",
+        "hasProperty": "Property details present",
+        "pass": "Pass",
+        "fail": "Fail"
+      },
+      "approveAction": "Approve & publish",
+      "returnAction": "Return for changes",
+      "approve": {
+        "title": "Approve publication",
+        "body": "The listing is published to the public marketplace using the standard compensated workflow. This is recorded in the audit log.",
+        "submit": "Approve & publish"
+      },
+      "return": {
+        "title": "Return for changes",
+        "body": "The request is returned to the owner with the selected reason. The owner is notified and can resubmit.",
+        "submit": "Return for changes",
+        "reason": {
+          "PROPERTY_INFO_INCOMPLETE": "Property information incomplete",
+          "PHOTOS_NEED_CHANGES": "Photos need changes",
+          "VERIFICATION_CORRECTION": "Verification correction needed",
+          "ASKING_PRICE_REVIEW": "Asking price needs review",
+          "PUBLIC_PRIVATE_FIELD_ISSUE": "Public/private field issue",
+          "OTHER": "Other"
+        }
+      },
+      "status": {
+        "PENDING": "Pending",
+        "APPROVED_DEMO": "Approved (demo)",
+        "REJECTED_DEMO": "Returned",
+        "NOT_SUBMITTED": "Not submitted"
+      }
+    },
+    "verifications": {
+      "title": "Verifications",
+      "description": "Simulated verification outcomes.",
+      "empty": "No verifications to show.",
+      "unavailable": "This verification is not available.",
+      "col": {
+        "kind": "Type",
+        "status": "Outcome",
+        "listing": "Listing",
+        "attempts": "State",
+        "created": "Created"
+      },
+      "kind": {
+        "OWNERSHIP": "Ownership",
+        "IDENTITY": "Identity",
+        "PERMIT": "Permit",
+        "TITLE_DEED": "Title deed"
+      },
+      "status": {
+        "PENDING": "Pending",
+        "VERIFIED_DEMO": "Verified (demo)",
+        "FAILED_DEMO": "Failed (demo)",
+        "PROCESSING": "Processing"
+      },
+      "superseded": "Superseded",
+      "failureReason": "Failure reason",
+      "retryAction": "Retry verification",
+      "retry": {
+        "title": "Retry verification",
+        "body": "A new simulated verification attempt is created. The previous attempt is preserved. This is recorded in the audit log.",
+        "submit": "Retry verification",
+        "reasonPlaceholder": "Reason (recorded in audit log)"
+      }
+    },
+    "adminOffers": {
+      "title": "Offers",
+      "description": "Offer threads across the marketplace. Read-only history.",
+      "empty": "No offer threads to show.",
+      "unavailable": "This offer is not available.",
+      "col": {
+        "reference": "Thread",
+        "status": "Status",
+        "nextActor": "Next actor",
+        "activity": "Last activity"
+      },
+      "proposals": "Proposal history",
+      "proposalsHint": "Immutable. Admins cannot alter proposal amounts.",
+      "closedReason": "Closed reason",
+      "side": {
+        "BUYER": "المشتري",
+        "SELLER": "البائع",
+        "BOTH": "كلاهما",
+        "SYSTEM": "النظام",
+        "NONE": "—"
+      },
+      "nextActorValue": {
+        "BUYER": "Buyer",
+        "SELLER": "Seller",
+        "NONE": "—"
+      },
+      "status": {
+        "OPEN": "Open",
+        "COUNTERED": "Countered",
+        "ACCEPTED": "Accepted",
+        "REJECTED": "Rejected",
+        "WITHDRAWN": "Withdrawn",
+        "EXPIRED": "Expired",
+        "CLOSED_OTHER_ACCEPTED": "Closed (other accepted)",
+        "CLOSED_LISTING_UNAVAILABLE": "Closed (listing unavailable)",
+        "DRAFT": "Draft",
+        "AWAITING_SELLER": "Awaiting seller",
+        "AWAITING_BUYER": "Awaiting buyer"
+      },
+      "proposalStatus": {
+        "PENDING": "Pending",
+        "COUNTERED": "Countered",
+        "ACCEPTED": "Accepted",
+        "REJECTED": "Rejected",
+        "WITHDRAWN": "Withdrawn",
+        "EXPIRED": "Expired",
+        "SUPERSEDED": "Superseded",
+        "CURRENT": "Current",
+        "CLOSED": "Closed"
+      },
+      "closeAction": "Close thread",
+      "close": {
+        "title": "Close offer thread",
+        "body": "Closing an invalid thread is an operational data-repair action. It does not change any proposal amounts or the accepted offer. This is recorded in the audit log.",
+        "submit": "Close thread",
+        "reason": {
+          "LISTING_UNAVAILABLE": "Listing unavailable",
+          "PARTICIPANT_MISMATCH": "Participant mismatch",
+          "DUPLICATE_ACTIVE_THREAD": "Duplicate active thread",
+          "INVALID_PROPOSAL_STATE": "Invalid proposal state",
+          "OPERATIONAL_DATA_REPAIR": "Operational data repair"
+        }
+      }
+    },
+    "adminTransactions": {
+      "title": "Transactions",
+      "description": "Simulated transaction workspaces. Recovery actions only.",
+      "empty": "No transactions to show.",
+      "unavailable": "This transaction is not available.",
+      "searchPlaceholder": "Search by reference…",
+      "col": {
+        "reference": "Reference",
+        "status": "Status",
+        "nextActor": "Next actor",
+        "amount": "Amount",
+        "activity": "Updated"
+      },
+      "acceptedAmount": "Accepted amount",
+      "route": "Purchase route",
+      "version": "Version",
+      "paused": "Paused",
+      "pauseReason": "Pause reason",
+      "failureCategory": "Failure category",
+      "routeValue": {
+        "CASH": "Cash",
+        "MORTGAGE": "Mortgage",
+        "UNSET": "Not selected"
+      },
+      "status": {
+        "INITIATED": "Initiated",
+        "CONFIRMATION": "Confirmation",
+        "DEPOSIT": "Deposit",
+        "DOCUMENTS": "Documents",
+        "DUE_DILIGENCE": "Due diligence",
+        "TRANSFER": "Transfer",
+        "COMPLETION": "Completion",
+        "COMPLETED_DEMO": "Completed (demo)",
+        "CANCELLATION_PENDING": "Cancellation pending",
+        "CANCELLED": "Cancelled",
+        "FAILED": "Failed"
+      },
+      "pauseAction": "Pause progression",
+      "resumeAction": "Resume progression",
+      "retryAction": "Retry step",
+      "markFailedAction": "Mark failed",
+      "resolveAction": "Resolve cancellation",
+      "pause": {
+        "title": "Pause transaction progression",
+        "body": "Both participants keep read access, but no milestone can advance while paused. This is recorded in the audit log.",
+        "submit": "Pause progression",
+        "reasonPlaceholder": "Reason (recorded in audit log)"
+      },
+      "resume": {
+        "title": "Resume transaction progression",
+        "body": "Milestones can advance again. This is recorded in the audit log.",
+        "submit": "Resume progression",
+        "reasonPlaceholder": "Reason (recorded in audit log)"
+      },
+      "retryStep": {
+        "title": "Retry system step",
+        "body": "Re-runs a retry-safe simulated step. Only steps that failed due to a transient simulated error can be retried.",
+        "submit": "Retry step",
+        "codeLabel": "Step code",
+        "reasonPlaceholder": "Reason (recorded in audit log)"
+      },
+      "markFailed": {
+        "title": "Mark transaction failed",
+        "body": "This is irreversible. Use only when the transaction cannot recover. Both participants are notified. This is recorded in the audit log.",
+        "submit": "Mark failed",
+        "reason": {
+          "UNRECOVERABLE_DATA_INCONSISTENCY": "Unrecoverable data inconsistency",
+          "REPEATED_SYSTEM_FAILURE": "Repeated system failure",
+          "INVALID_TRANSACTION_RELATIONSHIP": "Invalid transaction relationship",
+          "COMPLETION_CONFLICT": "Completion conflict",
+          "OTHER_TECHNICAL": "Other technical reason"
+        }
+      },
+      "resolveCancellation": {
+        "title": "Resolve cancellation request",
+        "body": "Choose how to resolve the pending cancellation. This is recorded in the audit log.",
+        "submit": "Resolve",
+        "actionLabel": "Resolution",
+        "action": {
+          "CONFIRM": "Confirm cancellation",
+          "DECLINE": "Decline cancellation",
+          "FAIL": "Fail transaction"
+        }
+      }
+    },
+    "document": {
+      "title": "Private documents",
+      "subtitle": "Metadata only. Opening a document is audited.",
+      "empty": "No documents on this transaction.",
+      "col": {
+        "name": "File",
+        "type": "Type",
+        "status": "Status",
+        "size": "Size",
+        "visibility": "Visibility",
+        "uploaded": "Uploaded"
+      },
+      "visibility": {
+        "PRIVATE_TO_UPLOADER": "Private to uploader",
+        "SHARED_WITH_PARTICIPANTS": "Shared with participants",
+        "ADMIN_ONLY_FUTURE": "Admin only"
+      },
+      "accessAction": "Open securely",
+      "preparing": "Preparing secure document view…",
+      "linkFailed": "The secure document link could not be prepared. Try again.",
+      "access": {
+        "title": "Open private document",
+        "body": "You are about to open a private customer document. Access is recorded in the audit log with your reason. Do not download or share the contents.",
+        "confirmLabel": "I am accessing this for a legitimate operational reason.",
+        "submit": "Open document",
+        "opened": "Document opened in a new tab. The secure link expires in {seconds} seconds.",
+        "reason": {
+          "VERIFICATION_REVIEW": "Verification review",
+          "LISTING_INVESTIGATION": "Listing investigation",
+          "TRANSACTION_ISSUE": "Transaction issue",
+          "DOCUMENT_PROCESSING_ISSUE": "Document processing issue",
+          "CUSTOMER_SUPPORT_REQUEST": "Customer support request"
+        }
+      }
+    },
+    "audit": {
+      "title": "Audit log",
+      "description": "Immutable record of admin and system actions.",
+      "empty": "No audit events match these filters.",
+      "unavailable": "This audit event is not available.",
+      "col": {
+        "time": "Time",
+        "actor": "Actor",
+        "action": "Action",
+        "entity": "Entity",
+        "result": "Result"
+      },
+      "actor": {
+        "ADMIN": "Admin",
+        "CUSTOMER": "Customer",
+        "SYSTEM": "System"
+      },
+      "metadata": "Details",
+      "filterAction": "Action",
+      "filterEntity": "Entity type",
+      "clearFilters": "Clear filters"
+    },
+    "realtime": {
+      "reconnecting": "Reconnecting…",
+      "stale": "This view may be out of date.",
+      "recovered": "Up to date.",
+      "refresh": "Refresh"
+    },
+    "result": {
+      "pending": "Working…",
+      "success": "Done. This action was recorded in the audit log.",
+      "partial": "Completed with a secondary issue.",
+      "failure": "That action could not be completed."
+    },
+    "error": {
+      "generic": "Something went wrong. Please try again.",
+      "notAvailable": "This record is not available.",
+      "stale": "This record changed before your action completed. Refresh and try again.",
+      "permission": "You do not have permission for this action.",
+      "alreadyRestricted": "This customer is already restricted.",
+      "notRestricted": "This customer is not restricted."
+    },
+    "permission": {
+      "title": "Not permitted",
+      "body": "Your admin account does not include the capability required for this area."
+    },
+    "accessDenied": {
+      "title": "تم رفض الوصول",
+      "body": "هذه البوابة مخصّصة لموظفي العمليات المصرّح لهم فقط."
+    },
+    "yes": "نعم",
+    "no": "لا"
   },
   "states": {
     "loading": "جارٍ التحميل…",
@@ -1013,5 +1561,542 @@
     "unavailable": "غير متاح من المعلومات المُقدَّمة",
     "areaUnavailable": "مقارنة المنطقة غير متاحة",
     "disclosure": "الأرقام الاستثمارية مقدمة من البائع ومحسوبة بناءً على المعلومات المُدخلة. وهي تقديرات وليست نصيحة مالية أو عوائد مضمونة."
+  },
+  "offers": {
+    "title": "العروض",
+    "tabMade": "العروض التي قدّمتها",
+    "tabReceived": "العروض الواردة على عقاراتي",
+    "filterAll": "الكل",
+    "filterAction": "يتطلب إجراءً منك",
+    "filterWaiting": "قيد الانتظار",
+    "filterAccepted": "المقبولة",
+    "filterClosed": "المغلقة",
+    "filterAboveThreshold": "عند حد الإشعار أو أعلى",
+    "filterBelowThreshold": "أقل من حد الإشعار",
+    "buyerEmptyTitle": "لم تقدّم أي عروض بعد",
+    "buyerEmptyBody": "تصفّح العقارات وقدّم عرضًا عندما تجد المنزل المناسب.",
+    "sellerTitle": "العروض الواردة",
+    "sellerDescription": "راجع العروض على عقاراتك المباشرة وردّ عليها.",
+    "sellerEmptyTitle": "لا توجد عروض واردة بعد",
+    "sellerEmptyBody": "ستظهر هنا عروض العملاء المهتمين.",
+    "browse": "تصفّح العقارات",
+    "viewOffer": "عرض التفاصيل",
+    "reviewOffer": "مراجعة العرض",
+    "reviewCounter": "مراجعة العرض المقابل",
+    "viewAccepted": "عرض العرض المقبول",
+    "askingPrice": "السعر المطلوب",
+    "currentOffer": "العرض الحالي",
+    "lastActivity": "آخر نشاط",
+    "received": "تاريخ الاستلام",
+    "loadError": "تعذّر تحميل بعض العروض. حاول مرة أخرى لتحديث القائمة.",
+    "resultCount": "{count, plural, =0 {لا توجد عروض} one {عرض واحد} other {# عروض}}",
+    "verifiedCustomer": "عميل تم التحقق منه تجريبيًا",
+    "buyerLabel": "المشتري {n}",
+    "cta": {
+      "make": "تقديم عرض",
+      "view": "عرض تفاصيل عرضك",
+      "underOffer": "قيد التفاوض على عرض",
+      "underOfferBody": "اختار البائع عرضًا ولم يعد يقبل عروضًا جديدة.",
+      "viewOffers": "عرض العروض",
+      "yourListing": "إعلانك"
+    },
+    "form": {
+      "title": "تقديم عرض",
+      "description": "أدخل المبلغ الذي ترغب في عرضه على البائع للنظر فيه.",
+      "amount": "عرضك",
+      "placeholder": "2,250,000",
+      "asking": "السعر المطلوب: {amount} درهم",
+      "belowAsking": "{amount} أقل من السعر المطلوب",
+      "aboveAsking": "{amount} أعلى من السعر المطلوب",
+      "matches": "مطابق للسعر المطلوب",
+      "expiry": "مدة صلاحية العرض",
+      "expiryHelp": "يجب أن يردّ البائع قبل انتهاء صلاحية هذا العرض.",
+      "review": "مراجعة العرض",
+      "cancel": "إلغاء",
+      "validUntil": "صالح حتى {date}",
+      "noExpiry": "بدون انتهاء"
+    },
+    "expiry": {
+      "h48": "48 ساعة",
+      "d3": "3 أيام",
+      "d7": "7 أيام",
+      "none": "بدون انتهاء"
+    },
+    "warning": {
+      "low": "هذا العرض أقل بكثير من السعر المطلوب. يمكنك تقديمه، لكن قد يكون البائع أقل ميلًا للرد.",
+      "high": "هذا العرض أعلى بكثير من السعر المطلوب. راجع المبلغ قبل المتابعة."
+    },
+    "review": {
+      "title": "مراجعة عرضك",
+      "description": "تحقّق من المبلغ والصلاحية قبل إرساله إلى البائع.",
+      "edit": "تعديل العرض",
+      "submit": "إرسال العرض",
+      "submitting": "جارٍ إرسال العرض…"
+    },
+    "disclosure": {
+      "nonBinding": "هذا العرض هو تعبير عن الاهتمام ضمن هذا النموذج الأولي، ولا ينشئ اتفاقًا عقاريًا ملزمًا قانونًا.",
+      "counter": "يظل هذا العرض المقابل جزءًا من تفاوض غير ملزم ضمن نموذج أولي.",
+      "accept": "قبول العرض في هذا النموذج الأولي لا ينشئ اتفاقًا عقاريًا ملزمًا قانونًا."
+    },
+    "submitted": {
+      "title": "تم إرسال عرضك",
+      "body": "يمكن للبائع المراجعة أو القبول أو الرفض أو اقتراح مبلغ مختلف.",
+      "viewDetails": "عرض تفاصيل العرض",
+      "returnProperty": "العودة إلى العقار",
+      "myOffers": "عرض عروضي"
+    },
+    "status": {
+      "draft": "عرض مسودة",
+      "waitingSeller": "بانتظار رد البائع",
+      "responseNeeded": "يتطلب ردًا منك",
+      "waitingBuyer": "بانتظار رد المشتري",
+      "accepted": "تم قبول العرض",
+      "rejected": "تم رفض العرض",
+      "withdrawn": "تم سحب العرض",
+      "expired": "انتهت صلاحية العرض",
+      "unavailable": "الإعلان غير متاح",
+      "otherAccepted": "العقار قيد التفاوض على عرض"
+    },
+    "context": {
+      "otherOffers": "قد يكون البائع بصدد مراجعة عروض أخرى."
+    },
+    "threshold": {
+      "above": "عند حد الإشعار أو أعلى منه",
+      "below": "أقل من حد الإشعار",
+      "help": "يتحكم الحد في الإشعارات الفورية فقط. وهو لا يمنع أو يخفي العروض الأقل."
+    },
+    "thread": {
+      "buyerTitle": "عرض على {headline}",
+      "sellerTitle": "عرض من {buyer}",
+      "proposedByBuyer": "مقدَّم من المشتري",
+      "proposedBySeller": "مقدَّم من البائع",
+      "proposedByYou": "مقدَّم منك",
+      "current": "العرض الحالي",
+      "history": "سجل التفاوض",
+      "nextAction": "الإجراء التالي",
+      "submittedAt": "أُرسل في {date}",
+      "validUntil": "صالح حتى {date}",
+      "youSubmitted": "قدّمت عرضًا بقيمة {amount}.",
+      "buyerSubmitted": "قدّم {buyer} عرضًا بقيمة {amount}.",
+      "sellerProposed": "اقترح البائع {amount}.",
+      "youProposed": "اقترحت {amount}.",
+      "buyerProposed": "اقترح {buyer} {amount}.",
+      "viewed": "اطّلع البائع على العرض.",
+      "acceptedEvent": "تم قبول العرض.",
+      "declinedEvent": "تم رفض العرض.",
+      "withdrewEvent": "سحب المشتري العرض.",
+      "expiredEvent": "انتهت صلاحية هذا العرض.",
+      "pausedEvent": "تم إيقاف الإعلان مؤقتًا.",
+      "unavailableEvent": "أصبح الإعلان غير متاح.",
+      "otherAcceptedEvent": "تم اختيار عرض آخر لهذا العقار."
+    },
+    "counter": {
+      "sellerTitle": "تقديم عرض مقابل",
+      "buyerTitle": "اقتراح مبلغ مختلف",
+      "description": "أدخل مبلغًا جديدًا لينظر فيه الطرف الآخر.",
+      "review": "مراجعة العرض المقابل",
+      "submit": "إرسال العرض المقابل",
+      "submitting": "جارٍ إرسال العرض المقابل…",
+      "equalError": "هذا مطابق للعرض الحالي. اقبله بدلًا من ذلك، أو أدخل مبلغًا مختلفًا.",
+      "previous": "العرض السابق"
+    },
+    "accept": {
+      "title": "قبول هذا العرض؟",
+      "body": "سيؤدي هذا إلى اختيار عرض هذا المشتري وإغلاق المفاوضات النشطة الأخرى لهذا العقار.",
+      "counterTitle": "قبول هذا العرض المقابل؟",
+      "counterBody": "أنت تختار المبلغ الذي اقترحه البائع وهو {amount}.",
+      "week5": "سيتواصل إعداد المعاملة في المرحلة التالية.",
+      "action": "قبول العرض",
+      "counterAction": "قبول العرض المقابل",
+      "cancel": "إلغاء",
+      "accepting": "جارٍ قبول العرض…",
+      "successTitle": "تم قبول العرض",
+      "sellerSuccess": "تم اختيار عرض هذا المشتري. سيتواصل إعداد المعاملة في المرحلة التالية.",
+      "buyerSuccess": "تم قبول اقتراح البائع. سيتواصل إعداد المعاملة في المرحلة التالية.",
+      "competing": "{count, plural, =0 {لن تتأثر أي عروض نشطة أخرى.} one {سيُغلق عرض نشط واحد آخر.} other {ستُغلق # عروض نشطة أخرى.}}"
+    },
+    "reject": {
+      "title": "رفض هذا العرض؟",
+      "body": "ستُغلق هذه المفاوضة. سيرى المشتري أن العرض قد رُفض.",
+      "counterTitle": "رفض هذا العرض المقابل؟",
+      "counterBody": "ستُغلق هذه المفاوضة ولن يتمكن البائع من قبول عرضك السابق.",
+      "action": "رفض العرض",
+      "counterAction": "رفض العرض المقابل",
+      "keep": "إبقاء العرض مفتوحًا",
+      "continue": "متابعة التفاوض",
+      "rejecting": "جارٍ رفض العرض…",
+      "reasonLabel": "السبب (اختياري، خاص بك)",
+      "reasonAMOUNT_TOO_LOW": "المبلغ منخفض جدًا",
+      "reasonNO_LONGER_AVAILABLE": "العقار لم يعد متاحًا",
+      "reasonSELECTED_ANOTHER": "تم اختيار عرض آخر",
+      "reasonTERMS_NOT_SUITABLE": "الشروط غير مناسبة",
+      "reasonOTHER": "أخرى"
+    },
+    "withdraw": {
+      "title": "سحب هذا العرض؟",
+      "body": "لن يتمكن البائع بعد الآن من قبول هذا العرض أو الرد عليه.",
+      "action": "سحب العرض",
+      "keep": "إبقاء العرض مفتوحًا",
+      "withdrawing": "جارٍ سحب العرض…",
+      "successTitle": "تم سحب العرض",
+      "successBody": "هذه المفاوضة مغلقة الآن.",
+      "newOffer": "يمكنك تقديم عرض جديد من صفحة العقار."
+    },
+    "closed": {
+      "expiredTitle": "انتهت صلاحية هذا العرض",
+      "expiredBody": "لم يعد العرض متاحًا للقبول أو تقديم عرض مقابل.",
+      "otherAcceptedTitle": "العقار قيد التفاوض على عرض",
+      "otherAcceptedBody": "اختار البائع عرضًا آخر، لذا أصبحت هذه المفاوضة مغلقة الآن.",
+      "pausedBody": "تم إيقاف الإعلان مؤقتًا، لذا أصبحت هذه المفاوضة مغلقة الآن.",
+      "changedBody": "تغيّرت تفاصيل العقار، لذا أصبحت هذه المفاوضة مغلقة الآن.",
+      "rejectedTitle": "تم رفض العرض",
+      "rejectedBody": "رفض البائع هذا العرض.",
+      "withdrawnTitle": "تم سحب العرض",
+      "withdrawnBody": "هذه المفاوضة مغلقة الآن.",
+      "returnOffers": "العودة إلى العروض",
+      "viewProperty": "عرض العقار",
+      "manageListing": "إدارة الإعلان"
+    },
+    "actions": {
+      "accept": "قبول العرض",
+      "counter": "تقديم عرض مقابل",
+      "reject": "رفض العرض",
+      "withdraw": "سحب العرض",
+      "more": "المزيد"
+    },
+    "listingView": {
+      "threshold": "حد الإشعار",
+      "activeOffers": "العروض النشطة",
+      "highestOffer": "أعلى عرض حالي",
+      "responsesNeeded": "ردود مطلوبة",
+      "publicLink": "عرض الإعلان العام",
+      "manageLink": "إدارة الإعلان",
+      "multipleNote": "يمكنك التفاوض مع أكثر من مشترٍ، لكن يمكنك قبول عرض واحد فقط لهذا العقار.",
+      "noneTitle": "لا توجد عروض بعد",
+      "noneBody": "ستظهر هنا عروض العملاء المهتمين."
+    },
+    "eligibility": {
+      "ownListing": "هذا إعلانك. أدِر العروض من إعلاناتي.",
+      "unavailable": "لم يعد هذا العقار متاحًا لتلقّي العروض.",
+      "underOffer": "هذا العقار قيد التفاوض على عرض ولا يقبل عروضًا جديدة.",
+      "activeThread": "لديك عرض نشط بالفعل",
+      "activeThreadBody": "تابع المفاوضة الحالية لمراجعة أحدث حالة لها أو اقتراح مبلغ جديد.",
+      "onboarding": "أكمل إعداد حسابك لتقديم عرض."
+    },
+    "auth": {
+      "title": "سجّل الدخول لتقديم عرض",
+      "body": "أنشئ حساب MARKAZ أو سجّل الدخول، ثم عُد إلى هذا العقار للمتابعة.",
+      "signIn": "تسجيل الدخول",
+      "create": "إنشاء حساب",
+      "cancel": "ليس الآن"
+    },
+    "error": {
+      "notAvailableTitle": "هذا العرض غير متاح",
+      "notAvailableBody": "قد لا يكون موجودًا، أو قد لا تملك صلاحية الاطلاع عليه.",
+      "staleTitle": "تغيّر هذا العرض",
+      "staleBody": "اكتمل إجراء آخر قبل إجرائك. لقد حدّثنا أحدث حالة.",
+      "generic": "تعذّر إكمال هذا الإجراء. راجع أحدث حالة للعرض وحاول مرة أخرى.",
+      "session": "انتهت صلاحية جلستك. سجّل الدخول مرة أخرى للمتابعة.",
+      "reviewLatest": "مراجعة أحدث حالة",
+      "INVALID_AMOUNT": "أدخل مبلغًا صحيحًا بالدرهم.",
+      "EQUAL_AMOUNT": "هذا مطابق للعرض الحالي. اقبله بدلًا من ذلك، أو أدخل مبلغًا مختلفًا.",
+      "EXPIRED": "انتهت صلاحية هذا العرض ولم يعد بالإمكان اتخاذ إجراء عليه.",
+      "STALE": "تغيّر هذا العرض. لقد حدّثنا أحدث حالة.",
+      "ALREADY_ACCEPTED": "تم بالفعل قبول عرض آخر لهذا العقار.",
+      "LISTING_UNAVAILABLE": "لم يعد هذا العقار متاحًا لتلقّي العروض.",
+      "LISTING_CHANGED": "تغيّرت تفاصيل العقار، لذا أصبحت هذه المفاوضة مغلقة الآن.",
+      "OWN_LISTING": "هذا إعلانك. أدِر العروض من إعلاناتي.",
+      "NOT_FOUND": "هذا العرض غير متاح.",
+      "GENERIC": "تعذّر إكمال هذا الإجراء. راجع أحدث حالة للعرض وحاول مرة أخرى."
+    },
+    "realtime": {
+      "reconnecting": "جارٍ إعادة الاتصال بالتحديثات المباشرة…",
+      "stale": "قد تتأخر التحديثات. حدّث للاطّلاع على أحدث حالة للعرض.",
+      "recovered": "حالة العرض محدّثة.",
+      "refresh": "تحديث"
+    },
+    "validation": {
+      "required": "أدخل مبلغ عرضك.",
+      "zero": "يجب أن يكون مبلغ العرض أكبر من صفر.",
+      "negative": "أدخل مبلغ عرض موجبًا.",
+      "invalid": "أدخل مبلغًا صحيحًا بالدرهم.",
+      "max": "يجب أن يكون مبلغ العرض 999,999,999 درهمًا أو أقل.",
+      "decimals": "أدخل المبلغ بالدراهم الكاملة."
+    },
+    "announce": {
+      "counterReceived": "تم استلام عرض مقابل من البائع. يتطلب ردًا منك.",
+      "accepted": "تم قبول العرض.",
+      "declined": "تم رفض العرض.",
+      "withdrew": "سحب المشتري العرض.",
+      "unavailable": "لم يعد الإعلان متاحًا."
+    },
+    "notify": {
+      "title": "الإشعارات",
+      "empty": "لا توجد إشعارات بعد.",
+      "markAllRead": "تحديد الكل كمقروء",
+      "view": "عرض",
+      "OFFER_RECEIVED": "تم استلام عرض جديد على إعلانك.",
+      "OFFER_COUNTER_SELLER": "اقترح البائع مبلغًا مختلفًا.",
+      "OFFER_COUNTER_BUYER": "اقترح مشترٍ مبلغًا مختلفًا.",
+      "OFFER_ACCEPTED": "تم قبول عرضك.",
+      "OFFER_REJECTED": "تم رفض عرضك.",
+      "OFFER_WITHDRAWN": "سحب مشترٍ عرضه.",
+      "OFFER_CLOSED_OTHER": "أصبح العقار قيد التفاوض على عرض الآن.",
+      "OFFER_LISTING_UNAVAILABLE": "أُغلق هذا العرض لأن الإعلان لم يعد متاحًا.",
+      "OFFER_EXPIRED": "انتهت صلاحية أحد العروض."
+    }
+  },
+  "transactions": {
+    "title": "المعاملات",
+    "subtitle": "تابع عروضك المقبولة خلال عملية المعاملة المحاكاة.",
+    "reference": "المرجع",
+    "buying": "أنت المشتري",
+    "selling": "أنت البائع",
+    "lastActivity": "آخر نشاط",
+    "viewWorkspace": "عرض المعاملة",
+    "continue": "المتابعة إلى المعاملة",
+    "continueBody": "افتح مساحة عمل المعاملة المشتركة لمتابعة الخطوات التالية.",
+    "backToList": "العودة إلى معاملاتي",
+    "disclosure": {
+      "title": "عملية المعاملة محاكاة",
+      "body": "لا ينفّذ هذا النموذج مدفوعات حقيقية، ولا ينشئ مستندات ملزمة قانونًا، ولا يجري نقل ملكية رسميًا."
+    },
+    "empty": {
+      "title": "لا توجد معاملات بعد",
+      "body": "تظهر المعاملات هنا بعد قبول العرض.",
+      "browse": "تصفح العقارات",
+      "offers": "عرض العروض"
+    },
+    "loadError": {
+      "title": "تعذّر تحميل المعاملة",
+      "body": "حاول مرة أخرى بعد قليل.",
+      "retry": "حاول مرة أخرى"
+    },
+    "unavailable": {
+      "title": "هذه المعاملة غير متاحة",
+      "body": "قد لا تكون موجودة، أو قد لا تملك صلاحية عرضها."
+    },
+    "stale": {
+      "title": "تغيّرت هذه المعاملة",
+      "body": "اكتمل إجراء آخر قبل إجرائك. حدّثنا أحدث حالة."
+    },
+    "filters": {
+      "all": "الكل",
+      "action": "يتطلب إجراءك",
+      "waiting": "في الانتظار",
+      "completed": "مكتمل",
+      "closed": "مغلق"
+    },
+    "progress": {
+      "stages": "اكتملت {completed} من {total} مراحل"
+    },
+    "status": {
+      "initiated": "البدء",
+      "confirmation": "تأكيد التفاصيل",
+      "deposit": "عربون تجريبي",
+      "documents": "المستندات",
+      "dueDiligence": "فحوصات تجريبية",
+      "transfer": "تحضير النقل",
+      "completion": "الإتمام",
+      "completed": "مكتمل في الوضع التجريبي",
+      "cancellationPending": "طُلب الإلغاء",
+      "cancelled": "ملغى",
+      "failed": "يحتاج إلى مراجعة"
+    },
+    "stage": {
+      "CONFIRMATION": "تأكيد",
+      "DEPOSIT": "العربون",
+      "DOCUMENTS": "المستندات",
+      "DUE_DILIGENCE": "الفحوصات",
+      "TRANSFER": "النقل",
+      "COMPLETION": "الإتمام"
+    },
+    "nextActor": {
+      "you": "مطلوب إجراء منك",
+      "waitingBuyer": "في انتظار المشتري",
+      "waitingSeller": "في انتظار البائع",
+      "both": "مطلوب إجراء من الطرفين",
+      "system": "في انتظار المعالجة التجريبية",
+      "none": "لا يوجد إجراء مطلوب"
+    },
+    "task": {
+      "you": "مطلوب إجراؤك",
+      "buyer": "مطلوب إجراء المشتري",
+      "seller": "مطلوب إجراء البائع",
+      "both": "مطلوب من الطرفين",
+      "system": "في انتظار النظام",
+      "completed": "مكتمل في الوضع التجريبي",
+      "skipped": "غير مطلوب",
+      "blocked": "محظور",
+      "failed": "يحتاج محاولة أخرى"
+    },
+    "taskLabel": {
+      "BUYER_CONFIRM_DETAILS": "تأكيد تفاصيل المعاملة",
+      "SELLER_CONFIRM_DETAILS": "تأكيد تفاصيل المعاملة",
+      "BUYER_SELECT_ROUTE": "اختر طريقة الشراء",
+      "BUYER_CONFIRM_DEPOSIT": "تأكيد العربون التجريبي",
+      "BUYER_DOCUMENTS": "أكمل قائمة مستنداتك",
+      "SELLER_DOCUMENTS": "أكمل قائمة مستنداتك",
+      "BUYER_FINANCING": "أكّد تمويلك (تجريبي)",
+      "BUYER_REVIEW_SUMMARY": "راجع الملخص التجريبي",
+      "SELLER_REVIEW_SUMMARY": "راجع الملخص التجريبي",
+      "DUE_DILIGENCE": "شغّل الفحوصات التجريبية",
+      "SELLER_PROPOSE_DATE": "اقترح تاريخ النقل",
+      "BUYER_CONFIRM_READINESS": "أكّد جاهزيتك",
+      "SELLER_CONFIRM_READINESS": "أكّد جاهزيتك",
+      "TRANSFER_APPOINTMENT": "أنشئ الموعد المحاكى",
+      "BUYER_CONFIRM_COMPLETION": "أكّد الإتمام في الوضع التجريبي",
+      "SELLER_CONFIRM_COMPLETION": "أكّد الإتمام في الوضع التجريبي",
+      "TRANSACTION_COMPLETE": "إنهاء المعاملة"
+    },
+    "details": {
+      "title": "تأكيد تفاصيل المعاملة",
+      "confirm": "أؤكد أن العقار والمبلغ المقبول المعروضين صحيحان لهذه المعاملة التجريبية.",
+      "action": "تأكيد تفاصيل المعاملة",
+      "acceptedAmount": "المبلغ المقبول",
+      "property": "العقار",
+      "buyerLabel": "المشتري",
+      "sellerLabel": "البائع",
+      "yourSide": "تم تأكيد جهتك",
+      "waitingOther": "في انتظار تأكيد الطرف الآخر."
+    },
+    "route": {
+      "title": "كيف تخطط لشراء هذا العقار؟",
+      "help": "يُستخدم هذا الاختيار فقط لتشكيل قائمة مهام المعاملة التجريبية.",
+      "cash": "شراء نقدي",
+      "financing": "تمويل",
+      "select": "تأكيد طريقة الشراء"
+    },
+    "financing": {
+      "title": "التمويل (تجريبي)",
+      "disclosure": "لا يتم تقديم طلب رهن عقاري أو موافقة بنكية أو تقييم ائتماني.",
+      "inProgress": "وضع علامة قيد التنفيذ",
+      "confirm": "تأكيد التمويل في الوضع التجريبي",
+      "unable": "تعذّر إتمام التمويل",
+      "status": "حالة التمويل"
+    },
+    "deposit": {
+      "title": "العربون التجريبي",
+      "body": "يُعرض عربون تجريبي بنسبة 10٪ من المبلغ المقبول للنموذج. لن يتم تحويل أي أموال.",
+      "amount": "مبلغ العربون التجريبي",
+      "ofAccepted": "10٪ من المبلغ المقبول",
+      "confirm": "أدرك أن هذا تأكيد عربون محاكى ولن يتم تحويل أي أموال.",
+      "action": "تأكيد العربون التجريبي",
+      "successTitle": "تم تأكيد العربون في الوضع التجريبي",
+      "successBody": "لم تتم معالجة أي دفعة حقيقية."
+    },
+    "documents": {
+      "title": "المستندات",
+      "notice": "استخدم ملفات عينة وهمية فقط",
+      "noticeBody": "لا ترفع هوية إماراتية أو جواز سفر أو كشف حساب بنكي أو موافقة رهن أو سند ملكية أو عقود أو أي مستند حساس حقيقي.",
+      "yours": "قائمة مستنداتك",
+      "other": "قائمة الطرف الآخر",
+      "complete": "مكتمل",
+      "incomplete": "غير مكتمل",
+      "markComplete": "وضع علامة اكتمال القائمة",
+      "summaryTitle": "ملخص المعاملة المحاكى",
+      "summaryDisclosure": "مراجعة المستند محاكاة — هذا ليس نموذج (F) رسميًا ولا اتفاقية ملزمة قانونًا.",
+      "reviewSummary": "أؤكد أنني راجعت الملخص التجريبي",
+      "upload": "رفع ملف",
+      "remove": "إزالة",
+      "accepted": "مقبول في الوضع التجريبي",
+      "type": {
+        "BUYER_IDENTITY": "عينة هوية المشتري (وهمية)",
+        "BUYER_TRANSACTION_FILE": "ملف معاملة المشتري (اختياري)",
+        "BUYER_FINANCING": "تأكيد التمويل (وهمي)",
+        "SELLER_IDENTITY": "عينة هوية البائع (وهمية)",
+        "SELLER_TRANSACTION_FILE": "ملف معاملة البائع (اختياري)"
+      }
+    },
+    "checks": {
+      "title": "الفحوصات التجريبية",
+      "disclosure": "فحوصات العناية الواجبة محاكاة — هذه الفحوصات النموذجية ليست نصيحة قانونية أو مالية أو إنشائية أو تنظيمية.",
+      "run": "تشغيل الفحوصات التجريبية",
+      "completedTitle": "اكتملت العناية الواجبة في الوضع التجريبي",
+      "completedBody": "اكتملت متطلبات النموذج الأولية. لم يتم إجراء أي تخليص قانوني أو تنظيمي."
+    },
+    "transfer": {
+      "title": "تحضير النقل",
+      "proposeDate": "تاريخ النقل المفضّل",
+      "proposeHelp": "اختر تاريخًا مفضّلًا لهذا النموذج. لن يتم حجز موعد رسمي.",
+      "propose": "اقتراح التاريخ",
+      "buyerReady": "أؤكد أن مهام المشتري جاهزة لمرحلة النقل المحاكاة.",
+      "sellerReady": "أؤكد أن مهام البائع جاهزة لمرحلة النقل المحاكاة.",
+      "confirmReady": "تأكيد الجاهزية",
+      "createAppointment": "إنشاء موعد محاكى",
+      "appointmentTitle": "تم محاكاة موعد النقل",
+      "appointmentBody": "لم يتم حجز أي موعد رسمي.",
+      "appointmentDate": "التاريخ المفضّل"
+    },
+    "completion": {
+      "title": "الإتمام",
+      "confirm": "أؤكد إتمام هذه المعاملة في الوضع التجريبي.",
+      "action": "تأكيد الإتمام في الوضع التجريبي",
+      "yourConfirmed": "تم تأكيد إتمامك",
+      "waitingOther": "في انتظار تأكيد الطرف الآخر للإتمام في الوضع التجريبي.",
+      "successTitle": "اكتملت المعاملة في الوضع التجريبي",
+      "successBody": "لم يعالج هذا النموذج دفعة حقيقية ولا نقل ملكية رسميًا.",
+      "completedDate": "اكتمل"
+    },
+    "cancellation": {
+      "request": "طلب الإلغاء",
+      "requestTitle": "طلب إلغاء المعاملة؟",
+      "requestBody": "ستتوقف المعاملة عن التقدم حتى يتم تأكيد الإلغاء أو مراجعته. سيتم إيقاف القائمة مؤقتًا دون إعادة نشرها.",
+      "reasonLabel": "السبب",
+      "keep": "إبقاء المعاملة نشطة",
+      "pendingTitle": "طُلب الإلغاء",
+      "pendingBody": "طُلب إلغاء لهذه المعاملة التجريبية.",
+      "confirm": "تأكيد الإلغاء",
+      "decline": "إبقاء المعاملة نشطة",
+      "cancelledTitle": "أُلغيت المعاملة",
+      "cancelledBody": "توقفت المعاملة. القائمة موقوفة مؤقتًا ولن تعود إلى السوق تلقائيًا.",
+      "reviewListing": "مراجعة القائمة الموقوفة",
+      "reason": {
+        "BUYER_UNABLE": "تعذّر على المشتري المتابعة",
+        "SELLER_UNABLE": "تعذّر على البائع المتابعة",
+        "FINANCING_FAILED": "تعذّر إتمام التمويل",
+        "DOCUMENTS_INCOMPLETE": "المستندات النموذجية المطلوبة غير مكتملة",
+        "MUTUAL": "اتفق الطرفان على التوقف",
+        "OTHER": "سبب منظّم آخر"
+      }
+    },
+    "timeline": {
+      "title": "الجدول الزمني",
+      "TRANSACTION_CREATED": "تم إنشاء مساحة عمل المعاملة.",
+      "DETAILS_CONFIRMED": "أكّد أحد الطرفين تفاصيل المعاملة.",
+      "PURCHASE_ROUTE_SELECTED": "اختار المشتري طريقة الشراء.",
+      "FINANCING_STATUS_UPDATED": "حدّث المشتري حالة التمويل التجريبية.",
+      "DEMO_DEPOSIT_CONFIRMED": "أكّد المشتري العربون التجريبي.",
+      "DOCUMENT_UPLOADED": "تم رفع مستند.",
+      "DOCUMENT_REPLACED": "تم استبدال مستند.",
+      "DOCUMENT_REMOVED": "تم حذف مستند.",
+      "SUMMARY_REVIEWED": "راجع أحد الطرفين الملخص التجريبي.",
+      "DUE_DILIGENCE_COMPLETED_DEMO": "اكتملت العناية الواجبة في الوضع التجريبي.",
+      "TRANSFER_DATE_PROPOSED": "تم اقتراح تاريخ نقل مفضّل.",
+      "TRANSFER_READINESS_CONFIRMED": "أكّد أحد الطرفين جاهزية النقل.",
+      "TRANSFER_APPOINTMENT_SIMULATED": "تم محاكاة موعد النقل.",
+      "COMPLETION_CONFIRMED": "أكّد أحد الطرفين الإتمام في الوضع التجريبي.",
+      "COMPLETED_DEMO": "اكتملت المعاملة في الوضع التجريبي.",
+      "CANCELLATION_REQUESTED": "طُلب إلغاء المعاملة.",
+      "CANCELLATION_DECLINED": "رُفض طلب الإلغاء.",
+      "CANCELLED": "أُلغيت المعاملة.",
+      "FAILED": "تحتاج المعاملة إلى مراجعة."
+    },
+    "notify": {
+      "TRANSACTION_CREATED": "مساحة عمل معاملتك جاهزة.",
+      "TRANSACTION_ACTION_REQUIRED": "مطلوب إجراؤك في معاملة.",
+      "TRANSACTION_DEPOSIT_CONFIRMED_DEMO": "أكّد المشتري العربون التجريبي.",
+      "TRANSACTION_TRANSFER_READY": "تم محاكاة موعد النقل.",
+      "TRANSACTION_COMPLETED_DEMO": "اكتملت المعاملة في الوضع التجريبي.",
+      "TRANSACTION_CANCELLATION_REQUESTED": "طُلب إلغاء المعاملة.",
+      "TRANSACTION_CANCELLED": "أُلغيت المعاملة.",
+      "TRANSACTION_FAILED": "تحتاج المعاملة إلى مراجعة.",
+      "view": "عرض"
+    },
+    "realtime": {
+      "reconnecting": "إعادة الاتصال — قد تتأخر التحديثات.",
+      "refresh": "تحديث"
+    },
+    "goToAction": "انتقل إلى إجرائك"
   }
 }

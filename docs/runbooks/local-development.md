@@ -26,17 +26,14 @@ pnpm supabase:start
 # 4. Apply the canonical migrations + (minimal) seed
 pnpm supabase:reset
 
-# 5. Provision demo Auth users + demo data via the Supabase Admin API
-pnpm db:setup
-
-# 6. Run both apps
+# 5. Run both apps, then SIGN UP in the web app to create accounts
 pnpm dev
 ```
 
-> `pnpm db:setup` creates the demo accounts (Customer A / B / Admin) and seeds
-> demo domain data. Demo Auth users are **not** created by SQL seed — see
-> `database-reset.md` and `demo-runbook.md`. Demo credentials live in
-> `demo-runbook.md`.
+> **No accounts are seeded** — open the web app and **sign up** (read the 6-digit code
+> from Mailpit at :54324 to verify). To create an admin (optional), run
+> `BOOTSTRAP_ADMIN_EMAIL=you@example.com BOOTSTRAP_ADMIN_PASSWORD='…' pnpm db:setup`.
+> See `demo-runbook.md`.
 
 `pnpm dev` runs the customer app on **:3000** and the admin app on **:3001**.
 
@@ -77,16 +74,13 @@ pnpm test:e2e       # Playwright (needs the local Supabase stack running)
 pnpm db:generate    # drizzle-kit generate (REVIEW only; fold into canonical SQL)
 pnpm db:migrate     # apply migrations
 pnpm db:seed        # run supabase/seed.sql (minimal; no Auth users)
-pnpm db:setup       # provision demo Auth users (Admin API) + demo data
+pnpm db:setup       # optional admin bootstrap (env-driven); no-op without env
 
 pnpm supabase:start   # start Docker stack
 pnpm supabase:stop    # stop Docker stack
 pnpm supabase:reset   # drop + re-apply migrations + seed
 pnpm supabase:status  # show local service status/URLs
 ```
-
-> Integration tests and e2e tests require the **local Supabase stack running**
-> (`pnpm supabase:start`).
 
 ## Troubleshooting
 
@@ -97,4 +91,4 @@ pnpm supabase:status  # show local service status/URLs
   from migrations + seed (see `database-reset.md`).
 - **Cannot log in** — see `authentication.md` (email + password; the new-account
   verification **code** and the password-recovery **link** arrive in the mail
-  inbox at :54324). Make sure you ran `pnpm db:setup` so the demo accounts exist.
+  inbox at :54324). **Sign up** in the app first — no accounts are pre-seeded.
