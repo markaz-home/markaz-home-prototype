@@ -71,7 +71,11 @@ export function parseMarketplaceQuery(raw: Record<string, string | undefined>): 
   const cleaned: Record<string, unknown> = { ...raw };
   for (const issue of parsed.error.issues) {
     const key = issue.path[0];
-    if (typeof key === 'string' && issue.message !== 'price_min_above_max' && issue.message !== 'size_min_above_max') {
+    if (
+      typeof key === 'string' &&
+      issue.message !== 'price_min_above_max' &&
+      issue.message !== 'size_min_above_max'
+    ) {
       delete cleaned[key];
     }
   }
@@ -95,7 +99,11 @@ export interface Pagination {
   hasPrev: boolean;
   hasNext: boolean;
 }
-export function paginate(total: number, page: number, pageSize = MARKETPLACE_PAGE_SIZE): Pagination {
+export function paginate(
+  total: number,
+  page: number,
+  pageSize = MARKETPLACE_PAGE_SIZE,
+): Pagination {
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const clamped = Math.min(Math.max(1, page), totalPages);
   return {

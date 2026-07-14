@@ -23,7 +23,9 @@ async function latestMessageBody(email: string): Promise<string> {
       const list = (await res.json()) as { messages?: Array<{ ID: string }> };
       const newest = list.messages?.[0];
       if (newest) {
-        const msg = (await fetch(`${MAILPIT}/api/v1/message/${newest.ID}`).then((r) => r.json())) as {
+        const msg = (await fetch(`${MAILPIT}/api/v1/message/${newest.ID}`).then((r) =>
+          r.json(),
+        )) as {
           Text?: string;
           HTML?: string;
         };
@@ -51,7 +53,9 @@ test.describe('email/password authentication', () => {
     test.skip(!(await mailpitReachable()), 'Local Supabase/Mailpit not running');
   });
 
-  test('new customer: sign up → check email → verify → demo identity → dashboard', async ({ page }) => {
+  test('new customer: sign up → check email → verify → demo identity → dashboard', async ({
+    page,
+  }) => {
     const email = `new-${Date.now()}@markaz.demo`;
     await page.goto('/en/sign-up');
     await page.getByLabel(/Full name/i).fill('Test Customer');

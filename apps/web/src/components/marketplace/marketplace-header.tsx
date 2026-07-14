@@ -48,7 +48,7 @@ export function MarketplaceHeader({
     href === '/properties' ? pathname.startsWith('/properties') : pathname === href;
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
+    <header className="bg-background/95 sticky top-0 z-40 border-b backdrop-blur">
       <div className="container flex h-16 items-center justify-between gap-4">
         <div className="flex items-center gap-6">
           <Link href={isAuthenticated ? '/dashboard' : '/'} aria-label={t('home')}>
@@ -125,24 +125,32 @@ export function MarketplaceHeader({
       </div>
 
       {open && (
-        <nav className="border-t bg-background md:hidden" aria-label="Primary mobile">
+        <nav className="bg-background border-t md:hidden" aria-label="Primary mobile">
           <div className="container flex flex-col py-2">
             {links.map((item) => (
               <Link
                 key={item.href + item.key}
                 href={item.href}
-                className="rounded-md px-3 py-2 text-sm font-medium text-foreground"
+                className="text-foreground rounded-md px-3 py-2 text-sm font-medium"
                 onClick={() => setOpen(false)}
               >
                 {t(item.key)}
               </Link>
             ))}
             {!isAuthenticated && (
-              <Link href="/sign-in" className="rounded-md px-3 py-2 text-sm font-medium text-foreground" onClick={() => setOpen(false)}>
+              <Link
+                href="/sign-in"
+                className="text-foreground rounded-md px-3 py-2 text-sm font-medium"
+                onClick={() => setOpen(false)}
+              >
                 {t('signIn')}
               </Link>
             )}
-            <Link href="/sell" className="rounded-md px-3 py-2 text-sm font-medium text-foreground" onClick={() => setOpen(false)}>
+            <Link
+              href="/sell"
+              className="text-foreground rounded-md px-3 py-2 text-sm font-medium"
+              onClick={() => setOpen(false)}
+            >
               {t('listProperty')}
             </Link>
           </div>

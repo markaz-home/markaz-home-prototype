@@ -103,7 +103,13 @@ export const transactionStatus = pgEnum('transaction_status', [
   'CANCELLED',
   'FAILED',
 ]);
-export const transactionNextActor = pgEnum('transaction_next_actor', ['BUYER', 'SELLER', 'BOTH', 'SYSTEM', 'NONE']);
+export const transactionNextActor = pgEnum('transaction_next_actor', [
+  'BUYER',
+  'SELLER',
+  'BOTH',
+  'SYSTEM',
+  'NONE',
+]);
 export const transactionActor = pgEnum('transaction_actor', ['BUYER', 'SELLER', 'BOTH', 'SYSTEM']);
 export const transactionTaskStatus = pgEnum('transaction_task_status', [
   'PENDING',
@@ -348,7 +354,10 @@ export const investmentCases = pgTable('investment_cases', {
   totalInvested: numeric('total_invested', { precision: 14, scale: 2 }),
   estimatedGain: numeric('estimated_gain', { precision: 14, scale: 2 }),
   estimatedRoiPct: numeric('estimated_roi_pct', { precision: 7, scale: 1 }),
-  estimatedAnnualisedReturnPct: numeric('estimated_annualised_return_pct', { precision: 7, scale: 1 }),
+  estimatedAnnualisedReturnPct: numeric('estimated_annualised_return_pct', {
+    precision: 7,
+    scale: 1,
+  }),
   pricePerSqft: numeric('price_per_sqft', { precision: 14, scale: 2 }),
   visible: boolean('visible').notNull().default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -504,7 +513,9 @@ export const transactions = pgTable(
     transferPreferredDate: date('transfer_preferred_date'),
     transferAppointmentAt: timestamp('transfer_appointment_at', { withTimezone: true }),
     cancellationReason: text('cancellation_reason'),
-    cancellationRequestedBy: uuid('cancellation_requested_by').references(() => profiles.id, { onDelete: 'set null' }),
+    cancellationRequestedBy: uuid('cancellation_requested_by').references(() => profiles.id, {
+      onDelete: 'set null',
+    }),
     failureCategory: text('failure_category'),
     progressionPausedAt: timestamp('progression_paused_at', { withTimezone: true }),
     progressionPauseReason: text('progression_pause_reason'),
@@ -646,7 +657,9 @@ export const adminNotes = pgTable(
     category: adminNoteCategory('category').notNull(),
     body: text('body').notNull(),
     followUpDate: date('follow_up_date'),
-    createdByAdminId: uuid('created_by_admin_id').references(() => profiles.id, { onDelete: 'set null' }),
+    createdByAdminId: uuid('created_by_admin_id').references(() => profiles.id, {
+      onDelete: 'set null',
+    }),
     supersedesNoteId: uuid('supersedes_note_id'),
     hiddenAt: timestamp('hidden_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

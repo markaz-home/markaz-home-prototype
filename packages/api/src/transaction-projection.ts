@@ -37,9 +37,7 @@ export interface TxPropertyJson {
 export function mapProperty(p: TxPropertyJson | null) {
   if (!p) return null;
   const headline =
-    p.headline ??
-    [p.buildingOrProject, p.community].filter(Boolean).join(' · ') ??
-    'Property';
+    p.headline ?? [p.buildingOrProject, p.community].filter(Boolean).join(' · ') ?? 'Property';
   return {
     publicId: p.publicId ?? null,
     slug: p.slug ?? null,
@@ -114,9 +112,16 @@ function num(v: string | number | null | undefined): number | null {
 }
 
 /** Compact card for the My Transactions dashboard (spec §16.2). */
-export function toTransactionListItem(row: TxRow, userId: string, property: TxPropertyJson | null, tasks: TaskRow[]) {
+export function toTransactionListItem(
+  row: TxRow,
+  userId: string,
+  property: TxPropertyJson | null,
+  tasks: TaskRow[],
+) {
   const perspective = perspectiveOf(row, userId);
-  const progress = computeProgress(tasks.map((t) => ({ code: t.code, status: t.status, required: t.required })));
+  const progress = computeProgress(
+    tasks.map((t) => ({ code: t.code, status: t.status, required: t.required })),
+  );
   return {
     id: row.id,
     reference: row.reference,

@@ -94,10 +94,10 @@ Docker-engine / Supabase-key / verification-email gotchas.
 `pnpm supabase:start` prints the keys your local stack expects. **Newer Supabase
 CLIs (≥ 2.10x) use the new key format** — copy them into `.env` like this:
 
-| `supabase start` output | `.env` variable |
-| --- | --- |
-| `Publishable` (`sb_publishable_…`) **or** legacy `anon` | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
-| `Secret` (`sb_secret_…`) **or** legacy `service_role` | `SUPABASE_SERVICE_ROLE_KEY` |
+| `supabase start` output                                              | `.env` variable                          |
+| -------------------------------------------------------------------- | ---------------------------------------- |
+| `Publishable` (`sb_publishable_…`) **or** legacy `anon`              | `NEXT_PUBLIC_SUPABASE_ANON_KEY`          |
+| `Secret` (`sb_secret_…`) **or** legacy `service_role`                | `SUPABASE_SERVICE_ROLE_KEY`              |
 | `DB URL` (`postgresql://postgres:postgres@127.0.0.1:54322/postgres`) | `DATABASE_URL` and `DIRECT_DATABASE_URL` |
 
 The publishable key is browser-safe and works as the client key; the secret key
@@ -115,11 +115,11 @@ direct endpoint.
 
 The local stack runs in Docker. Service URLs (after `pnpm supabase:start`):
 
-| Service | URL |
-| --- | --- |
-| Supabase API | http://127.0.0.1:54321 |
-| Postgres | 127.0.0.1:54322 |
-| Studio | http://127.0.0.1:54323 |
+| Service                                                                                 | URL                    |
+| --------------------------------------------------------------------------------------- | ---------------------- |
+| Supabase API                                                                            | http://127.0.0.1:54321 |
+| Postgres                                                                                | 127.0.0.1:54322        |
+| Studio                                                                                  | http://127.0.0.1:54323 |
 | **Mail inbox** (verification code + recovery link) — Mailpit, or Inbucket on older CLIs | http://127.0.0.1:54324 |
 
 Authentication is **email + password** (ADR 0009). A 6-digit email code is used
@@ -263,7 +263,7 @@ it finish. Subsequent starts are fast (images are cached).
 `Restarting`). It's an unrelated leftover — remove it: `docker rm -f <name>`
 (removes only the container, not data volumes).
 
-**The *verification* email shows a link instead of a 6-digit code.** Only the
+**The _verification_ email shows a link instead of a 6-digit code.** Only the
 `confirmation.html` template wasn't picked up. Templates live in
 `supabase/templates/` and are wired in `supabase/config.toml` under
 `[auth.email.template.*]`: `confirmation.html` carries the **code**

@@ -22,9 +22,13 @@ export function ForgotPasswordForm() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<ForgotPasswordInput>({ resolver: zodResolver(forgotPasswordSchema), defaultValues: { email: '' } });
+  } = useForm<ForgotPasswordInput>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: { email: '' },
+  });
 
-  const fe = (code?: string) => (code ? tv(FIELD_ERROR_KEYS[code] ?? 'unexpectedError') : undefined);
+  const fe = (code?: string) =>
+    code ? tv(FIELD_ERROR_KEYS[code] ?? 'unexpectedError') : undefined;
 
   async function onSubmit(data: ForgotPasswordInput) {
     setError(null);
@@ -48,12 +52,21 @@ export function ForgotPasswordForm() {
         {error ? <Alert variant="destructive">{error}</Alert> : null}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
           <FormField id="email" label={tf('email')} error={fe(errors.email?.message)} required>
-            <Input id="email" type="email" inputMode="email" autoComplete="email" dir="ltr" placeholder={tf('emailPlaceholder')} aria-invalid={!!errors.email} {...register('email')} />
+            <Input
+              id="email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              dir="ltr"
+              placeholder={tf('emailPlaceholder')}
+              aria-invalid={!!errors.email}
+              {...register('email')}
+            />
           </FormField>
           <Button type="submit" className="w-full" loading={isSubmitting}>
             {isSubmitting ? t('submitting') : t('submit')}
           </Button>
-          <p className="text-center text-xs text-muted-foreground">{t('security')}</p>
+          <p className="text-muted-foreground text-center text-xs">{t('security')}</p>
           <p className="text-center text-sm">
             <Link href="/sign-in" className="text-muted-foreground hover:text-foreground">
               {t('return')}

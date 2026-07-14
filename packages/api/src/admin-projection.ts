@@ -60,7 +60,20 @@ export function toAdminCustomerDetail(r: AdminCustomerDetailInput) {
 }
 
 // ---- Audit -----------------------------------------------------------------
-const SAFE_META_KEYS = new Set(['reason', 'category', 'previous', 'result', 'action', 'code', 'documentType', 'route', 'declined', 'kind', 'listingId', 'side']);
+const SAFE_META_KEYS = new Set([
+  'reason',
+  'category',
+  'previous',
+  'result',
+  'action',
+  'code',
+  'documentType',
+  'route',
+  'declined',
+  'kind',
+  'listingId',
+  'side',
+]);
 
 export interface AuditRow {
   id: string;
@@ -73,13 +86,18 @@ export interface AuditRow {
 }
 /** Allow-list audit metadata — never tokens, paths, signed URLs, raw errors (spec §30, §42.1). */
 export function toAuditEvent(r: AuditRow) {
-  const meta = (r.metadata && typeof r.metadata === 'object' ? (r.metadata as Record<string, unknown>) : {});
+  const meta =
+    r.metadata && typeof r.metadata === 'object' ? (r.metadata as Record<string, unknown>) : {};
   const safe: Record<string, unknown> = {};
   for (const k of Object.keys(meta)) if (SAFE_META_KEYS.has(k)) safe[k] = meta[k];
   return {
     id: r.id,
     action: r.action,
-    actorType: r.actorId ? (r.action.startsWith('ADMIN_') ? ('ADMIN' as const) : ('CUSTOMER' as const)) : ('SYSTEM' as const),
+    actorType: r.actorId
+      ? r.action.startsWith('ADMIN_')
+        ? ('ADMIN' as const)
+        : ('CUSTOMER' as const)
+      : ('SYSTEM' as const),
     entityType: r.entityType,
     entityId: r.entityId,
     metadata: safe,

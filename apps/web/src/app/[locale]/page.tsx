@@ -35,10 +35,10 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
 
       <main className="container flex-1 py-16">
         <section className="mx-auto max-w-3xl text-center">
-          <h1 className="text-balance font-display text-4xl font-medium leading-[1.08] tracking-tight text-brand-900 sm:text-5xl md:text-6xl">
+          <h1 className="font-display text-brand-900 text-balance text-4xl font-medium leading-[1.08] tracking-tight sm:text-5xl md:text-6xl">
             {t('title')}
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg text-muted-foreground">
+          <p className="text-muted-foreground mx-auto mt-6 max-w-2xl text-pretty text-lg">
             {t('subtitle')}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
@@ -55,10 +55,10 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
           {points.map(({ icon: Icon, title, body }) => (
             <Card key={title}>
               <CardHeader>
-                <Icon className="h-6 w-6 text-primary" aria-hidden />
+                <Icon className="text-primary h-6 w-6" aria-hidden />
                 <CardTitle className="text-base">{title}</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">{body}</CardContent>
+              <CardContent className="text-muted-foreground text-sm">{body}</CardContent>
             </Card>
           ))}
         </section>

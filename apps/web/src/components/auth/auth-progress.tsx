@@ -43,20 +43,22 @@ export function AuthProgress({
               </span>
               <span className={cn(s === 'upcoming' ? 'text-muted-foreground' : 'text-foreground')}>
                 {label}
-                {s === 'action' ? <span className="text-warning"> · {t('actionRequired')}</span> : null}
+                {s === 'action' ? (
+                  <span className="text-warning"> · {t('actionRequired')}</span>
+                ) : null}
               </span>
-              {i < 2 ? <span className="mx-1 h-px w-6 bg-border" aria-hidden /> : null}
+              {i < 2 ? <span className="bg-border mx-1 h-px w-6" aria-hidden /> : null}
             </li>
           );
         })}
       </ol>
       <div className="sm:hidden">
-        <p className="text-xs font-medium text-muted-foreground">
+        <p className="text-muted-foreground text-xs font-medium">
           {t('stepOf', { current: current + 1, total: 3, label: STEPS[current] })}
         </p>
-        <div className="mt-1.5 h-1 w-full rounded-full bg-border" aria-hidden>
+        <div className="bg-border mt-1.5 h-1 w-full rounded-full" aria-hidden>
           <div
-            className="h-1 rounded-full bg-primary transition-all"
+            className="bg-primary h-1 rounded-full transition-all"
             style={{ width: `${((current + 1) / 3) * 100}%` }}
           />
         </div>

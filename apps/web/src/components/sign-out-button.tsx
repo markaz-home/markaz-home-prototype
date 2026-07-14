@@ -29,7 +29,7 @@ export function SignOutButton({ asMenuItem = false }: { asMenuItem?: boolean }) 
       className={
         asMenuItem
           ? 'flex w-full items-center gap-2 disabled:opacity-50'
-          : 'inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50'
+          : 'text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-sm disabled:opacity-50'
       }
     >
       <LogOut className="h-4 w-4" aria-hidden />

@@ -75,11 +75,11 @@ dashboard.
 
 ## Demo accounts (fictional)
 
-| Account | Email | Local password | Type |
-| --- | --- | --- | --- |
-| Customer A | `customer-a@markaz.demo` | `Markaz!Demo1` | CUSTOMER (`VERIFIED_DEMO`) |
-| Customer B | `customer-b@markaz.demo` | `Markaz!Demo1` | CUSTOMER (`VERIFIED_DEMO`) |
-| Admin | `admin@markaz.demo` | `Markaz!Admin1` | ADMIN |
+| Account    | Email                    | Local password  | Type                       |
+| ---------- | ------------------------ | --------------- | -------------------------- |
+| Customer A | `customer-a@markaz.demo` | `Markaz!Demo1`  | CUSTOMER (`VERIFIED_DEMO`) |
+| Customer B | `customer-b@markaz.demo` | `Markaz!Demo1`  | CUSTOMER (`VERIFIED_DEMO`) |
+| Admin      | `admin@markaz.demo`      | `Markaz!Admin1` | ADMIN                      |
 
 These are **local-only** credentials. Provision them with
 `pnpm supabase:reset && pnpm db:setup`. Both customers are seeded `VERIFIED_DEMO`
@@ -101,7 +101,7 @@ real email/password flow.
   `supabase/templates/` and are wired in `supabase/config.toml`: `confirmation.html`
   carries the **code** (`{{ .Token }}`); `recovery.html` carries the **link**
   (`{{ .RedirectTo }}/auth/confirm?token_hash=…&type=recovery`). A **recovery**
-  email containing a link is **correct** — only a *verification* email should show
+  email containing a link is **correct** — only a _verification_ email should show
   a code. Restart the stack and request a **fresh** email after editing templates.
 - **"Email not confirmed" on sign-in** — verify the account first (the app routes
   you to verify-email); read the `confirmation` code from the inbox.

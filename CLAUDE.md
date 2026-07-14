@@ -3,6 +3,7 @@
 Guidance for Claude Code working in this repo. Read before making changes.
 
 ## What this is
+
 UAE (Dubai-first) property marketplace prototype. Real engineering; only the
 regulated integrations (UAE PASS, DLD, Trakheesi, payment) are **simulated** —
 behind named interfaces, with persisted outcomes. This repo is the **Week 1
@@ -12,7 +13,8 @@ transactions are **later milestones — do not build them unless asked.**
 Monorepo root is `markaz-home-prototype/`. Run all commands from there.
 
 ## Hard product rules (do not violate)
-- **Two account types only:** `CUSTOMER` and `ADMIN`. Buyer/Seller are *journeys*,
+
+- **Two account types only:** `CUSTOMER` and `ADMIN`. Buyer/Seller are _journeys_,
   not roles. Every CUSTOMER can both buy and sell. **No** buyer/seller selection
   screen, **no** per-journey route guards.
 - **Admin is a separate app** (`apps/admin`, port 3001). The customer app
@@ -32,7 +34,7 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   verify success, recovery-sent, password-updated, signed-out, session-expired, error
   panels), and the Operations shell for admin. Reuse `components/auth/*`.
 - **Routing gates on email verification first**: `resolvePostAuthDestination({
-  emailVerified, profile })` → verify-email → profile-setup (fallback) → uae-pass
+emailVerified, profile })` → verify-email → profile-setup (fallback) → uae-pass
   → dashboard; unverified/incomplete customers never reach the dashboard.
   `requireCustomerStep` enforces it server-side.
 - **No public admin sign-up.** Admins are created **only** by the env-driven admin
@@ -54,6 +56,7 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   generic message.
 
 ## Architecture you must preserve
+
 - **RLS is the security boundary.** Client/route guards are UX only.
 - **Authenticated-user context → queries (the key pattern):**
   `packages/db/src/rls-context.ts` `withUserContext()` opens a transaction, sets
@@ -75,12 +78,12 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   only if you want an admin). Idempotent. See ADR-0003 / ADR-0009.
 - **Realtime connects directly to the DB**, never behind a pooler (ADR-0005).
 - **i18n:** all user-facing copy goes through `next-intl` (`packages/i18n/messages/
-  {en,ar}.json`). Support RTL via logical CSS properties + the `dir` attribute.
+{en,ar}.json`). Support RTL via logical CSS properties + the `dir` attribute.
   Don't hardcode strings or left/right. Arabic legal/transactional copy is
   unreviewed — flag it, don't claim it's approved.
 - **Design tokens** live in `packages/ui/src/styles/globals.css` and implement the
   approved **MARKAZ "Architectural Blue" foundation** (`docs/design/
-  markaz-design-foundation.md`): brand blue scale (`brand-900…100`), Clear Blue
+markaz-design-foundation.md`): brand blue scale (`brand-900…100`), Clear Blue
   primary, Cool Off-White canvas, Manrope (interface) + Source Serif 4 (display,
   use `font-display` for hero/public headings), 10px radius, minimal shadows. The
   admin portal uses the dark-blue sidebar. Don't scatter one-off colors/spacing;
@@ -88,6 +91,7 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   (~65–75% white/off-white).
 
 ## Auth flow architecture (routes, layouts, sessions — keep it stable)
+
 - **Route groups + persistent chrome.** Auth/onboarding screens live under
   `apps/web/src/app/[locale]/(auth)/` with a **shared layout** that renders the
   chrome ONCE (header + language switcher + footer; admin: the deep-blue Operations
@@ -108,6 +112,7 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   `[locale]`) verify the token. Middleware excludes `/auth` from locale routing.
 
 ## Layout
+
 ```
 apps/{web,admin,worker}        web=customer/public, admin=separate, worker=placeholder
 packages/{config,ui,i18n,domain,db,auth,api,realtime,observability}
@@ -115,17 +120,21 @@ supabase/{migrations,seed.sql,config.toml,templates}
 docs/{adr,architecture,runbooks}   infra/ = boundary contracts only (no real AWS)
 tests/integration              RLS + storage gates (need the stack running)
 ```
+
 Path alias `@/*` → `src/*` in each app. Internal deps use `workspace:*`.
 
 ## Commands
+
 ```
 pnpm dev | build | lint | typecheck | test | test:e2e
 pnpm db:generate | db:migrate | db:seed | db:setup
 pnpm supabase:start | supabase:stop | supabase:reset | supabase:status
 ```
+
 Before declaring work done, run: `pnpm typecheck && pnpm lint && pnpm test && pnpm build`.
 
 ## Conventions
+
 - TypeScript strict; prefer `type`-only imports; no `any` (warn-enforced).
 - Server-only modules import `server-only`; never leak secrets to client bundles.
 - Every async screen needs intentional loading / empty / error states (no white
@@ -135,12 +144,13 @@ Before declaring work done, run: `pnpm typecheck && pnpm lint && pnpm test && pn
 - tRPC routers live in `packages/api/src/routers`. Keep the procedure tiers.
 
 ## Local-dev gotchas (learned the hard way)
+
 - Docker **engine** must be running or `supabase:start` hangs (`docker ps` hangs
   too). Newer Supabase CLIs use **Mailpit** (not Inbucket) at :54324 and the new
   **`sb_publishable_` / `sb_secret_`** key format — map them to
   `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY`.
 - Email templates are split by purpose (wired in `config.toml
-  [auth.email.template.*]`): `confirmation.html` forces the **6-digit code**
+[auth.email.template.*]`): `confirmation.html` forces the **6-digit code**
   (`{{ .Token }}`) for new-account verification; `recovery.html` forces the
   **official recovery link** (`{{ .RedirectTo }}/auth/confirm?token_hash=…&type=recovery`)
   for Forgot/Reset password. `enable_confirmations = true`. Changing templates
@@ -149,6 +159,7 @@ Before declaring work done, run: `pnpm typecheck && pnpm lint && pnpm test && pn
 - `.env` lives at the repo root; both apps load it via `dotenv` in `next.config.mjs`.
 
 ## Listing journey (Week 2 — built)
+
 The customer listing wizard `DRAFT → READY_TO_PUBLISH` is implemented under
 `apps/web/[locale]/(app)/sell/*` (My Listings + 9 steps + ready + owner preview),
 backed by `packages/api` `listing` router + `services/simulation.ts`, domain logic
@@ -161,6 +172,7 @@ readiness is server-computed (ADR-0010). Draft photos use the **private**
 `listing-storage.md`.
 
 ## Publication + marketplace (Week 3 — built)
+
 `READY_TO_PUBLISH → simulated review → LIVE` (then `LIVE ↔ PAUSED`) plus a public
 customer marketplace. Review is a **separate** `listing_publication_requests` table
 (NOT a listing-enum state). **Publication is an idempotent, compensated workflow —
@@ -191,8 +203,9 @@ non-material live edits per §17.4. See `WEEK-3.md`, `docs/design/publication-de
 `docs/architecture/{marketplace,public-listing-projection,publication-flow,listing-storage}.md`.
 
 ## Offers + negotiation (Week 4 — built)
+
 A complete, **non-binding** buyer-offer / seller-offer-management journey between
-`CUSTOMER`s on `LIVE` listings (Buyer/Seller stay *journeys*, not roles). One **thread per
+`CUSTOMER`s on `LIVE` listings (Buyer/Seller stay _journeys_, not roles). One **thread per
 (buyer, listing)** holds an **immutable chronological sequence of proposals** with an
 explicit `next_actor`; counters create new proposal rows — never overwrite. Migration
 `…0804` **replaced** the Week-1 flat `offers`/`counter_offers` stub (ADR-0014) with
@@ -220,6 +233,7 @@ handoff only** — no transaction/payment/legal/contact UI. See `WEEK-4.md`,
 offer-realtime,offer-security}.md`, ADR-0014…0018.
 
 ## Transactions (Week 5 — built)
+
 A **shared, simulated** transaction workspace on an accepted offer. Everything regulated is
 SIMULATED — **no** real payment/escrow/contract/DLD. Migrations `…0808`–`…0811`
 **superseded** the empty Week-1 placeholder (ADR-0019; it had a broken `offer_id → offers` FK)
@@ -248,13 +262,14 @@ API/control, Playwright E2E, axe. See `WEEK-5.md`, `docs/design/transaction-trac
 `docs/architecture/transactions.md`, ADR-0019…0023.
 
 ## Admin portal & operational controls (Week 6 — built)
+
 The **separate** operations portal (`apps/admin`, port 3001) where a single ADMIN oversees
 and, where necessary, **recovers** the marketplace — **never acting as a customer**. Customer
 workflows were **not** redesigned; the admin app reads the same canonical tables through
 **admin RLS** (`public.is_admin()`) and writes **only** through `is_admin()`-gated
 `SECURITY DEFINER` functions. **16 server-authoritative capabilities** (`packages/domain/src/
 admin.ts`); the tRPC tier `adminCapabilityProcedure(cap)` throws `CAPABILITY_REQUIRED` — the UI
-only *reflects* capability, it is never the gate. **Every mutation is capability-gated →
+only _reflects_ capability, it is never the gate. **Every mutation is capability-gated →
 closed reason-enum (no free-text authority, no hidden default) → SECURITY DEFINER fn that
 re-derives the actor from `auth.uid()`, validates state, writes an `audit_events` row.** Actions
 (migrations `…0812`/`…0813`): restrict/restore customer, pause/resume listing, approve
@@ -270,7 +285,7 @@ identity stay guarded (Week-4/5 triggers); **`audit_events` is immutable at the 
 document metadata with **no storage path**; raw enums never render (client maps to i18n key +
 tone). **Private-document access** needs a second capability + purpose + acknowledgement; the audit
 is a truthful **lifecycle** (`…0815`): `ADMIN_DOCUMENT_ACCESS_REQUESTED` before a 300s signed URL is
-minted → `GRANTED`/`FAILED` by outcome (the proc *returns* not throws on failure so FAILED commits;
+minted → `GRANTED`/`FAILED` by outcome (the proc _returns_ not throws on failure so FAILED commits;
 URL/path never recorded). **Live queues**: `useAdminQueueChannel` refetches dashboard metrics on
 `listing_publication_requests`/`transactions` changes (payload never trusted; RLS-scoped). UI:
 `apps/admin/[locale]/(portal)`, 8 fixed nav areas = 15 operational routes (Overview + 7 areas ×
@@ -286,6 +301,7 @@ low-RAM Docker. See `WEEK-6.md`, `docs/design/admin-portal-design-spec.md`,
 `docs/architecture/admin-portal.md`, ADR-0024…0029.
 
 ## Out of scope (next milestone+)
+
 Durable jobs, any AWS provisioning,
 real DLD/Trakheesi/Madmoun/payment integrations, free-form messaging/chat, contact
 exchange, email/SMS/push delivery, map search, the demo-auth fallback (disabled by default

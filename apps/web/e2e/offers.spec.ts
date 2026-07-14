@@ -24,7 +24,10 @@ test.beforeAll(async () => {
   seller = await createCustomer('seller');
   buyer = await createCustomer('buyer');
   buyer2 = await createCustomer('buyer2');
-  listing = await createLiveListing(seller.id, { askingPrice: 2_000_000, minNotificationPrice: 1_800_000 });
+  listing = await createLiveListing(seller.id, {
+    askingPrice: 2_000_000,
+    minNotificationPrice: 1_800_000,
+  });
 });
 
 test.afterAll(async () => {
@@ -54,7 +57,9 @@ test('full negotiation → seller accepts → Under Offer → Week 5 handoff', a
   // Buyer sees the accepted state + Week-5 handoff, and NO transaction UI.
   await openFirstThread(bp, 'made');
   await expect(bp.getByText('Offer accepted').first()).toBeVisible();
-  await expect(bp.getByRole('button', { name: /Pay deposit|Create transaction|Upload MOU/i })).toHaveCount(0);
+  await expect(
+    bp.getByRole('button', { name: /Pay deposit|Create transaction|Upload MOU/i }),
+  ).toHaveCount(0);
 
   // New offers are blocked — a different buyer sees the listing is under offer
   // (authoritative eligibility, derived from the accepted thread).
@@ -69,7 +74,9 @@ test('full negotiation → seller accepts → Under Offer → Week 5 handoff', a
   await sellerCtx.close();
 });
 
-test('anonymous Make-an-Offer intercepts to sign-in and returns to the same property', async ({ page }) => {
+test('anonymous Make-an-Offer intercepts to sign-in and returns to the same property', async ({
+  page,
+}) => {
   test.skip(skip, 'full stack required');
   await page.goto(`/en/properties/${listing.publicId}/${listing.slug}`);
   await page.getByRole('button', { name: 'Make an offer' }).click();
@@ -84,9 +91,14 @@ test('owner cannot make an offer on their own listing', async ({ page }) => {
   await expect(page.getByText(/your listing|cannot make an offer/i)).toBeVisible();
 });
 
-test('below-threshold offer appears in the seller inbox without a prominent notification', async ({ browser }) => {
+test('below-threshold offer appears in the seller inbox without a prominent notification', async ({
+  browser,
+}) => {
   test.skip(skip, 'full stack required');
-  const l = await createLiveListing(seller.id, { askingPrice: 2_000_000, minNotificationPrice: 1_800_000 });
+  const l = await createLiveListing(seller.id, {
+    askingPrice: 2_000_000,
+    minNotificationPrice: 1_800_000,
+  });
   const bp = await (await browser.newContext()).newPage();
   await signIn(bp, buyer2);
   await makeOffer(bp, l, 1_500_000); // below threshold

@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { toTransactionDetail, type TxRow, type TaskRow, type DocRow } from '../transaction-projection';
+import {
+  toTransactionDetail,
+  type TxRow,
+  type TaskRow,
+  type DocRow,
+} from '../transaction-projection';
 
 const BUYER = 'b0000000-0000-0000-0000-000000000000';
 const SELLER = 's0000000-0000-0000-0000-000000000000';
@@ -31,9 +36,33 @@ const row = (over: Partial<TxRow> = {}): TxRow => ({
 });
 
 const tasks: TaskRow[] = [
-  { code: 'BUYER_DOCUMENTS', stage: 'DOCUMENTS', sequence: 30, assignedActor: 'BUYER', required: true, status: 'ACTION_REQUIRED', completedAt: null },
-  { code: 'SELLER_DOCUMENTS', stage: 'DOCUMENTS', sequence: 31, assignedActor: 'SELLER', required: true, status: 'COMPLETED_DEMO', completedAt: new Date() },
-  { code: 'BUYER_FINANCING', stage: 'DOCUMENTS', sequence: 32, assignedActor: 'BUYER', required: false, status: 'SKIPPED', completedAt: null },
+  {
+    code: 'BUYER_DOCUMENTS',
+    stage: 'DOCUMENTS',
+    sequence: 30,
+    assignedActor: 'BUYER',
+    required: true,
+    status: 'ACTION_REQUIRED',
+    completedAt: null,
+  },
+  {
+    code: 'SELLER_DOCUMENTS',
+    stage: 'DOCUMENTS',
+    sequence: 31,
+    assignedActor: 'SELLER',
+    required: true,
+    status: 'COMPLETED_DEMO',
+    completedAt: new Date(),
+  },
+  {
+    code: 'BUYER_FINANCING',
+    stage: 'DOCUMENTS',
+    sequence: 32,
+    assignedActor: 'BUYER',
+    required: false,
+    status: 'SKIPPED',
+    completedAt: null,
+  },
 ];
 
 const buyerDoc: DocRow = {
@@ -73,15 +102,39 @@ describe('transaction projection privacy (§42)', () => {
   });
 
   it('never leaks participant user ids in the DTO', () => {
-    const view = toTransactionDetail({ row: row(), userId: BUYER, property: null, tasks, events: [], ownDocuments: [], otherDocuments: [] });
+    const view = toTransactionDetail({
+      row: row(),
+      userId: BUYER,
+      property: null,
+      tasks,
+      events: [],
+      ownDocuments: [],
+      otherDocuments: [],
+    });
     const json = JSON.stringify(view);
     expect(json).not.toContain(BUYER);
     expect(json).not.toContain(SELLER);
   });
 
   it('is perspective-aware: buyer vs seller see the same facts, own actions', () => {
-    const buyerView = toTransactionDetail({ row: row(), userId: BUYER, property: null, tasks, events: [], ownDocuments: [], otherDocuments: [] });
-    const sellerView = toTransactionDetail({ row: row(), userId: SELLER, property: null, tasks, events: [], ownDocuments: [], otherDocuments: [] });
+    const buyerView = toTransactionDetail({
+      row: row(),
+      userId: BUYER,
+      property: null,
+      tasks,
+      events: [],
+      ownDocuments: [],
+      otherDocuments: [],
+    });
+    const sellerView = toTransactionDetail({
+      row: row(),
+      userId: SELLER,
+      property: null,
+      tasks,
+      events: [],
+      ownDocuments: [],
+      otherDocuments: [],
+    });
     expect(buyerView.perspective).toBe('BUYER');
     expect(sellerView.perspective).toBe('SELLER');
     expect(buyerView.acceptedAmountAed).toBe(sellerView.acceptedAmountAed);
@@ -91,14 +144,26 @@ describe('transaction projection privacy (§42)', () => {
   });
 
   it('omits skipped tasks and computes progress on required non-skipped tasks', () => {
-    const view = toTransactionDetail({ row: row(), userId: BUYER, property: null, tasks, events: [], ownDocuments: [], otherDocuments: [] });
+    const view = toTransactionDetail({
+      row: row(),
+      userId: BUYER,
+      property: null,
+      tasks,
+      events: [],
+      ownDocuments: [],
+      otherDocuments: [],
+    });
     expect(view.tasks.find((t) => t.code === 'BUYER_FINANCING')).toBeUndefined();
     expect(view.progress).toEqual({ completed: 1, total: 2, ratio: 0.5 });
   });
 
   it('exposes a cancellation summary with the requester side (no user id)', () => {
     const view = toTransactionDetail({
-      row: row({ status: 'CANCELLATION_PENDING', cancellationRequestedBy: BUYER, cancellationReason: 'BUYER_UNABLE' }),
+      row: row({
+        status: 'CANCELLATION_PENDING',
+        cancellationRequestedBy: BUYER,
+        cancellationReason: 'BUYER_UNABLE',
+      }),
       userId: SELLER,
       property: null,
       tasks,
@@ -106,6 +171,10 @@ describe('transaction projection privacy (§42)', () => {
       ownDocuments: [],
       otherDocuments: [],
     });
-    expect(view.cancellation).toEqual({ reason: 'BUYER_UNABLE', requestedBySide: 'BUYER', pending: true });
+    expect(view.cancellation).toEqual({
+      reason: 'BUYER_UNABLE',
+      requestedBySide: 'BUYER',
+      pending: true,
+    });
   });
 });

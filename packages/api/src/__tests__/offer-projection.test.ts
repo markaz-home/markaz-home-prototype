@@ -58,7 +58,12 @@ describe('offer projection privacy (§37)', () => {
   });
 
   it('above-threshold classification', () => {
-    const v = toSellerThread({ thread, current: { ...current, amountAed: 2_500_000 }, property, minNotificationPrice: 2_300_000 });
+    const v = toSellerThread({
+      thread,
+      current: { ...current, amountAed: 2_500_000 },
+      property,
+      minNotificationPrice: 2_300_000,
+    });
     expect(v.threshold).toBe('AT_OR_ABOVE');
   });
 

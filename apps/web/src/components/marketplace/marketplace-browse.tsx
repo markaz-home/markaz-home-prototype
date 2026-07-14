@@ -11,8 +11,21 @@ import type { RouterInputs } from '@/trpc/types';
 import { PropertyCard } from './property-card';
 
 const PARAM_KEYS = [
-  'q', 'type', 'emirate', 'area', 'minPrice', 'maxPrice', 'beds', 'baths',
-  'minSize', 'maxSize', 'furnishing', 'completion', 'investmentCase', 'sort', 'page',
+  'q',
+  'type',
+  'emirate',
+  'area',
+  'minPrice',
+  'maxPrice',
+  'beds',
+  'baths',
+  'minSize',
+  'maxSize',
+  'furnishing',
+  'completion',
+  'investmentCase',
+  'sort',
+  'page',
 ] as const;
 
 const PROPERTY_TYPES = ['APARTMENT', 'VILLA', 'TOWNHOUSE', 'PENTHOUSE'] as const;
@@ -21,12 +34,21 @@ const BATHS = ['1', '2', '3', '4'] as const;
 const FURNISHINGS = ['FURNISHED', 'UNFURNISHED', 'PARTLY_FURNISHED'] as const;
 const COMPLETIONS = ['READY', 'OFF_PLAN'] as const;
 const SORTS = [
-  ['NEWEST', 'newest'], ['PRICE_ASC', 'priceLow'], ['PRICE_DESC', 'priceHigh'], ['SIZE_DESC', 'sizeLarge'],
+  ['NEWEST', 'newest'],
+  ['PRICE_ASC', 'priceLow'],
+  ['PRICE_DESC', 'priceHigh'],
+  ['SIZE_DESC', 'sizeLarge'],
 ] as const;
 
 const selectCls = 'h-10 w-full rounded-md border border-input bg-background px-3 text-sm';
 
-export function MarketplaceBrowse({ isAuthenticated, scope }: { isAuthenticated: boolean; scope: 'uae' | 'dubai' }) {
+export function MarketplaceBrowse({
+  isAuthenticated,
+  scope,
+}: {
+  isAuthenticated: boolean;
+  scope: 'uae' | 'dubai';
+}) {
   const sp = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -52,8 +74,12 @@ export function MarketplaceBrowse({ isAuthenticated, scope }: { isAuthenticated:
     staleTime: 0,
     placeholderData: (prev) => prev,
   });
-  const savedIds = trpc.marketplace.saved.publicIds.useQuery(undefined, { enabled: isAuthenticated });
-  const ownedIds = trpc.marketplace.myLivePublicIds.useQuery(undefined, { enabled: isAuthenticated });
+  const savedIds = trpc.marketplace.saved.publicIds.useQuery(undefined, {
+    enabled: isAuthenticated,
+  });
+  const ownedIds = trpc.marketplace.myLivePublicIds.useQuery(undefined, {
+    enabled: isAuthenticated,
+  });
   const savedSet = useMemo(() => new Set(savedIds.data ?? []), [savedIds.data]);
   const ownedSet = useMemo(() => new Set(ownedIds.data ?? []), [ownedIds.data]);
 
@@ -78,14 +104,32 @@ export function MarketplaceBrowse({ isAuthenticated, scope }: { isAuthenticated:
 
   // Active filter chips (search excluded — it has its own clear control).
   const chips: Array<{ key: string; label: string }> = [];
-  if (query.type) chips.push({ key: 'type', label: tf(`type${titleCase(query.type)}` as 'typeApartment') });
-  if (query.beds) chips.push({ key: 'beds', label: query.beds === 'studio' ? tf('studio') : tf('bedsOption', { count: query.beds }) });
+  if (query.type)
+    chips.push({ key: 'type', label: tf(`type${titleCase(query.type)}` as 'typeApartment') });
+  if (query.beds)
+    chips.push({
+      key: 'beds',
+      label: query.beds === 'studio' ? tf('studio') : tf('bedsOption', { count: query.beds }),
+    });
   if (query.baths) chips.push({ key: 'baths', label: `${query.baths}+ ${tf('bathrooms')}` });
   if (query.area) chips.push({ key: 'area', label: query.area });
-  if (query.minPrice || query.maxPrice) chips.push({ key: 'price', label: `AED ${query.minPrice ?? '0'}–${query.maxPrice ?? '∞'}` });
-  if (query.minSize || query.maxSize) chips.push({ key: 'size', label: `${query.minSize ?? '0'}–${query.maxSize ?? '∞'} ${tf('sizeSuffix')}` });
-  if (query.furnishing) chips.push({ key: 'furnishing', label: tf(`furnishing${query.furnishing}` as 'furnishingFURNISHED') });
-  if (query.completion) chips.push({ key: 'completion', label: tf(`completion${query.completion}` as 'completionREADY') });
+  if (query.minPrice || query.maxPrice)
+    chips.push({ key: 'price', label: `AED ${query.minPrice ?? '0'}–${query.maxPrice ?? '∞'}` });
+  if (query.minSize || query.maxSize)
+    chips.push({
+      key: 'size',
+      label: `${query.minSize ?? '0'}–${query.maxSize ?? '∞'} ${tf('sizeSuffix')}`,
+    });
+  if (query.furnishing)
+    chips.push({
+      key: 'furnishing',
+      label: tf(`furnishing${query.furnishing}` as 'furnishingFURNISHED'),
+    });
+  if (query.completion)
+    chips.push({
+      key: 'completion',
+      label: tf(`completion${query.completion}` as 'completionREADY'),
+    });
   if (query.investmentCase) chips.push({ key: 'investmentCase', label: tf('investment') });
 
   function removeChip(key: string) {
@@ -96,12 +140,14 @@ export function MarketplaceBrowse({ isAuthenticated, scope }: { isAuthenticated:
 
   return (
     <div className="container max-w-[1360px] py-8">
-      <h1 className="font-display text-3xl font-semibold">{scope === 'dubai' ? t('titleDubai') : t('titleUae')}</h1>
-      <p className="mt-2 max-w-2xl text-muted-foreground">{t('description')}</p>
+      <h1 className="font-display text-3xl font-semibold">
+        {scope === 'dubai' ? t('titleDubai') : t('titleUae')}
+      </h1>
+      <p className="text-muted-foreground mt-2 max-w-2xl">{t('description')}</p>
 
       <Alert className="mt-4">
         <p className="font-medium">{t('prototypeTitle')}</p>
-        <p className="text-sm text-muted-foreground">{t('prototypeBody')}</p>
+        <p className="text-muted-foreground text-sm">{t('prototypeBody')}</p>
       </Alert>
 
       {/* Search */}
@@ -113,7 +159,9 @@ export function MarketplaceBrowse({ isAuthenticated, scope }: { isAuthenticated:
         }}
       >
         <div className="relative flex-1">
-          <label htmlFor="mkt-search" className="sr-only">{t('searchLabel')}</label>
+          <label htmlFor="mkt-search" className="sr-only">
+            {t('searchLabel')}
+          </label>
           <input
             id="mkt-search"
             type="search"
@@ -121,14 +169,17 @@ export function MarketplaceBrowse({ isAuthenticated, scope }: { isAuthenticated:
             maxLength={100}
             onChange={(e) => setSearchText(e.target.value)}
             placeholder={t('searchPlaceholder')}
-            className="h-11 w-full rounded-md border border-input bg-background px-3 pe-10 text-sm"
+            className="border-input bg-background h-11 w-full rounded-md border px-3 pe-10 text-sm"
           />
           {searchText && (
             <button
               type="button"
               aria-label={t('clearSearch')}
-              onClick={() => { setSearchText(''); update({ q: null }); }}
-              className="absolute end-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
+              onClick={() => {
+                setSearchText('');
+                update({ q: null });
+              }}
+              className="text-muted-foreground hover:text-foreground absolute end-2 top-1/2 -translate-y-1/2 rounded p-1"
             >
               <X className="h-4 w-4" />
             </button>
@@ -140,66 +191,142 @@ export function MarketplaceBrowse({ isAuthenticated, scope }: { isAuthenticated:
       {/* Primary filters */}
       <div className="mt-4 flex flex-wrap items-end gap-3">
         <Field label={tf('propertyType')}>
-          <select className={selectCls} value={query.type ?? ''} onChange={(e) => update({ type: e.target.value || null })}>
+          <select
+            className={selectCls}
+            value={query.type ?? ''}
+            onChange={(e) => update({ type: e.target.value || null })}
+          >
             <option value="">{tf('any')}</option>
-            {PROPERTY_TYPES.map((v) => <option key={v} value={v}>{tf(`type${titleCase(v)}` as 'typeApartment')}</option>)}
+            {PROPERTY_TYPES.map((v) => (
+              <option key={v} value={v}>
+                {tf(`type${titleCase(v)}` as 'typeApartment')}
+              </option>
+            ))}
           </select>
         </Field>
         <Field label={tf('bedrooms')}>
-          <select className={selectCls} value={query.beds ?? ''} onChange={(e) => update({ beds: e.target.value || null })}>
+          <select
+            className={selectCls}
+            value={query.beds ?? ''}
+            onChange={(e) => update({ beds: e.target.value || null })}
+          >
             <option value="">{tf('any')}</option>
             <option value="studio">{tf('studio')}</option>
-            {BEDS.filter((b) => b !== 'studio').map((v) => <option key={v} value={v}>{tf('bedsOption', { count: v })}</option>)}
+            {BEDS.filter((b) => b !== 'studio').map((v) => (
+              <option key={v} value={v}>
+                {tf('bedsOption', { count: v })}
+              </option>
+            ))}
           </select>
         </Field>
         <Field label={tf('minimumPrice')}>
-          <input type="number" inputMode="numeric" min={0} className={selectCls} defaultValue={query.minPrice ?? ''}
-            onBlur={(e) => update({ minPrice: e.target.value || null })} />
+          <input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            className={selectCls}
+            defaultValue={query.minPrice ?? ''}
+            onBlur={(e) => update({ minPrice: e.target.value || null })}
+          />
         </Field>
         <Field label={tf('maximumPrice')}>
-          <input type="number" inputMode="numeric" min={0} className={selectCls} defaultValue={query.maxPrice ?? ''}
-            onBlur={(e) => update({ maxPrice: e.target.value || null })} />
+          <input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            className={selectCls}
+            defaultValue={query.maxPrice ?? ''}
+            onBlur={(e) => update({ maxPrice: e.target.value || null })}
+          />
         </Field>
         <Field label={tf('community')}>
-          <input className={selectCls} defaultValue={query.area ?? ''} placeholder={tf('communityPlaceholder')}
-            onBlur={(e) => update({ area: e.target.value || null })} />
+          <input
+            className={selectCls}
+            defaultValue={query.area ?? ''}
+            placeholder={tf('communityPlaceholder')}
+            onBlur={(e) => update({ area: e.target.value || null })}
+          />
         </Field>
-        <Button type="button" variant="outline" onClick={() => setMoreOpen((v) => !v)} aria-expanded={moreOpen}>
-          <SlidersHorizontal className="h-4 w-4 me-2" /> {tf('more')}
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setMoreOpen((v) => !v)}
+          aria-expanded={moreOpen}
+        >
+          <SlidersHorizontal className="me-2 h-4 w-4" /> {tf('more')}
         </Button>
       </div>
 
       {moreOpen && (
-        <div className="mt-4 grid gap-3 rounded-md border bg-card p-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="bg-card mt-4 grid gap-3 rounded-md border p-4 sm:grid-cols-2 lg:grid-cols-3">
           <Field label={tf('bathrooms')}>
-            <select className={selectCls} value={query.baths ?? ''} onChange={(e) => update({ baths: e.target.value || null })}>
+            <select
+              className={selectCls}
+              value={query.baths ?? ''}
+              onChange={(e) => update({ baths: e.target.value || null })}
+            >
               <option value="">{tf('any')}</option>
-              {BATHS.map((v) => <option key={v} value={v}>{tf('bedsOption', { count: v })}</option>)}
+              {BATHS.map((v) => (
+                <option key={v} value={v}>
+                  {tf('bedsOption', { count: v })}
+                </option>
+              ))}
             </select>
           </Field>
           <Field label={tf('minimumSize')}>
-            <input type="number" inputMode="numeric" min={0} className={selectCls} defaultValue={query.minSize ?? ''}
-              onBlur={(e) => update({ minSize: e.target.value || null })} />
+            <input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              className={selectCls}
+              defaultValue={query.minSize ?? ''}
+              onBlur={(e) => update({ minSize: e.target.value || null })}
+            />
           </Field>
           <Field label={tf('maximumSize')}>
-            <input type="number" inputMode="numeric" min={0} className={selectCls} defaultValue={query.maxSize ?? ''}
-              onBlur={(e) => update({ maxSize: e.target.value || null })} />
+            <input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              className={selectCls}
+              defaultValue={query.maxSize ?? ''}
+              onBlur={(e) => update({ maxSize: e.target.value || null })}
+            />
           </Field>
           <Field label={tf('furnishing')}>
-            <select className={selectCls} value={query.furnishing ?? ''} onChange={(e) => update({ furnishing: e.target.value || null })}>
+            <select
+              className={selectCls}
+              value={query.furnishing ?? ''}
+              onChange={(e) => update({ furnishing: e.target.value || null })}
+            >
               <option value="">{tf('any')}</option>
-              {FURNISHINGS.map((v) => <option key={v} value={v}>{tf(`furnishing${v}` as 'furnishingFURNISHED')}</option>)}
+              {FURNISHINGS.map((v) => (
+                <option key={v} value={v}>
+                  {tf(`furnishing${v}` as 'furnishingFURNISHED')}
+                </option>
+              ))}
             </select>
           </Field>
           <Field label={tf('completion')}>
-            <select className={selectCls} value={query.completion ?? ''} onChange={(e) => update({ completion: e.target.value || null })}>
+            <select
+              className={selectCls}
+              value={query.completion ?? ''}
+              onChange={(e) => update({ completion: e.target.value || null })}
+            >
               <option value="">{tf('any')}</option>
-              {COMPLETIONS.map((v) => <option key={v} value={v}>{tf(`completion${v}` as 'completionREADY')}</option>)}
+              {COMPLETIONS.map((v) => (
+                <option key={v} value={v}>
+                  {tf(`completion${v}` as 'completionREADY')}
+                </option>
+              ))}
             </select>
           </Field>
           <label className="flex items-center gap-2 pt-6 text-sm">
-            <input type="checkbox" checked={query.investmentCase === 'true'}
-              onChange={(e) => update({ investmentCase: e.target.checked ? 'true' : null })} />
+            <input
+              type="checkbox"
+              checked={query.investmentCase === 'true'}
+              onChange={(e) => update({ investmentCase: e.target.checked ? 'true' : null })}
+            />
             {tf('investment')}
           </label>
         </div>
@@ -209,19 +336,25 @@ export function MarketplaceBrowse({ isAuthenticated, scope }: { isAuthenticated:
       {chips.length > 0 && (
         <div className="mt-4 flex flex-wrap items-center gap-2">
           {chips.map((c) => (
-            <button key={c.key} type="button" onClick={() => removeChip(c.key)}
-              className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-sm text-secondary-foreground">
+            <button
+              key={c.key}
+              type="button"
+              onClick={() => removeChip(c.key)}
+              className="bg-secondary text-secondary-foreground inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm"
+            >
               {c.label}
               <X className="h-3 w-3" aria-label={tf('remove', { filter: c.label })} />
             </button>
           ))}
-          <Button type="button" variant="link" size="sm" onClick={clearAll}>{tf('clearAll')}</Button>
+          <Button type="button" variant="link" size="sm" onClick={clearAll}>
+            {tf('clearAll')}
+          </Button>
         </div>
       )}
 
       {/* Count + sort */}
       <div className="mt-6 flex items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground" aria-live="polite">
+        <p className="text-muted-foreground text-sm" aria-live="polite">
           {fetching
             ? t('updating')
             : data
@@ -233,10 +366,20 @@ export function MarketplaceBrowse({ isAuthenticated, scope }: { isAuthenticated:
               : ''}
         </p>
         <div className="flex items-center gap-2">
-          <label htmlFor="mkt-sort" className="text-sm text-muted-foreground">{ts('label')}</label>
-          <select id="mkt-sort" className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-            value={query.sort ?? 'NEWEST'} onChange={(e) => update({ sort: e.target.value })}>
-            {SORTS.map(([v, k]) => <option key={v} value={v}>{ts(k)}</option>)}
+          <label htmlFor="mkt-sort" className="text-muted-foreground text-sm">
+            {ts('label')}
+          </label>
+          <select
+            id="mkt-sort"
+            className="border-input bg-background h-10 rounded-md border px-3 text-sm"
+            value={query.sort ?? 'NEWEST'}
+            onChange={(e) => update({ sort: e.target.value })}
+          >
+            {SORTS.map(([v, k]) => (
+              <option key={v} value={v}>
+                {ts(k)}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -244,9 +387,18 @@ export function MarketplaceBrowse({ isAuthenticated, scope }: { isAuthenticated:
       {/* Results */}
       <div className="mt-4">
         {search.isLoading ? (
-          <Grid>{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="aspect-[4/3] w-full rounded-lg" />)}</Grid>
+          <Grid>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="aspect-[4/3] w-full rounded-lg" />
+            ))}
+          </Grid>
         ) : search.isError ? (
-          <ErrorState title={ter('marketplaceTitle')} description={ter('marketplaceBody')} retryLabel={ter('retry')} onRetry={() => search.refetch()} />
+          <ErrorState
+            title={ter('marketplaceTitle')}
+            description={ter('marketplaceBody')}
+            retryLabel={ter('retry')}
+            onRetry={() => search.refetch()}
+          />
         ) : data && data.items.length === 0 ? (
           <EmptyState
             title={te('resultsTitle')}
@@ -273,15 +425,21 @@ export function MarketplaceBrowse({ isAuthenticated, scope }: { isAuthenticated:
       {/* Pagination */}
       {data && data.pagination.totalPages > 1 && (
         <nav className="mt-8 flex items-center justify-center gap-4" aria-label="Pagination">
-          <Button variant="outline" disabled={!data.pagination.hasPrev}
-            onClick={() => update({ page: String(data.pagination.page - 1) }, false)}>
+          <Button
+            variant="outline"
+            disabled={!data.pagination.hasPrev}
+            onClick={() => update({ page: String(data.pagination.page - 1) }, false)}
+          >
             {t('previous')}
           </Button>
-          <span className="text-sm text-muted-foreground">
+          <span className="text-muted-foreground text-sm">
             {t('page', { page: data.pagination.page, total: data.pagination.totalPages })}
           </span>
-          <Button variant="outline" disabled={!data.pagination.hasNext}
-            onClick={() => update({ page: String(data.pagination.page + 1) }, false)}>
+          <Button
+            variant="outline"
+            disabled={!data.pagination.hasNext}
+            onClick={() => update({ page: String(data.pagination.page + 1) }, false)}
+          >
             {t('next')}
           </Button>
         </nav>
@@ -293,7 +451,7 @@ export function MarketplaceBrowse({ isAuthenticated, scope }: { isAuthenticated:
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex w-full flex-col gap-1 text-sm sm:w-40">
-      <span className="font-medium text-muted-foreground">{label}</span>
+      <span className="text-muted-foreground font-medium">{label}</span>
       {children}
     </label>
   );

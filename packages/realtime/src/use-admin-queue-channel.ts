@@ -33,8 +33,16 @@ export function useAdminQueueChannel(onChange?: () => void) {
 
     const channel = supabase
       .channel('admin-queues')
-      .on('postgres_changes', { event: '*', schema: 'public', table: REALTIME_TABLES.publicationRequests }, bump)
-      .on('postgres_changes', { event: '*', schema: 'public', table: REALTIME_TABLES.transactions }, bump)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: REALTIME_TABLES.publicationRequests },
+        bump,
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: REALTIME_TABLES.transactions },
+        bump,
+      )
       .subscribe((s) => {
         if (!active) return;
         if (s === 'SUBSCRIBED') {

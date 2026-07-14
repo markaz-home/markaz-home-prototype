@@ -52,7 +52,10 @@ export function NotificationsList() {
   }
 
   function Row({ n }: { n: Notification }) {
-    const when = format.dateTime(new Date(n.createdAt), { dateStyle: 'medium', timeStyle: 'short' });
+    const when = format.dateTime(new Date(n.createdAt), {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    });
     const body = (
       <span className="flex items-start gap-3">
         <span
@@ -63,7 +66,7 @@ export function NotificationsList() {
           <span dir="auto" className={n.read ? 'text-muted-foreground' : 'font-medium'}>
             {label(n.kind)}
           </span>
-          <time dateTime={n.createdAt} dir="ltr" className="text-xs text-muted-foreground">
+          <time dateTime={n.createdAt} dir="ltr" className="text-muted-foreground text-xs">
             {when}
           </time>
         </span>
@@ -118,7 +121,7 @@ export function NotificationsList() {
       {list.isLoading ? (
         <ul className="space-y-3" aria-hidden>
           {[0, 1, 2].map((i) => (
-            <li key={i} className="h-16 animate-pulse rounded-lg border bg-muted/40" />
+            <li key={i} className="bg-muted/40 h-16 animate-pulse rounded-lg border" />
           ))}
         </ul>
       ) : !list.data || list.data.length === 0 ? (

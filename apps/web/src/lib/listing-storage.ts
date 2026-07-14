@@ -61,7 +61,11 @@ export async function getSignedUrls(
   return map;
 }
 
-export async function removeObjects(supabase: SupabaseClient, bucket: string, paths: string[]): Promise<void> {
+export async function removeObjects(
+  supabase: SupabaseClient,
+  bucket: string,
+  paths: string[],
+): Promise<void> {
   if (paths.length === 0) return;
   await supabase.storage.from(bucket).remove(paths);
 }

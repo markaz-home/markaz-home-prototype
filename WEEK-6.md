@@ -2,24 +2,26 @@
 
 The separate **operations portal** (`apps/admin`, port 3001) that lets a single ADMIN
 oversee and, where necessary, recover the customer marketplace — **without ever acting
-as a customer**. Everything an admin can *do* is a narrow, reason-coded, audited,
+as a customer**. Everything an admin can _do_ is a narrow, reason-coded, audited,
 server-authoritative capability. Customer workflows were **not** redesigned; the admin
 app reads the same canonical tables through admin RLS and writes only through
 `SECURITY DEFINER` functions.
 
 ## Hard rules honoured (spec §1–§6)
+
 - **Two account types only** (`CUSTOMER`, `ADMIN`). No impersonation, no "act as buyer/seller",
   no admin-authored offers/listings/transactions.
 - **Immutable identity & history**: admins can never alter a proposal amount, an accepted
   offer, a transaction's immutable facts, or any `audit_events` row (grant-level immutability).
 - **Admin app stays separate** — the customer app exposes no admin route, link, or nav.
 - **Capabilities are server-authoritative** — the prototype ADMIN holds all 16, but every
-  procedure re-checks the capability server-side; the UI only *reflects* what the server allows.
+  procedure re-checks the capability server-side; the UI only _reflects_ what the server allows.
 - **No shared demo seed** — tests provision their own principals.
 
 ## What was built
 
 ### Phase A — Data & capability engine (migrations `…0812`, `…0813`)
+
 - **Restriction** is a two-state account flag (`ACTIVE` / `ACTIONS_RESTRICTED`) on `profiles`
   (`restricted_at`, `restriction_reason`, `restricted_by`), guarded by `guard_profile_restriction()`
   so only a `SECURITY DEFINER` admin function can set it. `is_restricted(uid)` is folded into
@@ -39,6 +41,7 @@ app reads the same canonical tables through admin RLS and writes only through
   action; `PROTOTYPE_ADMIN_CAPABILITIES` = all 16; `hasCapability` is the single check.
 
 ### Phase B — Admin API (`packages/api`)
+
 - `adminCapabilityProcedure(cap)` (`packages/api/src/trpc.ts`) → `FORBIDDEN 'CAPABILITY_REQUIRED'`.
 - `adminRouter` with 11 sub-routers (overview, search, customers, notes, listings, publication,
   verifications, offers, transactions, audit, documents) — reads via `ctx.tx` under admin RLS,
@@ -50,6 +53,7 @@ app reads the same canonical tables through admin RLS and writes only through
 - Document access records the audit event **before** minting a 300s signed URL.
 
 ### Phase C — Admin UI (`apps/admin`)
+
 - **8 fixed nav areas** (spec §8) = **15 operational routes** under `[locale]/(portal)` — Overview
   (1, no detail) + the 7 other areas × (list + detail) = 15 — plus the root `[locale]/page.tsx`
   redirect to `/overview` (16 page files total) and the separate `(auth)` routes.
@@ -63,18 +67,21 @@ app reads the same canonical tables through admin RLS and writes only through
   RTL logical properties + mirrored chevrons.
 
 ## Final routes (`apps/admin/[locale]/(portal)`)
+
 `/overview` · `/customers` `/customers/[customerId]` · `/listings` `/listings/[listingId]` ·
 `/publication` `/publication/[publicationRequestId]` · `/offers` `/offers/[offerThreadId]` ·
 `/transactions` `/transactions/[transactionId]` · `/verifications` `/verifications/[verificationId]` ·
 `/audit` `/audit/[auditEventId]`. Utilities: global search (header), language, admin account, sign-out.
 
 ## Capabilities (16, server-authoritative)
+
 `VIEW_OVERVIEW`, `VIEW_CUSTOMERS`, `MANAGE_CUSTOMER_STATUS`, `VIEW_LISTINGS`, `REVIEW_PUBLICATION`,
 `MANAGE_LISTING_AVAILABILITY`, `VIEW_OFFERS`, `CLOSE_INVALID_OFFER`, `VIEW_TRANSACTIONS`,
 `MANAGE_TRANSACTION_RECOVERY`, `VIEW_VERIFICATIONS`, `RETRY_SIMULATION`,
 `VIEW_PRIVATE_DOCUMENT_METADATA`, `ACCESS_PRIVATE_DOCUMENT`, `VIEW_AUDIT_LOGS`, `ADD_ADMIN_NOTES`.
 
 ## Tests & verification
+
 - **Integration (`tests/integration/admin.test.ts`, 10 tests)** — admin access + notes;
   restriction blocks new offers, `ALREADY_RESTRICTED`, restore; listing pause/resume; offer close
   keeps proposals immutable; transaction pause (`PROGRESSION_PAUSED`)/resume/mark-failed;
@@ -93,26 +100,29 @@ app reads the same canonical tables through admin RLS and writes only through
   review, transactions, audit) — **0 serious/critical violations**.
 
 ## Full-repository validation (whole monorepo, fresh stack 0100→0815)
+
 Run via the documented fresh-start approach (discard volume → `supabase start` → `db:setup`):
 
-| Command | Result |
-|---|---|
-| `pnpm typecheck` | **12/12 packages** ✅ |
-| `pnpm lint` | **11/11 packages** ✅ |
-| `pnpm test` | **258 tests, 0 failed, 0 skipped** (domain 106, web 54, integration 52, admin 21, api 14, i18n 6, auth 5; db has no test files) ✅ |
-| `pnpm build` | web (64 pages) + admin (36 pages) ✅ |
-| `pnpm db:setup` | env-driven admin bootstrap creates one ADMIN ✅ |
-| `pnpm test:e2e` | **36/36** — web **21** + admin **15**, 0 failed, 0 skipped ✅ |
+| Command          | Result                                                                                                                             |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm typecheck` | **12/12 packages** ✅                                                                                                              |
+| `pnpm lint`      | **11/11 packages** ✅                                                                                                              |
+| `pnpm test`      | **258 tests, 0 failed, 0 skipped** (domain 106, web 54, integration 52, admin 21, api 14, i18n 6, auth 5; db has no test files) ✅ |
+| `pnpm build`     | web (64 pages) + admin (36 pages) ✅                                                                                               |
+| `pnpm db:setup`  | env-driven admin bootstrap creates one ADMIN ✅                                                                                    |
+| `pnpm test:e2e`  | **36/36** — web **21** + admin **15**, 0 failed, 0 skipped ✅                                                                      |
 
-**E2E note:** the root `pnpm test:e2e` runs both apps' suites *concurrently* via turbo, which starts
+**E2E note:** the root `pnpm test:e2e` runs both apps' suites _concurrently_ via turbo, which starts
 two Next dev servers + two Chromium instances on top of the stack and can exhaust Docker Desktop's
 memory (≈7.6 GB here) — that manifested once as two flaky timeouts and a wedged daemon. Run the
 suites **serially** (web then admin) on a memory-constrained machine; both are then fully green.
 
 ## Bugs found by the E2E pass (and fixed)
+
 Running the suite end-to-end surfaced three real defects that unit/type checks could not:
+
 1. **`publication.returnForChanges` violated RLS** — it inserted the owner's notification through
-   the admin's own RLS-bound connection (a user may only insert their *own* notifications), rolling
+   the admin's own RLS-bound connection (a user may only insert their _own_ notifications), rolling
    the whole action back. Fixed by moving it into a `SECURITY DEFINER` function
    (`admin_return_publication`, migration `…0814`), matching every other admin action.
 2. **Missing enum i18n coverage crashed pages** — `offer_proposal_status` (`CURRENT`, `CLOSED`),
@@ -125,6 +135,7 @@ Running the suite end-to-end surfaced three real defects that unit/type checks c
    leaves the tab order correctly).
 
 ## Closure-pass corrections (post-review)
+
 1. **Private-document audit wording is now exact** (migration `…0815`, ADR-0027): the single
    pre-mint `ADMIN_PRIVATE_DOCUMENT_ACCESSED` event is replaced by an explicit lifecycle —
    `ADMIN_DOCUMENT_ACCESS_REQUESTED` (before mint) → `GRANTED` (mint ok) / `FAILED` (mint failed).
@@ -139,6 +150,7 @@ Running the suite end-to-end surfaced three real defects that unit/type checks c
    redirect (16 page files), not "16 routes".
 
 ## Known limitations
+
 - **Arabic copy is machine-draft** and must not be treated as reviewed (esp. any legal/operational
   wording).
 - The local Supabase CLI's `db reset` hangs on `DROP DATABASE` (a `pg_cron`/`pg_net` reconnect
@@ -147,6 +159,7 @@ Running the suite end-to-end surfaced three real defects that unit/type checks c
   run **serially** on a memory-constrained machine (see the E2E note above).
 
 ## Closure status
+
 **All phases A–E complete, executed, and green — closure pass done.** Full migration chain
 0100→**0815** applied on a fresh stack. Whole-monorepo evidence: **typecheck 12/12 · lint 11/11 ·
 258 unit/component/integration tests · web+admin build · db:setup · 36 E2E (web 21 + admin 15) + 5

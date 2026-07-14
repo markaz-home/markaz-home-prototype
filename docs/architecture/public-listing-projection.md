@@ -6,8 +6,8 @@ public and what is never public, and how the boundary is enforced twice.
 A listing's base tables (`properties`, `property_photos`, `investment_cases`,
 `listings`) mix public and **private** data. The marketplace must expose only the
 design-spec **§37 allowlist**. The boundary is enforced in **two layers** — the
-`marketplace_listings` view (what is *queryable*) and the explicit mappers (what is
-*returned*).
+`marketplace_listings` view (what is _queryable_) and the explicit mappers (what is
+_returned_).
 
 ## What IS public (the §37 allowlist)
 
@@ -80,7 +80,7 @@ contains no unit identifier, no owner id, and no `listing-photos-draft` path.
    private fields stripped, so a newly-added private column cannot leak by omission.
 
 Either layer alone is safe; together a new private column on a base table is
-inert until *both* the view and a mapper are deliberately extended to expose it.
+inert until _both_ the view and a mapper are deliberately extended to expose it.
 
 ## Why owner-only fields live outside the projection
 

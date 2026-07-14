@@ -149,7 +149,10 @@ export async function createLiveListing(
 }
 
 /** Assert a callback rejects with a message matching `matcher`. */
-export async function expectError(fn: () => Promise<unknown>, matcher: RegExp | string): Promise<void> {
+export async function expectError(
+  fn: () => Promise<unknown>,
+  matcher: RegExp | string,
+): Promise<void> {
   let threw = false;
   try {
     await fn();
@@ -165,7 +168,8 @@ export async function expectError(fn: () => Promise<unknown>, matcher: RegExp | 
 /** Remove everything this run created (auth.users cascade → profiles/threads/proposals/events). */
 export async function cleanup(): Promise<void> {
   await asService(async (tx) => {
-    if (createdListingIds.length) await tx`delete from public.listings where id in ${tx(createdListingIds)}`;
+    if (createdListingIds.length)
+      await tx`delete from public.listings where id in ${tx(createdListingIds)}`;
     if (createdUserIds.length) await tx`delete from auth.users where id in ${tx(createdUserIds)}`;
   });
   createdListingIds.length = 0;

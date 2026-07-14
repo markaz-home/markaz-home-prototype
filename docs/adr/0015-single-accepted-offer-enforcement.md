@@ -13,7 +13,7 @@ no partially-accepted state (offers-design-spec §6.2, Step 8).
 Defence in depth, both at the database:
 
 1. **Partial unique index** `uniq_accepted_thread_per_listing` on `offer_threads
-   (listing_id) WHERE status = 'ACCEPTED'` — the database refuses a second accepted thread.
+(listing_id) WHERE status = 'ACCEPTED'` — the database refuses a second accepted thread.
 2. **Controlled acceptance function** `accept_offer(thread, proposal, expected_version)`
    (`SECURITY DEFINER`): locks the listing row (`SELECT … FOR UPDATE`), re-reads, validates
    ownership + LIVE + availability + current/unexpired proposal + version, confirms no

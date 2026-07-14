@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, cn } from '@markaz/ui';
 export function Field({ label, value, ltr }: { label: string; value: ReactNode; ltr?: boolean }) {
   return (
     <div className="space-y-0.5">
-      <dt className="text-xs uppercase tracking-wide text-muted-foreground">{label}</dt>
+      <dt className="text-muted-foreground text-xs uppercase tracking-wide">{label}</dt>
       <dd className={cn('text-sm font-medium', ltr && 'font-mono')} dir={ltr ? 'ltr' : undefined}>
         {value ?? '—'}
       </dd>
@@ -39,7 +39,7 @@ export function DataSection({
           {visibility === 'private' ? (
             <Lock className="h-4 w-4 text-amber-700" aria-hidden />
           ) : visibility === 'public' ? (
-            <Globe className="h-4 w-4 text-brand-600" aria-hidden />
+            <Globe className="text-brand-600 h-4 w-4" aria-hidden />
           ) : null}
           {title}
         </CardTitle>

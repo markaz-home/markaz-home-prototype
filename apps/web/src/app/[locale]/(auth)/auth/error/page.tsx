@@ -12,7 +12,9 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   return (
     <AuthShell narrow>
       <ErrorPanel title={t('genericTitle')} description={t('genericBody')}>
-        <Button asChild className="mt-2"><Link href="/sign-in">{ta('tryAgain')}</Link></Button>
+        <Button asChild className="mt-2">
+          <Link href="/sign-in">{ta('tryAgain')}</Link>
+        </Button>
       </ErrorPanel>
     </AuthShell>
   );

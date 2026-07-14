@@ -50,7 +50,11 @@ export function useAutosave(listingId: string, initialVersion: number) {
     pending.current = null;
     setState('saving');
     try {
-      const res = await saveRef.current.mutateAsync({ listingId, version: versionRef.current, ...payload });
+      const res = await saveRef.current.mutateAsync({
+        listingId,
+        version: versionRef.current,
+        ...payload,
+      });
       versionRef.current = res.version;
       setState('saved');
     } catch {

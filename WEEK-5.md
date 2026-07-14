@@ -3,7 +3,7 @@
 Week 5 adds a **shared, secure, simulated transaction workspace** where the buyer and
 seller of an accepted offer track a prototype property transaction from acceptance to a
 demo completion or cancellation. Everything regulated is **simulated** — no real payment,
-escrow, contract, or DLD transfer. Buyer and Seller remain *journeys* of one `CUSTOMER`
+escrow, contract, or DLD transfer. Buyer and Seller remain _journeys_ of one `CUSTOMER`
 account.
 
 Governing design: `docs/design/transaction-tracker-design-spec.md`. Decisions: ADR-0019…0023.
@@ -54,9 +54,9 @@ to ignore cancelled transactions (spec §31).
 
 ## Final routes
 
-| Route | Who | Purpose |
-|---|---|---|
-| `/[locale]/transactions` | participant | My Transactions dashboard |
+| Route                                            | Who         | Purpose                            |
+| ------------------------------------------------ | ----------- | ---------------------------------- |
+| `/[locale]/transactions`                         | participant | My Transactions dashboard          |
 | `/[locale]/transactions/[transactionId]?focus=…` | participant | Shared perspective-aware workspace |
 
 One shared route; sub-steps are `?focus=` anchors, not separate paths (spec §13).
@@ -138,15 +138,15 @@ document content/paths/identity logged.
 
 ## Tests and exact totals
 
-| Layer | Count | Status |
-|---|---|---|
-| Unit (domain, incl. transaction + notification) | 101 | ✅ |
-| Unit (api projection, incl. 5 transaction-privacy) | 9 | ✅ |
-| Component (web, incl. 5 transactions) | 54 | ✅ |
-| **Integration (live DB) — transactions** | **13** | ✅ |
-| Integration (live DB) — offers (Week 4, preserved) | 29 | ✅ |
-| **E2E (Playwright) — transactions** | **5** | ✅ executed |
-| **Accessibility (axe) — transactions** | **5 scans** | ✅ 0 serious/critical |
+| Layer                                              | Count       | Status                |
+| -------------------------------------------------- | ----------- | --------------------- |
+| Unit (domain, incl. transaction + notification)    | 101         | ✅                    |
+| Unit (api projection, incl. 5 transaction-privacy) | 9           | ✅                    |
+| Component (web, incl. 5 transactions)              | 54          | ✅                    |
+| **Integration (live DB) — transactions**           | **13**      | ✅                    |
+| Integration (live DB) — offers (Week 4, preserved) | 29          | ✅                    |
+| **E2E (Playwright) — transactions**                | **5**       | ✅ executed           |
+| **Accessibility (axe) — transactions**             | **5 scans** | ✅ 0 serious/critical |
 
 `pnpm typecheck` 12/12 · `pnpm lint` 11/11 (0 warnings) · `pnpm build` web 64/64 + admin 36/36.
 Full `pnpm test` (stack up): **all green** — domain 101, web 54, integration (offers 29 +
@@ -214,23 +214,23 @@ Week-6 Admin Portal. No transaction-system restructuring is required to add Admi
 
 ## Final acceptance checklist (evidence-backed)
 
-| Criterion | State |
-|---|---|
-| Accepted offer creates one transaction; exact accepted proposal | ✅ integration |
-| Duplicate creation impossible (idempotent) | ✅ unique indexes + integration |
-| Buyer & seller access shared workspace; unrelated denied | ✅ RLS integration |
-| Server-authoritative stages; persisted milestone; correct next actor | ✅ integration |
-| Deposit simulation without real payment | ✅ |
-| Document checklist + upload works; documents private (participant-scoped) | ✅ integration + E2E |
-| Due-diligence / financing / transfer simulations | ✅ |
-| Completion blocked until requirements met; `COMPLETED_DEMO` | ✅ integration + E2E |
-| Cancellation works; listing PAUSED after cancel; SOLD_DEMO after completion | ✅ integration + E2E |
-| Notifications reuse canonical table; realtime participant-scoped | ✅ |
-| No legal/payment claims; approved simulation wording | ✅ i18n copy |
-| English / Arabic / RTL / mobile (incl. sticky action bar) | ✅ built + parity 199/199 |
-| No shared demo seed; isolated test data | ✅ |
-| Week 1–4 tests remain green; lint/typecheck/build pass | ✅ |
-| E2E / axe pass | ✅ 5 E2E + 5 axe (0 serious / 0 critical) |
+| Criterion                                                                   | State                                     |
+| --------------------------------------------------------------------------- | ----------------------------------------- |
+| Accepted offer creates one transaction; exact accepted proposal             | ✅ integration                            |
+| Duplicate creation impossible (idempotent)                                  | ✅ unique indexes + integration           |
+| Buyer & seller access shared workspace; unrelated denied                    | ✅ RLS integration                        |
+| Server-authoritative stages; persisted milestone; correct next actor        | ✅ integration                            |
+| Deposit simulation without real payment                                     | ✅                                        |
+| Document checklist + upload works; documents private (participant-scoped)   | ✅ integration + E2E                      |
+| Due-diligence / financing / transfer simulations                            | ✅                                        |
+| Completion blocked until requirements met; `COMPLETED_DEMO`                 | ✅ integration + E2E                      |
+| Cancellation works; listing PAUSED after cancel; SOLD_DEMO after completion | ✅ integration + E2E                      |
+| Notifications reuse canonical table; realtime participant-scoped            | ✅                                        |
+| No legal/payment claims; approved simulation wording                        | ✅ i18n copy                              |
+| English / Arabic / RTL / mobile (incl. sticky action bar)                   | ✅ built + parity 199/199                 |
+| No shared demo seed; isolated test data                                     | ✅                                        |
+| Week 1–4 tests remain green; lint/typecheck/build pass                      | ✅                                        |
+| E2E / axe pass                                                              | ✅ 5 E2E + 5 axe (0 serious / 0 critical) |
 
 ## Closure status
 
@@ -242,4 +242,4 @@ Week-6 Admin Portal. No transaction-system restructuring is required to add Admi
   pixel-level §37 gallery polish deferred to Week-7 hardening
 - **Ready for Week-6 Admin Portal:** Yes — `SOLD_DEMO` and cancellation→`PAUSED` are documented
   in ADR-0022, so no redesign is needed before Admin work begins.
-| `WEEK-5.md` accurate; ready for Week 6 without restructuring | ✅ |
+  | `WEEK-5.md` accurate; ready for Week 6 without restructuring | ✅ |

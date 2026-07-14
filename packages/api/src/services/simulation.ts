@@ -34,7 +34,9 @@ async function audit(
   entityId: string,
   metadata: Record<string, unknown> = {},
 ) {
-  await tx.insert(auditEvents).values({ actorId, action, entityType: 'listing', entityId, metadata });
+  await tx
+    .insert(auditEvents)
+    .values({ actorId, action, entityType: 'listing', entityId, metadata });
 }
 
 export interface SimContext {
@@ -51,7 +53,13 @@ export const OwnershipVerificationService = {
     await tx
       .update(verifications)
       .set({ supersededAt: new Date() })
-      .where(and(eq(verifications.listingId, listingId), eq(verifications.kind, 'OWNERSHIP'), isNull(verifications.supersededAt)));
+      .where(
+        and(
+          eq(verifications.listingId, listingId),
+          eq(verifications.kind, 'OWNERSHIP'),
+          isNull(verifications.supersededAt),
+        ),
+      );
     await tx.insert(verifications).values({
       listingId,
       kind: 'OWNERSHIP',
@@ -68,28 +76,48 @@ export const OwnershipVerificationService = {
     const [rec] = await tx
       .select()
       .from(verifications)
-      .where(and(eq(verifications.listingId, listingId), eq(verifications.kind, 'OWNERSHIP'), isNull(verifications.supersededAt)))
+      .where(
+        and(
+          eq(verifications.listingId, listingId),
+          eq(verifications.kind, 'OWNERSHIP'),
+          isNull(verifications.supersededAt),
+        ),
+      )
       .orderBy(desc(verifications.createdAt))
       .limit(1);
     if (!rec || rec.status !== 'PENDING') return rec ?? null;
 
     const decided = (rec.result as { decided?: DemoOutcome })?.decided ?? 'SUCCESS';
     if (decided === 'SUCCESS') {
-      await tx.update(verifications).set({ status: 'VERIFIED_DEMO' }).where(eq(verifications.id, rec.id));
+      await tx
+        .update(verifications)
+        .set({ status: 'VERIFIED_DEMO' })
+        .where(eq(verifications.id, rec.id));
       await tx
         .update(ownershipDocuments)
         .set({ status: 'VERIFIED_DEMO' })
-        .where(and(eq(ownershipDocuments.listingId, listingId), eq(ownershipDocuments.active, true)));
-      await tx.update(listings).set({ state: 'OWNERSHIP_VERIFIED' }).where(eq(listings.id, listingId));
+        .where(
+          and(eq(ownershipDocuments.listingId, listingId), eq(ownershipDocuments.active, true)),
+        );
+      await tx
+        .update(listings)
+        .set({ state: 'OWNERSHIP_VERIFIED' })
+        .where(eq(listings.id, listingId));
       await audit(tx, userId, 'OWNERSHIP_VERIFICATION_SUCCEEDED', listingId);
     } else {
       await tx
         .update(verifications)
         .set({ status: 'FAILED_DEMO', failureReason: 'DEMO_MISMATCH' })
         .where(eq(verifications.id, rec.id));
-      await audit(tx, userId, 'OWNERSHIP_VERIFICATION_FAILED', listingId, { reason: 'DEMO_MISMATCH' });
+      await audit(tx, userId, 'OWNERSHIP_VERIFICATION_FAILED', listingId, {
+        reason: 'DEMO_MISMATCH',
+      });
     }
-    const [updated] = await tx.select().from(verifications).where(eq(verifications.id, rec.id)).limit(1);
+    const [updated] = await tx
+      .select()
+      .from(verifications)
+      .where(eq(verifications.id, rec.id))
+      .limit(1);
     return updated ?? null;
   },
 };
@@ -97,7 +125,11 @@ export const OwnershipVerificationService = {
 // --- Simulated Form A (§17) -------------------------------------------------
 export const FormAService = {
   /** Record the demo confirmation and complete (or fail) the simulated Form A. */
-  async complete({ tx, userId, listingId }: SimContext, listingPriceAed: number, force?: DemoOutcome) {
+  async complete(
+    { tx, userId, listingId }: SimContext,
+    listingPriceAed: number,
+    force?: DemoOutcome,
+  ) {
     const decided = resolveDemoOutcome(force);
     await tx
       .update(formARecords)
@@ -156,7 +188,9 @@ export const PermitService = {
         .update(permitRecords)
         .set({ status: 'FAILED_DEMO', failureReason: 'DEMO_SERVICE_UNAVAILABLE' })
         .where(eq(permitRecords.id, rec.id));
-      await audit(tx, userId, 'PERMIT_SIMULATION_FAILED', listingId, { reason: 'DEMO_SERVICE_UNAVAILABLE' });
+      await audit(tx, userId, 'PERMIT_SIMULATION_FAILED', listingId, {
+        reason: 'DEMO_SERVICE_UNAVAILABLE',
+      });
     } else {
       const permitNumber = `DEMO-TRK-${listingId.slice(0, 8).toUpperCase()}`;
       await tx
@@ -165,7 +199,11 @@ export const PermitService = {
         .where(eq(permitRecords.id, rec.id));
       await audit(tx, userId, 'PERMIT_SIMULATION_APPROVED', listingId);
     }
-    const [updated] = await tx.select().from(permitRecords).where(eq(permitRecords.id, rec.id)).limit(1);
+    const [updated] = await tx
+      .select()
+      .from(permitRecords)
+      .where(eq(permitRecords.id, rec.id))
+      .limit(1);
     return updated ?? null;
   },
 };

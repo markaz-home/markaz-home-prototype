@@ -185,20 +185,20 @@ Excluded features must not appear as active or disabled upsells in the listing j
 
 ## 4.1 Canonical state transitions
 
-| Current state | Trigger | Next state | Customer-visible meaning |
-|---|---|---|---|
-| None | Create listing | `DRAFT` | Listing draft created |
-| `DRAFT` | Required property details saved and valid | `DETAILS_COMPLETE` | Property information complete |
-| `DETAILS_COMPLETE` | Active ownership document uploaded | `DOCUMENT_UPLOADED` | Private document received |
-| `DOCUMENT_UPLOADED` | Simulated check started | `OWNERSHIP_REVIEW` | Ownership check in progress |
-| `OWNERSHIP_REVIEW` | Verification record becomes verified | `OWNERSHIP_VERIFIED` | Ownership verification simulated |
-| `OWNERSHIP_REVIEW` | Verification record fails | Remains recoverable | Replace document or retry |
-| `OWNERSHIP_VERIFIED` | Settings complete and simulated Form A completed | `FORM_A_COMPLETE` | Simulated Form A complete |
-| `FORM_A_COMPLETE` | At least one valid photo and cover selected | `PHOTOS_COMPLETE` | Photo requirement complete |
-| `PHOTOS_COMPLETE` | Simulated permit submitted | `PERMIT_PENDING` | Demo permit application pending |
-| `PERMIT_PENDING` | Permit approved | Remains pending review until final confirmation | Demo permit approved; review required |
-| `PERMIT_PENDING` | Permit failed | Remains recoverable | Review and retry |
-| `PERMIT_PENDING` | Permit approved + all requirements complete + customer confirms review | `READY_TO_PUBLISH` | Setup complete; not live |
+| Current state        | Trigger                                                                | Next state                                      | Customer-visible meaning              |
+| -------------------- | ---------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------- |
+| None                 | Create listing                                                         | `DRAFT`                                         | Listing draft created                 |
+| `DRAFT`              | Required property details saved and valid                              | `DETAILS_COMPLETE`                              | Property information complete         |
+| `DETAILS_COMPLETE`   | Active ownership document uploaded                                     | `DOCUMENT_UPLOADED`                             | Private document received             |
+| `DOCUMENT_UPLOADED`  | Simulated check started                                                | `OWNERSHIP_REVIEW`                              | Ownership check in progress           |
+| `OWNERSHIP_REVIEW`   | Verification record becomes verified                                   | `OWNERSHIP_VERIFIED`                            | Ownership verification simulated      |
+| `OWNERSHIP_REVIEW`   | Verification record fails                                              | Remains recoverable                             | Replace document or retry             |
+| `OWNERSHIP_VERIFIED` | Settings complete and simulated Form A completed                       | `FORM_A_COMPLETE`                               | Simulated Form A complete             |
+| `FORM_A_COMPLETE`    | At least one valid photo and cover selected                            | `PHOTOS_COMPLETE`                               | Photo requirement complete            |
+| `PHOTOS_COMPLETE`    | Simulated permit submitted                                             | `PERMIT_PENDING`                                | Demo permit application pending       |
+| `PERMIT_PENDING`     | Permit approved                                                        | Remains pending review until final confirmation | Demo permit approved; review required |
+| `PERMIT_PENDING`     | Permit failed                                                          | Remains recoverable                             | Review and retry                      |
+| `PERMIT_PENDING`     | Permit approved + all requirements complete + customer confirms review | `READY_TO_PUBLISH`                              | Setup complete; not live              |
 
 ## 4.2 Derived section statuses
 
@@ -220,17 +220,17 @@ These statuses drive the stepper and Review screen but do not replace the canoni
 
 Do not show raw enum names in normal customer UI.
 
-| Domain value | Customer label |
-|---|---|
-| `DRAFT` | Draft started |
-| `DETAILS_COMPLETE` | Property details complete |
-| `DOCUMENT_UPLOADED` | Document uploaded |
-| `OWNERSHIP_REVIEW` | Ownership check in progress |
-| `OWNERSHIP_VERIFIED` | Ownership verification simulated |
-| `FORM_A_COMPLETE` | Simulated Form A complete |
-| `PHOTOS_COMPLETE` | Photos complete |
-| `PERMIT_PENDING` | Demo permit in progress / Review required after approval |
-| `READY_TO_PUBLISH` | Ready to publish |
+| Domain value         | Customer label                                           |
+| -------------------- | -------------------------------------------------------- |
+| `DRAFT`              | Draft started                                            |
+| `DETAILS_COMPLETE`   | Property details complete                                |
+| `DOCUMENT_UPLOADED`  | Document uploaded                                        |
+| `OWNERSHIP_REVIEW`   | Ownership check in progress                              |
+| `OWNERSHIP_VERIFIED` | Ownership verification simulated                         |
+| `FORM_A_COMPLETE`    | Simulated Form A complete                                |
+| `PHOTOS_COMPLETE`    | Photos complete                                          |
+| `PERMIT_PENDING`     | Demo permit in progress / Review required after approval |
+| `READY_TO_PUBLISH`   | Ready to publish                                         |
 
 ---
 
@@ -448,38 +448,38 @@ Route to the failure state for the relevant step and show persisted status and r
 
 # 9. Screen Inventory
 
-| ID | Screen / state | Route |
-|---|---|---|
-| L-01 | My Listings empty | `/sell` |
-| L-02 | My Listings with drafts | `/sell` |
-| L-03 | Resume Listing prompt | `/sell/new` dialog/state |
-| L-04 | Property Details | `/details` |
-| L-05 | Ownership Document selection and upload | `/ownership` |
-| L-06 | Ownership Check introduction | `/verification` |
-| L-07 | Ownership Check pending | `/verification` |
-| L-08 | Ownership Check success | `/verification` |
-| L-09 | Ownership Check failure / mismatch | `/verification` |
-| L-10 | Listing and Offer Settings | `/settings` |
-| L-11 | Investment Case introduction / skipped | `/investment-case` |
-| L-12 | Investment Case form and preview | `/investment-case` |
-| L-13 | Simulated Form A review | `/form-a` |
-| L-14 | Simulated Form A pending | `/form-a` |
-| L-15 | Simulated Form A success | `/form-a` |
-| L-16 | Simulated Form A failure | `/form-a` |
-| L-17 | Property Photos empty / upload | `/photos` |
-| L-18 | Property Photos grid / organisation | `/photos` |
-| L-19 | Simulated Trakheesi introduction | `/trakheesi` |
-| L-20 | Simulated Trakheesi pending | `/trakheesi` |
-| L-21 | Demo permit approved | `/trakheesi` |
-| L-22 | Simulated Trakheesi failed | `/trakheesi` |
-| L-23 | Final Review complete | `/review` |
-| L-24 | Final Review missing requirements | `/review` |
-| L-25 | Ready to Publish | `/ready` |
-| L-26 | Private Listing Preview | `/preview` |
-| L-27 | Loading existing draft | Any listing route |
-| L-28 | Session expired | Any listing route → Sign In |
-| L-29 | Listing unavailable | Any listing route |
-| L-30 | Network / save failure | Inline/persistent state |
+| ID   | Screen / state                          | Route                       |
+| ---- | --------------------------------------- | --------------------------- |
+| L-01 | My Listings empty                       | `/sell`                     |
+| L-02 | My Listings with drafts                 | `/sell`                     |
+| L-03 | Resume Listing prompt                   | `/sell/new` dialog/state    |
+| L-04 | Property Details                        | `/details`                  |
+| L-05 | Ownership Document selection and upload | `/ownership`                |
+| L-06 | Ownership Check introduction            | `/verification`             |
+| L-07 | Ownership Check pending                 | `/verification`             |
+| L-08 | Ownership Check success                 | `/verification`             |
+| L-09 | Ownership Check failure / mismatch      | `/verification`             |
+| L-10 | Listing and Offer Settings              | `/settings`                 |
+| L-11 | Investment Case introduction / skipped  | `/investment-case`          |
+| L-12 | Investment Case form and preview        | `/investment-case`          |
+| L-13 | Simulated Form A review                 | `/form-a`                   |
+| L-14 | Simulated Form A pending                | `/form-a`                   |
+| L-15 | Simulated Form A success                | `/form-a`                   |
+| L-16 | Simulated Form A failure                | `/form-a`                   |
+| L-17 | Property Photos empty / upload          | `/photos`                   |
+| L-18 | Property Photos grid / organisation     | `/photos`                   |
+| L-19 | Simulated Trakheesi introduction        | `/trakheesi`                |
+| L-20 | Simulated Trakheesi pending             | `/trakheesi`                |
+| L-21 | Demo permit approved                    | `/trakheesi`                |
+| L-22 | Simulated Trakheesi failed              | `/trakheesi`                |
+| L-23 | Final Review complete                   | `/review`                   |
+| L-24 | Final Review missing requirements       | `/review`                   |
+| L-25 | Ready to Publish                        | `/ready`                    |
+| L-26 | Private Listing Preview                 | `/preview`                  |
+| L-27 | Loading existing draft                  | Any listing route           |
+| L-28 | Session expired                         | Any listing route → Sign In |
+| L-29 | Listing unavailable                     | Any listing route           |
+| L-30 | Network / save failure                  | Inline/persistent state     |
 
 ---
 
@@ -556,15 +556,15 @@ Upload a fictional sample document...
 
 ## 10.4 Step states
 
-| Visual state | Treatment |
-|---|---|
-| Current | Deep-blue label, pale-blue background, current-step marker |
-| Complete | Check icon, standard text, clickable |
-| Optional skipped | `Skipped` text, neutral icon, clickable |
-| Future available | Standard text, clickable only when prerequisites allow |
-| Locked | Muted text, lock icon, non-clickable |
-| Pending | Spinner/status icon and `In progress` |
-| Failed | Attention icon and `Action required`; no aggressive red rail |
+| Visual state     | Treatment                                                    |
+| ---------------- | ------------------------------------------------------------ |
+| Current          | Deep-blue label, pale-blue background, current-step marker   |
+| Complete         | Check icon, standard text, clickable                         |
+| Optional skipped | `Skipped` text, neutral icon, clickable                      |
+| Future available | Standard text, clickable only when prerequisites allow       |
+| Locked           | Muted text, lock icon, non-clickable                         |
+| Pending          | Spinner/status icon and `In progress`                        |
+| Failed           | Attention icon and `Action required`; no aggressive red rail |
 
 ## 10.5 Navigation rules
 
@@ -576,7 +576,6 @@ Upload a fictional sample document...
 - Required future steps cannot be selected before prerequisites.
 - Review may be opened only after the permit is approved and all earlier required sections can be evaluated.
 - Browser Back behaves like wizard Back for completed/current routes; state is fetched after navigation.
-
 
 ---
 
@@ -732,31 +731,31 @@ Collect the minimum information needed to identify and describe one residential 
 
 ### Section A — Property type and location
 
-| Field | Required | Visibility | Notes |
-|---|---:|---|---|
-| Property type | Yes | Public later | Apartment, Villa, Townhouse, Penthouse |
-| Emirate | Yes | Public later | Dubai only in this prototype |
-| Area or community | Yes | Public later | Searchable combobox using seeded options plus free-text fallback |
-| Building or project | Conditional | Public later | Required for Apartment/Penthouse; optional for Villa/Townhouse |
-| Unit or property identifier | Yes | Private | Unit number, villa number, or internal property reference; never shown publicly |
+| Field                       |    Required | Visibility   | Notes                                                                           |
+| --------------------------- | ----------: | ------------ | ------------------------------------------------------------------------------- |
+| Property type               |         Yes | Public later | Apartment, Villa, Townhouse, Penthouse                                          |
+| Emirate                     |         Yes | Public later | Dubai only in this prototype                                                    |
+| Area or community           |         Yes | Public later | Searchable combobox using seeded options plus free-text fallback                |
+| Building or project         | Conditional | Public later | Required for Apartment/Penthouse; optional for Villa/Townhouse                  |
+| Unit or property identifier |         Yes | Private      | Unit number, villa number, or internal property reference; never shown publicly |
 
 ### Section B — Property facts
 
-| Field | Required | Visibility | Options / rule |
-|---|---:|---|---|
-| Bedrooms | Yes | Public later | Studio or 1–10; Studio stored as 0 |
-| Bathrooms | Yes | Public later | 1–10 whole numbers |
-| Property size | Yes | Public later | Square feet; 200–50,000 |
-| Furnishing status | Yes | Public later | Unfurnished, Partly furnished, Furnished |
-| Occupancy status | Yes | Private by default | Vacant, Owner occupied, Tenant occupied |
-| Completion status | Yes | Public later | Ready, Off-plan |
-| Parking spaces | Optional | Public later | 0–10 |
+| Field             | Required | Visibility         | Options / rule                           |
+| ----------------- | -------: | ------------------ | ---------------------------------------- |
+| Bedrooms          |      Yes | Public later       | Studio or 1–10; Studio stored as 0       |
+| Bathrooms         |      Yes | Public later       | 1–10 whole numbers                       |
+| Property size     |      Yes | Public later       | Square feet; 200–50,000                  |
+| Furnishing status |      Yes | Public later       | Unfurnished, Partly furnished, Furnished |
+| Occupancy status  |      Yes | Private by default | Vacant, Owner occupied, Tenant occupied  |
+| Completion status |      Yes | Public later       | Ready, Off-plan                          |
+| Parking spaces    | Optional | Public later       | 0–10                                     |
 
 ### Section C — Description and amenities
 
-| Field | Required | Visibility | Rule |
-|---|---:|---|---|
-| Property description | Yes | Public later | 80–2,000 characters |
+| Field                  | Required | Visibility   | Rule                         |
+| ---------------------- | -------: | ------------ | ---------------------------- |
+| Property description   |      Yes | Public later | 80–2,000 characters          |
 | Features and amenities | Optional | Public later | Curated multi-select, max 15 |
 
 ## 12.4 Dubai-only decision
@@ -2033,7 +2032,6 @@ Success:
 - Transition to `PHOTOS_COMPLETE`
 - Route to Simulated Trakheesi
 
-
 ---
 
 # 19. Simulated Trakheesi Specification
@@ -2239,15 +2237,15 @@ Incomplete state:
 
 ## 20.4 Section status vocabulary
 
-| Status | Label | Meaning |
-|---|---|---|
-| Complete | `Complete` | Required section satisfies rules |
-| Optional added | `Added` | Optional Investment Case included |
-| Optional skipped | `Skipped · Optional` | Does not block readiness |
-| Missing | `Missing` | Required data absent |
-| In progress | `In progress` | Async simulation pending |
-| Failed | `Action required` | Retry or correction needed |
-| Invalidated | `Update required` | Later edit invalidated confirmation/result |
+| Status           | Label                | Meaning                                    |
+| ---------------- | -------------------- | ------------------------------------------ |
+| Complete         | `Complete`           | Required section satisfies rules           |
+| Optional added   | `Added`              | Optional Investment Case included          |
+| Optional skipped | `Skipped · Optional` | Does not block readiness                   |
+| Missing          | `Missing`            | Required data absent                       |
+| In progress      | `In progress`        | Async simulation pending                   |
+| Failed           | `Action required`    | Retry or correction needed                 |
+| Invalidated      | `Update required`    | Later edit invalidated confirmation/result |
 
 Use status text plus icon; do not rely on colour.
 
@@ -2642,237 +2640,237 @@ Failed card example:
 
 ## 23.1 Listing Wizard Shell
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Provides customer header, property context, save status, step navigation, form canvas, optional help, and actions |
-| Anatomy | Header, listing identity, autosave, stepper, main, help rail, action bar |
-| Variants | Standard, loading, review, ready |
-| States | Saving, saved, failed, offline, RTL |
-| Interaction | Routes between allowed steps; blocks unsafe leave only when dirty |
-| Accessibility | One main landmark; skip link; logical headings; stepper labelled |
-| Responsive | Three-column desktop, one-column mobile |
-| RTL | Columns mirror; DOM order remains meaningful |
-| Reuse | All listing steps |
+| Attribute     | Specification                                                                                                     |
+| ------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Purpose       | Provides customer header, property context, save status, step navigation, form canvas, optional help, and actions |
+| Anatomy       | Header, listing identity, autosave, stepper, main, help rail, action bar                                          |
+| Variants      | Standard, loading, review, ready                                                                                  |
+| States        | Saving, saved, failed, offline, RTL                                                                               |
+| Interaction   | Routes between allowed steps; blocks unsafe leave only when dirty                                                 |
+| Accessibility | One main landmark; skip link; logical headings; stepper labelled                                                  |
+| Responsive    | Three-column desktop, one-column mobile                                                                           |
+| RTL           | Columns mirror; DOM order remains meaningful                                                                      |
+| Reuse         | All listing steps                                                                                                 |
 
 ## 23.2 Desktop Step Navigation
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Shows nine-step position and status |
-| Anatomy | Ordered list, marker, label, optional status text |
-| Variants | Current, complete, optional skipped, locked, pending, failed |
-| Interaction | Completed/available items are links; locked are not interactive |
-| Accessibility | Ordered list; `aria-current=step`; explicit status text |
-| Responsive | Hidden/replaced below tablet threshold |
-| RTL | Visual sequence mirrors; reading order follows locale |
-| Reuse | Listing wizard |
+| Attribute     | Specification                                                   |
+| ------------- | --------------------------------------------------------------- |
+| Purpose       | Shows nine-step position and status                             |
+| Anatomy       | Ordered list, marker, label, optional status text               |
+| Variants      | Current, complete, optional skipped, locked, pending, failed    |
+| Interaction   | Completed/available items are links; locked are not interactive |
+| Accessibility | Ordered list; `aria-current=step`; explicit status text         |
+| Responsive    | Hidden/replaced below tablet threshold                          |
+| RTL           | Visual sequence mirrors; reading order follows locale           |
+| Reuse         | Listing wizard                                                  |
 
 ## 23.3 Mobile Progress Indicator
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Compact current-step context |
-| Anatomy | `Step X of 9`, title, thin progress line |
-| States | Standard, optional, attention |
-| Accessibility | Current and total announced as text |
-| RTL | Fill direction mirrors |
-| Reuse | Mobile wizard |
+| Attribute     | Specification                            |
+| ------------- | ---------------------------------------- |
+| Purpose       | Compact current-step context             |
+| Anatomy       | `Step X of 9`, title, thin progress line |
+| States        | Standard, optional, attention            |
+| Accessibility | Current and total announced as text      |
+| RTL           | Fill direction mirrors                   |
+| Reuse         | Mobile wizard                            |
 
 ## 23.4 Step Header
 
-| Attribute | Specification |
-|---|---|
-| Anatomy | Eyebrow step label, h1, description, optional badge/disclosure |
-| States | Standard, optional, simulated, failed |
-| Accessibility | One h1; badge text not colour-only |
-| Responsive | Description wraps; no fixed height |
-| Reuse | Every step |
+| Attribute     | Specification                                                  |
+| ------------- | -------------------------------------------------------------- |
+| Anatomy       | Eyebrow step label, h1, description, optional badge/disclosure |
+| States        | Standard, optional, simulated, failed                          |
+| Accessibility | One h1; badge text not colour-only                             |
+| Responsive    | Description wraps; no fixed height                             |
+| Reuse         | Every step                                                     |
 
 ## 23.5 Draft Status Indicator
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Shows private draft / ready state |
-| Variants | Draft, pending demo, action required, ready to publish |
-| Accessibility | Text label always present |
-| Reuse | My Listings, wizard header, ready screen |
+| Attribute     | Specification                                          |
+| ------------- | ------------------------------------------------------ |
+| Purpose       | Shows private draft / ready state                      |
+| Variants      | Draft, pending demo, action required, ready to publish |
+| Accessibility | Text label always present                              |
+| Reuse         | My Listings, wizard header, ready screen               |
 
 ## 23.6 Autosave Indicator
 
-| Attribute | Specification |
-|---|---|
-| Anatomy | Status icon, text, optional retry |
-| States | Saving, saved, failed, offline |
-| Interaction | Retry on failed state |
+| Attribute     | Specification                                                   |
+| ------------- | --------------------------------------------------------------- |
+| Anatomy       | Status icon, text, optional retry                               |
+| States        | Saving, saved, failed, offline                                  |
+| Interaction   | Retry on failed state                                           |
 | Accessibility | Polite announcements; do not announce every successful debounce |
-| RTL | Logical alignment |
-| Reuse | Wizard header and action bar |
+| RTL           | Logical alignment                                               |
+| Reuse         | Wizard header and action bar                                    |
 
 ## 23.7 Form Section
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Groups related fields without excessive card stacking |
-| Anatomy | h2, description, content, optional divider |
-| Visual | Mostly borderless sections; cards reserved for privacy/simulation/summary |
-| Accessibility | Semantic fieldset/legend when controls form a choice group |
-| Reuse | Details, Settings, Investment Case |
+| Attribute     | Specification                                                             |
+| ------------- | ------------------------------------------------------------------------- |
+| Purpose       | Groups related fields without excessive card stacking                     |
+| Anatomy       | h2, description, content, optional divider                                |
+| Visual        | Mostly borderless sections; cards reserved for privacy/simulation/summary |
+| Accessibility | Semantic fieldset/legend when controls form a choice group                |
+| Reuse         | Details, Settings, Investment Case                                        |
 
 ## 23.8 Field Group
 
-| Attribute | Specification |
-|---|---|
-| Anatomy | Label, optional/required text, control, helper, error |
-| States | Default, focus, valid, invalid, disabled, read-only |
-| Accessibility | Persistent label; described-by; invalid state |
-| Responsive | Full width mobile |
-| Reuse | All forms |
+| Attribute     | Specification                                         |
+| ------------- | ----------------------------------------------------- |
+| Anatomy       | Label, optional/required text, control, helper, error |
+| States        | Default, focus, valid, invalid, disabled, read-only   |
+| Accessibility | Persistent label; described-by; invalid state         |
+| Responsive    | Full width mobile                                     |
+| Reuse         | All forms                                             |
 
 ## 23.9 Select and Combobox
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Controlled choice or searchable location selection |
-| States | Empty, selected, open, loading, no results, invalid |
-| Interaction | Keyboard navigation; typeahead; clear where allowed |
-| Accessibility | Accessible listbox/combobox semantics |
-| RTL | Popup alignment uses logical edges |
-| Reuse | Property facts and location |
+| Attribute     | Specification                                       |
+| ------------- | --------------------------------------------------- |
+| Purpose       | Controlled choice or searchable location selection  |
+| States        | Empty, selected, open, loading, no results, invalid |
+| Interaction   | Keyboard navigation; typeahead; clear where allowed |
+| Accessibility | Accessible listbox/combobox semantics               |
+| RTL           | Popup alignment uses logical edges                  |
+| Reuse         | Property facts and location                         |
 
 ## 23.10 Number Input
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Bedrooms, bathrooms, size, parking |
-| Interaction | Accept locale digits; normalise; prevent mouse-wheel accidental change where appropriate |
-| Accessibility | Unit included in label or described-by |
-| Mobile | Numeric keyboard |
-| RTL | Numeric value LTR or bidi-isolated |
-| Reuse | Details |
+| Attribute     | Specification                                                                            |
+| ------------- | ---------------------------------------------------------------------------------------- |
+| Purpose       | Bedrooms, bathrooms, size, parking                                                       |
+| Interaction   | Accept locale digits; normalise; prevent mouse-wheel accidental change where appropriate |
+| Accessibility | Unit included in label or described-by                                                   |
+| Mobile        | Numeric keyboard                                                                         |
+| RTL           | Numeric value LTR or bidi-isolated                                                       |
+| Reuse         | Details                                                                                  |
 
 ## 23.11 AED Currency Input
 
-| Attribute | Specification |
-|---|---|
-| Anatomy | Label, `AED` prefix, numeric field, helper/error |
-| States | Empty, focus raw edit, blur formatted, invalid, read-only |
-| Interaction | Accept Western and Arabic-Indic digits; whole dirhams; retain caret predictably |
-| Accessibility | Screen reader label includes `Amount in UAE dirhams` |
-| RTL | `AED` and value isolated; prefix appears at logical field start without reversing digits |
-| Reuse | Settings and Investment Case |
+| Attribute     | Specification                                                                            |
+| ------------- | ---------------------------------------------------------------------------------------- |
+| Anatomy       | Label, `AED` prefix, numeric field, helper/error                                         |
+| States        | Empty, focus raw edit, blur formatted, invalid, read-only                                |
+| Interaction   | Accept Western and Arabic-Indic digits; whole dirhams; retain caret predictably          |
+| Accessibility | Screen reader label includes `Amount in UAE dirhams`                                     |
+| RTL           | `AED` and value isolated; prefix appears at logical field start without reversing digits |
+| Reuse         | Settings and Investment Case                                                             |
 
 ## 23.12 Date Input
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Purchase date |
-| Interaction | Native or accessible date picker plus typed entry |
-| Accessibility | Expected format described; error clear |
-| RTL | Locale presentation; stored ISO date hidden from user |
-| Reuse | Investment Case |
+| Attribute     | Specification                                         |
+| ------------- | ----------------------------------------------------- |
+| Purpose       | Purchase date                                         |
+| Interaction   | Native or accessible date picker plus typed entry     |
+| Accessibility | Expected format described; error clear                |
+| RTL           | Locale presentation; stored ISO date hidden from user |
+| Reuse         | Investment Case                                       |
 
 ## 23.13 Text Area
 
-| Attribute | Specification |
-|---|---|
-| Anatomy | Label, control, helper, counter, error |
-| Interaction | Counter updates; no auto-resize beyond sensible max without scroll |
-| Accessibility | Counter not announced every keystroke; announce near limit |
-| Reuse | Description |
+| Attribute     | Specification                                                      |
+| ------------- | ------------------------------------------------------------------ |
+| Anatomy       | Label, control, helper, counter, error                             |
+| Interaction   | Counter updates; no auto-resize beyond sensible max without scroll |
+| Accessibility | Counter not announced every keystroke; announce near limit         |
+| Reuse         | Description                                                        |
 
 ## 23.14 Checkbox, Toggle, and Radio Group
 
-| Component | Use |
-|---|---|
-| Checkbox | Required confirmations and legal/demo acknowledgements |
-| Toggle | Investment Case public visibility |
+| Component               | Use                                                             |
+| ----------------------- | --------------------------------------------------------------- |
+| Checkbox                | Required confirmations and legal/demo acknowledgements          |
+| Toggle                  | Investment Case public visibility                               |
 | Radio / selectable tile | Property type, document type, furnishing, occupancy, completion |
 
 All use visible labels, 44 px targets, keyboard input, and explicit selected state.
 
 ## 23.15 Document-Type Selector
 
-| Attribute | Specification |
-|---|---|
-| Anatomy | Two tiles with icon, title, description, selected marker |
-| States | Default, hover, focus, selected, recommended |
-| Accessibility | Radio group |
-| Reuse | Ownership Document |
+| Attribute     | Specification                                            |
+| ------------- | -------------------------------------------------------- |
+| Anatomy       | Two tiles with icon, title, description, selected marker |
+| States        | Default, hover, focus, selected, recommended             |
+| Accessibility | Radio group                                              |
+| Reuse         | Ownership Document                                       |
 
 ## 23.16 File Uploader
 
-| Attribute | Specification |
-|---|---|
-| Variants | Private document, public-future photo |
-| States | Empty, drag active, validating, uploading, success, failure, offline |
-| Interaction | Click, keyboard, drag/drop; no drag-only requirement |
-| Accessibility | Native file input available; instructions and errors connected |
-| Security | Private variant never exposes public URL |
-| Reuse | Document and Photos |
+| Attribute     | Specification                                                        |
+| ------------- | -------------------------------------------------------------------- |
+| Variants      | Private document, public-future photo                                |
+| States        | Empty, drag active, validating, uploading, success, failure, offline |
+| Interaction   | Click, keyboard, drag/drop; no drag-only requirement                 |
+| Accessibility | Native file input available; instructions and errors connected       |
+| Security      | Private variant never exposes public URL                             |
+| Reuse         | Document and Photos                                                  |
 
 ## 23.17 File Metadata Card
 
-| Attribute | Specification |
-|---|---|
-| Anatomy | Type icon, file name, size, date, privacy/status, actions |
-| States | Uploading, uploaded, failed, verified, invalidated |
+| Attribute     | Specification                                                |
+| ------------- | ------------------------------------------------------------ |
+| Anatomy       | Type icon, file name, size, date, privacy/status, actions    |
+| States        | Uploading, uploaded, failed, verified, invalidated           |
 | Accessibility | Full file name available; action labels include file context |
-| Reuse | Ownership |
+| Reuse         | Ownership                                                    |
 
 ## 23.18 Verification Status Panel
 
-| Attribute | Specification |
-|---|---|
-| Variants | Intro, pending, verified, failed, invalidated |
-| Anatomy | Disclosure, status icon/text, explanation, summary, actions |
-| Accessibility | Status is announced; no colour-only state |
-| Reuse | Ownership, Form A, Trakheesi |
+| Attribute     | Specification                                               |
+| ------------- | ----------------------------------------------------------- |
+| Variants      | Intro, pending, verified, failed, invalidated               |
+| Anatomy       | Disclosure, status icon/text, explanation, summary, actions |
+| Accessibility | Status is announced; no colour-only state                   |
+| Reuse         | Ownership, Form A, Trakheesi                                |
 
 ## 23.19 Simulation Badge
 
-| Attribute | Specification |
-|---|---|
-| Label | `Demo simulation` or context-specific `Demo` |
-| Visual | Pale blue, information icon, restrained pill/ribbon |
-| Rules | Never resembles government seal; always paired with disclosure on step page |
-| Reuse | Ownership, Form A, Trakheesi |
+| Attribute | Specification                                                               |
+| --------- | --------------------------------------------------------------------------- |
+| Label     | `Demo simulation` or context-specific `Demo`                                |
+| Visual    | Pale blue, information icon, restrained pill/ribbon                         |
+| Rules     | Never resembles government seal; always paired with disclosure on step page |
+| Reuse     | Ownership, Form A, Trakheesi                                                |
 
 ## 23.20 Pending, Success, Failure and Retry Panels
 
-| Variant | Required content |
-|---|---|
-| Pending | Status, what is happening, safe-leave guidance, refresh/exit |
-| Success | Completed wording, demo label where needed, next action |
+| Variant | Required content                                              |
+| ------- | ------------------------------------------------------------- |
+| Pending | Status, what is happening, safe-leave guidance, refresh/exit  |
+| Success | Completed wording, demo label where needed, next action       |
 | Failure | Safe reason, saved-data reassurance, retry/correction actions |
 
 Reuse across all simulations.
 
 ## 23.21 Investment Metric
 
-| Attribute | Specification |
-|---|---|
-| Anatomy | Plain-language label, formatted value, optional source/explanation |
-| Variants | Positive, negative, neutral, unavailable |
-| Accessibility | Sign and value announced; colour supplementary |
-| Reuse | Investment Case and future property detail |
+| Attribute     | Specification                                                      |
+| ------------- | ------------------------------------------------------------------ |
+| Anatomy       | Plain-language label, formatted value, optional source/explanation |
+| Variants      | Positive, negative, neutral, unavailable                           |
+| Accessibility | Sign and value announced; colour supplementary                     |
+| Reuse         | Investment Case and future property detail                         |
 
 ## 23.22 Calculation Summary Card
 
-| Attribute | Specification |
-|---|---|
-| Anatomy | Heading, 2–3 column metrics, disclaimer, visibility state |
-| Responsive | Metrics stack to two columns then one |
-| Reuse | Investment Case preview and Review |
+| Attribute  | Specification                                             |
+| ---------- | --------------------------------------------------------- |
+| Anatomy    | Heading, 2–3 column metrics, disclaimer, visibility state |
+| Responsive | Metrics stack to two columns then one                     |
+| Reuse      | Investment Case preview and Review                        |
 
 ## 23.23 Photo Uploader and Photo Tile
 
-| Attribute | Specification |
-|---|---|
-| Photo uploader | Multi-file selection, limits, guidance, progress |
-| Photo tile | Preview, order, cover, drag handle, menu, warnings |
-| Accessibility | Keyboard reorder alternative; contextual action names |
-| RTL | Grid visual order follows locale, persisted order remains explicit numeric order |
-| Reuse | Photos and future gallery management |
+| Attribute      | Specification                                                                    |
+| -------------- | -------------------------------------------------------------------------------- |
+| Photo uploader | Multi-file selection, limits, guidance, progress                                 |
+| Photo tile     | Preview, order, cover, drag handle, menu, warnings                               |
+| Accessibility  | Keyboard reorder alternative; contextual action names                            |
+| RTL            | Grid visual order follows locale, persisted order remains explicit numeric order |
+| Reuse          | Photos and future gallery management                                             |
 
 ## 23.24 Cover-Photo Badge
 
@@ -2892,12 +2890,12 @@ Deep-blue badge with white text; text always present.
 
 ## 23.26 Review Section Card
 
-| Attribute | Specification |
-|---|---|
-| Anatomy | Section title, status, short summary, Edit/Review action |
-| Variants | Complete, skipped, missing, pending, failed, update required |
+| Attribute   | Specification                                                   |
+| ----------- | --------------------------------------------------------------- |
+| Anatomy     | Section title, status, short summary, Edit/Review action        |
+| Variants    | Complete, skipped, missing, pending, failed, update required    |
 | Interaction | Action deep-links to section and preserves Review return target |
-| Reuse | Final Review and My Listings detail later |
+| Reuse       | Final Review and My Listings detail later                       |
 
 ## 23.27 Completion Checklist
 
@@ -2929,57 +2927,57 @@ Defined in Draft Saving. Focus-trapped, initial focus on `Stay and try saving`, 
 
 All copy below is approved English product copy. Arabic requires professional review as marked.
 
-| Step | Field / state | Req. | Rule | Trigger | English error copy | Placement | Clears when | Blocks progression | Arabic review |
-|---|---|---:|---|---|---|---|---|---:|---|
-| Details | Property type | Yes | One supported type | Continue / blur group | Select a property type. | Under tile group | Selected | Yes | Language/property |
-| Details | Emirate | Yes | Dubai in prototype | Load / continue | This prototype currently supports Dubai listings. | Field/help | Dubai set | Yes | Language/property |
-| Details | Area/community | Yes | 2–100 chars | Blur / continue | Enter the area or community. | Under field | Valid value | Yes | Language/property |
-| Details | Building/project | Conditional | Required for apartment/penthouse; max 120 | Blur / continue | Enter the building or project name. | Under field | Valid or not applicable | Yes | Language/property |
-| Details | Unit/property identifier | Yes | 1–50 chars | Blur / continue | Enter a private unit or property identifier. | Under field | Valid | Yes | Language/property |
-| Details | Bedrooms | Yes | Studio/0 or 1–10 | Continue | Select the number of bedrooms. | Under control | Valid | Yes | Language/property |
-| Details | Bathrooms | Yes | Integer 1–10 | Continue | Select the number of bathrooms. | Under control | Valid | Yes | Language/property |
-| Details | Size | Yes | 200–50,000 sq ft | Blur / continue | Enter a property size between 200 and 50,000 sq ft. | Under field | Valid | Yes | Language/property |
-| Details | Furnishing | Yes | One option | Continue | Select the furnishing status. | Under group | Selected | Yes | Language/property |
-| Details | Occupancy | Yes | One option | Continue | Select the occupancy status. | Under group | Selected | Yes | Language/property |
-| Details | Completion | Yes | Ready or off-plan | Continue | Select the completion status. | Under group | Selected | Yes | Language/property |
-| Details | Parking | No | Integer 0–10 | Blur | Enter a number from 0 to 10. | Under field | Empty or valid | No if empty | Language/property |
-| Details | Description | Yes | 80–2,000 chars | Blur / continue | Add at least 80 characters describing the property. | Under field | ≥80 | Yes | Language/property |
-| Details | Description too long | Yes | Max 2,000 | Input / continue | Description must be 2,000 characters or fewer. | Under field | ≤2,000 | Yes | Language/property |
-| Details | Amenities | No | Max 15 | Select | Choose up to 15 features and amenities. | Selector | ≤15 | No if ≤15 | Language/property |
-| Ownership | Document type | Yes | Title Deed or Oqood | Continue | Choose Title Deed or Oqood. | Under tiles | Selected | Yes | Legal/property |
-| Ownership | File missing | Yes | One active file | Continue | Upload a fictional sample ownership document. | Uploader | Upload succeeds | Yes | Security/language |
-| Ownership | Unsupported file | Yes | PDF/JPG/PNG | Selection | This file type is not supported. Upload a PDF, JPG, or PNG file. | Uploader/file row | New valid file | Yes | Security/language |
-| Ownership | Oversized file | Yes | ≤10 MB | Selection | This file is larger than 10 MB. Choose a smaller file. | Uploader/file row | New valid file | Yes | Security/language |
-| Ownership | Upload failed | Yes | Successful private upload | Response | We could not upload this file. Your listing draft is still saved. Try again. | File row + alert | Retry succeeds | Yes | Security/language |
-| Verification | Check failed | Yes | Verification record verified | Result | The simulated ownership check was not completed. Review the details and try again. | Status panel | Verified | Yes | Legal/simulation |
-| Settings | Asking price empty | Yes | Required | Blur / continue | Enter an asking price. | Under input | Valid | Yes | Language/property |
-| Settings | Asking price invalid | Yes | Whole AED >0 | Blur / continue | Enter a valid whole AED amount greater than zero. | Under input | Valid | Yes | Language/property |
-| Settings | Asking price maximum | Yes | <1,000,000,000 | Blur / continue | Asking price must be below AED 1,000,000,000. | Under input | Valid | Yes | Language/property |
-| Settings | Threshold empty | Yes | Required | Blur / continue | Enter a minimum offer-notification amount. | Under input | Valid | Yes | Language/product |
-| Settings | Threshold invalid | Yes | Whole AED >0 | Blur / continue | Enter a valid whole AED amount greater than zero. | Under input | Valid | Yes | Language/product |
-| Settings | Threshold above asking | Yes | ≤ asking | Blur / continue | The notification amount cannot be higher than the asking price. | Under threshold | ≤ asking | Yes | Language/product |
-| Investment | Original price | If added | Whole AED >0 | Blur / save | Enter a valid original purchase price. | Under input | Valid | Yes when added | Finance/language |
-| Investment | Renovation spend | No | Whole AED ≥0 | Blur / save | Renovation spend cannot be negative. | Under input | Empty/valid | Yes when invalid | Finance/language |
-| Investment | Purchase date empty | If added | Required | Save | Enter the purchase date. | Under date | Valid | Yes when added | Finance/language |
-| Investment | Future date | If added | Not future | Blur / save | Purchase date cannot be in the future. | Under date | Valid | Yes | Finance/language |
-| Investment | Date too old | If added | ≥1970 | Blur / save | Enter a purchase date from 1970 onwards. | Under date | Valid | Yes | Finance/language |
-| Investment | Annualisation unavailable | No | Held <30 days | Calculate | Annualised return is not available for a holding period under 30 days. | Metric helper | Date gives valid period | No | Finance/language |
-| Investment | Missing asking price | Dependency | Settings required | Enter step | Add an asking price before calculating the Investment Case. | Dependency alert | Settings complete | Yes to add | Finance/language |
-| Investment | Missing size | Dependency | Details required | Enter step | Add the property size before calculating price per square foot. | Dependency alert | Details complete | Yes to full calc | Finance/language |
-| Form A | Confirmation unchecked | Yes | Checkbox checked | Submit | Confirm the demo listing details to continue. | Under checkbox | Checked | Yes | Legal/simulation |
-| Form A | Completion failed | Yes | Service success | Response | We could not complete the Form A simulation. Your listing details remain saved. | Status panel | Retry succeeds | Yes | Legal/simulation |
-| Photos | Too few | Yes | At least one | Continue | Upload at least one property photograph. | Grid summary | ≥1 | Yes | Language |
-| Photos | Unsupported format | Yes | JPG/PNG/WebP | Selection | This file type is not supported. Upload a JPG, PNG, or WebP image. | Tile/uploader | Valid file | Yes for file | Language |
-| Photos | Oversized photo | Yes | ≤12 MB | Selection | This photograph is larger than 12 MB. Choose a smaller file. | Tile/uploader | Valid file | Yes for file | Language |
-| Photos | Too many | Yes | Max 20 | Selection | You can upload up to 20 photographs. | Uploader | ≤20 | Yes | Language |
-| Photos | No cover | Yes | One cover | Continue | Select a cover photograph. | Grid summary | Cover set | Yes | Language |
-| Photos | Upload failed | Yes | All active uploads complete | Response | This photograph could not be uploaded. Try again or remove it. | Tile | Retry/remove | Yes if active | Language |
-| Trakheesi | Confirmation unchecked | Yes | Checkbox checked | Submit | Confirm the demo listing information to continue. | Under checkbox | Checked | Yes | Legal/simulation |
-| Trakheesi | Permit failed | Yes | Permit approved | Result | The demo permit step was not completed. Review the listing information and try again. | Status panel | Approved | Yes | Legal/simulation |
-| Review | Listing incomplete | Yes | All required groups complete | Load/confirm | Complete the highlighted sections before marking the listing ready. | Top summary | All complete | Yes | Language |
-| Review | Acknowledgement unchecked | Yes | Checkbox checked | Confirm | Confirm that the listing will remain private until a future publication step. | Under checkbox | Checked | Yes | Legal/language |
-| Global | Session expired | Yes | Valid session | Request | Your session has expired. Sign in again to continue. | Route notice | Reauthenticated | Yes | Security/language |
-| Global | Access denied/unavailable | Yes | Owner access | Load | This listing is not available. Return to My Listings. | Blocking panel | Correct route/account | Yes | Security/language |
+| Step         | Field / state             |        Req. | Rule                                      | Trigger               | English error copy                                                                    | Placement         | Clears when             | Blocks progression | Arabic review     |
+| ------------ | ------------------------- | ----------: | ----------------------------------------- | --------------------- | ------------------------------------------------------------------------------------- | ----------------- | ----------------------- | -----------------: | ----------------- |
+| Details      | Property type             |         Yes | One supported type                        | Continue / blur group | Select a property type.                                                               | Under tile group  | Selected                |                Yes | Language/property |
+| Details      | Emirate                   |         Yes | Dubai in prototype                        | Load / continue       | This prototype currently supports Dubai listings.                                     | Field/help        | Dubai set               |                Yes | Language/property |
+| Details      | Area/community            |         Yes | 2–100 chars                               | Blur / continue       | Enter the area or community.                                                          | Under field       | Valid value             |                Yes | Language/property |
+| Details      | Building/project          | Conditional | Required for apartment/penthouse; max 120 | Blur / continue       | Enter the building or project name.                                                   | Under field       | Valid or not applicable |                Yes | Language/property |
+| Details      | Unit/property identifier  |         Yes | 1–50 chars                                | Blur / continue       | Enter a private unit or property identifier.                                          | Under field       | Valid                   |                Yes | Language/property |
+| Details      | Bedrooms                  |         Yes | Studio/0 or 1–10                          | Continue              | Select the number of bedrooms.                                                        | Under control     | Valid                   |                Yes | Language/property |
+| Details      | Bathrooms                 |         Yes | Integer 1–10                              | Continue              | Select the number of bathrooms.                                                       | Under control     | Valid                   |                Yes | Language/property |
+| Details      | Size                      |         Yes | 200–50,000 sq ft                          | Blur / continue       | Enter a property size between 200 and 50,000 sq ft.                                   | Under field       | Valid                   |                Yes | Language/property |
+| Details      | Furnishing                |         Yes | One option                                | Continue              | Select the furnishing status.                                                         | Under group       | Selected                |                Yes | Language/property |
+| Details      | Occupancy                 |         Yes | One option                                | Continue              | Select the occupancy status.                                                          | Under group       | Selected                |                Yes | Language/property |
+| Details      | Completion                |         Yes | Ready or off-plan                         | Continue              | Select the completion status.                                                         | Under group       | Selected                |                Yes | Language/property |
+| Details      | Parking                   |          No | Integer 0–10                              | Blur                  | Enter a number from 0 to 10.                                                          | Under field       | Empty or valid          |        No if empty | Language/property |
+| Details      | Description               |         Yes | 80–2,000 chars                            | Blur / continue       | Add at least 80 characters describing the property.                                   | Under field       | ≥80                     |                Yes | Language/property |
+| Details      | Description too long      |         Yes | Max 2,000                                 | Input / continue      | Description must be 2,000 characters or fewer.                                        | Under field       | ≤2,000                  |                Yes | Language/property |
+| Details      | Amenities                 |          No | Max 15                                    | Select                | Choose up to 15 features and amenities.                                               | Selector          | ≤15                     |          No if ≤15 | Language/property |
+| Ownership    | Document type             |         Yes | Title Deed or Oqood                       | Continue              | Choose Title Deed or Oqood.                                                           | Under tiles       | Selected                |                Yes | Legal/property    |
+| Ownership    | File missing              |         Yes | One active file                           | Continue              | Upload a fictional sample ownership document.                                         | Uploader          | Upload succeeds         |                Yes | Security/language |
+| Ownership    | Unsupported file          |         Yes | PDF/JPG/PNG                               | Selection             | This file type is not supported. Upload a PDF, JPG, or PNG file.                      | Uploader/file row | New valid file          |                Yes | Security/language |
+| Ownership    | Oversized file            |         Yes | ≤10 MB                                    | Selection             | This file is larger than 10 MB. Choose a smaller file.                                | Uploader/file row | New valid file          |                Yes | Security/language |
+| Ownership    | Upload failed             |         Yes | Successful private upload                 | Response              | We could not upload this file. Your listing draft is still saved. Try again.          | File row + alert  | Retry succeeds          |                Yes | Security/language |
+| Verification | Check failed              |         Yes | Verification record verified              | Result                | The simulated ownership check was not completed. Review the details and try again.    | Status panel      | Verified                |                Yes | Legal/simulation  |
+| Settings     | Asking price empty        |         Yes | Required                                  | Blur / continue       | Enter an asking price.                                                                | Under input       | Valid                   |                Yes | Language/property |
+| Settings     | Asking price invalid      |         Yes | Whole AED >0                              | Blur / continue       | Enter a valid whole AED amount greater than zero.                                     | Under input       | Valid                   |                Yes | Language/property |
+| Settings     | Asking price maximum      |         Yes | <1,000,000,000                            | Blur / continue       | Asking price must be below AED 1,000,000,000.                                         | Under input       | Valid                   |                Yes | Language/property |
+| Settings     | Threshold empty           |         Yes | Required                                  | Blur / continue       | Enter a minimum offer-notification amount.                                            | Under input       | Valid                   |                Yes | Language/product  |
+| Settings     | Threshold invalid         |         Yes | Whole AED >0                              | Blur / continue       | Enter a valid whole AED amount greater than zero.                                     | Under input       | Valid                   |                Yes | Language/product  |
+| Settings     | Threshold above asking    |         Yes | ≤ asking                                  | Blur / continue       | The notification amount cannot be higher than the asking price.                       | Under threshold   | ≤ asking                |                Yes | Language/product  |
+| Investment   | Original price            |    If added | Whole AED >0                              | Blur / save           | Enter a valid original purchase price.                                                | Under input       | Valid                   |     Yes when added | Finance/language  |
+| Investment   | Renovation spend          |          No | Whole AED ≥0                              | Blur / save           | Renovation spend cannot be negative.                                                  | Under input       | Empty/valid             |   Yes when invalid | Finance/language  |
+| Investment   | Purchase date empty       |    If added | Required                                  | Save                  | Enter the purchase date.                                                              | Under date        | Valid                   |     Yes when added | Finance/language  |
+| Investment   | Future date               |    If added | Not future                                | Blur / save           | Purchase date cannot be in the future.                                                | Under date        | Valid                   |                Yes | Finance/language  |
+| Investment   | Date too old              |    If added | ≥1970                                     | Blur / save           | Enter a purchase date from 1970 onwards.                                              | Under date        | Valid                   |                Yes | Finance/language  |
+| Investment   | Annualisation unavailable |          No | Held <30 days                             | Calculate             | Annualised return is not available for a holding period under 30 days.                | Metric helper     | Date gives valid period |                 No | Finance/language  |
+| Investment   | Missing asking price      |  Dependency | Settings required                         | Enter step            | Add an asking price before calculating the Investment Case.                           | Dependency alert  | Settings complete       |         Yes to add | Finance/language  |
+| Investment   | Missing size              |  Dependency | Details required                          | Enter step            | Add the property size before calculating price per square foot.                       | Dependency alert  | Details complete        |   Yes to full calc | Finance/language  |
+| Form A       | Confirmation unchecked    |         Yes | Checkbox checked                          | Submit                | Confirm the demo listing details to continue.                                         | Under checkbox    | Checked                 |                Yes | Legal/simulation  |
+| Form A       | Completion failed         |         Yes | Service success                           | Response              | We could not complete the Form A simulation. Your listing details remain saved.       | Status panel      | Retry succeeds          |                Yes | Legal/simulation  |
+| Photos       | Too few                   |         Yes | At least one                              | Continue              | Upload at least one property photograph.                                              | Grid summary      | ≥1                      |                Yes | Language          |
+| Photos       | Unsupported format        |         Yes | JPG/PNG/WebP                              | Selection             | This file type is not supported. Upload a JPG, PNG, or WebP image.                    | Tile/uploader     | Valid file              |       Yes for file | Language          |
+| Photos       | Oversized photo           |         Yes | ≤12 MB                                    | Selection             | This photograph is larger than 12 MB. Choose a smaller file.                          | Tile/uploader     | Valid file              |       Yes for file | Language          |
+| Photos       | Too many                  |         Yes | Max 20                                    | Selection             | You can upload up to 20 photographs.                                                  | Uploader          | ≤20                     |                Yes | Language          |
+| Photos       | No cover                  |         Yes | One cover                                 | Continue              | Select a cover photograph.                                                            | Grid summary      | Cover set               |                Yes | Language          |
+| Photos       | Upload failed             |         Yes | All active uploads complete               | Response              | This photograph could not be uploaded. Try again or remove it.                        | Tile              | Retry/remove            |      Yes if active | Language          |
+| Trakheesi    | Confirmation unchecked    |         Yes | Checkbox checked                          | Submit                | Confirm the demo listing information to continue.                                     | Under checkbox    | Checked                 |                Yes | Legal/simulation  |
+| Trakheesi    | Permit failed             |         Yes | Permit approved                           | Result                | The demo permit step was not completed. Review the listing information and try again. | Status panel      | Approved                |                Yes | Legal/simulation  |
+| Review       | Listing incomplete        |         Yes | All required groups complete              | Load/confirm          | Complete the highlighted sections before marking the listing ready.                   | Top summary       | All complete            |                Yes | Language          |
+| Review       | Acknowledgement unchecked |         Yes | Checkbox checked                          | Confirm               | Confirm that the listing will remain private until a future publication step.         | Under checkbox    | Checked                 |                Yes | Legal/language    |
+| Global       | Session expired           |         Yes | Valid session                             | Request               | Your session has expired. Sign in again to continue.                                  | Route notice      | Reauthenticated         |                Yes | Security/language |
+| Global       | Access denied/unavailable |         Yes | Owner access                              | Load                  | This listing is not available. Return to My Listings.                                 | Blocking panel    | Correct route/account   |                Yes | Security/language |
 
 ---
 
@@ -3100,19 +3098,18 @@ Actions:
 
 An optional support reference may be shown. It must contain no customer data.
 
-
 ---
 
 # 26. Responsive Behaviour
 
 ## 26.1 Shared measurements
 
-| Context | Maximum page width | Main form width | Page padding | Stepper |
-|---|---:|---:|---:|---|
-| Wide desktop ≥1440 px | 1360 px | 760 px | 40 px | 240 px side rail |
-| Desktop 1024–1439 px | 1200–1280 px | 720 px | 32 px | 220–240 px side rail |
-| Tablet 768–1023 px | 760 px | 100% | 32 px | Compact top navigator |
-| Mobile <768 px | 100% | 100% | 20–24 px | Step X of 9 + progress line |
+| Context               | Maximum page width | Main form width | Page padding | Stepper                     |
+| --------------------- | -----------------: | --------------: | -----------: | --------------------------- |
+| Wide desktop ≥1440 px |            1360 px |          760 px |        40 px | 240 px side rail            |
+| Desktop 1024–1439 px  |       1200–1280 px |          720 px |        32 px | 220–240 px side rail        |
+| Tablet 768–1023 px    |             760 px |            100% |        32 px | Compact top navigator       |
+| Mobile <768 px        |               100% |            100% |     20–24 px | Step X of 9 + progress line |
 
 ## 26.2 Sticky actions
 
@@ -3384,216 +3381,216 @@ The detailed screen sections are authoritative. This table provides implementati
 
 ## 29.1 Global and wizard
 
-| Key | English |
-|---|---|
-| `listing.myListings.title` | My listings |
+| Key                              | English                                                      |
+| -------------------------------- | ------------------------------------------------------------ |
+| `listing.myListings.title`       | My listings                                                  |
 | `listing.myListings.description` | Create and manage the properties you want to list on MARKAZ. |
-| `listing.create` | Create new listing |
-| `listing.continue` | Continue listing |
-| `listing.saveExit` | Save and exit |
-| `listing.back` | Back |
-| `listing.saveContinue` | Save and continue |
-| `listing.saving` | Saving… |
-| `listing.savedNow` | Saved just now |
-| `listing.saveFailed` | Couldn’t save changes |
-| `listing.offline` | Offline · Changes not saved |
-| `listing.privateDraft` | Private draft |
-| `listing.actionRequired` | Action required |
-| `listing.optional` | Optional |
-| `listing.skipped` | Skipped · Optional |
-| `listing.complete` | Complete |
-| `listing.inProgress` | In progress |
-| `listing.ready` | Ready to publish |
+| `listing.create`                 | Create new listing                                           |
+| `listing.continue`               | Continue listing                                             |
+| `listing.saveExit`               | Save and exit                                                |
+| `listing.back`                   | Back                                                         |
+| `listing.saveContinue`           | Save and continue                                            |
+| `listing.saving`                 | Saving…                                                      |
+| `listing.savedNow`               | Saved just now                                               |
+| `listing.saveFailed`             | Couldn’t save changes                                        |
+| `listing.offline`                | Offline · Changes not saved                                  |
+| `listing.privateDraft`           | Private draft                                                |
+| `listing.actionRequired`         | Action required                                              |
+| `listing.optional`               | Optional                                                     |
+| `listing.skipped`                | Skipped · Optional                                           |
+| `listing.complete`               | Complete                                                     |
+| `listing.inProgress`             | In progress                                                  |
+| `listing.ready`                  | Ready to publish                                             |
 
 ## 29.2 Property Details
 
-| Key | English |
-|---|---|
-| `details.step` | Step 1 of 9 · Property details |
-| `details.title` | Tell us about the property |
-| `details.description` | Start with the essential information buyers will use to understand the property. You can return and update these details before publication. |
-| `details.type` | Property type |
-| `details.emirate` | Emirate |
-| `details.dubaiOnly` | This prototype currently supports residential property listings in Dubai. |
-| `details.community` | Area or community |
-| `details.communityPlaceholder` | Search for an area, such as Dubai Marina |
-| `details.building` | Building or project |
-| `details.buildingPlaceholder` | Enter the building or project name |
-| `details.identifier` | Unit or property identifier |
-| `details.identifierPlaceholder` | For example, Unit 2205 or Villa 27 |
-| `details.identifierPrivate` | Kept private. This helps connect your fictional sample document to the listing. |
-| `details.bedrooms` | Bedrooms |
-| `details.bathrooms` | Bathrooms |
-| `details.size` | Property size |
-| `details.sizeUnit` | sq ft |
-| `details.furnishing` | Furnishing status |
-| `details.occupancy` | Occupancy status |
-| `details.completion` | Completion status |
-| `details.parking` | Parking spaces |
-| `details.descriptionLabel` | Property description |
-| `details.descriptionPlaceholder` | Describe the layout, condition, views, natural light, recent improvements, and what makes the property distinctive. |
-| `details.amenities` | Features and amenities |
-| `details.submitLoading` | Saving property details… |
+| Key                              | English                                                                                                                                      |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `details.step`                   | Step 1 of 9 · Property details                                                                                                               |
+| `details.title`                  | Tell us about the property                                                                                                                   |
+| `details.description`            | Start with the essential information buyers will use to understand the property. You can return and update these details before publication. |
+| `details.type`                   | Property type                                                                                                                                |
+| `details.emirate`                | Emirate                                                                                                                                      |
+| `details.dubaiOnly`              | This prototype currently supports residential property listings in Dubai.                                                                    |
+| `details.community`              | Area or community                                                                                                                            |
+| `details.communityPlaceholder`   | Search for an area, such as Dubai Marina                                                                                                     |
+| `details.building`               | Building or project                                                                                                                          |
+| `details.buildingPlaceholder`    | Enter the building or project name                                                                                                           |
+| `details.identifier`             | Unit or property identifier                                                                                                                  |
+| `details.identifierPlaceholder`  | For example, Unit 2205 or Villa 27                                                                                                           |
+| `details.identifierPrivate`      | Kept private. This helps connect your fictional sample document to the listing.                                                              |
+| `details.bedrooms`               | Bedrooms                                                                                                                                     |
+| `details.bathrooms`              | Bathrooms                                                                                                                                    |
+| `details.size`                   | Property size                                                                                                                                |
+| `details.sizeUnit`               | sq ft                                                                                                                                        |
+| `details.furnishing`             | Furnishing status                                                                                                                            |
+| `details.occupancy`              | Occupancy status                                                                                                                             |
+| `details.completion`             | Completion status                                                                                                                            |
+| `details.parking`                | Parking spaces                                                                                                                               |
+| `details.descriptionLabel`       | Property description                                                                                                                         |
+| `details.descriptionPlaceholder` | Describe the layout, condition, views, natural light, recent improvements, and what makes the property distinctive.                          |
+| `details.amenities`              | Features and amenities                                                                                                                       |
+| `details.submitLoading`          | Saving property details…                                                                                                                     |
 
 ## 29.3 Ownership Document
 
-| Key | English |
-|---|---|
-| `ownership.step` | Step 2 of 9 · Ownership document |
-| `ownership.title` | Add a fictional ownership document |
-| `ownership.description` | Choose the document type and upload one fictional sample file for the simulated ownership check. |
-| `ownership.safetyTitle` | Use a fictional sample document only |
-| `ownership.safetyBody1` | For this prototype, use a fictional sample document only. |
-| `ownership.safetyBody2` | Do not upload a real Title Deed, Oqood, Emirates ID, passport, or other sensitive document. |
-| `ownership.titleDeed` | Title Deed |
-| `ownership.oqood` | Oqood |
-| `ownership.privateTitle` | Private document |
-| `ownership.privateBody` | This file is visible only to you and authorised MARKAZ Operations users. It will not appear on the public listing or listing preview. The check is simulated and does not connect to official property or government records. |
-| `ownership.drop` | Drag a fictional sample file here, or choose a file |
-| `ownership.types` | PDF, JPG or PNG · Maximum 10 MB |
-| `ownership.uploading` | Uploading… {percent}% |
-| `ownership.uploaded` | Uploaded privately |
-| `ownership.replace` | Replace file |
-| `ownership.remove` | Remove file |
+| Key                      | English                                                                                                                                                                                                                       |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ownership.step`         | Step 2 of 9 · Ownership document                                                                                                                                                                                              |
+| `ownership.title`        | Add a fictional ownership document                                                                                                                                                                                            |
+| `ownership.description`  | Choose the document type and upload one fictional sample file for the simulated ownership check.                                                                                                                              |
+| `ownership.safetyTitle`  | Use a fictional sample document only                                                                                                                                                                                          |
+| `ownership.safetyBody1`  | For this prototype, use a fictional sample document only.                                                                                                                                                                     |
+| `ownership.safetyBody2`  | Do not upload a real Title Deed, Oqood, Emirates ID, passport, or other sensitive document.                                                                                                                                   |
+| `ownership.titleDeed`    | Title Deed                                                                                                                                                                                                                    |
+| `ownership.oqood`        | Oqood                                                                                                                                                                                                                         |
+| `ownership.privateTitle` | Private document                                                                                                                                                                                                              |
+| `ownership.privateBody`  | This file is visible only to you and authorised MARKAZ Operations users. It will not appear on the public listing or listing preview. The check is simulated and does not connect to official property or government records. |
+| `ownership.drop`         | Drag a fictional sample file here, or choose a file                                                                                                                                                                           |
+| `ownership.types`        | PDF, JPG or PNG · Maximum 10 MB                                                                                                                                                                                               |
+| `ownership.uploading`    | Uploading… {percent}%                                                                                                                                                                                                         |
+| `ownership.uploaded`     | Uploaded privately                                                                                                                                                                                                            |
+| `ownership.replace`      | Replace file                                                                                                                                                                                                                  |
+| `ownership.remove`       | Remove file                                                                                                                                                                                                                   |
 
 ## 29.4 Ownership Verification
 
-| Key | English |
-|---|---|
-| `verification.step` | Step 3 of 9 · Ownership check |
-| `verification.disclosureTitle` | Ownership verification simulated |
-| `verification.disclosureBody` | This prototype does not connect to official property or government records. |
-| `verification.introTitle` | Run the simulated ownership check |
-| `verification.introBody` | We will compare the fictional sample document with the private property information in this listing. |
-| `verification.start` | Start simulated check |
-| `verification.pendingTitle` | Ownership check in progress |
-| `verification.pendingBody` | The simulated check is reviewing the fictional document and listing details. You can leave this page and return later. |
-| `verification.successTitle` | Ownership verification simulated |
-| `verification.successBody` | The fictional document and listing details matched for this demo. |
-| `verification.failedMismatchTitle` | The demo details did not match |
-| `verification.failedUnreadableTitle` | The fictional sample could not be reviewed |
-| `verification.retry` | Try the check again |
+| Key                                  | English                                                                                                                |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `verification.step`                  | Step 3 of 9 · Ownership check                                                                                          |
+| `verification.disclosureTitle`       | Ownership verification simulated                                                                                       |
+| `verification.disclosureBody`        | This prototype does not connect to official property or government records.                                            |
+| `verification.introTitle`            | Run the simulated ownership check                                                                                      |
+| `verification.introBody`             | We will compare the fictional sample document with the private property information in this listing.                   |
+| `verification.start`                 | Start simulated check                                                                                                  |
+| `verification.pendingTitle`          | Ownership check in progress                                                                                            |
+| `verification.pendingBody`           | The simulated check is reviewing the fictional document and listing details. You can leave this page and return later. |
+| `verification.successTitle`          | Ownership verification simulated                                                                                       |
+| `verification.successBody`           | The fictional document and listing details matched for this demo.                                                      |
+| `verification.failedMismatchTitle`   | The demo details did not match                                                                                         |
+| `verification.failedUnreadableTitle` | The fictional sample could not be reviewed                                                                             |
+| `verification.retry`                 | Try the check again                                                                                                    |
 
 ## 29.5 Listing Settings
 
-| Key | English |
-|---|---|
-| `settings.step` | Step 4 of 9 · Listing settings |
-| `settings.title` | Set your price and offer preference |
-| `settings.description` | Choose the asking price and the lowest offer amount you want to be notified about. |
-| `settings.asking` | Asking price |
-| `settings.askingHelp` | This will be the advertised price when the listing is published in a later step. |
-| `settings.threshold` | Minimum offer notification |
-| `settings.thresholdHelp` | Choose the lowest offer amount you want to be notified about. Lower offers may still appear in your offer history, but you will not receive an immediate notification. |
-| `settings.notificationDemo` | Offer notifications will be simulated in a later milestone. |
-| `settings.comparison` | Demo area comparison |
-| `settings.visibilityTitle` | Current visibility: Private draft |
-| `settings.visibilityBody` | The listing will not appear publicly during this milestone. |
-| `settings.submitLoading` | Saving listing settings… |
+| Key                         | English                                                                                                                                                                |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `settings.step`             | Step 4 of 9 · Listing settings                                                                                                                                         |
+| `settings.title`            | Set your price and offer preference                                                                                                                                    |
+| `settings.description`      | Choose the asking price and the lowest offer amount you want to be notified about.                                                                                     |
+| `settings.asking`           | Asking price                                                                                                                                                           |
+| `settings.askingHelp`       | This will be the advertised price when the listing is published in a later step.                                                                                       |
+| `settings.threshold`        | Minimum offer notification                                                                                                                                             |
+| `settings.thresholdHelp`    | Choose the lowest offer amount you want to be notified about. Lower offers may still appear in your offer history, but you will not receive an immediate notification. |
+| `settings.notificationDemo` | Offer notifications will be simulated in a later milestone.                                                                                                            |
+| `settings.comparison`       | Demo area comparison                                                                                                                                                   |
+| `settings.visibilityTitle`  | Current visibility: Private draft                                                                                                                                      |
+| `settings.visibilityBody`   | The listing will not appear publicly during this milestone.                                                                                                            |
+| `settings.submitLoading`    | Saving listing settings…                                                                                                                                               |
 
 ## 29.6 Investment Case
 
-| Key | English |
-|---|---|
-| `investment.step` | Step 5 of 9 · Investment Case · Optional |
-| `investment.title` | Add an Investment Case |
-| `investment.description` | Share optional purchase-history information and an estimated return summary with future buyers. |
-| `investment.privacy` | Purchase history is optional. You choose whether the calculated Investment Case will appear on the future public listing. |
-| `investment.add` | Add Investment Case |
-| `investment.skip` | Skip for now |
-| `investment.originalPrice` | Original purchase price |
-| `investment.purchaseDate` | Purchase date |
-| `investment.renovation` | Renovation or improvement spend |
-| `investment.visibility` | Show the Investment Case on the future public listing |
-| `investment.totalInvested` | Total invested |
-| `investment.gain` | Estimated gain |
-| `investment.roi` | Estimated ROI |
-| `investment.annualised` | Estimated annualised return |
-| `investment.priceSqft` | Asking price per sq ft |
-| `investment.areaAverage` | Demo area average per sq ft |
-| `investment.cardTitle` | Estimated Investment Case |
-| `investment.disclaimer` | Estimates are based only on the values entered for this demo. They do not include transaction costs, financing, rental income, taxes, service charges, or market changes. |
-| `investment.save` | Save Investment Case |
-| `investment.remove` | Remove Investment Case |
+| Key                        | English                                                                                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `investment.step`          | Step 5 of 9 · Investment Case · Optional                                                                                                                                  |
+| `investment.title`         | Add an Investment Case                                                                                                                                                    |
+| `investment.description`   | Share optional purchase-history information and an estimated return summary with future buyers.                                                                           |
+| `investment.privacy`       | Purchase history is optional. You choose whether the calculated Investment Case will appear on the future public listing.                                                 |
+| `investment.add`           | Add Investment Case                                                                                                                                                       |
+| `investment.skip`          | Skip for now                                                                                                                                                              |
+| `investment.originalPrice` | Original purchase price                                                                                                                                                   |
+| `investment.purchaseDate`  | Purchase date                                                                                                                                                             |
+| `investment.renovation`    | Renovation or improvement spend                                                                                                                                           |
+| `investment.visibility`    | Show the Investment Case on the future public listing                                                                                                                     |
+| `investment.totalInvested` | Total invested                                                                                                                                                            |
+| `investment.gain`          | Estimated gain                                                                                                                                                            |
+| `investment.roi`           | Estimated ROI                                                                                                                                                             |
+| `investment.annualised`    | Estimated annualised return                                                                                                                                               |
+| `investment.priceSqft`     | Asking price per sq ft                                                                                                                                                    |
+| `investment.areaAverage`   | Demo area average per sq ft                                                                                                                                               |
+| `investment.cardTitle`     | Estimated Investment Case                                                                                                                                                 |
+| `investment.disclaimer`    | Estimates are based only on the values entered for this demo. They do not include transaction costs, financing, rental income, taxes, service charges, or market changes. |
+| `investment.save`          | Save Investment Case                                                                                                                                                      |
+| `investment.remove`        | Remove Investment Case                                                                                                                                                    |
 
 ## 29.7 Simulated Form A
 
-| Key | English |
-|---|---|
-| `formA.step` | Step 6 of 9 · Simulated Form A |
-| `formA.disclosureTitle` | Simulated Form A |
-| `formA.disclosureBody` | This prototype does not create or submit a legal Form A. |
-| `formA.title` | Review the simulated listing agreement |
-| `formA.description` | Form A is normally used to document the relationship between a property owner and a real-estate brokerage. This prototype shows a simplified, non-legal simulation of that step. |
-| `formA.confirm` | I confirm the demo listing details above. |
-| `formA.complete` | Complete simulated Form A |
-| `formA.pendingTitle` | Simulated Form A in progress |
-| `formA.successTitle` | Simulated Form A complete |
-| `formA.successBody` | The demo confirmation has been recorded for this listing. |
-| `formA.failureTitle` | We could not complete the Form A simulation |
+| Key                     | English                                                                                                                                                                          |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `formA.step`            | Step 6 of 9 · Simulated Form A                                                                                                                                                   |
+| `formA.disclosureTitle` | Simulated Form A                                                                                                                                                                 |
+| `formA.disclosureBody`  | This prototype does not create or submit a legal Form A.                                                                                                                         |
+| `formA.title`           | Review the simulated listing agreement                                                                                                                                           |
+| `formA.description`     | Form A is normally used to document the relationship between a property owner and a real-estate brokerage. This prototype shows a simplified, non-legal simulation of that step. |
+| `formA.confirm`         | I confirm the demo listing details above.                                                                                                                                        |
+| `formA.complete`        | Complete simulated Form A                                                                                                                                                        |
+| `formA.pendingTitle`    | Simulated Form A in progress                                                                                                                                                     |
+| `formA.successTitle`    | Simulated Form A complete                                                                                                                                                        |
+| `formA.successBody`     | The demo confirmation has been recorded for this listing.                                                                                                                        |
+| `formA.failureTitle`    | We could not complete the Form A simulation                                                                                                                                      |
 
 ## 29.8 Photos
 
-| Key | English |
-|---|---|
-| `photos.step` | Step 7 of 9 · Property photos |
-| `photos.title` | Add property photographs |
-| `photos.description` | Upload clear photographs that show the property accurately. Choose the strongest landscape image as the cover. |
-| `photos.guidance` | For the strongest listing, include the living area, bedrooms, kitchen, bathrooms, exterior or balcony, and any important view or amenity. |
-| `photos.drop` | Drag photographs here, or choose photographs |
-| `photos.rules` | JPG, PNG or WebP · Up to 20 files · Maximum 12 MB each |
-| `photos.gallery` | Choose from gallery |
-| `photos.camera` | Take a photo |
-| `photos.cover` | Cover photograph |
-| `photos.setCover` | Set as cover |
-| `photos.replace` | Replace photograph |
-| `photos.remove` | Remove photograph |
-| `photos.reorder` | Reorder photographs |
-| `photos.save` | Save photos and continue |
+| Key                  | English                                                                                                                                   |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `photos.step`        | Step 7 of 9 · Property photos                                                                                                             |
+| `photos.title`       | Add property photographs                                                                                                                  |
+| `photos.description` | Upload clear photographs that show the property accurately. Choose the strongest landscape image as the cover.                            |
+| `photos.guidance`    | For the strongest listing, include the living area, bedrooms, kitchen, bathrooms, exterior or balcony, and any important view or amenity. |
+| `photos.drop`        | Drag photographs here, or choose photographs                                                                                              |
+| `photos.rules`       | JPG, PNG or WebP · Up to 20 files · Maximum 12 MB each                                                                                    |
+| `photos.gallery`     | Choose from gallery                                                                                                                       |
+| `photos.camera`      | Take a photo                                                                                                                              |
+| `photos.cover`       | Cover photograph                                                                                                                          |
+| `photos.setCover`    | Set as cover                                                                                                                              |
+| `photos.replace`     | Replace photograph                                                                                                                        |
+| `photos.remove`      | Remove photograph                                                                                                                         |
+| `photos.reorder`     | Reorder photographs                                                                                                                       |
+| `photos.save`        | Save photos and continue                                                                                                                  |
 
 ## 29.9 Simulated Trakheesi
 
-| Key | English |
-|---|---|
-| `permit.step` | Step 8 of 9 · Simulated Trakheesi |
-| `permit.disclosureTitle` | Simulated Trakheesi |
-| `permit.disclosureBody` | This prototype does not submit information to the official Trakheesi service. |
-| `permit.title` | Prepare the demo permit application |
-| `permit.description` | Review the listing information that will be used for this simulated permit step. |
-| `permit.confirm` | I confirm the demo listing information is ready for the simulated permit step. |
-| `permit.submit` | Submit simulated application |
-| `permit.pendingTitle` | Demo permit application in progress |
-| `permit.approvedTitle` | Demo permit approved |
-| `permit.approvedBody` | The simulated Trakheesi step is complete. Review the full listing before marking it ready to publish. |
-| `permit.failedTitle` | The demo permit step was not completed |
-| `permit.qr` | Simulated Madmoun QR · Demo only |
+| Key                      | English                                                                                               |
+| ------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `permit.step`            | Step 8 of 9 · Simulated Trakheesi                                                                     |
+| `permit.disclosureTitle` | Simulated Trakheesi                                                                                   |
+| `permit.disclosureBody`  | This prototype does not submit information to the official Trakheesi service.                         |
+| `permit.title`           | Prepare the demo permit application                                                                   |
+| `permit.description`     | Review the listing information that will be used for this simulated permit step.                      |
+| `permit.confirm`         | I confirm the demo listing information is ready for the simulated permit step.                        |
+| `permit.submit`          | Submit simulated application                                                                          |
+| `permit.pendingTitle`    | Demo permit application in progress                                                                   |
+| `permit.approvedTitle`   | Demo permit approved                                                                                  |
+| `permit.approvedBody`    | The simulated Trakheesi step is complete. Review the full listing before marking it ready to publish. |
+| `permit.failedTitle`     | The demo permit step was not completed                                                                |
+| `permit.qr`              | Simulated Madmoun QR · Demo only                                                                      |
 
 ## 29.10 Review and Ready
 
-| Key | English |
-|---|---|
-| `review.step` | Step 9 of 9 · Review |
-| `review.title` | Review your listing |
-| `review.description` | Check the property information, demo verification steps, price, and photographs before marking the listing ready to publish. |
-| `review.completeTitle` | All required sections are complete |
-| `review.incompleteTitle` | {count} items need attention |
-| `review.prototypeTitle` | Prototype listing |
-| `review.prototypeBody` | Ownership verification, Form A, Trakheesi, and permit results in this prototype are simulated. They do not represent official government, legal, or property approval. |
-| `review.notPublicTitle` | Not yet public |
-| `review.notPublicBody` | Marking the listing ready does not publish it. Publication will be handled in a later product stage. |
-| `review.acknowledge` | I have reviewed the listing and understand it will remain private until a future publication step. |
-| `review.readyAction` | Mark listing ready |
-| `review.checking` | Checking listing readiness… |
-| `ready.title` | Your listing is ready |
-| `ready.description` | You have completed the required property details, demo verification steps, photographs, and listing settings. |
-| `ready.notLive` | Your listing is not live yet. Review the preview before publishing in the next product stage. |
-| `ready.preview` | View listing preview |
-| `ready.myListings` | Return to My Listings |
-| `ready.continueLater` | Continue later |
-| `ready.nextTitle` | Next stage: Publication |
-| `ready.nextBody` | Publishing the listing will be added in the next product milestone. |
-| `preview.bannerTitle` | Private preview |
-| `preview.bannerBody` | Only you can view this draft. The listing is not live. |
+| Key                      | English                                                                                                                                                                |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `review.step`            | Step 9 of 9 · Review                                                                                                                                                   |
+| `review.title`           | Review your listing                                                                                                                                                    |
+| `review.description`     | Check the property information, demo verification steps, price, and photographs before marking the listing ready to publish.                                           |
+| `review.completeTitle`   | All required sections are complete                                                                                                                                     |
+| `review.incompleteTitle` | {count} items need attention                                                                                                                                           |
+| `review.prototypeTitle`  | Prototype listing                                                                                                                                                      |
+| `review.prototypeBody`   | Ownership verification, Form A, Trakheesi, and permit results in this prototype are simulated. They do not represent official government, legal, or property approval. |
+| `review.notPublicTitle`  | Not yet public                                                                                                                                                         |
+| `review.notPublicBody`   | Marking the listing ready does not publish it. Publication will be handled in a later product stage.                                                                   |
+| `review.acknowledge`     | I have reviewed the listing and understand it will remain private until a future publication step.                                                                     |
+| `review.readyAction`     | Mark listing ready                                                                                                                                                     |
+| `review.checking`        | Checking listing readiness…                                                                                                                                            |
+| `ready.title`            | Your listing is ready                                                                                                                                                  |
+| `ready.description`      | You have completed the required property details, demo verification steps, photographs, and listing settings.                                                          |
+| `ready.notLive`          | Your listing is not live yet. Review the preview before publishing in the next product stage.                                                                          |
+| `ready.preview`          | View listing preview                                                                                                                                                   |
+| `ready.myListings`       | Return to My Listings                                                                                                                                                  |
+| `ready.continueLater`    | Continue later                                                                                                                                                         |
+| `ready.nextTitle`        | Next stage: Publication                                                                                                                                                |
+| `ready.nextBody`         | Publishing the listing will be added in the next product milestone.                                                                                                    |
+| `preview.bannerTitle`    | Private preview                                                                                                                                                        |
+| `preview.bannerBody`     | Only you can view this draft. The listing is not live.                                                                                                                 |
 
 ---
 
@@ -3603,87 +3600,87 @@ The detailed screen sections are authoritative. This table provides implementati
 
 All Arabic below is **draft**. It must receive professional Arabic review. Property, legal, government, investment, and permit terminology requires business/legal review as noted.
 
-| English | Draft Arabic | Review |
-|---|---|---|
-| My listings | عقاراتي المدرجة | Property/language |
-| Create new listing | إنشاء إعلان عقاري جديد | Property/language |
-| Continue listing | متابعة إعداد الإعلان | Property/language |
-| Save and exit | حفظ وخروج | Language |
-| Save and continue | حفظ ومتابعة | Language |
-| Saved just now | تم الحفظ الآن | Language |
-| Couldn’t save changes | تعذّر حفظ التغييرات | Language |
-| Private draft | مسودة خاصة | Property/language |
-| Step {current} of 9 | الخطوة {current} من 9 | Language |
-| Property details | تفاصيل العقار | Property/language |
-| Tell us about the property | أخبرنا عن العقار | Property/language |
-| Property type | نوع العقار | Property/language |
-| Apartment | شقة | Property/language |
-| Villa | فيلا | Property/language |
-| Townhouse | تاون هاوس | Property/language |
-| Penthouse | بنتهاوس | Property/language |
-| Emirate | الإمارة | Property/language |
-| Area or community | المنطقة أو المجمع | Property/language |
-| Building or project | المبنى أو المشروع | Property/language |
-| Unit or property identifier | رقم الوحدة أو معرّف العقار | Property/security/language |
-| Bedrooms | غرف النوم | Property/language |
-| Studio | استوديو | Property/language |
-| Bathrooms | الحمّامات | Property/language |
-| Property size | مساحة العقار | Property/language |
-| sq ft | قدم مربع | Property/language |
-| Furnishing status | حالة التأثيث | Property/language |
-| Occupancy status | حالة الإشغال | Property/language |
-| Completion status | حالة الإنجاز | Property/language |
-| Parking spaces | مواقف السيارات | Property/language |
-| Property description | وصف العقار | Property/language |
-| Features and amenities | المزايا والمرافق | Property/language |
-| Ownership document | مستند الملكية | Legal/property/language |
-| Add a fictional ownership document | أضف مستند ملكية افتراضيًا | Legal/property/language |
-| Use a fictional sample document only | استخدم مستندًا تجريبيًا وهميًا فقط | Security/legal/language |
-| Do not upload a real Title Deed, Oqood, Emirates ID, passport, or other sensitive document. | لا ترفع سند ملكية حقيقيًا أو مستند عقود أو هوية إماراتية أو جواز سفر أو أي مستند حساس آخر. | Legal/security/professional review |
-| Title Deed | سند الملكية | Legal/property |
-| Oqood | عقود | Legal/property |
-| Private document | مستند خاص | Security/language |
-| Uploaded privately | تم الرفع بشكل خاص | Security/language |
-| Ownership verification simulated | محاكاة التحقق من الملكية | Legal/simulation/language |
-| This prototype does not connect to official property or government records. | هذا النموذج الأولي غير متصل بسجلات العقارات أو الجهات الحكومية الرسمية. | Legal/simulation/language |
-| Start simulated check | بدء الفحص التجريبي | Simulation/language |
-| Ownership check in progress | فحص الملكية التجريبي قيد التنفيذ | Simulation/language |
-| Verified · Demo | تم التحقق · تجريبي | Simulation/language |
-| Listing settings | إعدادات الإعلان | Property/language |
-| Asking price | السعر المطلوب | Property/language |
-| Minimum offer notification | الحد الأدنى لإشعار العرض | Product/property/language |
-| Private draft | مسودة خاصة | Property/language |
-| Investment Case | ملخص الاستثمار | Finance/product review |
-| Add an Investment Case | إضافة ملخص استثماري | Finance/product review |
-| Original purchase price | سعر الشراء الأصلي | Finance/language |
-| Purchase date | تاريخ الشراء | Finance/language |
-| Renovation or improvement spend | تكاليف التجديد أو التحسين | Finance/language |
-| Total invested | إجمالي المبلغ المستثمر | Finance/language |
-| Estimated gain | الربح التقديري | Finance/legal/language |
-| Estimated ROI | العائد التقديري على الاستثمار | Finance/legal/language |
-| Estimated annualised return | العائد السنوي التقديري | Finance/legal/language |
-| Asking price per sq ft | السعر المطلوب لكل قدم مربع | Finance/property/language |
-| Simulated Form A | نموذج A تجريبي | Legal/business/language |
-| This prototype does not create or submit a legal Form A. | هذا النموذج الأولي لا ينشئ أو يقدّم نموذج A قانونيًا. | Legal/professional review |
-| Simulated Form A complete | اكتمل نموذج A التجريبي | Legal/simulation/language |
-| Property photographs | صور العقار | Property/language |
-| Add property photographs | أضف صور العقار | Property/language |
-| Cover photograph | الصورة الرئيسية | Property/language |
-| Set as cover | تعيين كصورة رئيسية | Property/language |
-| Reorder photographs | إعادة ترتيب الصور | Language |
-| Simulated Trakheesi | ترخيصي تجريبي | Legal/government/professional review |
-| This prototype does not submit information to the official Trakheesi service. | هذا النموذج الأولي لا يرسل معلومات إلى خدمة ترخيصي الرسمية. | Legal/government/professional review |
-| Submit simulated application | إرسال الطلب التجريبي | Simulation/language |
-| Demo permit approved | تمت الموافقة على التصريح التجريبي | Legal/government/professional review |
-| Simulated Madmoun QR · Demo only | رمز مضمون تجريبي · للعرض فقط | Legal/government/professional review |
-| Review your listing | راجع إعلانك العقاري | Property/language |
-| All required sections are complete | اكتملت جميع الأقسام المطلوبة | Language |
-| Mark listing ready | تعيين الإعلان كجاهز | Product/property/language |
-| Your listing is ready | إعلانك جاهز | Property/language |
-| Your listing is not live yet. | إعلانك غير منشور بعد. | Property/language |
-| View listing preview | عرض معاينة الإعلان | Property/language |
-| Return to My Listings | العودة إلى عقاراتي المدرجة | Property/language |
-| Private preview | معاينة خاصة | Property/language |
+| English                                                                                     | Draft Arabic                                                                               | Review                               |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------ |
+| My listings                                                                                 | عقاراتي المدرجة                                                                            | Property/language                    |
+| Create new listing                                                                          | إنشاء إعلان عقاري جديد                                                                     | Property/language                    |
+| Continue listing                                                                            | متابعة إعداد الإعلان                                                                       | Property/language                    |
+| Save and exit                                                                               | حفظ وخروج                                                                                  | Language                             |
+| Save and continue                                                                           | حفظ ومتابعة                                                                                | Language                             |
+| Saved just now                                                                              | تم الحفظ الآن                                                                              | Language                             |
+| Couldn’t save changes                                                                       | تعذّر حفظ التغييرات                                                                        | Language                             |
+| Private draft                                                                               | مسودة خاصة                                                                                 | Property/language                    |
+| Step {current} of 9                                                                         | الخطوة {current} من 9                                                                      | Language                             |
+| Property details                                                                            | تفاصيل العقار                                                                              | Property/language                    |
+| Tell us about the property                                                                  | أخبرنا عن العقار                                                                           | Property/language                    |
+| Property type                                                                               | نوع العقار                                                                                 | Property/language                    |
+| Apartment                                                                                   | شقة                                                                                        | Property/language                    |
+| Villa                                                                                       | فيلا                                                                                       | Property/language                    |
+| Townhouse                                                                                   | تاون هاوس                                                                                  | Property/language                    |
+| Penthouse                                                                                   | بنتهاوس                                                                                    | Property/language                    |
+| Emirate                                                                                     | الإمارة                                                                                    | Property/language                    |
+| Area or community                                                                           | المنطقة أو المجمع                                                                          | Property/language                    |
+| Building or project                                                                         | المبنى أو المشروع                                                                          | Property/language                    |
+| Unit or property identifier                                                                 | رقم الوحدة أو معرّف العقار                                                                 | Property/security/language           |
+| Bedrooms                                                                                    | غرف النوم                                                                                  | Property/language                    |
+| Studio                                                                                      | استوديو                                                                                    | Property/language                    |
+| Bathrooms                                                                                   | الحمّامات                                                                                  | Property/language                    |
+| Property size                                                                               | مساحة العقار                                                                               | Property/language                    |
+| sq ft                                                                                       | قدم مربع                                                                                   | Property/language                    |
+| Furnishing status                                                                           | حالة التأثيث                                                                               | Property/language                    |
+| Occupancy status                                                                            | حالة الإشغال                                                                               | Property/language                    |
+| Completion status                                                                           | حالة الإنجاز                                                                               | Property/language                    |
+| Parking spaces                                                                              | مواقف السيارات                                                                             | Property/language                    |
+| Property description                                                                        | وصف العقار                                                                                 | Property/language                    |
+| Features and amenities                                                                      | المزايا والمرافق                                                                           | Property/language                    |
+| Ownership document                                                                          | مستند الملكية                                                                              | Legal/property/language              |
+| Add a fictional ownership document                                                          | أضف مستند ملكية افتراضيًا                                                                  | Legal/property/language              |
+| Use a fictional sample document only                                                        | استخدم مستندًا تجريبيًا وهميًا فقط                                                         | Security/legal/language              |
+| Do not upload a real Title Deed, Oqood, Emirates ID, passport, or other sensitive document. | لا ترفع سند ملكية حقيقيًا أو مستند عقود أو هوية إماراتية أو جواز سفر أو أي مستند حساس آخر. | Legal/security/professional review   |
+| Title Deed                                                                                  | سند الملكية                                                                                | Legal/property                       |
+| Oqood                                                                                       | عقود                                                                                       | Legal/property                       |
+| Private document                                                                            | مستند خاص                                                                                  | Security/language                    |
+| Uploaded privately                                                                          | تم الرفع بشكل خاص                                                                          | Security/language                    |
+| Ownership verification simulated                                                            | محاكاة التحقق من الملكية                                                                   | Legal/simulation/language            |
+| This prototype does not connect to official property or government records.                 | هذا النموذج الأولي غير متصل بسجلات العقارات أو الجهات الحكومية الرسمية.                    | Legal/simulation/language            |
+| Start simulated check                                                                       | بدء الفحص التجريبي                                                                         | Simulation/language                  |
+| Ownership check in progress                                                                 | فحص الملكية التجريبي قيد التنفيذ                                                           | Simulation/language                  |
+| Verified · Demo                                                                             | تم التحقق · تجريبي                                                                         | Simulation/language                  |
+| Listing settings                                                                            | إعدادات الإعلان                                                                            | Property/language                    |
+| Asking price                                                                                | السعر المطلوب                                                                              | Property/language                    |
+| Minimum offer notification                                                                  | الحد الأدنى لإشعار العرض                                                                   | Product/property/language            |
+| Private draft                                                                               | مسودة خاصة                                                                                 | Property/language                    |
+| Investment Case                                                                             | ملخص الاستثمار                                                                             | Finance/product review               |
+| Add an Investment Case                                                                      | إضافة ملخص استثماري                                                                        | Finance/product review               |
+| Original purchase price                                                                     | سعر الشراء الأصلي                                                                          | Finance/language                     |
+| Purchase date                                                                               | تاريخ الشراء                                                                               | Finance/language                     |
+| Renovation or improvement spend                                                             | تكاليف التجديد أو التحسين                                                                  | Finance/language                     |
+| Total invested                                                                              | إجمالي المبلغ المستثمر                                                                     | Finance/language                     |
+| Estimated gain                                                                              | الربح التقديري                                                                             | Finance/legal/language               |
+| Estimated ROI                                                                               | العائد التقديري على الاستثمار                                                              | Finance/legal/language               |
+| Estimated annualised return                                                                 | العائد السنوي التقديري                                                                     | Finance/legal/language               |
+| Asking price per sq ft                                                                      | السعر المطلوب لكل قدم مربع                                                                 | Finance/property/language            |
+| Simulated Form A                                                                            | نموذج A تجريبي                                                                             | Legal/business/language              |
+| This prototype does not create or submit a legal Form A.                                    | هذا النموذج الأولي لا ينشئ أو يقدّم نموذج A قانونيًا.                                      | Legal/professional review            |
+| Simulated Form A complete                                                                   | اكتمل نموذج A التجريبي                                                                     | Legal/simulation/language            |
+| Property photographs                                                                        | صور العقار                                                                                 | Property/language                    |
+| Add property photographs                                                                    | أضف صور العقار                                                                             | Property/language                    |
+| Cover photograph                                                                            | الصورة الرئيسية                                                                            | Property/language                    |
+| Set as cover                                                                                | تعيين كصورة رئيسية                                                                         | Property/language                    |
+| Reorder photographs                                                                         | إعادة ترتيب الصور                                                                          | Language                             |
+| Simulated Trakheesi                                                                         | ترخيصي تجريبي                                                                              | Legal/government/professional review |
+| This prototype does not submit information to the official Trakheesi service.               | هذا النموذج الأولي لا يرسل معلومات إلى خدمة ترخيصي الرسمية.                                | Legal/government/professional review |
+| Submit simulated application                                                                | إرسال الطلب التجريبي                                                                       | Simulation/language                  |
+| Demo permit approved                                                                        | تمت الموافقة على التصريح التجريبي                                                          | Legal/government/professional review |
+| Simulated Madmoun QR · Demo only                                                            | رمز مضمون تجريبي · للعرض فقط                                                               | Legal/government/professional review |
+| Review your listing                                                                         | راجع إعلانك العقاري                                                                        | Property/language                    |
+| All required sections are complete                                                          | اكتملت جميع الأقسام المطلوبة                                                               | Language                             |
+| Mark listing ready                                                                          | تعيين الإعلان كجاهز                                                                        | Product/property/language            |
+| Your listing is ready                                                                       | إعلانك جاهز                                                                                | Property/language                    |
+| Your listing is not live yet.                                                               | إعلانك غير منشور بعد.                                                                      | Property/language                    |
+| View listing preview                                                                        | عرض معاينة الإعلان                                                                         | Property/language                    |
+| Return to My Listings                                                                       | العودة إلى عقاراتي المدرجة                                                                 | Property/language                    |
+| Private preview                                                                             | معاينة خاصة                                                                                | Property/language                    |
 
 ## 30.2 Arabic review rules
 
@@ -3719,30 +3716,30 @@ All Arabic below is **draft**. It must receive professional Arabic review. Prope
 
 ## 31.1 Meaningful audit events
 
-| Event | Trigger | Safe metadata |
-|---|---|---|
-| `listing.created` | New draft created | Listing ID, customer ID, timestamp |
-| `listing.details_completed` | Details first become valid | Listing ID, property ID, timestamp |
-| `listing.ownership_document_uploaded` | Active file saved | Listing ID, document ID, document type, timestamp |
-| `listing.ownership_document_replaced` | Active file replaced | Listing ID, old/new document IDs, timestamp |
-| `listing.ownership_document_removed` | File removed | Listing ID, document ID, timestamp |
-| `listing.ownership_verification_started` | Demo check begins | Listing ID, verification ID, timestamp |
-| `listing.ownership_verification_verified` | Demo success | Listing ID, verification ID, timestamp |
-| `listing.ownership_verification_failed` | Demo failure | Listing ID, verification ID, safe reason category, timestamp |
-| `listing.settings_updated` | Price/threshold saved | Listing ID, timestamp; avoid unnecessary full value duplication if DB already stores it |
-| `listing.investment_case_added` | Optional case saved | Listing ID, visibility flag, timestamp |
-| `listing.investment_case_removed` | Optional case removed | Listing ID, timestamp |
-| `listing.form_a_completed_demo` | Simulation completes | Listing ID, record ID, timestamp |
-| `listing.form_a_failed_demo` | Simulation fails | Listing ID, record ID, safe reason category |
-| `listing.photo_uploaded` | Photo saved | Listing ID, photo ID, timestamp |
-| `listing.photo_removed` | Photo removed | Listing ID, photo ID, timestamp |
-| `listing.photos_reordered` | Order saved | Listing ID, photo IDs/order, timestamp |
-| `listing.cover_photo_changed` | Cover changed | Listing ID, photo ID, timestamp |
-| `listing.permit_submitted_demo` | Demo permit starts | Listing ID, permit ID, timestamp |
-| `listing.permit_approved_demo` | Demo approval | Listing ID, permit ID, timestamp |
-| `listing.permit_failed_demo` | Demo failure | Listing ID, permit ID, safe reason category |
-| `listing.ready_to_publish` | Customer confirms Review | Listing ID, customer ID, timestamp |
-| `listing.draft_deleted` | Customer deletes draft | Listing ID, timestamp |
+| Event                                     | Trigger                    | Safe metadata                                                                           |
+| ----------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------- |
+| `listing.created`                         | New draft created          | Listing ID, customer ID, timestamp                                                      |
+| `listing.details_completed`               | Details first become valid | Listing ID, property ID, timestamp                                                      |
+| `listing.ownership_document_uploaded`     | Active file saved          | Listing ID, document ID, document type, timestamp                                       |
+| `listing.ownership_document_replaced`     | Active file replaced       | Listing ID, old/new document IDs, timestamp                                             |
+| `listing.ownership_document_removed`      | File removed               | Listing ID, document ID, timestamp                                                      |
+| `listing.ownership_verification_started`  | Demo check begins          | Listing ID, verification ID, timestamp                                                  |
+| `listing.ownership_verification_verified` | Demo success               | Listing ID, verification ID, timestamp                                                  |
+| `listing.ownership_verification_failed`   | Demo failure               | Listing ID, verification ID, safe reason category, timestamp                            |
+| `listing.settings_updated`                | Price/threshold saved      | Listing ID, timestamp; avoid unnecessary full value duplication if DB already stores it |
+| `listing.investment_case_added`           | Optional case saved        | Listing ID, visibility flag, timestamp                                                  |
+| `listing.investment_case_removed`         | Optional case removed      | Listing ID, timestamp                                                                   |
+| `listing.form_a_completed_demo`           | Simulation completes       | Listing ID, record ID, timestamp                                                        |
+| `listing.form_a_failed_demo`              | Simulation fails           | Listing ID, record ID, safe reason category                                             |
+| `listing.photo_uploaded`                  | Photo saved                | Listing ID, photo ID, timestamp                                                         |
+| `listing.photo_removed`                   | Photo removed              | Listing ID, photo ID, timestamp                                                         |
+| `listing.photos_reordered`                | Order saved                | Listing ID, photo IDs/order, timestamp                                                  |
+| `listing.cover_photo_changed`             | Cover changed              | Listing ID, photo ID, timestamp                                                         |
+| `listing.permit_submitted_demo`           | Demo permit starts         | Listing ID, permit ID, timestamp                                                        |
+| `listing.permit_approved_demo`            | Demo approval              | Listing ID, permit ID, timestamp                                                        |
+| `listing.permit_failed_demo`              | Demo failure               | Listing ID, permit ID, safe reason category                                             |
+| `listing.ready_to_publish`                | Customer confirms Review   | Listing ID, customer ID, timestamp                                                      |
+| `listing.draft_deleted`                   | Customer deletes draft     | Listing ID, timestamp                                                                   |
 
 Never capture:
 
@@ -3761,46 +3758,46 @@ Never capture:
 
 ## 32.1 Core screen handoff
 
-| ID | Route / screen | Listing state | Entry conditions | Required data | Primary action | Secondary actions | Components | Validation | Loading | Failure | Success / transition | Audit | Responsive / RTL / A11y | Claude Code notes |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| L-01 | `/[locale]/sell` Empty | None | Authenticated complete CUSTOMER, no listings | Customer profile | Create new listing | Dashboard | Customer shell, empty state | None | Listing list skeleton | Generic list error | `/sell/new` | None | Stack mobile; RTL mirror; h1 focus | Reuse existing customer nav; no seller role gate |
-| L-02 | `/[locale]/sell` Drafts | Mixed pre-live | Customer owns listings | Listings, derived progress, next step | Continue listing | Preview, delete, create | Listing cards, progress, status | Ownership enforced server-side | Card skeleton | Generic unavailable | Step resolver | Delete only | Single-column mobile; status text | Query own listings through RLS |
-| L-03 | `/sell/new` Resume prompt | Recent `DRAFT` | Recent near-empty draft exists | Draft ID/time | Continue recent listing | Create another, view all | Dialog | Ownership and state | Creating/resolving | Creation error | Existing/new `/details` | `listing.created` if new | Mobile full-screen dialog; focus trap | Multiple drafts allowed |
-| L-04 | `/details` | `DRAFT` | Owner, onboarding complete | Property fields | Save and continue | Back, Save and exit | Wizard, fields, tiles | Details matrix | Saving | Save/validation | `DETAILS_COMPLETE` → ownership | details completed | 2-col desktop, stack mobile; RTL logical | Extend schema for approved fields if absent; server schema authoritative |
-| L-05 | `/ownership` | `DETAILS_COMPLETE` / `DOCUMENT_UPLOADED` | Details complete | Document type/file metadata | Save and continue | Replace/remove, Back, exit | Private uploader, type selector, privacy panel | Type/file/size | Upload progress | Upload error | `DOCUMENT_UPLOADED` → verification | upload/replace/remove | Mobile picker; filename bidi; native file input | Private bucket; one active document; no OCR |
-| L-06 | `/verification` Intro | `DOCUMENT_UPLOADED` | Active document | Property/document summary | Start simulated check | Replace document, exit | Simulation panel | Active doc and details | Starting | Start failure | `OWNERSHIP_REVIEW` | verification started | Status semantics; disclosure visible | Service interface; idempotent start |
-| L-07 | `/verification` Pending | `OWNERSHIP_REVIEW` | Verification `PENDING` | Attempt status | Return to My Listings | Refresh | Pending panel | None | Refreshing | Provider unavailable | Success/failure state | None | No fake percent; live status | Re-fetch authoritative result; Realtime optional |
-| L-08 | `/verification` Success | `OWNERSHIP_VERIFIED` | Verification `VERIFIED` | Summary/time | Continue to settings | View metadata | Success panel | None | None | Invalidation state | Settings | verification verified | Demo label announced | Never say official verified |
-| L-09 | `/verification` Failure | Recoverable review | Verification `FAILED` | Safe reason category | Correct/replace | Retry, exit | Failure panel | Correct prerequisite | Retrying | Retry failure | Pending/success | verification failed | Action text; no colour-only | Do not transition listing to permanent REJECTED |
-| L-10 | `/settings` | `OWNERSHIP_VERIFIED` | Ownership verified | Asking, threshold, optional demo comparison | Save and continue | Back, exit | AED inputs, info cards | Price matrix | Saving | Save/validation | Investment Case | settings updated | Numeric mobile; bidi currency | No visibility toggle; private draft fixed |
-| L-11 | `/investment-case` Intro | `OWNERSHIP_VERIFIED` | Settings complete; no case | Asking, size | Add Investment Case | Skip, Back | Optional intro, dependency alerts | Dependencies | Loading sources | Source unavailable | Form or Form A | optional skipped only if audited by design | Stack; clear optional label | Skip does not block state transition |
-| L-12 | `/investment-case` Form | Same | User adds/edits case | Purchase data, asking, size, area demo | Save Investment Case | Remove/skip, Back | Currency/date, metrics, preview | Investment matrix | Calculating/saving | Calculation/save | Form A | added/removed | Metric announcements; RTL number isolation | Use decimal-safe shared utilities; annualised return, not IRR |
-| L-13 | `/form-a` Review | `OWNERSHIP_VERIFIED` | Settings complete | Profile/property/settings | Complete simulated Form A | Back, exit | Disclosure, summary, checkbox | Confirmation; material field currency | Completing | Failure | `FORM_A_COMPLETE` | form A complete | Legal copy review; focus | No legal document or signature capture |
-| L-14 | `/form-a` Pending | Transitional | Service pending | Record status | Return/refresh | Exit | Pending panel | None | Pending | Service failure | Success/failure | None | Status announcements | Avoid artificial delay |
-| L-15 | `/form-a` Success | `FORM_A_COMPLETE` | Record signed demo | Summary/time | Continue to photos | Review details | Success panel | None | None | Invalidation | Photos | None | Demo status text | Material edits invalidate completion |
-| L-16 | `/form-a` Failure | Recoverable | Service failed | Safe reason | Try again | Review details, exit | Failure panel | Prerequisites | Retrying | Retry failure | Pending/success | form A failed | Clear recovery | Preserve listing data |
-| L-17 | `/photos` Empty | `FORM_A_COMPLETE` | Form A current | Upload rules | Choose photographs | Back, exit | Photo uploader/guidance | Files | Uploading | File failures | Organise grid | photo uploaded | Camera/gallery mobile; native input | Public-future bucket; not public until publication |
-| L-18 | `/photos` Grid | `FORM_A_COMPLETE` / `PHOTOS_COMPLETE` | ≥1 photo | Photos/order/cover | Save photos and continue | Reorder, replace, remove | Photo grid/tiles | ≥1, cover, no active errors | Saving order/uploads | Individual failures | `PHOTOS_COMPLETE` → Trakheesi | photo/reorder/cover | Keyboard reorder; grid RTL | Existing state machine min one; recommend 5–12 |
-| L-19 | `/trakheesi` Intro | `PHOTOS_COMPLETE` | Required sections current | Summary, confirmations | Submit simulated application | Review details | Disclosure, summary, dialog | Prerequisites/checkbox | Submitting | Submission fail | `PERMIT_PENDING` | permit submitted | Legal/government review | Service interface; no official calls |
-| L-20 | `/trakheesi` Pending | `PERMIT_PENDING` | Permit `PENDING` | Permit status | Return to My Listings | Refresh | Pending panel | None | Refreshing | Service failure | Approved/failed | None | No fake duration | Persist result; Realtime optional |
-| L-21 | `/trakheesi` Approved | `PERMIT_PENDING`, record approved | Permit `APPROVED` | Permit/demo QR | Review listing | View details | Success panel, optional QR | All earlier current | None | Invalidation | Review | permit approved | QR labelled demo; screen-reader status | Do not set/live-display READY until Review confirm |
-| L-22 | `/trakheesi` Failed | Recoverable | Permit `FAILED` | Safe reason | Review required info | Retry, exit | Failure panel | Correct prerequisites | Retrying | Retry failure | Pending/approved | permit failed | No official rejection wording | Do not permanent-REJECT listing |
-| L-23 | `/review` Complete | Permit approved | All required complete | Full projection + private summaries | Mark listing ready | Edit sections, preview | Review cards, checklist, disclosures | Server readiness | Checking | Stale/incomplete | `READY_TO_PUBLISH` | listing ready | Mobile stack; status text; focus | Server revalidation and idempotent transition |
-| L-24 | `/review` Incomplete | Any unmet requirement | Review accessed from resolver | Status list | Complete first item | Edit others | Missing summary, review cards | Derived completion | Loading statuses | Section errors | Remains review/step | None | Disabled reason visible | Normally redirect locked direct access; allow review summary when useful |
-| L-25 | `/ready` | `READY_TO_PUBLISH` | Readiness transition complete | Property summary | View listing preview | Return to My Listings, Continue later | Success, property summary | State verified | Loading summary | Error | Preview/My Listings | None | No confetti; RTL mirror | No Publish button, no LIVE transition |
-| L-26 | `/preview` | Pre-live owner-only | Own listing, adequate data | Public projection | Back to ready listing | Edit listing | Preview banner/gallery/details | Owner access | Skeleton | Not available | Ready/Edit | None | Responsive future listing; private banner | Exclude document, identifier, private inputs |
+| ID   | Route / screen            | Listing state                            | Entry conditions                             | Required data                               | Primary action               | Secondary actions                     | Components                                     | Validation                            | Loading               | Failure              | Success / transition               | Audit                                      | Responsive / RTL / A11y                         | Claude Code notes                                                        |
+| ---- | ------------------------- | ---------------------------------------- | -------------------------------------------- | ------------------------------------------- | ---------------------------- | ------------------------------------- | ---------------------------------------------- | ------------------------------------- | --------------------- | -------------------- | ---------------------------------- | ------------------------------------------ | ----------------------------------------------- | ------------------------------------------------------------------------ |
+| L-01 | `/[locale]/sell` Empty    | None                                     | Authenticated complete CUSTOMER, no listings | Customer profile                            | Create new listing           | Dashboard                             | Customer shell, empty state                    | None                                  | Listing list skeleton | Generic list error   | `/sell/new`                        | None                                       | Stack mobile; RTL mirror; h1 focus              | Reuse existing customer nav; no seller role gate                         |
+| L-02 | `/[locale]/sell` Drafts   | Mixed pre-live                           | Customer owns listings                       | Listings, derived progress, next step       | Continue listing             | Preview, delete, create               | Listing cards, progress, status                | Ownership enforced server-side        | Card skeleton         | Generic unavailable  | Step resolver                      | Delete only                                | Single-column mobile; status text               | Query own listings through RLS                                           |
+| L-03 | `/sell/new` Resume prompt | Recent `DRAFT`                           | Recent near-empty draft exists               | Draft ID/time                               | Continue recent listing      | Create another, view all              | Dialog                                         | Ownership and state                   | Creating/resolving    | Creation error       | Existing/new `/details`            | `listing.created` if new                   | Mobile full-screen dialog; focus trap           | Multiple drafts allowed                                                  |
+| L-04 | `/details`                | `DRAFT`                                  | Owner, onboarding complete                   | Property fields                             | Save and continue            | Back, Save and exit                   | Wizard, fields, tiles                          | Details matrix                        | Saving                | Save/validation      | `DETAILS_COMPLETE` → ownership     | details completed                          | 2-col desktop, stack mobile; RTL logical        | Extend schema for approved fields if absent; server schema authoritative |
+| L-05 | `/ownership`              | `DETAILS_COMPLETE` / `DOCUMENT_UPLOADED` | Details complete                             | Document type/file metadata                 | Save and continue            | Replace/remove, Back, exit            | Private uploader, type selector, privacy panel | Type/file/size                        | Upload progress       | Upload error         | `DOCUMENT_UPLOADED` → verification | upload/replace/remove                      | Mobile picker; filename bidi; native file input | Private bucket; one active document; no OCR                              |
+| L-06 | `/verification` Intro     | `DOCUMENT_UPLOADED`                      | Active document                              | Property/document summary                   | Start simulated check        | Replace document, exit                | Simulation panel                               | Active doc and details                | Starting              | Start failure        | `OWNERSHIP_REVIEW`                 | verification started                       | Status semantics; disclosure visible            | Service interface; idempotent start                                      |
+| L-07 | `/verification` Pending   | `OWNERSHIP_REVIEW`                       | Verification `PENDING`                       | Attempt status                              | Return to My Listings        | Refresh                               | Pending panel                                  | None                                  | Refreshing            | Provider unavailable | Success/failure state              | None                                       | No fake percent; live status                    | Re-fetch authoritative result; Realtime optional                         |
+| L-08 | `/verification` Success   | `OWNERSHIP_VERIFIED`                     | Verification `VERIFIED`                      | Summary/time                                | Continue to settings         | View metadata                         | Success panel                                  | None                                  | None                  | Invalidation state   | Settings                           | verification verified                      | Demo label announced                            | Never say official verified                                              |
+| L-09 | `/verification` Failure   | Recoverable review                       | Verification `FAILED`                        | Safe reason category                        | Correct/replace              | Retry, exit                           | Failure panel                                  | Correct prerequisite                  | Retrying              | Retry failure        | Pending/success                    | verification failed                        | Action text; no colour-only                     | Do not transition listing to permanent REJECTED                          |
+| L-10 | `/settings`               | `OWNERSHIP_VERIFIED`                     | Ownership verified                           | Asking, threshold, optional demo comparison | Save and continue            | Back, exit                            | AED inputs, info cards                         | Price matrix                          | Saving                | Save/validation      | Investment Case                    | settings updated                           | Numeric mobile; bidi currency                   | No visibility toggle; private draft fixed                                |
+| L-11 | `/investment-case` Intro  | `OWNERSHIP_VERIFIED`                     | Settings complete; no case                   | Asking, size                                | Add Investment Case          | Skip, Back                            | Optional intro, dependency alerts              | Dependencies                          | Loading sources       | Source unavailable   | Form or Form A                     | optional skipped only if audited by design | Stack; clear optional label                     | Skip does not block state transition                                     |
+| L-12 | `/investment-case` Form   | Same                                     | User adds/edits case                         | Purchase data, asking, size, area demo      | Save Investment Case         | Remove/skip, Back                     | Currency/date, metrics, preview                | Investment matrix                     | Calculating/saving    | Calculation/save     | Form A                             | added/removed                              | Metric announcements; RTL number isolation      | Use decimal-safe shared utilities; annualised return, not IRR            |
+| L-13 | `/form-a` Review          | `OWNERSHIP_VERIFIED`                     | Settings complete                            | Profile/property/settings                   | Complete simulated Form A    | Back, exit                            | Disclosure, summary, checkbox                  | Confirmation; material field currency | Completing            | Failure              | `FORM_A_COMPLETE`                  | form A complete                            | Legal copy review; focus                        | No legal document or signature capture                                   |
+| L-14 | `/form-a` Pending         | Transitional                             | Service pending                              | Record status                               | Return/refresh               | Exit                                  | Pending panel                                  | None                                  | Pending               | Service failure      | Success/failure                    | None                                       | Status announcements                            | Avoid artificial delay                                                   |
+| L-15 | `/form-a` Success         | `FORM_A_COMPLETE`                        | Record signed demo                           | Summary/time                                | Continue to photos           | Review details                        | Success panel                                  | None                                  | None                  | Invalidation         | Photos                             | None                                       | Demo status text                                | Material edits invalidate completion                                     |
+| L-16 | `/form-a` Failure         | Recoverable                              | Service failed                               | Safe reason                                 | Try again                    | Review details, exit                  | Failure panel                                  | Prerequisites                         | Retrying              | Retry failure        | Pending/success                    | form A failed                              | Clear recovery                                  | Preserve listing data                                                    |
+| L-17 | `/photos` Empty           | `FORM_A_COMPLETE`                        | Form A current                               | Upload rules                                | Choose photographs           | Back, exit                            | Photo uploader/guidance                        | Files                                 | Uploading             | File failures        | Organise grid                      | photo uploaded                             | Camera/gallery mobile; native input             | Public-future bucket; not public until publication                       |
+| L-18 | `/photos` Grid            | `FORM_A_COMPLETE` / `PHOTOS_COMPLETE`    | ≥1 photo                                     | Photos/order/cover                          | Save photos and continue     | Reorder, replace, remove              | Photo grid/tiles                               | ≥1, cover, no active errors           | Saving order/uploads  | Individual failures  | `PHOTOS_COMPLETE` → Trakheesi      | photo/reorder/cover                        | Keyboard reorder; grid RTL                      | Existing state machine min one; recommend 5–12                           |
+| L-19 | `/trakheesi` Intro        | `PHOTOS_COMPLETE`                        | Required sections current                    | Summary, confirmations                      | Submit simulated application | Review details                        | Disclosure, summary, dialog                    | Prerequisites/checkbox                | Submitting            | Submission fail      | `PERMIT_PENDING`                   | permit submitted                           | Legal/government review                         | Service interface; no official calls                                     |
+| L-20 | `/trakheesi` Pending      | `PERMIT_PENDING`                         | Permit `PENDING`                             | Permit status                               | Return to My Listings        | Refresh                               | Pending panel                                  | None                                  | Refreshing            | Service failure      | Approved/failed                    | None                                       | No fake duration                                | Persist result; Realtime optional                                        |
+| L-21 | `/trakheesi` Approved     | `PERMIT_PENDING`, record approved        | Permit `APPROVED`                            | Permit/demo QR                              | Review listing               | View details                          | Success panel, optional QR                     | All earlier current                   | None                  | Invalidation         | Review                             | permit approved                            | QR labelled demo; screen-reader status          | Do not set/live-display READY until Review confirm                       |
+| L-22 | `/trakheesi` Failed       | Recoverable                              | Permit `FAILED`                              | Safe reason                                 | Review required info         | Retry, exit                           | Failure panel                                  | Correct prerequisites                 | Retrying              | Retry failure        | Pending/approved                   | permit failed                              | No official rejection wording                   | Do not permanent-REJECT listing                                          |
+| L-23 | `/review` Complete        | Permit approved                          | All required complete                        | Full projection + private summaries         | Mark listing ready           | Edit sections, preview                | Review cards, checklist, disclosures           | Server readiness                      | Checking              | Stale/incomplete     | `READY_TO_PUBLISH`                 | listing ready                              | Mobile stack; status text; focus                | Server revalidation and idempotent transition                            |
+| L-24 | `/review` Incomplete      | Any unmet requirement                    | Review accessed from resolver                | Status list                                 | Complete first item          | Edit others                           | Missing summary, review cards                  | Derived completion                    | Loading statuses      | Section errors       | Remains review/step                | None                                       | Disabled reason visible                         | Normally redirect locked direct access; allow review summary when useful |
+| L-25 | `/ready`                  | `READY_TO_PUBLISH`                       | Readiness transition complete                | Property summary                            | View listing preview         | Return to My Listings, Continue later | Success, property summary                      | State verified                        | Loading summary       | Error                | Preview/My Listings                | None                                       | No confetti; RTL mirror                         | No Publish button, no LIVE transition                                    |
+| L-26 | `/preview`                | Pre-live owner-only                      | Own listing, adequate data                   | Public projection                           | Back to ready listing        | Edit listing                          | Preview banner/gallery/details                 | Owner access                          | Skeleton              | Not available        | Ready/Edit                         | None                                       | Responsive future listing; private banner       | Exclude document, identifier, private inputs                             |
 
 ## 32.2 Global state handoff
 
-| State | Entry | UI | Recovery | Security / implementation |
-|---|---|---|---|---|
-| Loading draft | Listing route opens | Wizard skeleton + `Loading your listing draft…` | Retry / My Listings after delay | Verify owner before rendering data |
-| Save failed | Autosave/blocking save fails | Persistent banner; dirty status | Retry before leaving | Do not claim saved; version check |
-| Offline | Browser/network unavailable | Persistent offline banner | Auto-detect reconnect + retry | No uploads/simulations; no unsafe local persistence |
-| Session expired | Protected request fails auth | Redirect Sign In notice | Reauthenticate + safe return | Do not leak listing existence/details |
-| Listing unavailable | Not found or not owner | Generic blocking panel | My Listings / Dashboard | Same response for not found and forbidden |
-| Conflict | Newer version exists | Another-tab notice | Refresh | Optimistic concurrency required |
-| Unexpected | Error boundary | Safe error panel/reference | Retry / My Listings | No raw provider/database/storage details |
+| State               | Entry                        | UI                                              | Recovery                        | Security / implementation                           |
+| ------------------- | ---------------------------- | ----------------------------------------------- | ------------------------------- | --------------------------------------------------- |
+| Loading draft       | Listing route opens          | Wizard skeleton + `Loading your listing draft…` | Retry / My Listings after delay | Verify owner before rendering data                  |
+| Save failed         | Autosave/blocking save fails | Persistent banner; dirty status                 | Retry before leaving            | Do not claim saved; version check                   |
+| Offline             | Browser/network unavailable  | Persistent offline banner                       | Auto-detect reconnect + retry   | No uploads/simulations; no unsafe local persistence |
+| Session expired     | Protected request fails auth | Redirect Sign In notice                         | Reauthenticate + safe return    | Do not leak listing existence/details               |
+| Listing unavailable | Not found or not owner       | Generic blocking panel                          | My Listings / Dashboard         | Same response for not found and forbidden           |
+| Conflict            | Newer version exists         | Another-tab notice                              | Refresh                         | Optimistic concurrency required                     |
+| Unexpected          | Error boundary               | Safe error panel/reference                      | Retry / My Listings             | No raw provider/database/storage details            |
 
 ## 32.3 Requirement labels for implementation tickets
 
@@ -3821,28 +3818,28 @@ Mockups are required before implementation for the screens below. They should us
 
 ## Priority 0 — approve before core UI implementation
 
-| Mockup | Viewport | Key state | Why important | Must approve |
-|---|---|---|---|---|
-| 1. My Listings empty | Desktop 1440 px | First-time empty | Establishes seller-journey entry without a seller role | Page hierarchy, empty-state composition, customer nav continuity, CTA |
-| 2. Property Details | Desktop 1440 px | Partially completed form | Defines wizard shell and core form language used everywhere | Side stepper, widths, field hierarchy, autosave, sticky actions, type tiles |
-| 3. Ownership Document Upload | Desktop 1440 px | Document type selected, uploader empty | Highest privacy and trust risk | Fictional-file warning, private-document panel, upload styling, step navigation |
-| 4. Ownership Verification Pending | Desktop 1440 px | `PENDING` | Establishes all simulation pending patterns | Demo disclosure, progress treatment, safe-leave messaging, actions |
-| 5. Ownership Verification Success | Desktop 1440 px | `VERIFIED` | Establishes believable but non-official success | Status language, summary density, demo badge, next action |
-| 6. Listing and Offer Settings | Desktop 1440 px | Valid asking/threshold with demo comparison | Key product concept and currency interaction | AED controls, threshold explanation, private status, comparison card |
-| 7. Investment Case | Desktop 1440 px | Completed inputs, negative or positive example, visibility off/on | Most data-dense and calculation-sensitive screen | Metric styling, privacy, toggle, disclaimer, non-trading visual tone |
-| 8. Simulated Form A | Desktop 1440 px | Review before confirmation | Legal-simulation risk | Disclosure, summary, confirmation checkbox, action hierarchy |
-| 9. Property Photo Upload | Desktop 1440 px | 8 photos, uploads complete, cover selected | Complex upload and organisation | Grid, cover, reorder, menus, guidance, progress, sticky actions |
-| 10. Simulated Trakheesi Pending | Desktop 1440 px | `PENDING` | Second critical simulation pattern | Disclosure, pending structure, safe return, distinction from ownership check |
-| 11. Simulated Trakheesi Success | Desktop 1440 px | `APPROVED` with optional demo QR | Government-imitation risk | Demo permit wording, QR labelling, route to Review |
-| 12. Final Review | Desktop 1440 px | Complete with Investment Case | Integrates all components and readiness decision | Section cards, statuses, disclosures, property summary, confirmation |
-| 13. Ready to Publish | Desktop 1440 px | `READY_TO_PUBLISH` | Defines milestone completion without publication | Private/not-live hierarchy, preview CTA, no enabled publish action |
+| Mockup                            | Viewport        | Key state                                                         | Why important                                               | Must approve                                                                    |
+| --------------------------------- | --------------- | ----------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| 1. My Listings empty              | Desktop 1440 px | First-time empty                                                  | Establishes seller-journey entry without a seller role      | Page hierarchy, empty-state composition, customer nav continuity, CTA           |
+| 2. Property Details               | Desktop 1440 px | Partially completed form                                          | Defines wizard shell and core form language used everywhere | Side stepper, widths, field hierarchy, autosave, sticky actions, type tiles     |
+| 3. Ownership Document Upload      | Desktop 1440 px | Document type selected, uploader empty                            | Highest privacy and trust risk                              | Fictional-file warning, private-document panel, upload styling, step navigation |
+| 4. Ownership Verification Pending | Desktop 1440 px | `PENDING`                                                         | Establishes all simulation pending patterns                 | Demo disclosure, progress treatment, safe-leave messaging, actions              |
+| 5. Ownership Verification Success | Desktop 1440 px | `VERIFIED`                                                        | Establishes believable but non-official success             | Status language, summary density, demo badge, next action                       |
+| 6. Listing and Offer Settings     | Desktop 1440 px | Valid asking/threshold with demo comparison                       | Key product concept and currency interaction                | AED controls, threshold explanation, private status, comparison card            |
+| 7. Investment Case                | Desktop 1440 px | Completed inputs, negative or positive example, visibility off/on | Most data-dense and calculation-sensitive screen            | Metric styling, privacy, toggle, disclaimer, non-trading visual tone            |
+| 8. Simulated Form A               | Desktop 1440 px | Review before confirmation                                        | Legal-simulation risk                                       | Disclosure, summary, confirmation checkbox, action hierarchy                    |
+| 9. Property Photo Upload          | Desktop 1440 px | 8 photos, uploads complete, cover selected                        | Complex upload and organisation                             | Grid, cover, reorder, menus, guidance, progress, sticky actions                 |
+| 10. Simulated Trakheesi Pending   | Desktop 1440 px | `PENDING`                                                         | Second critical simulation pattern                          | Disclosure, pending structure, safe return, distinction from ownership check    |
+| 11. Simulated Trakheesi Success   | Desktop 1440 px | `APPROVED` with optional demo QR                                  | Government-imitation risk                                   | Demo permit wording, QR labelling, route to Review                              |
+| 12. Final Review                  | Desktop 1440 px | Complete with Investment Case                                     | Integrates all components and readiness decision            | Section cards, statuses, disclosures, property summary, confirmation            |
+| 13. Ready to Publish              | Desktop 1440 px | `READY_TO_PUBLISH`                                                | Defines milestone completion without publication            | Private/not-live hierarchy, preview CTA, no enabled publish action              |
 
 ## Priority 1 — approve responsive and language patterns
 
-| Mockup | Viewport | Key state | Why important | Must approve |
-|---|---|---|---|---|
-| 14. Key mobile screen: Property Photos | Mobile 390 × 844 | Two-column grid, reorder mode, sticky actions | Most interaction-heavy mobile screen | Safe-area action bar, camera/gallery controls, reorder accessibility, tile menus |
-| 15. Arabic RTL screen: Listing Settings | Desktop 1440 px and mobile 390 px | Valid AED values | Validates mixed RTL, AED, numbers, stepper, and action order | Currency direction, labels, progress direction, helper/error alignment |
+| Mockup                                  | Viewport                          | Key state                                     | Why important                                                | Must approve                                                                     |
+| --------------------------------------- | --------------------------------- | --------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| 14. Key mobile screen: Property Photos  | Mobile 390 × 844                  | Two-column grid, reorder mode, sticky actions | Most interaction-heavy mobile screen                         | Safe-area action bar, camera/gallery controls, reorder accessibility, tile menus |
+| 15. Arabic RTL screen: Listing Settings | Desktop 1440 px and mobile 390 px | Valid AED values                              | Validates mixed RTL, AED, numbers, stepper, and action order | Currency direction, labels, progress direction, helper/error alignment           |
 
 ## Priority 2 — recommended polish mockups
 
@@ -3870,30 +3867,30 @@ Engineering may build domain/service groundwork in parallel, but should not fina
 
 # 34. Open Design Decisions
 
-| Decision | Current specification | Owner / required review |
-|---|---|---|
-| Production logo SVG | Approved concept only | Brand/design |
-| Dubai-only listing support | Dubai only because Trakheesi journey is Dubai-specific | Product |
-| Building requirement for villas/townhouses | Optional; community + private identifier sufficient | Product/property SME |
-| Minimum photo count | 1 required to preserve existing state machine; 5 recommended | Product/engineering |
-| Maximum photo count | 20 | Product/storage |
-| Document max size | 10 MB | Security/storage |
-| Photo max size | 12 MB each | Performance/storage |
-| Photo minimum resolution warning | 1,600 × 1,200 recommended; non-blocking | Design/performance |
-| File-virus or malware scanning | Not represented as complete; architecture/security decision needed before real uploads | Security/platform |
-| Verification simulation resolution | Service-controlled; no fake duration | Engineering/demo owner |
-| Permit simulation resolution | Service-controlled; no fake duration | Engineering/demo owner |
-| Simulation failure state vs listing `REJECTED` | Keep retryable sub-record failure; reserve `REJECTED` for future Admin | Product/architecture |
-| READY transition timing | Review confirmation after permit approval | Product/architecture |
-| Area comparison dataset | Show only if seeded data exists and label Demo data | Product/data |
-| Investment Case visibility default | Off | Product/privacy |
-| Occupancy public visibility | Private in this milestone | Product/legal |
-| Support route | Only show link if route exists | Product/operations |
-| Arabic terminology | Draft only | Professional Arabic + UAE property/legal reviewer |
-| Simulated Madmoun QR | Optional, non-functional, explicitly labelled | Product/legal/design |
-| Autosave debounce | 800 ms | Engineering/UX validation |
-| Multiple draft cap | No artificial cap | Product/platform |
-| Local offline draft persistence | Not assumed or required | Security/product |
+| Decision                                       | Current specification                                                                  | Owner / required review                           |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| Production logo SVG                            | Approved concept only                                                                  | Brand/design                                      |
+| Dubai-only listing support                     | Dubai only because Trakheesi journey is Dubai-specific                                 | Product                                           |
+| Building requirement for villas/townhouses     | Optional; community + private identifier sufficient                                    | Product/property SME                              |
+| Minimum photo count                            | 1 required to preserve existing state machine; 5 recommended                           | Product/engineering                               |
+| Maximum photo count                            | 20                                                                                     | Product/storage                                   |
+| Document max size                              | 10 MB                                                                                  | Security/storage                                  |
+| Photo max size                                 | 12 MB each                                                                             | Performance/storage                               |
+| Photo minimum resolution warning               | 1,600 × 1,200 recommended; non-blocking                                                | Design/performance                                |
+| File-virus or malware scanning                 | Not represented as complete; architecture/security decision needed before real uploads | Security/platform                                 |
+| Verification simulation resolution             | Service-controlled; no fake duration                                                   | Engineering/demo owner                            |
+| Permit simulation resolution                   | Service-controlled; no fake duration                                                   | Engineering/demo owner                            |
+| Simulation failure state vs listing `REJECTED` | Keep retryable sub-record failure; reserve `REJECTED` for future Admin                 | Product/architecture                              |
+| READY transition timing                        | Review confirmation after permit approval                                              | Product/architecture                              |
+| Area comparison dataset                        | Show only if seeded data exists and label Demo data                                    | Product/data                                      |
+| Investment Case visibility default             | Off                                                                                    | Product/privacy                                   |
+| Occupancy public visibility                    | Private in this milestone                                                              | Product/legal                                     |
+| Support route                                  | Only show link if route exists                                                         | Product/operations                                |
+| Arabic terminology                             | Draft only                                                                             | Professional Arabic + UAE property/legal reviewer |
+| Simulated Madmoun QR                           | Optional, non-functional, explicitly labelled                                          | Product/legal/design                              |
+| Autosave debounce                              | 800 ms                                                                                 | Engineering/UX validation                         |
+| Multiple draft cap                             | No artificial cap                                                                      | Product/platform                                  |
+| Local offline draft persistence                | Not assumed or required                                                                | Security/product                                  |
 
 No unresolved item allows engineering to invent a user-facing interaction. Use the current decision unless the owner explicitly changes it.
 

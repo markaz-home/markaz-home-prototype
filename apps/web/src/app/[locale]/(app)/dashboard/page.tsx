@@ -1,13 +1,6 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { ArrowRight, Bookmark, Building2, FileText, Inbox, Receipt, Bell } from 'lucide-react';
-import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@markaz/ui';
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
 import { getSession } from '@/server/session';
 
@@ -33,7 +26,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
         <h1 className="text-2xl font-semibold tracking-tight">
           {name ? t('welcome', { name }) : t('welcomeNoName')}
         </h1>
-        <p className="mt-1 text-muted-foreground">{t('subtitle')}</p>
+        <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Both primary journeys on one account — no Buyer/Seller selection. */}
@@ -69,16 +62,16 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
       </div>
 
       <section>
-        <h2 className="mb-3 text-sm font-medium text-muted-foreground">{t('summaryTitle')}</h2>
+        <h2 className="text-muted-foreground mb-3 text-sm font-medium">{t('summaryTitle')}</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {summaries.map(({ icon: Icon, label, empty }) => (
             <Card key={label}>
               <CardHeader className="flex-row items-center gap-2 space-y-0 pb-2">
-                <Icon className="h-4 w-4 text-muted-foreground" aria-hidden />
+                <Icon className="text-muted-foreground h-4 w-4" aria-hidden />
                 <CardTitle className="text-sm font-medium">{label}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">{empty}</p>
+                <p className="text-muted-foreground text-sm">{empty}</p>
               </CardContent>
             </Card>
           ))}

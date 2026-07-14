@@ -11,12 +11,15 @@ export function RecoveryEmailSent() {
   return (
     <AuthShell narrow>
       <SuccessPanel title={t('sentTitle')} description={t('sentBody')}>
-        <p className="text-sm text-muted-foreground">{t('sentHelp')}</p>
+        <p className="text-muted-foreground text-sm">{t('sentHelp')}</p>
         <div className="flex flex-col gap-3 pt-2">
           <Button asChild>
             <Link href="/sign-in">{t('return')}</Link>
           </Button>
-          <Link href="/forgot-password" className="text-center text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            href="/forgot-password"
+            className="text-muted-foreground hover:text-foreground text-center text-sm"
+          >
             {t('changeEmail')}
           </Link>
         </div>

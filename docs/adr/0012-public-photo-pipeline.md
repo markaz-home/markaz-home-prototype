@@ -14,7 +14,7 @@ Week 3 publishes a listing to `LIVE` and must serve its photographs to **anonymo
 marketplace visitors. A private bucket only serves objects through short-lived
 signed URLs minted by an authenticated owner session — that cannot serve an
 anonymous public grid. The published photos therefore have to reach the **public**
-bucket, while ownership documents (a "never public" asset class) and *unpublished*
+bucket, while ownership documents (a "never public" asset class) and _unpublished_
 draft photos must stay private. The preparation of public photos and the database
 LIVE transition must be coordinated: a listing must never go `LIVE` with a partial
 or broken photo set. Supabase Storage and PostgreSQL do not share a cross-system
@@ -113,4 +113,4 @@ policies exist; the service role bypasses RLS and is the sole writer.
   integration test (which uploads a real PNG and asserts the public cover URL).
 - Re-publication overwrites public objects (upsert) at the same deterministic keys;
   the opaque `public_id` is stable across re-publication.
-</content>
+  </content>

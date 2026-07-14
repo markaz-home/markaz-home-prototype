@@ -10,11 +10,11 @@ reads **only** the `marketplace_listings` security-barrier view via the
 
 ## Routes (§11, §19)
 
-| Route | Access | Purpose |
-| --- | --- | --- |
-| `/[locale]/properties` | anon or authed | browse grid + filters + pagination |
-| `/[locale]/properties/[publicId]/[slug]` | anon or authed | public detail page |
-| `/[locale]/saved-properties` | customer-only | saved available/unavailable list |
+| Route                                    | Access         | Purpose                            |
+| ---------------------------------------- | -------------- | ---------------------------------- |
+| `/[locale]/properties`                   | anon or authed | browse grid + filters + pagination |
+| `/[locale]/properties/[publicId]/[slug]` | anon or authed | public detail page                 |
+| `/[locale]/saved-properties`             | customer-only  | saved available/unavailable list   |
 
 The `(public)` route group has **no auth guard**; its `MarketplaceHeader` adapts to
 the session (public links + Sign in / List property vs the authenticated customer
@@ -91,7 +91,7 @@ When a signed-out visitor taps **Save** (`SaveButton`):
 
 1. `storeSaveIntent` writes a **short-lived, client-only** intent to `sessionStorage`
    (`save-intent.ts`): `{ action: 'SAVE_PROPERTY', publicId, returnPath, locale,
-   expiresAt }`, TTL 30 min. The `returnPath` is **allow-listed** to
+expiresAt }`, TTL 30 min. The `returnPath` is **allow-listed** to
    `/{locale}/properties/{publicId}[/...]` (no open redirect); the intent never
    travels to the server and holds no credentials.
 2. A dialog offers **Sign in** / **Create account** / **Continue browsing**.

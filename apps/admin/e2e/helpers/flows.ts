@@ -11,7 +11,12 @@ export async function adminSignIn(page: Page, principal: Principal, locale = 'en
 }
 
 /** Open an entity detail page directly by id. */
-export async function gotoDetail(page: Page, area: string, id: string, locale = 'en'): Promise<void> {
+export async function gotoDetail(
+  page: Page,
+  area: string,
+  id: string,
+  locale = 'en',
+): Promise<void> {
   await page.goto(`/${locale}/${area}/${id}`);
 }
 

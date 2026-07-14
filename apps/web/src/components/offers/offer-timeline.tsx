@@ -38,7 +38,9 @@ export function OfferTimeline({
       case 'BUYER_COUNTERED':
         return youAreBuyer ? t('youProposed', { amount }) : t('buyerProposed', { buyer, amount });
       case 'SELLER_COUNTERED':
-        return perspective === 'SELLER' ? t('youProposed', { amount }) : t('sellerProposed', { amount });
+        return perspective === 'SELLER'
+          ? t('youProposed', { amount })
+          : t('sellerProposed', { amount });
       case 'OFFER_ACCEPTED':
         return t('acceptedEvent');
       case 'OFFER_REJECTED':
@@ -72,9 +74,14 @@ export function OfferTimeline({
     <ol className="mt-3 space-y-4 border-s ps-6">
       {events.map((e) => (
         <li key={e.id} className="relative">
-          <span className={`absolute -start-[1.7rem] mt-1 h-3 w-3 rounded-full ${markerClass(e)}`} aria-hidden />
-          <p className="text-sm" dir="auto">{copyFor(e)}</p>
-          <time dateTime={e.createdAt} className="text-xs text-muted-foreground" dir="ltr">
+          <span
+            className={`absolute -start-[1.7rem] mt-1 h-3 w-3 rounded-full ${markerClass(e)}`}
+            aria-hidden
+          />
+          <p className="text-sm" dir="auto">
+            {copyFor(e)}
+          </p>
+          <time dateTime={e.createdAt} className="text-muted-foreground text-xs" dir="ltr">
             {new Date(e.createdAt).toLocaleString(locale)}
           </time>
         </li>

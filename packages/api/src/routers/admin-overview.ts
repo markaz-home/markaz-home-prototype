@@ -22,12 +22,18 @@ export const adminOverviewRouter = router({
       completedDemo,
     ] = await Promise.all([
       tx.select({ n: count() }).from(listings).where(eq(listings.state, 'LIVE')),
-      tx.select({ n: count() }).from(listings).where(inArray(listings.state, [...REVIEW_STATES])),
+      tx
+        .select({ n: count() })
+        .from(listings)
+        .where(inArray(listings.state, [...REVIEW_STATES])),
       tx
         .select({ n: count() })
         .from(offerThreads)
         .where(inArray(offerThreads.status, [...ACTIVE_THREAD_STATES])),
-      tx.select({ n: count() }).from(transactions).where(notInArray(transactions.status, [...TERMINAL_TX_STATES])),
+      tx
+        .select({ n: count() })
+        .from(transactions)
+        .where(notInArray(transactions.status, [...TERMINAL_TX_STATES])),
       tx.select({ n: count() }).from(transactions).where(eq(transactions.status, 'FAILED')),
       tx.select({ n: count() }).from(transactions).where(eq(transactions.status, 'COMPLETED_DEMO')),
     ]);

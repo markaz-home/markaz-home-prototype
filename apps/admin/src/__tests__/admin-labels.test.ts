@@ -1,16 +1,36 @@
 import { describe, it, expect } from 'vitest';
 import {
-  listingStateLabel, publicationStatusLabel, verificationStatusLabel, offerStatusLabel,
-  transactionStatusLabel, customerStatusLabel, actorTypeTone, formatAed, formatWhen, formatBytes,
+  listingStateLabel,
+  publicationStatusLabel,
+  verificationStatusLabel,
+  offerStatusLabel,
+  transactionStatusLabel,
+  customerStatusLabel,
+  actorTypeTone,
+  formatAed,
+  formatWhen,
+  formatBytes,
 } from '@/components/admin/labels';
 
 describe('admin label maps (spec §35 — no raw enums in UI)', () => {
   it('maps known enum values to a tone + namespaced key', () => {
     expect(listingStateLabel('LIVE')).toEqual({ tone: 'complete', key: 'listings.state.LIVE' });
-    expect(publicationStatusLabel('PENDING')).toEqual({ tone: 'attention', key: 'publication.status.PENDING' });
-    expect(verificationStatusLabel('FAILED_DEMO')).toEqual({ tone: 'failed', key: 'verifications.status.FAILED_DEMO' });
-    expect(offerStatusLabel('ACCEPTED')).toEqual({ tone: 'complete', key: 'adminOffers.status.ACCEPTED' });
-    expect(transactionStatusLabel('FAILED')).toEqual({ tone: 'failed', key: 'adminTransactions.status.FAILED' });
+    expect(publicationStatusLabel('PENDING')).toEqual({
+      tone: 'attention',
+      key: 'publication.status.PENDING',
+    });
+    expect(verificationStatusLabel('FAILED_DEMO')).toEqual({
+      tone: 'failed',
+      key: 'verifications.status.FAILED_DEMO',
+    });
+    expect(offerStatusLabel('ACCEPTED')).toEqual({
+      tone: 'complete',
+      key: 'adminOffers.status.ACCEPTED',
+    });
+    expect(transactionStatusLabel('FAILED')).toEqual({
+      tone: 'failed',
+      key: 'adminTransactions.status.FAILED',
+    });
   });
 
   it('falls back to neutral for an unknown enum so a new server value cannot crash a page', () => {
@@ -19,8 +39,14 @@ describe('admin label maps (spec §35 — no raw enums in UI)', () => {
   });
 
   it('derives customer status tone/key from the restricted flag', () => {
-    expect(customerStatusLabel('ACTIONS_RESTRICTED')).toEqual({ tone: 'attention', key: 'customers.status.restricted' });
-    expect(customerStatusLabel('ACTIVE')).toEqual({ tone: 'complete', key: 'customers.status.active' });
+    expect(customerStatusLabel('ACTIONS_RESTRICTED')).toEqual({
+      tone: 'attention',
+      key: 'customers.status.restricted',
+    });
+    expect(customerStatusLabel('ACTIVE')).toEqual({
+      tone: 'complete',
+      key: 'customers.status.active',
+    });
   });
 
   it('assigns actor tones', () => {

@@ -18,8 +18,16 @@ export function useOfferErrorMessage() {
     const token = offerErrorToken(err);
     // next-intl throws on a missing key; guard with the known set.
     const known = new Set([
-      'INVALID_AMOUNT', 'EQUAL_AMOUNT', 'EXPIRED', 'STALE', 'ALREADY_ACCEPTED',
-      'LISTING_UNAVAILABLE', 'LISTING_CHANGED', 'OWN_LISTING', 'NOT_FOUND', 'GENERIC',
+      'INVALID_AMOUNT',
+      'EQUAL_AMOUNT',
+      'EXPIRED',
+      'STALE',
+      'ALREADY_ACCEPTED',
+      'LISTING_UNAVAILABLE',
+      'LISTING_CHANGED',
+      'OWN_LISTING',
+      'NOT_FOUND',
+      'GENERIC',
     ]);
     return t(known.has(token) ? (token as 'GENERIC') : 'GENERIC');
   };
@@ -41,11 +49,19 @@ const STATUS_TONE: Record<string, 'neutral' | 'success' | 'warning' | 'primary'>
 /** Text-first status pill; colour is never the sole indicator (§36.6). */
 export function OfferStatusBadge({ statusKey }: { statusKey: string }) {
   const t = useTranslations('offers.status');
-  return <StatusBadge tone={STATUS_TONE[statusKey] ?? 'neutral'}>{t(statusKey as 'accepted')}</StatusBadge>;
+  return (
+    <StatusBadge tone={STATUS_TONE[statusKey] ?? 'neutral'}>
+      {t(statusKey as 'accepted')}
+    </StatusBadge>
+  );
 }
 
 /** Non-binding disclosure — always plain text, never a tooltip (§32 / spec §15.2). */
-export function NonBindingDisclosure({ variant = 'nonBinding' }: { variant?: 'nonBinding' | 'counter' | 'accept' }) {
+export function NonBindingDisclosure({
+  variant = 'nonBinding',
+}: {
+  variant?: 'nonBinding' | 'counter' | 'accept';
+}) {
   const t = useTranslations('offers.disclosure');
   return (
     <Alert variant="info">
@@ -63,11 +79,13 @@ export function AmountComparison({
   const t = useTranslations('offers.form');
   const locale = useLocale();
   if (!comparison) return null;
-  if (comparison.direction === 'EQUAL') return <p className="text-sm text-muted-foreground">{t('matches')}</p>;
+  if (comparison.direction === 'EQUAL')
+    return <p className="text-muted-foreground text-sm">{t('matches')}</p>;
   const amount = formatAed(comparison.absDiff, locale);
-  const phrase = comparison.direction === 'BELOW' ? t('belowAsking', { amount }) : t('aboveAsking', { amount });
+  const phrase =
+    comparison.direction === 'BELOW' ? t('belowAsking', { amount }) : t('aboveAsking', { amount });
   return (
-    <p className="text-sm text-muted-foreground">
+    <p className="text-muted-foreground text-sm">
       <span dir="ltr">{phrase}</span> · <span dir="ltr">{formatPct(comparison.pct, locale)}</span>
     </p>
   );

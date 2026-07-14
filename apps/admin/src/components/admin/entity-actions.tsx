@@ -2,12 +2,24 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
-  Ban, CheckCircle2, PauseCircle, PlayCircle, CornerUpLeft, RotateCcw, XOctagon, Gavel,
+  Ban,
+  CheckCircle2,
+  PauseCircle,
+  PlayCircle,
+  CornerUpLeft,
+  RotateCcw,
+  XOctagon,
+  Gavel,
 } from 'lucide-react';
 import { toast } from '@markaz/ui';
 import {
-  RESTRICT_REASONS, RESTORE_REASONS, LISTING_PAUSE_REASONS, RETURN_FOR_CHANGES_REASONS,
-  OFFER_CLOSE_REASONS, TRANSACTION_FAIL_REASONS, CANCELLATION_RESOLUTIONS,
+  RESTRICT_REASONS,
+  RESTORE_REASONS,
+  LISTING_PAUSE_REASONS,
+  RETURN_FOR_CHANGES_REASONS,
+  OFFER_CLOSE_REASONS,
+  TRANSACTION_FAIL_REASONS,
+  CANCELLATION_RESOLUTIONS,
 } from '@markaz/domain';
 import { useRouter } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
@@ -44,7 +56,14 @@ export function RestrictCustomerAction({ customerId }: { customerId: string }) {
         done();
       }}
     >
-      <ReasonSelect id="restrict-reason" label={t('reasonLabel')} basePath="customer.restrict.reason" values={RESTRICT_REASONS} value={reason} onChange={setReason} />
+      <ReasonSelect
+        id="restrict-reason"
+        label={t('reasonLabel')}
+        basePath="customer.restrict.reason"
+        values={RESTRICT_REASONS}
+        value={reason}
+        onChange={setReason}
+      />
     </ActionDialog>
   );
 }
@@ -67,7 +86,14 @@ export function RestoreCustomerAction({ customerId }: { customerId: string }) {
         done();
       }}
     >
-      <ReasonSelect id="restore-reason" label={t('reasonLabel')} basePath="customer.restore.reason" values={RESTORE_REASONS} value={reason} onChange={setReason} />
+      <ReasonSelect
+        id="restore-reason"
+        label={t('reasonLabel')}
+        basePath="customer.restore.reason"
+        values={RESTORE_REASONS}
+        value={reason}
+        onChange={setReason}
+      />
     </ActionDialog>
   );
 }
@@ -88,11 +114,21 @@ export function PauseListingAction({ listingId }: { listingId: string }) {
       submitLabel={t('listing.pause.submit')}
       canSubmit={reason !== ''}
       onSubmit={async () => {
-        await m.mutateAsync({ listingId, reason: reason as (typeof LISTING_PAUSE_REASONS)[number] });
+        await m.mutateAsync({
+          listingId,
+          reason: reason as (typeof LISTING_PAUSE_REASONS)[number],
+        });
         done();
       }}
     >
-      <ReasonSelect id="pause-reason" label={t('reasonLabel')} basePath="listing.pause.reason" values={LISTING_PAUSE_REASONS} value={reason} onChange={setReason} />
+      <ReasonSelect
+        id="pause-reason"
+        label={t('reasonLabel')}
+        basePath="listing.pause.reason"
+        values={LISTING_PAUSE_REASONS}
+        value={reason}
+        onChange={setReason}
+      />
     </ActionDialog>
   );
 }
@@ -115,7 +151,14 @@ export function ResumeListingAction({ listingId }: { listingId: string }) {
         done();
       }}
     >
-      <NoteField id="resume-reason" label={t('reasonLabel')} value={reason} onChange={setReason} max={60} placeholder={t('listing.resume.reasonPlaceholder')} />
+      <NoteField
+        id="resume-reason"
+        label={t('reasonLabel')}
+        value={reason}
+        onChange={setReason}
+        max={60}
+        placeholder={t('listing.resume.reasonPlaceholder')}
+      />
     </ActionDialog>
   );
 }
@@ -159,11 +202,22 @@ export function ReturnPublicationAction({ requestId }: { requestId: string }) {
       submitLabel={t('publication.return.submit')}
       canSubmit={reason !== ''}
       onSubmit={async () => {
-        await m.mutateAsync({ requestId, reason: reason as (typeof RETURN_FOR_CHANGES_REASONS)[number], note: note.trim() || undefined });
+        await m.mutateAsync({
+          requestId,
+          reason: reason as (typeof RETURN_FOR_CHANGES_REASONS)[number],
+          note: note.trim() || undefined,
+        });
         done();
       }}
     >
-      <ReasonSelect id="return-reason" label={t('reasonLabel')} basePath="publication.return.reason" values={RETURN_FOR_CHANGES_REASONS} value={reason} onChange={setReason} />
+      <ReasonSelect
+        id="return-reason"
+        label={t('reasonLabel')}
+        basePath="publication.return.reason"
+        values={RETURN_FOR_CHANGES_REASONS}
+        value={reason}
+        onChange={setReason}
+      />
       <NoteField id="return-note" label={t('noteOptional')} value={note} onChange={setNote} />
     </ActionDialog>
   );
@@ -188,7 +242,14 @@ export function RetryVerificationAction({ verificationId }: { verificationId: st
         done();
       }}
     >
-      <NoteField id="verify-retry-reason" label={t('reasonLabel')} value={reason} onChange={setReason} max={200} placeholder={t('verifications.retry.reasonPlaceholder')} />
+      <NoteField
+        id="verify-retry-reason"
+        label={t('reasonLabel')}
+        value={reason}
+        onChange={setReason}
+        max={200}
+        placeholder={t('verifications.retry.reasonPlaceholder')}
+      />
     </ActionDialog>
   );
 }
@@ -213,7 +274,14 @@ export function CloseOfferAction({ threadId }: { threadId: string }) {
         done();
       }}
     >
-      <ReasonSelect id="offer-close-reason" label={t('reasonLabel')} basePath="adminOffers.close.reason" values={OFFER_CLOSE_REASONS} value={reason} onChange={setReason} />
+      <ReasonSelect
+        id="offer-close-reason"
+        label={t('reasonLabel')}
+        basePath="adminOffers.close.reason"
+        values={OFFER_CLOSE_REASONS}
+        value={reason}
+        onChange={setReason}
+      />
     </ActionDialog>
   );
 }
@@ -238,7 +306,14 @@ export function PauseTransactionAction({ transactionId }: { transactionId: strin
         done();
       }}
     >
-      <NoteField id="tx-pause-reason" label={t('reasonLabel')} value={reason} onChange={setReason} max={80} placeholder={t('adminTransactions.pause.reasonPlaceholder')} />
+      <NoteField
+        id="tx-pause-reason"
+        label={t('reasonLabel')}
+        value={reason}
+        onChange={setReason}
+        max={80}
+        placeholder={t('adminTransactions.pause.reasonPlaceholder')}
+      />
     </ActionDialog>
   );
 }
@@ -261,7 +336,14 @@ export function ResumeTransactionAction({ transactionId }: { transactionId: stri
         done();
       }}
     >
-      <NoteField id="tx-resume-reason" label={t('reasonLabel')} value={reason} onChange={setReason} max={80} placeholder={t('adminTransactions.resume.reasonPlaceholder')} />
+      <NoteField
+        id="tx-resume-reason"
+        label={t('reasonLabel')}
+        value={reason}
+        onChange={setReason}
+        max={80}
+        placeholder={t('adminTransactions.resume.reasonPlaceholder')}
+      />
     </ActionDialog>
   );
 }
@@ -282,11 +364,21 @@ export function MarkFailedAction({ transactionId }: { transactionId: string }) {
       danger
       canSubmit={reason !== ''}
       onSubmit={async () => {
-        await m.mutateAsync({ transactionId, reason: reason as (typeof TRANSACTION_FAIL_REASONS)[number] });
+        await m.mutateAsync({
+          transactionId,
+          reason: reason as (typeof TRANSACTION_FAIL_REASONS)[number],
+        });
         done();
       }}
     >
-      <ReasonSelect id="tx-fail-reason" label={t('reasonLabel')} basePath="adminTransactions.markFailed.reason" values={TRANSACTION_FAIL_REASONS} value={reason} onChange={setReason} />
+      <ReasonSelect
+        id="tx-fail-reason"
+        label={t('reasonLabel')}
+        basePath="adminTransactions.markFailed.reason"
+        values={TRANSACTION_FAIL_REASONS}
+        value={reason}
+        onChange={setReason}
+      />
     </ActionDialog>
   );
 }
@@ -311,8 +403,21 @@ export function RetryStepAction({ transactionId }: { transactionId: string }) {
         done();
       }}
     >
-      <NoteField id="tx-retry-code" label={t('adminTransactions.retryStep.codeLabel')} value={code} onChange={setCode} max={60} />
-      <NoteField id="tx-retry-reason" label={t('reasonLabel')} value={reason} onChange={setReason} max={200} placeholder={t('adminTransactions.retryStep.reasonPlaceholder')} />
+      <NoteField
+        id="tx-retry-code"
+        label={t('adminTransactions.retryStep.codeLabel')}
+        value={code}
+        onChange={setCode}
+        max={60}
+      />
+      <NoteField
+        id="tx-retry-reason"
+        label={t('reasonLabel')}
+        value={reason}
+        onChange={setReason}
+        max={200}
+        placeholder={t('adminTransactions.retryStep.reasonPlaceholder')}
+      />
     </ActionDialog>
   );
 }
@@ -333,12 +438,29 @@ export function ResolveCancellationAction({ transactionId }: { transactionId: st
       submitLabel={t('adminTransactions.resolveCancellation.submit')}
       canSubmit={action !== '' && reason.trim().length > 0}
       onSubmit={async () => {
-        await m.mutateAsync({ transactionId, action: action as (typeof CANCELLATION_RESOLUTIONS)[number], reason: reason.trim() });
+        await m.mutateAsync({
+          transactionId,
+          action: action as (typeof CANCELLATION_RESOLUTIONS)[number],
+          reason: reason.trim(),
+        });
         done();
       }}
     >
-      <ReasonSelect id="tx-resolve-action" label={t('adminTransactions.resolveCancellation.actionLabel')} basePath="adminTransactions.resolveCancellation.action" values={CANCELLATION_RESOLUTIONS} value={action} onChange={setAction} />
-      <NoteField id="tx-resolve-reason" label={t('reasonLabel')} value={reason} onChange={setReason} max={200} />
+      <ReasonSelect
+        id="tx-resolve-action"
+        label={t('adminTransactions.resolveCancellation.actionLabel')}
+        basePath="adminTransactions.resolveCancellation.action"
+        values={CANCELLATION_RESOLUTIONS}
+        value={action}
+        onChange={setAction}
+      />
+      <NoteField
+        id="tx-resolve-reason"
+        label={t('reasonLabel')}
+        value={reason}
+        onChange={setReason}
+        max={200}
+      />
     </ActionDialog>
   );
 }

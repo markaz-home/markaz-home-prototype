@@ -67,7 +67,7 @@ supabase.auth.signUp({
   email,
   password,
   options: { data: { full_name, terms_accepted, privacy_accepted } },
-})
+});
 ```
 
 The user is routed to `/[locale]/verify-email`, where they enter the 6-digit
@@ -85,7 +85,7 @@ local Mailpit inbox).
 `/[locale]/forgot-password` calls
 
 ```ts
-supabase.auth.resetPasswordForEmail(email, { redirectTo: `${origin}/auth/confirm` })
+supabase.auth.resetPasswordForEmail(email, { redirectTo: `${origin}/auth/confirm` });
 ```
 
 and **always** shows a generic "If an account exists…" message (anti-enumeration —
@@ -98,9 +98,9 @@ cookies, then forwards to `/reset-password`:
 
 ```ts
 // app/auth/confirm/route.ts (GET)
-const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash })
-if (!error) return NextResponse.redirect(new URL(next, origin))     // → /reset-password
-return NextResponse.redirect(new URL('/reset-password?error=invalid', origin))
+const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
+if (!error) return NextResponse.redirect(new URL(next, origin)); // → /reset-password
+return NextResponse.redirect(new URL('/reset-password?error=invalid', origin));
 ```
 
 `/[locale]/reset-password` renders **only** with a valid recovery session (the
@@ -109,7 +109,7 @@ invalid-link panel with a "Request a new link" action). The form asks for a **ne
 password only — there is no code field** — and runs:
 
 ```ts
-updateUser({ password })          // sets the new password
+updateUser({ password }); // sets the new password
 // then: sign out → /reset-password/success → fresh sign-in
 ```
 
@@ -162,13 +162,13 @@ Supabase **Admin API** to create the user and then promotes `account_type` to
 
 ## Data ownership: Supabase Auth vs `profiles`
 
-| Lives in **Supabase Auth** | Lives in **`profiles`** (our DB) |
-| --- | --- |
-| Email + password hash | `full_name` |
-| Email-confirmation state | `account_type` (`CUSTOMER` / `ADMIN`) |
-| Verification codes, recovery links + tokens | Identity status (e.g. `VERIFIED_DEMO`) |
-| Session refresh tokens | `terms_accepted_at` / `privacy_accepted_at` consent timestamps |
-| | `onboarding_completed_at` |
+| Lives in **Supabase Auth**                  | Lives in **`profiles`** (our DB)                               |
+| ------------------------------------------- | -------------------------------------------------------------- |
+| Email + password hash                       | `full_name`                                                    |
+| Email-confirmation state                    | `account_type` (`CUSTOMER` / `ADMIN`)                          |
+| Verification codes, recovery links + tokens | Identity status (e.g. `VERIFIED_DEMO`)                         |
+| Session refresh tokens                      | `terms_accepted_at` / `privacy_accepted_at` consent timestamps |
+|                                             | `onboarding_completed_at`                                      |
 
 **No secrets are stored in `profiles`** — no password hashes, no verification/
 recovery codes, no tokens, no session tokens. Those are owned entirely by Supabase

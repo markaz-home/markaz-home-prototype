@@ -171,7 +171,10 @@ function resolveExpiry(option: z.infer<typeof expiryOptionSchema>): string | nul
 }
 
 const threadIdInput = z.object({ threadId: z.string().uuid() });
-const versionedThread = z.object({ threadId: z.string().uuid(), expectedVersion: z.number().int().nonnegative() });
+const versionedThread = z.object({
+  threadId: z.string().uuid(),
+  expectedVersion: z.number().int().nonnegative(),
+});
 const amountInput = z.number().int().positive();
 
 export const offersRouter = router({
@@ -185,25 +188,44 @@ export const offersRouter = router({
         .from(listings)
         .where(eq(listings.publicId, input.publicId))
         .limit(1);
-      if (!l || l.state !== 'LIVE') return { eligible: false as const, reason: 'UNAVAILABLE' as const };
+      if (!l || l.state !== 'LIVE')
+        return { eligible: false as const, reason: 'UNAVAILABLE' as const };
       if (l.ownerId === ctx.user.id) return { eligible: false as const, reason: 'OWNER' as const };
 
       const [existing] = await ctx.tx
         .select({ id: offerThreads.id })
         .from(offerThreads)
-        .where(and(eq(offerThreads.listingId, l.id), eq(offerThreads.buyerUserId, ctx.user.id), inArray(offerThreads.status, [...ACTIVE_STATUSES])))
+        .where(
+          and(
+            eq(offerThreads.listingId, l.id),
+            eq(offerThreads.buyerUserId, ctx.user.id),
+            inArray(offerThreads.status, [...ACTIVE_STATUSES]),
+          ),
+        )
         .limit(1);
-      if (existing) return { eligible: false as const, reason: 'ACTIVE_THREAD' as const, threadId: existing.id };
+      if (existing)
+        return {
+          eligible: false as const,
+          reason: 'ACTIVE_THREAD' as const,
+          threadId: existing.id,
+        };
 
       // "Under offer" is derived from an ACCEPTED thread, but that thread is private to
       // its participants — a non-participant buyer cannot see it under RLS. Use the
       // SECURITY DEFINER helper so eligibility is authoritative for everyone (§6.1),
       // matching the block that create_offer enforces at submit time.
-      const acc = await ctx.tx.execute(sql`select public.listing_has_accepted_offer(${l.id}::uuid) as under_offer`);
-      const underOffer = (acc as unknown as Array<{ under_offer: boolean }>)[0]?.under_offer ?? false;
+      const acc = await ctx.tx.execute(
+        sql`select public.listing_has_accepted_offer(${l.id}::uuid) as under_offer`,
+      );
+      const underOffer =
+        (acc as unknown as Array<{ under_offer: boolean }>)[0]?.under_offer ?? false;
       if (underOffer) return { eligible: false as const, reason: 'UNDER_OFFER' as const };
 
-      const [me] = await ctx.tx.select({ onboarded: profiles.onboardingCompletedAt }).from(profiles).where(eq(profiles.id, ctx.user.id)).limit(1);
+      const [me] = await ctx.tx
+        .select({ onboarded: profiles.onboardingCompletedAt })
+        .from(profiles)
+        .where(eq(profiles.id, ctx.user.id))
+        .limit(1);
       if (!me?.onboarded) return { eligible: false as const, reason: 'ONBOARDING' as const };
 
       // Pre-thread property summary comes from the PUBLIC marketplace view — the
@@ -211,9 +233,15 @@ export const offersRouter = router({
       // would return nothing here.
       const [row] = await ctx.tx
         .select({
-          publicId: mv.publicId, publicSlug: mv.publicSlug, askingPrice: mv.askingPrice,
-          bedrooms: mv.bedrooms, bathrooms: mv.bathrooms, propertyType: mv.propertyType,
-          community: mv.community, buildingOrProject: mv.buildingOrProject, emirate: mv.emirate,
+          publicId: mv.publicId,
+          publicSlug: mv.publicSlug,
+          askingPrice: mv.askingPrice,
+          bedrooms: mv.bedrooms,
+          bathrooms: mv.bathrooms,
+          propertyType: mv.propertyType,
+          community: mv.community,
+          buildingOrProject: mv.buildingOrProject,
+          emirate: mv.emirate,
           coverPublicPath: mv.coverPublicPath,
         })
         .from(mv)
@@ -225,17 +253,34 @@ export const offersRouter = router({
 
   /** Submit the initial buyer proposal; creates the thread atomically (idempotent). */
   submitInitialProposal: customerProcedure
-    .input(z.object({ publicId: z.string().max(40), amountAed: amountInput, expiry: expiryOptionSchema }))
+    .input(
+      z.object({
+        publicId: z.string().max(40),
+        amountAed: amountInput,
+        expiry: expiryOptionSchema,
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-      if (validateOfferAmount(input.amountAed)) throw new TRPCError({ code: 'BAD_REQUEST', message: 'INVALID_AMOUNT' });
-      const [l] = await ctx.tx.select({ id: listings.id }).from(listings).where(eq(listings.publicId, input.publicId)).limit(1);
+      if (validateOfferAmount(input.amountAed))
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'INVALID_AMOUNT' });
+      const [l] = await ctx.tx
+        .select({ id: listings.id })
+        .from(listings)
+        .where(eq(listings.publicId, input.publicId))
+        .limit(1);
       if (!l) throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_FOUND' });
 
       // If an active thread already exists, resolve it idempotently (§15.3).
       const [existing] = await ctx.tx
         .select({ id: offerThreads.id })
         .from(offerThreads)
-        .where(and(eq(offerThreads.listingId, l.id), eq(offerThreads.buyerUserId, ctx.user.id), inArray(offerThreads.status, [...ACTIVE_STATUSES])))
+        .where(
+          and(
+            eq(offerThreads.listingId, l.id),
+            eq(offerThreads.buyerUserId, ctx.user.id),
+            inArray(offerThreads.status, [...ACTIVE_STATUSES]),
+          ),
+        )
         .limit(1);
       if (existing) return { threadId: existing.id, created: false as const };
 
@@ -252,7 +297,13 @@ export const offersRouter = router({
           const [t] = await ctx.tx
             .select({ id: offerThreads.id })
             .from(offerThreads)
-            .where(and(eq(offerThreads.listingId, l.id), eq(offerThreads.buyerUserId, ctx.user.id), inArray(offerThreads.status, [...ACTIVE_STATUSES])))
+            .where(
+              and(
+                eq(offerThreads.listingId, l.id),
+                eq(offerThreads.buyerUserId, ctx.user.id),
+                inArray(offerThreads.status, [...ACTIVE_STATUSES]),
+              ),
+            )
             .limit(1);
           if (t) return { threadId: t.id, created: false as const };
         }
@@ -263,7 +314,13 @@ export const offersRouter = router({
   // ---- Lists ----------------------------------------------------------------
   /** Threads the current customer created (buyer perspective). */
   getBuyerThreads: customerProcedure
-    .input(z.object({ filter: z.enum(['all', 'action', 'waiting', 'accepted', 'closed']).default('all') }).optional())
+    .input(
+      z
+        .object({
+          filter: z.enum(['all', 'action', 'waiting', 'accepted', 'closed']).default('all'),
+        })
+        .optional(),
+    )
     .query(async ({ ctx, input }) => {
       await ctx.tx.execute(sql`select public.expire_due_offers()`);
       const rows = await ctx.tx
@@ -274,18 +331,42 @@ export const offersRouter = router({
       const summaries = new Map<string, ListingSummaryRow | null>();
       const out = [];
       for (const t of rows) {
-        if (!matchesBuyerFilter(t.status as OfferThreadStatus, t.nextActor, input?.filter ?? 'all')) continue;
-        if (!summaries.has(t.listingId)) summaries.set(t.listingId, await loadSummary(ctx.tx, t.listingId));
+        if (!matchesBuyerFilter(t.status as OfferThreadStatus, t.nextActor, input?.filter ?? 'all'))
+          continue;
+        if (!summaries.has(t.listingId))
+          summaries.set(t.listingId, await loadSummary(ctx.tx, t.listingId));
         const s = summaries.get(t.listingId);
         if (!s) continue;
-        out.push(toBuyerThread({ thread: toThreadInput(t), current: await currentProposal(ctx.tx, t.currentProposalId), property: summaryToProperty(s) }));
+        out.push(
+          toBuyerThread({
+            thread: toThreadInput(t),
+            current: await currentProposal(ctx.tx, t.currentProposalId),
+            property: summaryToProperty(s),
+          }),
+        );
       }
       return out;
     }),
 
   /** Threads received across the current customer's listings (seller perspective). */
   getSellerInbox: customerProcedure
-    .input(z.object({ filter: z.enum(['all', 'action', 'waiting', 'accepted', 'closed', 'aboveThreshold', 'belowThreshold']).default('all') }).optional())
+    .input(
+      z
+        .object({
+          filter: z
+            .enum([
+              'all',
+              'action',
+              'waiting',
+              'accepted',
+              'closed',
+              'aboveThreshold',
+              'belowThreshold',
+            ])
+            .default('all'),
+        })
+        .optional(),
+    )
     .query(async ({ ctx, input }) => {
       await ctx.tx.execute(sql`select public.expire_due_offers()`);
       const rows = await ctx.tx
@@ -296,8 +377,12 @@ export const offersRouter = router({
       const summaries = new Map<string, ListingSummaryRow | null>();
       const out = [];
       for (const t of rows) {
-        if (!matchesSellerFilter(t.status as OfferThreadStatus, t.nextActor, input?.filter ?? 'all')) continue;
-        if (!summaries.has(t.listingId)) summaries.set(t.listingId, await loadSummary(ctx.tx, t.listingId));
+        if (
+          !matchesSellerFilter(t.status as OfferThreadStatus, t.nextActor, input?.filter ?? 'all')
+        )
+          continue;
+        if (!summaries.has(t.listingId))
+          summaries.set(t.listingId, await loadSummary(ctx.tx, t.listingId));
         const s = summaries.get(t.listingId);
         if (!s) continue;
         const cur = await currentProposal(ctx.tx, t.currentProposalId);
@@ -305,7 +390,8 @@ export const offersRouter = router({
           thread: toThreadInput(t),
           current: cur,
           property: summaryToProperty(s),
-          minNotificationPrice: s.minNotificationPrice == null ? null : Number(s.minNotificationPrice),
+          minNotificationPrice:
+            s.minNotificationPrice == null ? null : Number(s.minNotificationPrice),
         });
         // Threshold-based seller filters.
         if (input?.filter === 'aboveThreshold' && view.threshold !== 'AT_OR_ABOVE') continue;
@@ -320,7 +406,8 @@ export const offersRouter = router({
     .input(z.object({ listingId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
       const s = await loadSummary(ctx.tx, input.listingId);
-      if (!s || s.ownerId !== ctx.user.id) throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_FOUND' });
+      if (!s || s.ownerId !== ctx.user.id)
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_FOUND' });
       await ctx.tx.execute(sql`select public.expire_due_offers()`);
       const rows = await ctx.tx
         .select()
@@ -334,7 +421,12 @@ export const offersRouter = router({
       let activeCount = 0;
       for (const t of rows) {
         const cur = await currentProposal(ctx.tx, t.currentProposalId);
-        const view = toSellerThread({ thread: toThreadInput(t), current: cur, property: summaryToProperty(s), minNotificationPrice: min });
+        const view = toSellerThread({
+          thread: toThreadInput(t),
+          current: cur,
+          property: summaryToProperty(s),
+          minNotificationPrice: min,
+        });
         if (view.isActionable) actionNeeded += 1;
         if (t.status === 'AWAITING_SELLER' || t.status === 'AWAITING_BUYER') {
           activeCount += 1;
@@ -365,10 +457,15 @@ export const offersRouter = router({
   /** Perspective-aware thread detail + timeline (participant-only). */
   getThread: customerProcedure.input(threadIdInput).query(async ({ ctx, input }) => {
     await ctx.tx.execute(sql`select public.expire_due_offers()`);
-    const [t] = await ctx.tx.select().from(offerThreads).where(eq(offerThreads.id, input.threadId)).limit(1);
+    const [t] = await ctx.tx
+      .select()
+      .from(offerThreads)
+      .where(eq(offerThreads.id, input.threadId))
+      .limit(1);
     if (!t) throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_FOUND' });
     const perspective = perspectiveOf(t, ctx.user.id);
-    if (perspective === 'SELLER') await ctx.tx.execute(sql`select public.mark_offer_viewed(${t.id}::uuid)`);
+    if (perspective === 'SELLER')
+      await ctx.tx.execute(sql`select public.mark_offer_viewed(${t.id}::uuid)`);
 
     const s = await loadSummary(ctx.tx, t.listingId);
     if (!s) throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_FOUND' });
@@ -378,14 +475,18 @@ export const offersRouter = router({
       .from(offerEvents)
       .where(eq(offerEvents.threadId, t.id))
       .orderBy(offerEvents.createdAt);
-    const timeline = toTimeline(eventRows.map((e): EventInput => ({
-      id: e.id,
-      eventType: e.eventType,
-      actorSide: e.actorSide,
-      amountAed: e.amountAed,
-      metadata: e.metadata,
-      createdAt: e.createdAt,
-    })));
+    const timeline = toTimeline(
+      eventRows.map(
+        (e): EventInput => ({
+          id: e.id,
+          eventType: e.eventType,
+          actorSide: e.actorSide,
+          amountAed: e.amountAed,
+          metadata: e.metadata,
+          createdAt: e.createdAt,
+        }),
+      ),
+    );
 
     const thread =
       perspective === 'BUYER'
@@ -394,7 +495,8 @@ export const offersRouter = router({
             thread: toThreadInput(t),
             current: cur,
             property: summaryToProperty(s),
-            minNotificationPrice: s.minNotificationPrice == null ? null : Number(s.minNotificationPrice),
+            minNotificationPrice:
+              s.minNotificationPrice == null ? null : Number(s.minNotificationPrice),
           });
     return { thread, timeline };
   }),
@@ -431,7 +533,9 @@ export const offersRouter = router({
 
   rejectSellerCounter: customerProcedure.input(versionedThread).mutation(async ({ ctx, input }) => {
     try {
-      await ctx.tx.execute(sql`select public.reject_offer(${input.threadId}::uuid, ${input.expectedVersion}, ${null})`);
+      await ctx.tx.execute(
+        sql`select public.reject_offer(${input.threadId}::uuid, ${input.expectedVersion}, ${null})`,
+      );
       return { ok: true as const };
     } catch (e) {
       mapOfferError(e);
@@ -440,7 +544,9 @@ export const offersRouter = router({
 
   withdraw: customerProcedure.input(versionedThread).mutation(async ({ ctx, input }) => {
     try {
-      await ctx.tx.execute(sql`select public.withdraw_offer(${input.threadId}::uuid, ${input.expectedVersion})`);
+      await ctx.tx.execute(
+        sql`select public.withdraw_offer(${input.threadId}::uuid, ${input.expectedVersion})`,
+      );
       return { ok: true as const };
     } catch (e) {
       mapOfferError(e);
@@ -456,7 +562,12 @@ export const offersRouter = router({
       .from(notifications)
       .where(and(eq(notifications.recipientId, ctx.user.id), isNull(notifications.readAt)));
     const action = await ctx.tx
-      .select({ status: offerThreads.status, nextActor: offerThreads.nextActor, buyer: offerThreads.buyerUserId, seller: offerThreads.sellerUserId })
+      .select({
+        status: offerThreads.status,
+        nextActor: offerThreads.nextActor,
+        buyer: offerThreads.buyerUserId,
+        seller: offerThreads.sellerUserId,
+      })
       .from(offerThreads)
       .where(inArray(offerThreads.status, ['AWAITING_SELLER', 'AWAITING_BUYER']));
     const actionNeeded = action.filter(
@@ -468,36 +579,40 @@ export const offersRouter = router({
   }),
 
   /** Recent in-app notifications for the header bell menu (§30.3). */
-  notifications: customerProcedure.input(z.object({ limit: z.number().int().min(1).max(50).default(20) }).optional()).query(async ({ ctx, input }) => {
-    const rows = await ctx.tx
-      .select()
-      .from(notifications)
-      .where(eq(notifications.recipientId, ctx.user.id))
-      .orderBy(desc(notifications.createdAt))
-      .limit(input?.limit ?? 20);
-    return rows.map((n) => {
-      // Validate {kind, payload} through the discriminated-union schema; an
-      // unexpected kind or malformed payload degrades to a safe UNKNOWN/null.
-      const safe = toSafeNotification(n.kind, n.payload);
-      return {
-        id: n.id,
-        kind: safe.kind,
-        threadId: safe.threadId,
-        transactionId: safe.transactionId,
-        listingId: safe.listingId,
-        read: n.readAt != null,
-        createdAt: n.createdAt.toISOString(),
-      };
-    });
-  }),
+  notifications: customerProcedure
+    .input(z.object({ limit: z.number().int().min(1).max(50).default(20) }).optional())
+    .query(async ({ ctx, input }) => {
+      const rows = await ctx.tx
+        .select()
+        .from(notifications)
+        .where(eq(notifications.recipientId, ctx.user.id))
+        .orderBy(desc(notifications.createdAt))
+        .limit(input?.limit ?? 20);
+      return rows.map((n) => {
+        // Validate {kind, payload} through the discriminated-union schema; an
+        // unexpected kind or malformed payload degrades to a safe UNKNOWN/null.
+        const safe = toSafeNotification(n.kind, n.payload);
+        return {
+          id: n.id,
+          kind: safe.kind,
+          threadId: safe.threadId,
+          transactionId: safe.transactionId,
+          listingId: safe.listingId,
+          read: n.readAt != null,
+          createdAt: n.createdAt.toISOString(),
+        };
+      });
+    }),
 
-  markNotificationRead: customerProcedure.input(z.object({ id: z.string().uuid() })).mutation(async ({ ctx, input }) => {
-    await ctx.tx
-      .update(notifications)
-      .set({ readAt: new Date() })
-      .where(and(eq(notifications.id, input.id), eq(notifications.recipientId, ctx.user.id)));
-    return { ok: true as const };
-  }),
+  markNotificationRead: customerProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.tx
+        .update(notifications)
+        .set({ readAt: new Date() })
+        .where(and(eq(notifications.id, input.id), eq(notifications.recipientId, ctx.user.id)));
+      return { ok: true as const };
+    }),
 
   markAllNotificationsRead: customerProcedure.mutation(async ({ ctx }) => {
     await ctx.tx
@@ -513,9 +628,15 @@ type Ctx = { tx: Tx };
 
 async function runCounter(
   ctx: Ctx,
-  input: { threadId: string; expectedVersion: number; amountAed: number; expiry: z.infer<typeof expiryOptionSchema> },
+  input: {
+    threadId: string;
+    expectedVersion: number;
+    amountAed: number;
+    expiry: z.infer<typeof expiryOptionSchema>;
+  },
 ) {
-  if (validateOfferAmount(input.amountAed)) throw new TRPCError({ code: 'BAD_REQUEST', message: 'INVALID_AMOUNT' });
+  if (validateOfferAmount(input.amountAed))
+    throw new TRPCError({ code: 'BAD_REQUEST', message: 'INVALID_AMOUNT' });
   const expiresAt = resolveExpiry(input.expiry);
   try {
     await ctx.tx.execute(
@@ -527,7 +648,10 @@ async function runCounter(
   }
 }
 
-async function runAccept(ctx: Ctx, input: { threadId: string; expectedVersion: number; proposalId: string }) {
+async function runAccept(
+  ctx: Ctx,
+  input: { threadId: string; expectedVersion: number; proposalId: string },
+) {
   try {
     await ctx.tx.execute(
       sql`select public.accept_offer(${input.threadId}::uuid, ${input.proposalId}::uuid, ${input.expectedVersion})`,
@@ -548,13 +672,23 @@ function matchesBuyerFilter(status: OfferThreadStatus, nextActor: string, filter
     case 'accepted':
       return status === 'ACCEPTED';
     case 'closed':
-      return ['REJECTED', 'WITHDRAWN', 'EXPIRED', 'CLOSED_OTHER_ACCEPTED', 'CLOSED_LISTING_UNAVAILABLE'].includes(status);
+      return [
+        'REJECTED',
+        'WITHDRAWN',
+        'EXPIRED',
+        'CLOSED_OTHER_ACCEPTED',
+        'CLOSED_LISTING_UNAVAILABLE',
+      ].includes(status);
     default:
       return true;
   }
 }
 
-function matchesSellerFilter(status: OfferThreadStatus, nextActor: string, filter: string): boolean {
+function matchesSellerFilter(
+  status: OfferThreadStatus,
+  nextActor: string,
+  filter: string,
+): boolean {
   switch (filter) {
     case 'action':
       return status === 'AWAITING_SELLER' && nextActor === 'SELLER';
@@ -563,7 +697,13 @@ function matchesSellerFilter(status: OfferThreadStatus, nextActor: string, filte
     case 'accepted':
       return status === 'ACCEPTED';
     case 'closed':
-      return ['REJECTED', 'WITHDRAWN', 'EXPIRED', 'CLOSED_OTHER_ACCEPTED', 'CLOSED_LISTING_UNAVAILABLE'].includes(status);
+      return [
+        'REJECTED',
+        'WITHDRAWN',
+        'EXPIRED',
+        'CLOSED_OTHER_ACCEPTED',
+        'CLOSED_LISTING_UNAVAILABLE',
+      ].includes(status);
     default:
       return true;
   }

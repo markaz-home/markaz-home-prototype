@@ -22,7 +22,14 @@ import { PasswordChecklist } from '@/components/auth/password-checklist';
 import { ErrorSummary } from '@/components/auth/error-summary';
 import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
 
-const FIELDS = ['fullName', 'email', 'password', 'confirmPassword', 'acceptTerms', 'acceptPrivacy'] as const;
+const FIELDS = [
+  'fullName',
+  'email',
+  'password',
+  'confirmPassword',
+  'acceptTerms',
+  'acceptPrivacy',
+] as const;
 
 export function SignUpForm() {
   const t = useTranslations('signup');
@@ -54,10 +61,12 @@ export function SignUpForm() {
   });
 
   const password = watch('password') ?? '';
-  const fe = (code?: string) => (code ? tv(FIELD_ERROR_KEYS[code] ?? 'unexpectedError') : undefined);
+  const fe = (code?: string) =>
+    code ? tv(FIELD_ERROR_KEYS[code] ?? 'unexpectedError') : undefined;
   // The live checklist covers min-length + policy; surface the max-length (128)
   // error under the field too (design spec §2194 — never a silent truncation).
-  const passwordFieldError = errors.password?.message === 'password_too_long' ? fe('password_too_long') : undefined;
+  const passwordFieldError =
+    errors.password?.message === 'password_too_long' ? fe('password_too_long') : undefined;
   const errorList = FIELDS.filter((k) => errors[k]).map((k) => ({
     id: k,
     message: fe(errors[k]?.message as string | undefined) ?? '',
@@ -105,7 +114,10 @@ export function SignUpForm() {
               <Link href="/sign-in" className="text-primary underline-offset-4 hover:underline">
                 {ta('signIn')}
               </Link>
-              <Link href="/forgot-password" className="text-primary underline-offset-4 hover:underline">
+              <Link
+                href="/forgot-password"
+                className="text-primary underline-offset-4 hover:underline"
+              >
                 {tsi('forgot')}
               </Link>
             </div>
@@ -118,42 +130,102 @@ export function SignUpForm() {
           className="space-y-5"
           noValidate
         >
-          <FormField id="fullName" label={t('fullName')} error={fe(errors.fullName?.message)} required>
-            <Input id="fullName" autoComplete="name" placeholder={t('fullNamePlaceholder')} aria-invalid={!!errors.fullName} {...register('fullName')} />
+          <FormField
+            id="fullName"
+            label={t('fullName')}
+            error={fe(errors.fullName?.message)}
+            required
+          >
+            <Input
+              id="fullName"
+              autoComplete="name"
+              placeholder={t('fullNamePlaceholder')}
+              aria-invalid={!!errors.fullName}
+              {...register('fullName')}
+            />
           </FormField>
 
           <FormField id="email" label={t('email')} error={fe(errors.email?.message)} required>
-            <Input id="email" type="email" inputMode="email" autoComplete="email" dir="ltr" placeholder={t('emailPlaceholder')} aria-invalid={!!errors.email} {...register('email')} />
+            <Input
+              id="email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              dir="ltr"
+              placeholder={t('emailPlaceholder')}
+              aria-invalid={!!errors.email}
+              {...register('email')}
+            />
           </FormField>
 
           <FormField id="password" label={t('password')} error={passwordFieldError} required>
-            <PasswordField id="password" autoComplete="new-password" dir="ltr" placeholder={t('passwordPlaceholder')} aria-invalid={!!errors.password} {...register('password')} />
+            <PasswordField
+              id="password"
+              autoComplete="new-password"
+              dir="ltr"
+              placeholder={t('passwordPlaceholder')}
+              aria-invalid={!!errors.password}
+              {...register('password')}
+            />
           </FormField>
           <PasswordChecklist password={password} submitted={submitted} />
 
-          <FormField id="confirmPassword" label={t('confirmPassword')} error={fe(errors.confirmPassword?.message)} required>
-            <PasswordField id="confirmPassword" autoComplete="new-password" dir="ltr" placeholder={t('confirmPasswordPlaceholder')} aria-invalid={!!errors.confirmPassword} {...register('confirmPassword')} />
+          <FormField
+            id="confirmPassword"
+            label={t('confirmPassword')}
+            error={fe(errors.confirmPassword?.message)}
+            required
+          >
+            <PasswordField
+              id="confirmPassword"
+              autoComplete="new-password"
+              dir="ltr"
+              placeholder={t('confirmPasswordPlaceholder')}
+              aria-invalid={!!errors.confirmPassword}
+              {...register('confirmPassword')}
+            />
           </FormField>
 
           <div className="space-y-2">
             <label className="flex items-start gap-3 text-sm">
-              <input id="acceptTerms" type="checkbox" className="mt-1 h-4 w-4" {...register('acceptTerms')} />
+              <input
+                id="acceptTerms"
+                type="checkbox"
+                className="mt-1 h-4 w-4"
+                {...register('acceptTerms')}
+              />
               <span>{t('terms')}</span>
             </label>
-            {errors.acceptTerms ? <p role="alert" className="text-xs font-medium text-destructive">{fe(errors.acceptTerms.message)}</p> : null}
+            {errors.acceptTerms ? (
+              <p role="alert" className="text-destructive text-xs font-medium">
+                {fe(errors.acceptTerms.message)}
+              </p>
+            ) : null}
             <label className="flex items-start gap-3 text-sm">
-              <input id="acceptPrivacy" type="checkbox" className="mt-1 h-4 w-4" {...register('acceptPrivacy')} />
+              <input
+                id="acceptPrivacy"
+                type="checkbox"
+                className="mt-1 h-4 w-4"
+                {...register('acceptPrivacy')}
+              />
               <span>{t('privacy')}</span>
             </label>
-            {errors.acceptPrivacy ? <p role="alert" className="text-xs font-medium text-destructive">{fe(errors.acceptPrivacy.message)}</p> : null}
+            {errors.acceptPrivacy ? (
+              <p role="alert" className="text-destructive text-xs font-medium">
+                {fe(errors.acceptPrivacy.message)}
+              </p>
+            ) : null}
           </div>
 
           <Button type="submit" className="w-full" loading={isSubmitting}>
             {isSubmitting ? t('submitting') : t('submit')}
           </Button>
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-center text-sm">
             {t('existing')}{' '}
-            <Link href="/sign-in" className="font-medium text-primary underline-offset-4 hover:underline">
+            <Link
+              href="/sign-in"
+              className="text-primary font-medium underline-offset-4 hover:underline"
+            >
               {ta('signIn')}
             </Link>
           </p>

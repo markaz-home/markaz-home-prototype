@@ -33,7 +33,11 @@ afterAll(async () => {
 });
 
 const asA = <T>(fn: Parameters<typeof withUserContext>[2]) =>
-  withUserContext(getAppDb(), { userId: ids!.customerA, accountType: 'CUSTOMER' }, fn) as Promise<T>;
+  withUserContext(
+    getAppDb(),
+    { userId: ids!.customerA, accountType: 'CUSTOMER' },
+    fn,
+  ) as Promise<T>;
 const rows = <T = Record<string, unknown>>(r: unknown): T[] => r as T[];
 
 // --- Storage boundary --------------------------------------------------------
@@ -47,19 +51,32 @@ describe('public photo Storage boundary (migration 08.3)', () => {
     if (!url || !anonKey || !serviceKey || !ids) return;
     service = createClient(url, serviceKey, { auth: { persistSession: false } });
     authed = createClient(url, anonKey, { auth: { persistSession: false } });
-    const signIn = await authed.auth.signInWithPassword({ email: 'customer-a@markaz.demo', password: DEMO_PASSWORD });
+    const signIn = await authed.auth.signInWithPassword({
+      email: 'customer-a@markaz.demo',
+      password: DEMO_PASSWORD,
+    });
     if (signIn.error) return;
-    const up = await service.storage.from('listing-photos').upload(PUBLIC_PATH, new Blob(['published cover']), { upsert: true, contentType: 'text/plain' });
+    const up = await service.storage
+      .from('listing-photos')
+      .upload(PUBLIC_PATH, new Blob(['published cover']), {
+        upsert: true,
+        contentType: 'text/plain',
+      });
     available = !up.error;
   });
   afterAll(async () => {
-    if (service) await service.storage.from('listing-photos').remove([PUBLIC_PATH, 'integration/customer-write.txt']);
+    if (service)
+      await service.storage
+        .from('listing-photos')
+        .remove([PUBLIC_PATH, 'integration/customer-write.txt']);
   });
 
   it('the publication service (service-role) can copy and clean up public photos', async () => {
     if (!available) return;
     const tmp = 'integration/service-copy.txt';
-    const up = await service!.storage.from('listing-photos').upload(tmp, new Blob(['svc']), { upsert: true });
+    const up = await service!.storage
+      .from('listing-photos')
+      .upload(tmp, new Blob(['svc']), { upsert: true });
     expect(up.error).toBeNull();
     const rm = await service!.storage.from('listing-photos').remove([tmp]);
     expect(rm.error).toBeNull();
@@ -75,14 +92,18 @@ describe('public photo Storage boundary (migration 08.3)', () => {
 
   it('an authenticated customer CANNOT insert into the public bucket', async () => {
     if (!available) return;
-    const up = await authed!.storage.from('listing-photos').upload('integration/customer-write.txt', new Blob(['nope']), { upsert: false });
+    const up = await authed!.storage
+      .from('listing-photos')
+      .upload('integration/customer-write.txt', new Blob(['nope']), { upsert: false });
     expect(up.error).not.toBeNull();
   });
 
   it('an authenticated customer CANNOT overwrite or delete a public object', async () => {
     if (!available) return;
     // Overwrite (update) attempt.
-    const over = await authed!.storage.from('listing-photos').upload(PUBLIC_PATH, new Blob(['hacked']), { upsert: true });
+    const over = await authed!.storage
+      .from('listing-photos')
+      .upload(PUBLIC_PATH, new Blob(['hacked']), { upsert: true });
     expect(over.error).not.toBeNull();
     // Delete attempt — object must survive (RLS filters the delete to nothing).
     await authed!.storage.from('listing-photos').remove([PUBLIC_PATH]);
@@ -117,31 +138,51 @@ describe('public_path is server-only (guard_public_photo_path trigger)', () => {
     if (!ids) return;
     const db = getAppDb();
     const before = rows<{ id: string; public_path: string | null }>(
-      await db.execute(sql`select id::text, public_path from public.property_photos where listing_id = ${L.aReady} order by sort_order limit 1`),
+      await db.execute(
+        sql`select id::text, public_path from public.property_photos where listing_id = ${L.aReady} order by sort_order limit 1`,
+      ),
     )[0];
     if (!before) return;
-    await db.execute(sql`update public.property_photos set public_path = 'integration/elevated.jpg' where id = ${before.id}`);
-    const mid = rows<{ public_path: string }>(await db.execute(sql`select public_path from public.property_photos where id = ${before.id}`))[0];
+    await db.execute(
+      sql`update public.property_photos set public_path = 'integration/elevated.jpg' where id = ${before.id}`,
+    );
+    const mid = rows<{ public_path: string }>(
+      await db.execute(sql`select public_path from public.property_photos where id = ${before.id}`),
+    )[0];
     expect(mid?.public_path).toBe('integration/elevated.jpg');
     // restore
-    await db.execute(sql`update public.property_photos set public_path = ${before.public_path} where id = ${before.id}`);
+    await db.execute(
+      sql`update public.property_photos set public_path = ${before.public_path} where id = ${before.id}`,
+    );
   });
 });
 
 // --- saved_properties database boundary --------------------------------------
 describe('saved_properties database boundary (migration 08.3)', () => {
   async function clearSave(listingId: string) {
-    await getAppDb().execute(sql`delete from public.saved_properties where customer_id = ${ids!.customerA} and listing_id = ${listingId}`);
+    await getAppDb().execute(
+      sql`delete from public.saved_properties where customer_id = ${ids!.customerA} and listing_id = ${listingId}`,
+    );
   }
   async function restoreSave(listingId: string) {
-    await getAppDb().execute(sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${listingId}) on conflict do nothing`);
+    await getAppDb().execute(
+      sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${listingId}) on conflict do nothing`,
+    );
   }
 
-  it('Customer A CAN save Customer B\'s LIVE listing', async () => {
+  it("Customer A CAN save Customer B's LIVE listing", async () => {
     if (!ids) return;
     await clearSave(L.bLive);
-    await asA((tx) => tx.execute(sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${L.bLive})`));
-    const got = rows(await getAppDb().execute(sql`select id from public.saved_properties where customer_id = ${ids!.customerA} and listing_id = ${L.bLive}`));
+    await asA((tx) =>
+      tx.execute(
+        sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${L.bLive})`,
+      ),
+    );
+    const got = rows(
+      await getAppDb().execute(
+        sql`select id from public.saved_properties where customer_id = ${ids!.customerA} and listing_id = ${L.bLive}`,
+      ),
+    );
     expect(got).toHaveLength(1);
   });
 
@@ -149,7 +190,11 @@ describe('saved_properties database boundary (migration 08.3)', () => {
     if (!ids) return;
     await clearSave(L.aLive);
     await expect(
-      asA((tx) => tx.execute(sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${L.aLive})`)),
+      asA((tx) =>
+        tx.execute(
+          sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${L.aLive})`,
+        ),
+      ),
     ).rejects.toThrow();
   });
 
@@ -157,7 +202,11 @@ describe('saved_properties database boundary (migration 08.3)', () => {
     if (!ids) return;
     await clearSave(L.bPaused);
     await expect(
-      asA((tx) => tx.execute(sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${L.bPaused})`)),
+      asA((tx) =>
+        tx.execute(
+          sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${L.bPaused})`,
+        ),
+      ),
     ).rejects.toThrow();
     await restoreSave(L.bPaused); // restore the seeded "unavailable saved" stub
   });
@@ -165,31 +214,53 @@ describe('saved_properties database boundary (migration 08.3)', () => {
   it('Customer A CANNOT save a non-LIVE (DRAFT) listing', async () => {
     if (!ids) return;
     await expect(
-      asA((tx) => tx.execute(sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${L.bDraft})`)),
+      asA((tx) =>
+        tx.execute(
+          sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${L.bDraft})`,
+        ),
+      ),
     ).rejects.toThrow();
   });
 
   it('Customer A CANNOT insert a save row on behalf of Customer B', async () => {
     if (!ids) return;
     await expect(
-      asA((tx) => tx.execute(sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerB}, ${L.bLive})`)),
+      asA((tx) =>
+        tx.execute(
+          sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerB}, ${L.bLive})`,
+        ),
+      ),
     ).rejects.toThrow();
   });
 
-  it('Customer A CANNOT read Customer B\'s saved rows', async () => {
+  it("Customer A CANNOT read Customer B's saved rows", async () => {
     if (!ids) return;
     // Ensure B has at least one save (as postgres).
-    await getAppDb().execute(sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerB}, ${L.aLive}) on conflict do nothing`);
-    const visible = await asA((tx) => tx.execute(sql`select id from public.saved_properties where customer_id = ${ids!.customerB}`));
+    await getAppDb().execute(
+      sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerB}, ${L.aLive}) on conflict do nothing`,
+    );
+    const visible = await asA((tx) =>
+      tx.execute(sql`select id from public.saved_properties where customer_id = ${ids!.customerB}`),
+    );
     expect(rows(visible)).toHaveLength(0);
-    await getAppDb().execute(sql`delete from public.saved_properties where customer_id = ${ids!.customerB} and listing_id = ${L.aLive}`);
+    await getAppDb().execute(
+      sql`delete from public.saved_properties where customer_id = ${ids!.customerB} and listing_id = ${L.aLive}`,
+    );
   });
 
   it('Customer A CAN remove their own save', async () => {
     if (!ids) return;
     await restoreSave(L.bLive);
-    await asA((tx) => tx.execute(sql`delete from public.saved_properties where customer_id = ${ids!.customerA} and listing_id = ${L.bLive}`));
-    const got = rows(await getAppDb().execute(sql`select id from public.saved_properties where customer_id = ${ids!.customerA} and listing_id = ${L.bLive}`));
+    await asA((tx) =>
+      tx.execute(
+        sql`delete from public.saved_properties where customer_id = ${ids!.customerA} and listing_id = ${L.bLive}`,
+      ),
+    );
+    const got = rows(
+      await getAppDb().execute(
+        sql`select id from public.saved_properties where customer_id = ${ids!.customerA} and listing_id = ${L.bLive}`,
+      ),
+    );
     expect(got).toHaveLength(0);
     await restoreSave(L.bLive); // leave the seed's available-saved card intact
   });

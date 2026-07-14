@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  canTransitionListing,
-  canRewindListing,
-  listingStageIndex,
-} from '../listing';
+import { canTransitionListing, canRewindListing, listingStageIndex } from '../listing';
 import {
   computeSectionStatuses,
   computeReadiness,
@@ -75,16 +71,28 @@ describe('section statuses + readiness', () => {
   it('flags photos without a cover as requires-attention', () => {
     const s = computeSectionStatuses({ ...complete, photos: { count: 3, hasCover: false } });
     expect(s.photos).toBe('REQUIRES_ATTENTION');
-    expect(computeReadiness({ ...complete, photos: { count: 3, hasCover: false } }).ready).toBe(false);
+    expect(computeReadiness({ ...complete, photos: { count: 3, hasCover: false } }).ready).toBe(
+      false,
+    );
   });
   it('treats a stale (not-fresh) verification as requires-attention, not ready', () => {
-    const s = computeSectionStatuses({ ...complete, verification: { status: 'VERIFIED', fresh: false } });
+    const s = computeSectionStatuses({
+      ...complete,
+      verification: { status: 'VERIFIED', fresh: false },
+    });
     expect(s.verification).toBe('REQUIRES_ATTENTION');
-    expect(computeReadiness({ ...complete, verification: { status: 'VERIFIED', fresh: false } }).ready).toBe(false);
+    expect(
+      computeReadiness({ ...complete, verification: { status: 'VERIFIED', fresh: false } }).ready,
+    ).toBe(false);
   });
   it('maps pending/failed simulation statuses', () => {
-    expect(computeSectionStatuses({ ...complete, verification: { status: 'PENDING', fresh: true } }).verification).toBe('PENDING');
-    expect(computeSectionStatuses({ ...complete, permit: { status: 'FAILED', fresh: true } }).permit).toBe('FAILED');
+    expect(
+      computeSectionStatuses({ ...complete, verification: { status: 'PENDING', fresh: true } })
+        .verification,
+    ).toBe('PENDING');
+    expect(
+      computeSectionStatuses({ ...complete, permit: { status: 'FAILED', fresh: true } }).permit,
+    ).toBe('FAILED');
   });
 });
 
@@ -104,10 +112,18 @@ describe('resume step + access', () => {
   it('resumes at the earliest incomplete required step', () => {
     expect(resolveNextStep(fresh)).toBe('details');
     expect(resolveNextStep({ ...fresh, detailsComplete: true })).toBe('ownership');
-    expect(resolveNextStep({ ...fresh, detailsComplete: true, hasActiveDocument: true })).toBe('verification');
+    expect(resolveNextStep({ ...fresh, detailsComplete: true, hasActiveDocument: true })).toBe(
+      'verification',
+    );
   });
   it('offers the optional Investment Case once after settings, before Form A', () => {
-    const afterSettings = { ...fresh, detailsComplete: true, hasActiveDocument: true, verification: { status: 'VERIFIED' as const, fresh: true }, settingsComplete: true };
+    const afterSettings = {
+      ...fresh,
+      detailsComplete: true,
+      hasActiveDocument: true,
+      verification: { status: 'VERIFIED' as const, fresh: true },
+      settingsComplete: true,
+    };
     expect(resolveNextStep(afterSettings)).toBe('investment-case');
     expect(resolveNextStep({ ...afterSettings, investment: { status: 'SKIPPED' } })).toBe('form-a');
   });
@@ -213,26 +229,65 @@ describe('listing validation schemas', () => {
   it('requires a building for apartments/penthouses but not villas', () => {
     const noBuilding = { ...baseDetails, buildingOrProject: '' };
     expect(propertyDetailsSchema.safeParse(noBuilding).success).toBe(false);
-    expect(propertyDetailsSchema.safeParse({ ...noBuilding, propertyType: 'VILLA' }).success).toBe(true);
+    expect(propertyDetailsSchema.safeParse({ ...noBuilding, propertyType: 'VILLA' }).success).toBe(
+      true,
+    );
   });
   it('rejects short descriptions and >15 amenities', () => {
-    expect(propertyDetailsSchema.safeParse({ ...baseDetails, description: 'too short' }).success).toBe(false);
+    expect(
+      propertyDetailsSchema.safeParse({ ...baseDetails, description: 'too short' }).success,
+    ).toBe(false);
   });
   it('enforces settings: notification cannot exceed asking price', () => {
-    expect(listingSettingsSchema.safeParse({ askingPriceAed: 2_000_000, minNotificationPriceAed: 1_950_000 }).success).toBe(true);
-    expect(listingSettingsSchema.safeParse({ askingPriceAed: 2_000_000, minNotificationPriceAed: 2_000_000 }).success).toBe(true);
-    const bad = listingSettingsSchema.safeParse({ askingPriceAed: 2_000_000, minNotificationPriceAed: 2_100_000 });
+    expect(
+      listingSettingsSchema.safeParse({
+        askingPriceAed: 2_000_000,
+        minNotificationPriceAed: 1_950_000,
+      }).success,
+    ).toBe(true);
+    expect(
+      listingSettingsSchema.safeParse({
+        askingPriceAed: 2_000_000,
+        minNotificationPriceAed: 2_000_000,
+      }).success,
+    ).toBe(true);
+    const bad = listingSettingsSchema.safeParse({
+      askingPriceAed: 2_000_000,
+      minNotificationPriceAed: 2_100_000,
+    });
     expect(bad.success).toBe(false);
-    if (!bad.success) expect(bad.error.issues.map((i) => i.message)).toContain('notification_above_asking');
+    if (!bad.success)
+      expect(bad.error.issues.map((i) => i.message)).toContain('notification_above_asking');
   });
   it('rejects non-whole or non-positive prices', () => {
-    expect(listingSettingsSchema.safeParse({ askingPriceAed: 0, minNotificationPriceAed: 0 }).success).toBe(false);
-    expect(listingSettingsSchema.safeParse({ askingPriceAed: 1_000_000.5, minNotificationPriceAed: 1 }).success).toBe(false);
+    expect(
+      listingSettingsSchema.safeParse({ askingPriceAed: 0, minNotificationPriceAed: 0 }).success,
+    ).toBe(false);
+    expect(
+      listingSettingsSchema.safeParse({ askingPriceAed: 1_000_000.5, minNotificationPriceAed: 1 })
+        .success,
+    ).toBe(false);
   });
   it('validates investment case inputs (negative renovation, future date)', () => {
-    const ok = investmentCaseSchema.safeParse({ originalPurchasePriceAed: 1_750_000, renovationCostsAed: 50_000, purchaseDate: '2022-06-29', visible: true });
+    const ok = investmentCaseSchema.safeParse({
+      originalPurchasePriceAed: 1_750_000,
+      renovationCostsAed: 50_000,
+      purchaseDate: '2022-06-29',
+      visible: true,
+    });
     expect(ok.success).toBe(true);
-    expect(investmentCaseSchema.safeParse({ originalPurchasePriceAed: 1_000, renovationCostsAed: -5, purchaseDate: '2022-06-29' }).success).toBe(false);
-    expect(investmentCaseSchema.safeParse({ originalPurchasePriceAed: 1_000, purchaseDate: '2999-01-01' }).success).toBe(false);
+    expect(
+      investmentCaseSchema.safeParse({
+        originalPurchasePriceAed: 1_000,
+        renovationCostsAed: -5,
+        purchaseDate: '2022-06-29',
+      }).success,
+    ).toBe(false);
+    expect(
+      investmentCaseSchema.safeParse({
+        originalPurchasePriceAed: 1_000,
+        purchaseDate: '2999-01-01',
+      }).success,
+    ).toBe(false);
   });
 });

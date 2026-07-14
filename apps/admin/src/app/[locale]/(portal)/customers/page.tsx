@@ -10,7 +10,9 @@ import { SearchBox } from '@/components/admin/search';
 import { customerStatusLabel, formatWhen } from '@/components/admin/labels';
 
 const LIMIT = 25;
-type Row = Awaited<ReturnType<Awaited<ReturnType<typeof getServerApi>>['admin']['customers']['list']>>[number];
+type Row = Awaited<
+  ReturnType<Awaited<ReturnType<typeof getServerApi>>['admin']['customers']['list']>
+>[number];
 
 export default async function CustomersPage({
   params,
@@ -25,47 +27,100 @@ export default async function CustomersPage({
   const t = await getTranslations('admin');
 
   const offset = Math.max(0, Number(sp.offset ?? 0) || 0);
-  const filter = (['all', 'active', 'restricted', 'onboarding'].includes(sp.filter ?? '') ? sp.filter : 'all') as
-    | 'all' | 'active' | 'restricted' | 'onboarding';
+  const filter = (
+    ['all', 'active', 'restricted', 'onboarding'].includes(sp.filter ?? '') ? sp.filter : 'all'
+  ) as 'all' | 'active' | 'restricted' | 'onboarding';
   const query = sp.query?.trim() || undefined;
 
   let rows: Row[] = [];
   let failed = false;
   try {
-    rows = await (await getServerApi()).admin.customers.list({ limit: LIMIT, offset, filter, query });
+    rows = await (
+      await getServerApi()
+    ).admin.customers.list({ limit: LIMIT, offset, filter, query });
   } catch {
     failed = true;
   }
 
   const columns: Column<Row>[] = [
-    { id: 'name', header: t('customers.col.name'), priority: 'primary', cell: (r) => (
-      <span className="inline-flex items-center gap-2">
-        {r.displayName}
-        {r.attention ? <AlertTriangle className="h-3.5 w-3.5 text-amber-600" aria-label={t('customers.attention')} /> : null}
-      </span>
-    ) },
-    { id: 'email', header: t('customers.col.email'), priority: 'secondary', cell: (r) => <span className="text-muted-foreground">{r.emailMasked}</span> },
-    { id: 'status', header: t('customers.col.status'), priority: 'secondary', cell: (r) => {
-      const s = customerStatusLabel(r.status);
-      return <StatusBadge tone={s.tone} label={t(s.key)} />;
-    } },
-    { id: 'listings', header: t('customers.col.listings'), priority: 'low', align: 'end', cell: (r) => r.listingCount },
-    { id: 'offers', header: t('customers.col.offers'), priority: 'low', align: 'end', cell: (r) => r.activeOfferCount },
-    { id: 'transactions', header: t('customers.col.transactions'), priority: 'low', align: 'end', cell: (r) => r.activeTransactionCount },
-    { id: 'activity', header: t('customers.col.activity'), priority: 'low', cell: (r) => formatWhen(r.lastActivityAt) },
+    {
+      id: 'name',
+      header: t('customers.col.name'),
+      priority: 'primary',
+      cell: (r) => (
+        <span className="inline-flex items-center gap-2">
+          {r.displayName}
+          {r.attention ? (
+            <AlertTriangle
+              className="h-3.5 w-3.5 text-amber-600"
+              aria-label={t('customers.attention')}
+            />
+          ) : null}
+        </span>
+      ),
+    },
+    {
+      id: 'email',
+      header: t('customers.col.email'),
+      priority: 'secondary',
+      cell: (r) => <span className="text-muted-foreground">{r.emailMasked}</span>,
+    },
+    {
+      id: 'status',
+      header: t('customers.col.status'),
+      priority: 'secondary',
+      cell: (r) => {
+        const s = customerStatusLabel(r.status);
+        return <StatusBadge tone={s.tone} label={t(s.key)} />;
+      },
+    },
+    {
+      id: 'listings',
+      header: t('customers.col.listings'),
+      priority: 'low',
+      align: 'end',
+      cell: (r) => r.listingCount,
+    },
+    {
+      id: 'offers',
+      header: t('customers.col.offers'),
+      priority: 'low',
+      align: 'end',
+      cell: (r) => r.activeOfferCount,
+    },
+    {
+      id: 'transactions',
+      header: t('customers.col.transactions'),
+      priority: 'low',
+      align: 'end',
+      cell: (r) => r.activeTransactionCount,
+    },
+    {
+      id: 'activity',
+      header: t('customers.col.activity'),
+      priority: 'low',
+      cell: (r) => formatWhen(r.lastActivityAt),
+    },
   ];
 
   return (
     <PageShell maxWidth={1600}>
       <PageHeader title={t('customers.title')} description={t('customers.description')} />
-      {failed ? <Alert variant="warning" className="mb-4">{t('overview.partialError')}</Alert> : null}
+      {failed ? (
+        <Alert variant="warning" className="mb-4">
+          {t('overview.partialError')}
+        </Alert>
+      ) : null}
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <FilterTabs
           pathname="/customers"
           params={{ query }}
           paramKey="filter"
           active={filter}
-          options={(['all', 'active', 'restricted', 'onboarding'] as const).map((v) => ({ value: v, label: t(`customers.filter.${v}`) }))}
+          options={(['all', 'active', 'restricted', 'onboarding'] as const).map((v) => ({
+            value: v,
+            label: t(`customers.filter.${v}`),
+          }))}
         />
         <SearchBox placeholder={t('search.placeholder')} />
       </div>
@@ -73,7 +128,13 @@ export default async function CustomersPage({
         <EmptyState title={t('customers.empty')} />
       ) : (
         <>
-          <DataTable columns={columns} rows={rows} rowKey={(r) => r.id} rowHref={(r) => `/customers/${r.id}`} caption={t('customers.title')} />
+          <DataTable
+            columns={columns}
+            rows={rows}
+            rowKey={(r) => r.id}
+            rowHref={(r) => `/customers/${r.id}`}
+            caption={t('customers.title')}
+          />
           <div className="mt-4">
             <ListPagination
               pathname="/customers"
@@ -81,7 +142,11 @@ export default async function CustomersPage({
               offset={offset}
               limit={LIMIT}
               count={rows.length}
-              labels={{ prev: t('prev'), next: t('next'), range: t('paginationRange', { from: offset + 1, to: offset + rows.length }) }}
+              labels={{
+                prev: t('prev'),
+                next: t('next'),
+                range: t('paginationRange', { from: offset + 1, to: offset + rows.length }),
+              }}
             />
           </div>
         </>

@@ -30,7 +30,7 @@ invalidation) and **ADR-0011** (draft-photo privacy). UX governed by
 - **Web UI** (`apps/web`): My Listings, the `/sell/*` route tree, wizard shell
   (stepper + property identity + autosave indicator), and all step screens.
 - **i18n**: full `listing/details/ownership/verification/settings/investment/
-  formA/photos/permit/review/ready/preview` namespaces (en + **ar draft, flagged**).
+formA/photos/permit/review/ready/preview` namespaces (en + **ar draft, flagged**).
 - **Seed**: Customer A incomplete / verification-pending / READY_TO_PUBLISH
   listings + Customer B draft (fictional).
 
@@ -132,19 +132,19 @@ signed URLs, tokens, or identity data.
 
 Validated against a clean local stack (`pnpm supabase:reset && pnpm db:setup`).
 
-| Command | Result |
-| --- | --- |
-| `pnpm typecheck` | ✅ 12/12 packages |
-| `pnpm lint` | ✅ 11/11 packages |
-| `pnpm test` (unit + component + integration) | ✅ **120 tests**, 8 packages |
-| &nbsp;&nbsp;`@markaz/domain` | 45 |
-| &nbsp;&nbsp;`@markaz/web` (component) | 31 |
-| &nbsp;&nbsp;`@markaz/admin` (component) | 7 |
-| &nbsp;&nbsp;`@markaz/auth` | 5 |
-| &nbsp;&nbsp;`@markaz/i18n` | 6 |
+| Command                                               | Result                                                                      |
+| ----------------------------------------------------- | --------------------------------------------------------------------------- |
+| `pnpm typecheck`                                      | ✅ 12/12 packages                                                           |
+| `pnpm lint`                                           | ✅ 11/11 packages                                                           |
+| `pnpm test` (unit + component + integration)          | ✅ **120 tests**, 8 packages                                                |
+| &nbsp;&nbsp;`@markaz/domain`                          | 45                                                                          |
+| &nbsp;&nbsp;`@markaz/web` (component)                 | 31                                                                          |
+| &nbsp;&nbsp;`@markaz/admin` (component)               | 7                                                                           |
+| &nbsp;&nbsp;`@markaz/auth`                            | 5                                                                           |
+| &nbsp;&nbsp;`@markaz/i18n`                            | 6                                                                           |
 | &nbsp;&nbsp;`@markaz/tests` (integration, live stack) | 26 — RLS 9, storage 3, provisioning 3, listing-journey 6, listing-privacy 5 |
-| `pnpm test:e2e` (Playwright, live stack + Mailpit) | ✅ **21** — auth 6, foundation 4, listing-journey 3, listing-quality 8 |
-| `pnpm build` | ✅ web + admin compiled |
+| `pnpm test:e2e` (Playwright, live stack + Mailpit)    | ✅ **21** — auth 6, foundation 4, listing-journey 3, listing-quality 8      |
+| `pnpm build`                                          | ✅ web + admin compiled                                                     |
 
 - **Skipped:** none (integration + e2e ran against the active stack).
 - Migration `07` applies cleanly; `db:setup` seeds the Week-2 scenarios.

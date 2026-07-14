@@ -17,21 +17,44 @@ const createCaller = createCallerFactory(appRouter);
 const created: string[] = [];
 
 const callerFor = (userId: string) =>
-  createCaller({ db: getAppDb(), user: { id: userId, accountType: 'CUSTOMER' }, requestId: 'test', log: logger } as Context);
+  createCaller({
+    db: getAppDb(),
+    user: { id: userId, accountType: 'CUSTOMER' },
+    requestId: 'test',
+    log: logger,
+  } as Context);
 const anonCaller = () =>
   createCaller({ db: getAppDb(), user: null, requestId: 'test', log: logger } as Context);
 
-const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
+const PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+  'base64',
+);
 const VALID_DETAILS = {
-  propertyType: 'APARTMENT' as const, emirate: 'DUBAI' as const, community: 'Dubai Marina', buildingOrProject: 'Marina Gate 2',
-  unitIdentifier: 'Unit 9090', bedrooms: 2, bathrooms: 3, sizeSqft: 1284, furnishingStatus: 'FURNISHED' as const,
-  occupancyStatus: 'VACANT' as const, completionStatus: 'READY' as const, parkingSpaces: 1, description: 'A'.repeat(120), features: ['BALCONY' as const],
+  propertyType: 'APARTMENT' as const,
+  emirate: 'DUBAI' as const,
+  community: 'Dubai Marina',
+  buildingOrProject: 'Marina Gate 2',
+  unitIdentifier: 'Unit 9090',
+  bedrooms: 2,
+  bathrooms: 3,
+  sizeSqft: 1284,
+  furnishingStatus: 'FURNISHED' as const,
+  occupancyStatus: 'VACANT' as const,
+  completionStatus: 'READY' as const,
+  parkingSpaces: 1,
+  description: 'A'.repeat(120),
+  features: ['BALCONY' as const],
 };
 
 beforeAll(async () => {
   ids = await resolveDemoIds();
   if (!ids) return console.warn('[publication-marketplace] Skipped — run `pnpm db:setup`.');
-  admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
+  admin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } },
+  );
 });
 afterAll(async () => {
   if (ids) {
@@ -45,15 +68,25 @@ async function driveToLive(a: ReturnType<typeof callerFor>, ownerId: string): Pr
   const { listingId } = await a.listing.create();
   created.push(listingId);
   await a.listing.saveDetails({ listingId, ...VALID_DETAILS });
-  await a.listing.document.register({ listingId, documentType: 'TITLE_DEED', storagePath: `${ownerId}/${listingId}/doc.pdf` });
+  await a.listing.document.register({
+    listingId,
+    documentType: 'TITLE_DEED',
+    storagePath: `${ownerId}/${listingId}/doc.pdf`,
+  });
   await a.listing.verification.start({ listingId });
   await a.listing.verification.status({ listingId });
-  await a.listing.saveSettings({ listingId, askingPriceAed: 2_100_000, minNotificationPriceAed: 1_950_000 });
+  await a.listing.saveSettings({
+    listingId,
+    askingPriceAed: 2_100_000,
+    minNotificationPriceAed: 1_950_000,
+  });
   await a.listing.investment.skip({ listingId });
   await a.listing.formA.complete({ listingId, confirm: true });
   // Upload a REAL draft photo so the public-photo pipeline can copy it.
   const path = `${ownerId}/${listingId}/cover.png`;
-  await admin!.storage.from('listing-photos-draft').upload(path, PNG, { contentType: 'image/png', upsert: true });
+  await admin!.storage
+    .from('listing-photos-draft')
+    .upload(path, PNG, { contentType: 'image/png', upsert: true });
   await a.listing.photos.register({ listingId, storagePath: path, contentType: 'image/png' });
   await a.listing.photos.complete({ listingId });
   await a.listing.permit.submit({ listingId, confirm: true });
@@ -99,14 +132,18 @@ describe('publication → marketplace', () => {
     const anon = anonCaller();
 
     await a.listing.pause({ listingId });
-    expect((await anon.marketplace.search({})).items.some((i) => i.publicId === publicId)).toBe(false);
+    expect((await anon.marketplace.search({})).items.some((i) => i.publicId === publicId)).toBe(
+      false,
+    );
     expect(await anon.marketplace.getByPublicId({ publicId })).toBeNull();
 
     await a.listing.resume({ listingId });
-    expect((await anon.marketplace.search({})).items.some((i) => i.publicId === publicId)).toBe(true);
+    expect((await anon.marketplace.search({})).items.some((i) => i.publicId === publicId)).toBe(
+      true,
+    );
   });
 
-  it('save rules: customer saves another customer\'s LIVE listing; owner cannot save own; unavailable stays safe', async () => {
+  it("save rules: customer saves another customer's LIVE listing; owner cannot save own; unavailable stays safe", async () => {
     if (!ids) return;
     const a = callerFor(ids.customerA);
     const b = callerFor(ids.customerB);
@@ -119,7 +156,9 @@ describe('publication → marketplace', () => {
     const listB = await b.marketplace.saved.list();
     expect(listB.some((i) => (i as { kind: string }).kind === 'available')).toBe(true);
 
-    await expect(a.marketplace.saved.save({ publicId })).rejects.toMatchObject({ code: 'BAD_REQUEST' });
+    await expect(a.marketplace.saved.save({ publicId })).rejects.toMatchObject({
+      code: 'BAD_REQUEST',
+    });
 
     // Pause → B's saved entry becomes a safe unavailable stub (no private data).
     await a.listing.pause({ listingId });

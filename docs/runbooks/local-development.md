@@ -39,13 +39,13 @@ pnpm dev
 
 ## Ports
 
-| Service | URL / Port |
-| --- | --- |
-| Customer app (`apps/web`) | http://localhost:3000 |
-| Admin app (`apps/admin`) | http://localhost:3001 |
-| Supabase API (Kong) | http://127.0.0.1:54321 |
-| Postgres database | 127.0.0.1:54322 |
-| Supabase Studio | http://127.0.0.1:54323 |
+| Service                                                                             | URL / Port             |
+| ----------------------------------------------------------------------------------- | ---------------------- |
+| Customer app (`apps/web`)                                                           | http://localhost:3000  |
+| Admin app (`apps/admin`)                                                            | http://localhost:3001  |
+| Supabase API (Kong)                                                                 | http://127.0.0.1:54321 |
+| Postgres database                                                                   | 127.0.0.1:54322        |
+| Supabase Studio                                                                     | http://127.0.0.1:54323 |
 | Mail inbox (verification code + recovery link) — Mailpit, or Inbucket on older CLIs | http://127.0.0.1:54324 |
 
 ## Environment variables

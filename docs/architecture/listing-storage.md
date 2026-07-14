@@ -4,11 +4,11 @@ See **ADR-0011** for the draft-photo privacy decision.
 
 ## Buckets
 
-| Bucket | Public? | Contents | Access |
-| --- | --- | --- | --- |
-| `ownership-documents` | **private** | fictional ownership documents | owner or admin; signed URLs only |
-| `listing-photos-draft` | **private** | draft listing photographs | owner (read + write own objects) or admin; signed URLs only |
-| `listing-photos` | public | published listing photographs (Week 3) | public read (`anon + authenticated SELECT`); **server-only writes** via service role during publication |
+| Bucket                 | Public?     | Contents                               | Access                                                                                                  |
+| ---------------------- | ----------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `ownership-documents`  | **private** | fictional ownership documents          | owner or admin; signed URLs only                                                                        |
+| `listing-photos-draft` | **private** | draft listing photographs              | owner (read + write own objects) or admin; signed URLs only                                             |
+| `listing-photos`       | public      | published listing photographs (Week 3) | public read (`anon + authenticated SELECT`); **server-only writes** via service role during publication |
 
 Storage RLS (`supabase/migrations/…0400` + `…0700` + `…0803`) scopes the private
 buckets to `owner = auth.uid()` (or `is_admin()`). Draft photos are **never**

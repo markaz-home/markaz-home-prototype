@@ -3,7 +3,11 @@ import { ShieldAlert } from 'lucide-react';
 import { AdminAuthShell, AdminHeading } from '@/components/auth/admin-auth-shell';
 import { AdminSignOut } from '@/components/admin-sign-out';
 
-export default async function AccessDeniedPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function AccessDeniedPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('admin');
@@ -11,12 +15,15 @@ export default async function AccessDeniedPage({ params }: { params: Promise<{ l
   return (
     <AdminAuthShell>
       <div className="space-y-5">
-        <ShieldAlert className="h-9 w-9 text-destructive" aria-hidden />
+        <ShieldAlert className="text-destructive h-9 w-9" aria-hidden />
         <AdminHeading title={t('deniedTitle')} description={t('deniedBody')} />
-        <p className="text-sm text-muted-foreground">{t('deniedHelp')}</p>
+        <p className="text-muted-foreground text-sm">{t('deniedHelp')}</p>
         <div className="flex flex-col gap-3 pt-2">
           <AdminSignOut variant="outline" />
-          <a href={webUrl} className="text-center text-sm text-muted-foreground hover:text-foreground">
+          <a
+            href={webUrl}
+            className="text-muted-foreground hover:text-foreground text-center text-sm"
+          >
             {t('returnHome')}
           </a>
         </div>

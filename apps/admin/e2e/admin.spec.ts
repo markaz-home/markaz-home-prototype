@@ -1,7 +1,13 @@
 import { test, expect } from '@playwright/test';
 import {
-  createAdmin, createCustomer, createLiveListing, createPendingPublication, createOfferThread,
-  acceptedTransaction, provisionTransactionDocument, teardown,
+  createAdmin,
+  createCustomer,
+  createLiveListing,
+  createPendingPublication,
+  createOfferThread,
+  acceptedTransaction,
+  provisionTransactionDocument,
+  teardown,
   type Principal,
 } from './helpers/provision';
 import { adminSignIn, gotoDetail, runReasonAction } from './helpers/flows';
@@ -31,7 +37,16 @@ test.describe('Admin portal — access control', () => {
     await adminSignIn(page, adminUser);
     // Scope to the sidebar nav landmark — "Customers" etc. also appear as dashboard metric links.
     const nav = page.getByRole('navigation', { name: 'Admin' });
-    for (const area of ['Overview', 'Customers', 'Listings', 'Publication', 'Offers', 'Transactions', 'Verifications', 'Audit']) {
+    for (const area of [
+      'Overview',
+      'Customers',
+      'Listings',
+      'Publication',
+      'Offers',
+      'Transactions',
+      'Verifications',
+      'Audit',
+    ]) {
       await expect(nav.getByRole('link', { name: area, exact: true })).toBeVisible();
     }
   });
@@ -43,15 +58,29 @@ test.describe('Customer restriction', () => {
     await adminSignIn(page, adminUser);
     await gotoDetail(page, 'customers', customer.id);
 
-    await runReasonAction(page, /Restrict actions/i, /Reason/i, 'ACCOUNT_REVIEW', /Restrict actions/i);
+    await runReasonAction(
+      page,
+      /Restrict actions/i,
+      /Reason/i,
+      'ACCOUNT_REVIEW',
+      /Restrict actions/i,
+    );
     await expect(page.getByText(/Actions restricted/i).first()).toBeVisible();
 
-    await runReasonAction(page, /Restore actions/i, /Reason/i, 'REVIEW_COMPLETED', /Restore actions/i);
+    await runReasonAction(
+      page,
+      /Restore actions/i,
+      /Reason/i,
+      'REVIEW_COMPLETED',
+      /Restore actions/i,
+    );
     await expect(page.getByText(/^Active$/i).first()).toBeVisible();
 
     // The action is recorded in the audit log.
     await page.goto('/en/audit');
-    await expect(page.getByText(/ADMIN_CUSTOMER_ACTIONS_RESTRICTED/).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(/ADMIN_CUSTOMER_ACTIONS_RESTRICTED/).first()).toBeVisible({
+      timeout: 15_000,
+    });
   });
 });
 
@@ -62,7 +91,10 @@ test.describe('Publication review', () => {
     await adminSignIn(page, adminUser);
     await gotoDetail(page, 'publication', requestId);
     await page.getByRole('button', { name: /Approve & publish/i }).click();
-    await page.getByRole('button', { name: /Approve & publish/i }).last().click();
+    await page
+      .getByRole('button', { name: /Approve & publish/i })
+      .last()
+      .click();
     await expect(page.getByRole('dialog')).toBeHidden({ timeout: 20_000 });
   });
 
@@ -71,7 +103,13 @@ test.describe('Publication review', () => {
     const { requestId } = await createPendingPublication(seller.id);
     await adminSignIn(page, adminUser);
     await gotoDetail(page, 'publication', requestId);
-    await runReasonAction(page, /Return for changes/i, /Reason/i, 'PHOTOS_NEED_CHANGES', /Return for changes/i);
+    await runReasonAction(
+      page,
+      /Return for changes/i,
+      /Reason/i,
+      'PHOTOS_NEED_CHANGES',
+      /Return for changes/i,
+    );
     await expect(page.getByText(/Returned|already completed/i).first()).toBeVisible();
   });
 });
@@ -82,11 +120,20 @@ test.describe('Listing availability', () => {
     const listing = await createLiveListing(seller.id);
     await adminSignIn(page, adminUser);
     await gotoDetail(page, 'listings', listing.id);
-    await runReasonAction(page, /Pause listing/i, /Reason/i, 'INFORMATION_UNDER_REVIEW', /Pause listing/i);
+    await runReasonAction(
+      page,
+      /Pause listing/i,
+      /Reason/i,
+      'INFORMATION_UNDER_REVIEW',
+      /Pause listing/i,
+    );
     await expect(page.getByText(/Paused/i).first()).toBeVisible();
     await page.getByRole('button', { name: /Resume listing/i }).click();
     await page.getByLabel(/Reason/i).fill('Review complete');
-    await page.getByRole('button', { name: /Resume listing/i }).last().click();
+    await page
+      .getByRole('button', { name: /Resume listing/i })
+      .last()
+      .click();
     await expect(page.getByRole('dialog')).toBeHidden({ timeout: 15_000 });
   });
 });
@@ -106,7 +153,9 @@ test.describe('Offer oversight', () => {
 });
 
 test.describe('Private-document access', () => {
-  test('admin opens a private document with a reason (audited REQUESTED+GRANTED); customer is denied', async ({ page }) => {
+  test('admin opens a private document with a reason (audited REQUESTED+GRANTED); customer is denied', async ({
+    page,
+  }) => {
     const seller = await createCustomer('doc-seller');
     const buyer = await createCustomer('doc-buyer');
     const listing = await createLiveListing(seller.id, 'E2E Doc Listing');
@@ -119,7 +168,10 @@ test.describe('Private-document access', () => {
     await expect(page.getByText('id.pdf').first()).toBeVisible();
 
     // Open securely: reason + acknowledgement are both required before the button enables.
-    await page.getByRole('button', { name: /Open securely/i }).first().click();
+    await page
+      .getByRole('button', { name: /Open securely/i })
+      .first()
+      .click();
     const dialog = page.getByRole('dialog');
     await expect(dialog.getByRole('button', { name: /Open document/i })).toBeDisabled();
     await dialog.getByLabel('Reason', { exact: true }).selectOption('VERIFICATION_REVIEW');
@@ -133,7 +185,9 @@ test.describe('Private-document access', () => {
 
     // Exact audit lifecycle — REQUESTED then GRANTED, never a URL/path.
     await page.goto('/en/audit');
-    await expect(page.getByText('ADMIN_DOCUMENT_ACCESS_GRANTED').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('ADMIN_DOCUMENT_ACCESS_GRANTED').first()).toBeVisible({
+      timeout: 15_000,
+    });
     await expect(page.getByText('ADMIN_DOCUMENT_ACCESS_REQUESTED').first()).toBeVisible();
 
     // A customer cannot reach the transaction (and thus the document control) in the portal.
@@ -151,7 +205,9 @@ test.describe('Private-document access', () => {
 });
 
 test.describe('Transaction recovery', () => {
-  test('admin pauses then resumes a transaction; participant ownership unchanged; audited', async ({ page }) => {
+  test('admin pauses then resumes a transaction; participant ownership unchanged; audited', async ({
+    page,
+  }) => {
     const seller = await createCustomer('rec-seller');
     const buyer = await createCustomer('rec-buyer');
     const listing = await createLiveListing(seller.id, 'E2E Recovery Listing');
@@ -162,12 +218,19 @@ test.describe('Transaction recovery', () => {
 
     // Capture the customer's next-action ownership before recovery.
     const nextActor = () =>
-      page.locator('dt', { hasText: 'Next actor' }).locator('xpath=following-sibling::dd[1]').first().innerText();
+      page
+        .locator('dt', { hasText: 'Next actor' })
+        .locator('xpath=following-sibling::dd[1]')
+        .first()
+        .innerText();
     const before = (await nextActor()).trim();
 
     // Pause progression (reason recorded). The detail page swaps the action to "Resume",
     // which is the on-page evidence the transaction is now paused.
-    await page.getByRole('button', { name: /Pause progression/i }).first().click();
+    await page
+      .getByRole('button', { name: /Pause progression/i })
+      .first()
+      .click();
     let dialog = page.getByRole('dialog');
     await dialog.getByLabel('Reason', { exact: true }).fill('Under operational review');
     await dialog.getByRole('button', { name: /Pause progression/i }).click();
@@ -175,19 +238,26 @@ test.describe('Transaction recovery', () => {
     await expect(page.getByRole('button', { name: /Resume progression/i })).toBeVisible();
 
     // Resume progression.
-    await page.getByRole('button', { name: /Resume progression/i }).first().click();
+    await page
+      .getByRole('button', { name: /Resume progression/i })
+      .first()
+      .click();
     dialog = page.getByRole('dialog');
     await dialog.getByLabel('Reason', { exact: true }).fill('Review complete');
     await dialog.getByRole('button', { name: /Resume progression/i }).click();
     await expect(dialog).toBeHidden({ timeout: 15_000 });
 
     // Ownership unchanged: same next actor, and the transaction was not failed/cancelled.
-    await expect(async () => expect((await nextActor()).trim()).toBe(before)).toPass({ timeout: 10_000 });
+    await expect(async () => expect((await nextActor()).trim()).toBe(before)).toPass({
+      timeout: 10_000,
+    });
     await expect(page.getByText(/^Failed$|^Cancelled$/i)).toHaveCount(0);
 
     // Both recovery actions recorded immutably.
     await page.goto('/en/audit');
-    await expect(page.getByText('ADMIN_TRANSACTION_PAUSED').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('ADMIN_TRANSACTION_PAUSED').first()).toBeVisible({
+      timeout: 15_000,
+    });
     await expect(page.getByText('ADMIN_TRANSACTION_RESUMED').first()).toBeVisible();
   });
 });

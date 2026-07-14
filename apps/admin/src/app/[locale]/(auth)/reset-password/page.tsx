@@ -25,12 +25,23 @@ export default async function Page({
         <div className="space-y-5">
           <AdminHeading title={t('invalidTitle')} description={t('invalidBody')} />
           <div className="flex flex-col gap-3 pt-2">
-            <Button asChild><Link href="/forgot-password">{t('requestNew')}</Link></Button>
-            <Link href="/login" className="text-center text-sm text-muted-foreground hover:text-foreground">{ta('returnSignIn')}</Link>
+            <Button asChild>
+              <Link href="/forgot-password">{t('requestNew')}</Link>
+            </Button>
+            <Link
+              href="/login"
+              className="text-muted-foreground hover:text-foreground text-center text-sm"
+            >
+              {ta('returnSignIn')}
+            </Link>
           </div>
         </div>
       </AdminAuthShell>
     );
   }
-  return <Suspense><AdminResetPassword /></Suspense>;
+  return (
+    <Suspense>
+      <AdminResetPassword />
+    </Suspense>
+  );
 }

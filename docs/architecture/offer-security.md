@@ -4,15 +4,16 @@ RLS is the authorisation boundary (offers-design-spec §37); client/API checks a
 
 ## Access matrix
 
-| Actor | Threads / proposals / events |
-|---|---|
-| Anonymous | **No access** (no grant, no policy) |
-| Buyer | Read own threads only |
-| Seller (listing owner) | Read threads on owned listings only |
-| Admin | Read all (parity with other tables) |
-| Any customer | **No direct INSERT/UPDATE/DELETE** — writes only via SECURITY DEFINER fns |
+| Actor                  | Threads / proposals / events                                              |
+| ---------------------- | ------------------------------------------------------------------------- |
+| Anonymous              | **No access** (no grant, no policy)                                       |
+| Buyer                  | Read own threads only                                                     |
+| Seller (listing owner) | Read threads on owned listings only                                       |
+| Admin                  | Read all (parity with other tables)                                       |
+| Any customer           | **No direct INSERT/UPDATE/DELETE** — writes only via SECURITY DEFINER fns |
 
 Enforced in `supabase/migrations/20260301000804_offers.sql`:
+
 - `force row level security` on `offer_threads`/`offer_proposals`/`offer_events`;
   participant-only `SELECT` policies; `grant select` to `authenticated` only.
 - Guard triggers make identity + money columns immutable and block `authenticated`/`anon`

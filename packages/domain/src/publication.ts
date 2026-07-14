@@ -66,7 +66,10 @@ export function publicationChecklist(
 }
 
 /** A listing is eligible to be submitted for publication when every required item is COMPLETE. */
-export function isPublicationEligible(input: ListingProgressInput, askingPriceAed: number | null): boolean {
+export function isPublicationEligible(
+  input: ListingProgressInput,
+  askingPriceAed: number | null,
+): boolean {
   const c = publicationChecklist(input, askingPriceAed);
   return (Object.keys(c) as PublicationChecklistItem[]).every((k) => c[k] !== 'INCOMPLETE');
 }
@@ -143,6 +146,9 @@ export function buildListingSlug(parts: {
 
 /** Format an opaque public id from a random alphanumeric token (set by the API). */
 export function formatPublicId(token: string): string {
-  const clean = token.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10);
+  const clean = token
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
+    .slice(0, 10);
   return `mkz-${clean}`;
 }

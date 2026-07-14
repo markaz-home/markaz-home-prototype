@@ -24,7 +24,11 @@ export function QueueLive() {
     >
       <WifiOff className="h-3.5 w-3.5" aria-hidden />
       {status === 'stale' ? t('realtime.stale') : t('realtime.reconnecting')}
-      <button type="button" onClick={() => router.refresh()} className="inline-flex items-center gap-1 font-medium underline">
+      <button
+        type="button"
+        onClick={() => router.refresh()}
+        className="inline-flex items-center gap-1 font-medium underline"
+      >
         <RefreshCw className="h-3 w-3" aria-hidden />
         {t('realtime.refresh')}
       </button>

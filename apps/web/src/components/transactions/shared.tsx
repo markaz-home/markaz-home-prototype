@@ -11,7 +11,7 @@ export function TransactionsNavBadge() {
   if (n <= 0) return null;
   return (
     <span
-      className="ms-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground"
+      className="bg-primary text-primary-foreground ms-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold"
       aria-hidden
     >
       {n > 99 ? '99+' : n}
@@ -23,8 +23,8 @@ export function TransactionsNavBadge() {
 export function SimulationDisclosure() {
   const t = useTranslations('transactions.disclosure');
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm">
-      <Info className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
+    <div className="border-primary/20 bg-primary/5 flex items-start gap-3 rounded-lg border p-4 text-sm">
+      <Info className="text-primary mt-0.5 h-5 w-5 shrink-0" aria-hidden />
       <p>
         <span className="font-medium">{t('title')}</span>
         {' — '}

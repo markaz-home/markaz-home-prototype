@@ -14,7 +14,15 @@ const h = vi.hoisted(() => ({
 }));
 
 vi.mock('@/i18n/navigation', () => ({
-  Link: ({ children, href, onClick }: { children: React.ReactNode; href: string; onClick?: () => void }) => (
+  Link: ({
+    children,
+    href,
+    onClick,
+  }: {
+    children: React.ReactNode;
+    href: string;
+    onClick?: () => void;
+  }) => (
     <a href={href} onClick={onClick}>
       {children}
     </a>
@@ -32,7 +40,9 @@ vi.mock('@/trpc/react', () => ({
       notifications: { useQuery: () => h.Q.notifications },
       getUnreadCounts: { useQuery: () => h.Q.counts },
       markNotificationRead: { useMutation: () => ({ mutate: h.markReadMutate }) },
-      markAllNotificationsRead: { useMutation: () => ({ mutate: h.markAllMutate, isPending: false }) },
+      markAllNotificationsRead: {
+        useMutation: () => ({ mutate: h.markAllMutate, isPending: false }),
+      },
     },
   },
 }));
@@ -41,7 +51,12 @@ import { NotificationsList } from '@/components/offers/notifications-list';
 
 function renderList(locale: 'en' | 'ar' = 'en') {
   return render(
-    <NextIntlClientProvider locale={locale} messages={loadMessages(locale)} timeZone="Asia/Dubai" now={new Date('2026-07-14T09:00:00Z')}>
+    <NextIntlClientProvider
+      locale={locale}
+      messages={loadMessages(locale)}
+      timeZone="Asia/Dubai"
+      now={new Date('2026-07-14T09:00:00Z')}
+    >
       <NotificationsList />
     </NextIntlClientProvider>,
   );
@@ -73,8 +88,20 @@ describe('NotificationsList', () => {
   it('renders translated labels and links actionable notifications to their thread', () => {
     h.Q.notifications = {
       data: [
-        { id: 'n1', kind: 'OFFER_ACCEPTED', threadId: 't1', read: false, createdAt: '2026-07-14T08:00:00Z' },
-        { id: 'n2', kind: 'OFFER_EXPIRED', threadId: null, read: true, createdAt: '2026-07-13T08:00:00Z' },
+        {
+          id: 'n1',
+          kind: 'OFFER_ACCEPTED',
+          threadId: 't1',
+          read: false,
+          createdAt: '2026-07-14T08:00:00Z',
+        },
+        {
+          id: 'n2',
+          kind: 'OFFER_EXPIRED',
+          threadId: null,
+          read: true,
+          createdAt: '2026-07-13T08:00:00Z',
+        },
       ],
       isLoading: false,
     };
@@ -87,7 +114,15 @@ describe('NotificationsList', () => {
 
   it('shows "Mark all as read" only when there are unread notifications and calls the mutation', async () => {
     h.Q.notifications = {
-      data: [{ id: 'n1', kind: 'OFFER_RECEIVED', threadId: 't1', read: false, createdAt: '2026-07-14T08:00:00Z' }],
+      data: [
+        {
+          id: 'n1',
+          kind: 'OFFER_RECEIVED',
+          threadId: 't1',
+          read: false,
+          createdAt: '2026-07-14T08:00:00Z',
+        },
+      ],
       isLoading: false,
     };
     h.Q.counts = { data: { unread: 2, actionNeeded: 0 } };
@@ -99,7 +134,15 @@ describe('NotificationsList', () => {
 
   it('marks an unread notification read when its link is opened', async () => {
     h.Q.notifications = {
-      data: [{ id: 'n1', kind: 'OFFER_RECEIVED', threadId: 't1', read: false, createdAt: '2026-07-14T08:00:00Z' }],
+      data: [
+        {
+          id: 'n1',
+          kind: 'OFFER_RECEIVED',
+          threadId: 't1',
+          read: false,
+          createdAt: '2026-07-14T08:00:00Z',
+        },
+      ],
       isLoading: false,
     };
     h.Q.counts = { data: { unread: 1, actionNeeded: 0 } };
@@ -110,7 +153,15 @@ describe('NotificationsList', () => {
 
   it('hides "Mark all as read" when everything is read', () => {
     h.Q.notifications = {
-      data: [{ id: 'n1', kind: 'OFFER_ACCEPTED', threadId: 't1', read: true, createdAt: '2026-07-14T08:00:00Z' }],
+      data: [
+        {
+          id: 'n1',
+          kind: 'OFFER_ACCEPTED',
+          threadId: 't1',
+          read: true,
+          createdAt: '2026-07-14T08:00:00Z',
+        },
+      ],
       isLoading: false,
     };
     h.Q.counts = { data: { unread: 0, actionNeeded: 0 } };

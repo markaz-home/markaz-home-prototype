@@ -3,8 +3,19 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { FileLock2, ExternalLink } from 'lucide-react';
 import {
-  Alert, Button, Card, CardContent, CardHeader, CardTitle,
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, toast,
+  Alert,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  toast,
 } from '@markaz/ui';
 import { DOCUMENT_ACCESS_REASONS } from '@markaz/domain';
 import { trpc } from '@/trpc/react';
@@ -30,17 +41,20 @@ export function DocumentPanel({ transactionId }: { transactionId: string }) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <p className="text-xs text-muted-foreground">{t('document.subtitle')}</p>
+        <p className="text-muted-foreground text-xs">{t('document.subtitle')}</p>
         {docs.isLoading ? (
-          <p className="text-sm text-muted-foreground">{t('loading')}</p>
+          <p className="text-muted-foreground text-sm">{t('loading')}</p>
         ) : docs.data && docs.data.length > 0 ? (
           <ul className="divide-y">
             {docs.data.map((d) => (
               <li key={d.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">{d.fileName ?? t('document.col.name')}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {d.documentType} · {formatBytes(d.sizeBytes)} · {t(`document.visibility.${d.visibility}`)} · {formatWhen(d.createdAt)}
+                  <p className="truncate text-sm font-medium">
+                    {d.fileName ?? t('document.col.name')}
+                  </p>
+                  <p className="text-muted-foreground text-xs">
+                    {d.documentType} · {formatBytes(d.sizeBytes)} ·{' '}
+                    {t(`document.visibility.${d.visibility}`)} · {formatWhen(d.createdAt)}
                   </p>
                 </div>
                 <AccessDialog documentId={d.id} />
@@ -48,7 +62,7 @@ export function DocumentPanel({ transactionId }: { transactionId: string }) {
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-muted-foreground">{t('document.empty')}</p>
+          <p className="text-muted-foreground text-sm">{t('document.empty')}</p>
         )}
       </CardContent>
     </Card>
@@ -66,7 +80,10 @@ function AccessDialog({ documentId }: { documentId: string }) {
   async function submit() {
     setError(null);
     try {
-      const res = await m.mutateAsync({ transactionDocumentId: documentId, reason: reason as (typeof DOCUMENT_ACCESS_REASONS)[number] });
+      const res = await m.mutateAsync({
+        transactionDocumentId: documentId,
+        reason: reason as (typeof DOCUMENT_ACCESS_REASONS)[number],
+      });
       if (!res.url) {
         // The access attempt is audited (REQUESTED + FAILED); surface a safe message.
         setError(t('document.linkFailed'));
@@ -83,7 +100,15 @@ function AccessDialog({ documentId }: { documentId: string }) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { if (!m.isPending) { setOpen(o); if (!o) setError(null); } }}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        if (!m.isPending) {
+          setOpen(o);
+          if (!o) setError(null);
+        }
+      }}
+    >
       <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
         <ExternalLink className="h-4 w-4" aria-hidden />
         {t('document.accessAction')}
@@ -94,15 +119,29 @@ function AccessDialog({ documentId }: { documentId: string }) {
           <DialogDescription>{t('document.access.body')}</DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
-          <ReasonSelect id="doc-access-reason" label={t('reasonLabel')} basePath="document.access.reason" values={DOCUMENT_ACCESS_REASONS} value={reason} onChange={setReason} />
+          <ReasonSelect
+            id="doc-access-reason"
+            label={t('reasonLabel')}
+            basePath="document.access.reason"
+            values={DOCUMENT_ACCESS_REASONS}
+            value={reason}
+            onChange={setReason}
+          />
           <label className="flex items-start gap-2 text-sm">
-            <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} className="mt-0.5" />
+            <input
+              type="checkbox"
+              checked={ack}
+              onChange={(e) => setAck(e.target.checked)}
+              className="mt-0.5"
+            />
             <span>{t('document.access.confirmLabel')}</span>
           </label>
           {error ? <Alert variant="destructive">{error}</Alert> : null}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={m.isPending}>{t('cancel')}</Button>
+          <Button variant="outline" onClick={() => setOpen(false)} disabled={m.isPending}>
+            {t('cancel')}
+          </Button>
           <Button onClick={submit} disabled={m.isPending || reason === '' || !ack}>
             {m.isPending ? t('document.preparing') : t('document.access.submit')}
           </Button>

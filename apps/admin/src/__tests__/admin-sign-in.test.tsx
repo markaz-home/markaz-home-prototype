@@ -60,6 +60,8 @@ describe('AdminSignInFlow (Operations)', () => {
 
   it('renders Arabic admin login', () => {
     renderWithIntl(<AdminSignInFlow />, 'ar');
-    expect(screen.getByRole('heading', { name: 'تسجيل الدخول إلى بوابة العمليات' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'تسجيل الدخول إلى بوابة العمليات' }),
+    ).toBeInTheDocument();
   });
 });

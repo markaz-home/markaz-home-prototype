@@ -8,7 +8,9 @@ import { ListPagination } from '@/components/admin/list-controls';
 import { offerStatusLabel, formatWhen } from '@/components/admin/labels';
 
 const LIMIT = 25;
-type Row = Awaited<ReturnType<Awaited<ReturnType<typeof getServerApi>>['admin']['offers']['list']>>[number];
+type Row = Awaited<
+  ReturnType<Awaited<ReturnType<typeof getServerApi>>['admin']['offers']['list']>
+>[number];
 
 export default async function OffersPage({
   params,
@@ -34,24 +36,61 @@ export default async function OffersPage({
   }
 
   const columns: Column<Row>[] = [
-    { id: 'reference', header: t('adminOffers.col.reference'), priority: 'primary', cell: (r) => <span dir="ltr" className="font-mono text-xs">#{r.buyerSeq}</span> },
-    { id: 'status', header: t('adminOffers.col.status'), priority: 'secondary', cell: (r) => {
-      const s = offerStatusLabel(r.status);
-      return <StatusBadge tone={s.tone} label={t.has(s.key) ? t(s.key) : r.status} />;
-    } },
-    { id: 'nextActor', header: t('adminOffers.col.nextActor'), priority: 'low', cell: (r) => r.nextActor && t.has(`adminOffers.side.${r.nextActor}`) ? t(`adminOffers.side.${r.nextActor}`) : '—' },
-    { id: 'activity', header: t('adminOffers.col.activity'), priority: 'low', cell: (r) => formatWhen(r.lastActivityAt) },
+    {
+      id: 'reference',
+      header: t('adminOffers.col.reference'),
+      priority: 'primary',
+      cell: (r) => (
+        <span dir="ltr" className="font-mono text-xs">
+          #{r.buyerSeq}
+        </span>
+      ),
+    },
+    {
+      id: 'status',
+      header: t('adminOffers.col.status'),
+      priority: 'secondary',
+      cell: (r) => {
+        const s = offerStatusLabel(r.status);
+        return <StatusBadge tone={s.tone} label={t.has(s.key) ? t(s.key) : r.status} />;
+      },
+    },
+    {
+      id: 'nextActor',
+      header: t('adminOffers.col.nextActor'),
+      priority: 'low',
+      cell: (r) =>
+        r.nextActor && t.has(`adminOffers.side.${r.nextActor}`)
+          ? t(`adminOffers.side.${r.nextActor}`)
+          : '—',
+    },
+    {
+      id: 'activity',
+      header: t('adminOffers.col.activity'),
+      priority: 'low',
+      cell: (r) => formatWhen(r.lastActivityAt),
+    },
   ];
 
   return (
     <PageShell maxWidth={1600}>
       <PageHeader title={t('adminOffers.title')} description={t('adminOffers.description')} />
-      {failed ? <Alert variant="warning" className="mb-4">{t('overview.partialError')}</Alert> : null}
+      {failed ? (
+        <Alert variant="warning" className="mb-4">
+          {t('overview.partialError')}
+        </Alert>
+      ) : null}
       {rows.length === 0 ? (
         <EmptyState title={t('adminOffers.empty')} />
       ) : (
         <>
-          <DataTable columns={columns} rows={rows} rowKey={(r) => r.id} rowHref={(r) => `/offers/${r.id}`} caption={t('adminOffers.title')} />
+          <DataTable
+            columns={columns}
+            rows={rows}
+            rowKey={(r) => r.id}
+            rowHref={(r) => `/offers/${r.id}`}
+            caption={t('adminOffers.title')}
+          />
           <div className="mt-4">
             <ListPagination
               pathname="/offers"
@@ -59,7 +98,11 @@ export default async function OffersPage({
               offset={offset}
               limit={LIMIT}
               count={rows.length}
-              labels={{ prev: t('prev'), next: t('next'), range: t('paginationRange', { from: offset + 1, to: offset + rows.length }) }}
+              labels={{
+                prev: t('prev'),
+                next: t('next'),
+                range: t('paginationRange', { from: offset + 1, to: offset + rows.length }),
+              }}
             />
           </div>
         </>

@@ -44,7 +44,9 @@ d('offer RLS + write boundary (live DB)', () => {
       const [t] = await tx`select * from public.create_offer(${listing}::uuid, 900000, null)`;
       return (t as { id: string }).id;
     });
-    const t = await asService((tx: Sql) => tx`select current_proposal_id from public.offer_threads where id = ${threadId}`);
+    const t = await asService(
+      (tx: Sql) => tx`select current_proposal_id from public.offer_threads where id = ${threadId}`,
+    );
     currentProposalId = (t[0] as { current_proposal_id: string }).current_proposal_id;
   });
 
@@ -54,22 +56,34 @@ d('offer RLS + write boundary (live DB)', () => {
   });
 
   it('lets the participant buyer read their own thread', async () => {
-    const rows = await asUser(buyer1, (tx) => tx`select id from public.offer_threads where id = ${threadId}`);
+    const rows = await asUser(
+      buyer1,
+      (tx) => tx`select id from public.offer_threads where id = ${threadId}`,
+    );
     expect(rows.length).toBe(1);
   });
 
   it('lets the participant seller (listing owner) read the thread', async () => {
-    const rows = await asUser(seller, (tx) => tx`select id from public.offer_threads where id = ${threadId}`);
+    const rows = await asUser(
+      seller,
+      (tx) => tx`select id from public.offer_threads where id = ${threadId}`,
+    );
     expect(rows.length).toBe(1);
   });
 
   it('denies a different buyer any visibility of the thread', async () => {
-    const rows = await asUser(buyer2, (tx) => tx`select id from public.offer_threads where id = ${threadId}`);
+    const rows = await asUser(
+      buyer2,
+      (tx) => tx`select id from public.offer_threads where id = ${threadId}`,
+    );
     expect(rows.length).toBe(0);
   });
 
   it('denies a different seller any visibility of the thread', async () => {
-    const rows = await asUser(seller2, (tx) => tx`select id from public.offer_threads where id = ${threadId}`);
+    const rows = await asUser(
+      seller2,
+      (tx) => tx`select id from public.offer_threads where id = ${threadId}`,
+    );
     expect(rows.length).toBe(0);
   });
 
@@ -77,7 +91,9 @@ d('offer RLS + write boundary (live DB)', () => {
     // anon has no grant/policy: either 0 rows or a hard permission error — both are "no access".
     let count = -1;
     try {
-      const rows = await asAnon((tx) => tx`select id from public.offer_threads where id = ${threadId}`);
+      const rows = await asAnon(
+        (tx) => tx`select id from public.offer_threads where id = ${threadId}`,
+      );
       count = rows.length;
     } catch (e) {
       expect(String(e)).toMatch(/permission denied/i);
@@ -87,27 +103,43 @@ d('offer RLS + write boundary (live DB)', () => {
   });
 
   it('denies a non-participant buyer from reading the proposals', async () => {
-    const rows = await asUser(buyer2, (tx) => tx`select id from public.offer_proposals where thread_id = ${threadId}`);
+    const rows = await asUser(
+      buyer2,
+      (tx) => tx`select id from public.offer_proposals where thread_id = ${threadId}`,
+    );
     expect(rows.length).toBe(0);
   });
 
   it('blocks a customer from forging thread status to ACCEPTED directly', async () => {
     await expectError(
-      () => asUser(buyer1, (tx) => tx`update public.offer_threads set status = 'ACCEPTED' where id = ${threadId}`),
+      () =>
+        asUser(
+          buyer1,
+          (tx) => tx`update public.offer_threads set status = 'ACCEPTED' where id = ${threadId}`,
+        ),
       /permission denied|immutable|only by the server/i,
     );
   });
 
   it('blocks a customer from forging next_actor directly', async () => {
     await expectError(
-      () => asUser(buyer1, (tx) => tx`update public.offer_threads set next_actor = 'BUYER' where id = ${threadId}`),
+      () =>
+        asUser(
+          buyer1,
+          (tx) => tx`update public.offer_threads set next_actor = 'BUYER' where id = ${threadId}`,
+        ),
       /permission denied|immutable|only by the server/i,
     );
   });
 
   it('blocks a customer from mutating an immutable proposal amount', async () => {
     await expectError(
-      () => asUser(buyer1, (tx) => tx`update public.offer_proposals set amount_aed = 1 where id = ${currentProposalId}`),
+      () =>
+        asUser(
+          buyer1,
+          (tx) =>
+            tx`update public.offer_proposals set amount_aed = 1 where id = ${currentProposalId}`,
+        ),
       /permission denied|immutable/i,
     );
   });
@@ -115,8 +147,10 @@ d('offer RLS + write boundary (live DB)', () => {
   it('blocks a customer from inserting a proposal directly on any thread', async () => {
     await expectError(
       () =>
-        asUser(buyer2, (tx) =>
-          tx`insert into public.offer_proposals (thread_id, created_by_user_id, created_by_side, amount_aed)
+        asUser(
+          buyer2,
+          (tx) =>
+            tx`insert into public.offer_proposals (thread_id, created_by_user_id, created_by_side, amount_aed)
              values (${threadId}, ${buyer2}, 'BUYER', 1)`,
         ),
       /permission denied|violates row-level security|new row violates/i,
@@ -124,34 +158,52 @@ d('offer RLS + write boundary (live DB)', () => {
   });
 
   it('blocks a customer from performing the seller counter (turn/role enforced server-side)', async () => {
-    const t = await asService((tx: Sql) => tx`select version from public.offer_threads where id = ${threadId}`);
+    const t = await asService(
+      (tx: Sql) => tx`select version from public.offer_threads where id = ${threadId}`,
+    );
     const version = (t[0] as { version: number }).version;
     // buyer1 tries to act while it is the SELLER's turn → NOT_YOUR_TURN.
     await expectError(
-      () => asUser(buyer1, (tx) => tx`select public.submit_counter(${threadId}::uuid, 950000, null, ${version})`),
+      () =>
+        asUser(
+          buyer1,
+          (tx) => tx`select public.submit_counter(${threadId}::uuid, 950000, null, ${version})`,
+        ),
       /NOT_YOUR_TURN/,
     );
   });
 
   it('notifications are recipient-scoped: a customer cannot read another user notifications', async () => {
     // Seed a notification for buyer1 via the server path (seller counters).
-    const t = await asService((tx: Sql) => tx`select version from public.offer_threads where id = ${threadId}`);
-    await asUser(seller, (tx) =>
-      tx`select public.submit_counter(${threadId}::uuid, 1000000, null, ${(t[0] as { version: number }).version})`,
+    const t = await asService(
+      (tx: Sql) => tx`select version from public.offer_threads where id = ${threadId}`,
+    );
+    await asUser(
+      seller,
+      (tx) =>
+        tx`select public.submit_counter(${threadId}::uuid, 1000000, null, ${(t[0] as { version: number }).version})`,
     );
     // buyer2 must not see buyer1's notifications.
-    const rows = await asUser(buyer2, (tx) => tx`select id from public.notifications where recipient_id = ${buyer1}`);
+    const rows = await asUser(
+      buyer2,
+      (tx) => tx`select id from public.notifications where recipient_id = ${buyer1}`,
+    );
     expect(rows.length).toBe(0);
     // buyer1 sees their own.
-    const own = await asUser(buyer1, (tx) => tx`select id from public.notifications where recipient_id = ${buyer1}`);
+    const own = await asUser(
+      buyer1,
+      (tx) => tx`select id from public.notifications where recipient_id = ${buyer1}`,
+    );
     expect(own.length).toBeGreaterThanOrEqual(1);
   });
 
   it('blocks a customer from inserting a forged notification', async () => {
     await expectError(
       () =>
-        asUser(buyer1, (tx) =>
-          tx`insert into public.notifications (recipient_id, channel, kind, payload)
+        asUser(
+          buyer1,
+          (tx) =>
+            tx`insert into public.notifications (recipient_id, channel, kind, payload)
              values (${buyer1}, 'IN_APP', 'OFFER_ACCEPTED', '{}'::jsonb)`,
         ),
       /permission denied|violates row-level security|new row violates/i,

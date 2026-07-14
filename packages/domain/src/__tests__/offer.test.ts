@@ -25,14 +25,22 @@ import {
 
 describe('offer availability (§6.1)', () => {
   it('LIVE without accepted offer is AVAILABLE', () => {
-    expect(resolveAvailability({ listingState: 'LIVE', hasAcceptedOffer: false })).toBe('AVAILABLE');
+    expect(resolveAvailability({ listingState: 'LIVE', hasAcceptedOffer: false })).toBe(
+      'AVAILABLE',
+    );
   });
   it('LIVE with accepted offer is UNDER_OFFER', () => {
-    expect(resolveAvailability({ listingState: 'LIVE', hasAcceptedOffer: true })).toBe('UNDER_OFFER');
+    expect(resolveAvailability({ listingState: 'LIVE', hasAcceptedOffer: true })).toBe(
+      'UNDER_OFFER',
+    );
   });
   it('non-LIVE is OFFERS_DISABLED', () => {
-    expect(resolveAvailability({ listingState: 'PAUSED', hasAcceptedOffer: false })).toBe('OFFERS_DISABLED');
-    expect(resolveAvailability({ listingState: 'DRAFT', hasAcceptedOffer: false })).toBe('OFFERS_DISABLED');
+    expect(resolveAvailability({ listingState: 'PAUSED', hasAcceptedOffer: false })).toBe(
+      'OFFERS_DISABLED',
+    );
+    expect(resolveAvailability({ listingState: 'DRAFT', hasAcceptedOffer: false })).toBe(
+      'OFFERS_DISABLED',
+    );
   });
 });
 
@@ -44,7 +52,14 @@ describe('thread + next-actor logic (§5)', () => {
     expect(isThreadActionable('DRAFT')).toBe(false);
   });
   it('terminal states are closed', () => {
-    for (const s of ['ACCEPTED', 'REJECTED', 'WITHDRAWN', 'EXPIRED', 'CLOSED_OTHER_ACCEPTED', 'CLOSED_LISTING_UNAVAILABLE'] as const) {
+    for (const s of [
+      'ACCEPTED',
+      'REJECTED',
+      'WITHDRAWN',
+      'EXPIRED',
+      'CLOSED_OTHER_ACCEPTED',
+      'CLOSED_LISTING_UNAVAILABLE',
+    ] as const) {
       expect(isThreadClosed(s)).toBe(true);
     }
     expect(isThreadClosed('AWAITING_SELLER')).toBe(false);
@@ -98,8 +113,16 @@ describe('threshold (seller-private, §27)', () => {
 
 describe('comparison + warnings (§13.5–13.6)', () => {
   it('computes absolute + percentage difference', () => {
-    expect(offerComparison(2_250_000, 2_400_000)).toEqual({ absDiff: 150_000, pct: 6.3, direction: 'BELOW' });
-    expect(offerComparison(2_400_000, 2_400_000)).toEqual({ absDiff: 0, pct: 0, direction: 'EQUAL' });
+    expect(offerComparison(2_250_000, 2_400_000)).toEqual({
+      absDiff: 150_000,
+      pct: 6.3,
+      direction: 'BELOW',
+    });
+    expect(offerComparison(2_400_000, 2_400_000)).toEqual({
+      absDiff: 0,
+      pct: 0,
+      direction: 'EQUAL',
+    });
     expect(offerComparison(2_600_000, 2_400_000).direction).toBe('ABOVE');
   });
   it('warns only beyond 20% (non-blocking)', () => {

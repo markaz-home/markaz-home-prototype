@@ -27,13 +27,22 @@ export async function makeOffer(
   await page.getByLabel(/Your offer/i).fill(String(amount));
   await page.getByRole('button', { name: 'Review offer' }).click();
   await page.getByRole('button', { name: 'Submit offer' }).click();
-  await expect(page.getByText(/Your offer has been sent|Waiting for seller/i).first()).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText(/Your offer has been sent|Waiting for seller/i).first()).toBeVisible({
+    timeout: 15_000,
+  });
 }
 
 /** Open the single active thread for the signed-in user via the Offers hub. */
-export async function openFirstThread(page: Page, view: 'made' | 'received', locale = 'en'): Promise<void> {
+export async function openFirstThread(
+  page: Page,
+  view: 'made' | 'received',
+  locale = 'en',
+): Promise<void> {
   await page.goto(`/${locale}/offers?view=${view}`);
-  await page.getByRole('link', { name: /Review offer|View offer/i }).first().click();
+  await page
+    .getByRole('link', { name: /Review offer|View offer/i })
+    .first()
+    .click();
   await page.waitForURL(/\/offers\/[0-9a-f-]{36}/, { timeout: 15_000 });
 }
 
@@ -49,6 +58,9 @@ export async function counter(page: Page, amount: number): Promise<void> {
 /** Accept the current proposal (trigger button + confirmation dialog). */
 export async function acceptOffer(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Accept offer' }).click();
-  await page.getByRole('button', { name: /^Accept offer$|^Accept counteroffer$/ }).last().click();
+  await page
+    .getByRole('button', { name: /^Accept offer$|^Accept counteroffer$/ })
+    .last()
+    .click();
   await expect(page.getByText('Offer accepted').first()).toBeVisible({ timeout: 15_000 });
 }

@@ -36,7 +36,9 @@ export function ProfileSetupForm({ email }: { email?: string | null }) {
   });
 
   const fe = (c?: string) => (c ? tv(FIELD_ERROR_KEYS[c] ?? 'unexpectedError') : undefined);
-  const errorList = (['fullName', 'acceptTerms', 'acceptPrivacy'] as const).filter((k) => errors[k]).map((k) => ({ id: k, message: fe(errors[k]?.message) ?? '' }));
+  const errorList = (['fullName', 'acceptTerms', 'acceptPrivacy'] as const)
+    .filter((k) => errors[k])
+    .map((k) => ({ id: k, message: fe(errors[k]?.message) ?? '' }));
   // Setup-status resume variant (spec §9.7): account details needs attention.
   const statuses: StepStatus[] = ['action', 'complete', 'upcoming'];
 
@@ -52,7 +54,7 @@ export function ProfileSetupForm({ email }: { email?: string | null }) {
         {saveError ? <Alert variant="destructive">{saveError}</Alert> : null}
 
         {email ? (
-          <div className="flex items-center justify-between rounded-md border bg-muted/40 px-3 py-2 text-sm">
+          <div className="bg-muted/40 flex items-center justify-between rounded-md border px-3 py-2 text-sm">
             <span className="text-muted-foreground" dir="ltr">
               {email}
             </span>
@@ -68,25 +70,54 @@ export function ProfileSetupForm({ email }: { email?: string | null }) {
           className="space-y-5"
           noValidate
         >
-          <FormField id="fullName" label={ts('fullName')} error={fe(errors.fullName?.message)} required>
-            <Input id="fullName" autoComplete="name" placeholder={ts('fullNamePlaceholder')} aria-invalid={!!errors.fullName} {...register('fullName')} />
+          <FormField
+            id="fullName"
+            label={ts('fullName')}
+            error={fe(errors.fullName?.message)}
+            required
+          >
+            <Input
+              id="fullName"
+              autoComplete="name"
+              placeholder={ts('fullNamePlaceholder')}
+              aria-invalid={!!errors.fullName}
+              {...register('fullName')}
+            />
           </FormField>
 
           <label className="flex items-start gap-3 text-sm">
-            <input id="acceptTerms" type="checkbox" className="mt-1 h-4 w-4" {...register('acceptTerms')} />
+            <input
+              id="acceptTerms"
+              type="checkbox"
+              className="mt-1 h-4 w-4"
+              {...register('acceptTerms')}
+            />
             <span>{ts('terms')}</span>
           </label>
-          {errors.acceptTerms ? <p role="alert" className="text-xs font-medium text-destructive">{fe(errors.acceptTerms.message)}</p> : null}
+          {errors.acceptTerms ? (
+            <p role="alert" className="text-destructive text-xs font-medium">
+              {fe(errors.acceptTerms.message)}
+            </p>
+          ) : null}
           <label className="flex items-start gap-3 text-sm">
-            <input id="acceptPrivacy" type="checkbox" className="mt-1 h-4 w-4" {...register('acceptPrivacy')} />
+            <input
+              id="acceptPrivacy"
+              type="checkbox"
+              className="mt-1 h-4 w-4"
+              {...register('acceptPrivacy')}
+            />
             <span>{ts('privacy')}</span>
           </label>
-          {errors.acceptPrivacy ? <p role="alert" className="text-xs font-medium text-destructive">{fe(errors.acceptPrivacy.message)}</p> : null}
+          {errors.acceptPrivacy ? (
+            <p role="alert" className="text-destructive text-xs font-medium">
+              {fe(errors.acceptPrivacy.message)}
+            </p>
+          ) : null}
 
           <Button type="submit" className="w-full" loading={mutation.isPending}>
             {mutation.isPending ? t('submitting') : t('submit')}
           </Button>
-          <p className="text-center text-xs text-muted-foreground">{t('reassurance')}</p>
+          <p className="text-muted-foreground text-center text-xs">{t('reassurance')}</p>
         </form>
       </div>
     </AuthShell>

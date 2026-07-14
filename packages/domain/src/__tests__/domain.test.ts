@@ -70,7 +70,9 @@ describe('profile completeness + post-auth routing', () => {
     ).toBe('verify-email');
   });
   it('routes a verified user with no profile to profile setup', () => {
-    expect(resolvePostAuthDestination({ emailVerified: true, profile: null })).toBe('profile-setup');
+    expect(resolvePostAuthDestination({ emailVerified: true, profile: null })).toBe(
+      'profile-setup',
+    );
   });
   it('routes a verified incomplete profile to profile setup', () => {
     expect(
@@ -110,7 +112,13 @@ describe('auth helpers', () => {
     expect(passwordMeetsPolicy('nouppercase1!')).toBe(false);
     expect(passwordMeetsPolicy('Aa1!aaaa')).toBe(true);
     const r = checkPasswordRequirements('Aa1!aaaa');
-    expect(r).toEqual({ minLength: true, uppercase: true, lowercase: true, number: true, special: true });
+    expect(r).toEqual({
+      minLength: true,
+      uppercase: true,
+      lowercase: true,
+      number: true,
+      special: true,
+    });
   });
   it('enforces password length bounds: min 8, max 128 (ADR-0009, no silent truncation)', () => {
     expect(PASSWORD_MIN).toBe(8);
@@ -118,7 +126,8 @@ describe('auth helpers', () => {
     // Too short → password_too_short (fails min before policy).
     const short = passwordSchema.safeParse('Aa1!aaa'); // 7 chars
     expect(short.success).toBe(false);
-    if (!short.success) expect(short.error.issues.map((i) => i.message)).toContain('password_too_short');
+    if (!short.success)
+      expect(short.error.issues.map((i) => i.message)).toContain('password_too_short');
     // Exactly 128 valid chars → accepted (boundary).
     const at128 = `Aa1!${'a'.repeat(124)}`;
     expect(at128.length).toBe(128);
@@ -128,14 +137,16 @@ describe('auth helpers', () => {
     expect(over.length).toBe(129);
     const overRes = passwordSchema.safeParse(over);
     expect(overRes.success).toBe(false);
-    if (!overRes.success) expect(overRes.error.issues.map((i) => i.message)).toContain('password_too_long');
+    if (!overRes.success)
+      expect(overRes.error.issues.map((i) => i.message)).toContain('password_too_long');
   });
   it('reset-password schema requires a matching confirmation (no recovery-code field)', () => {
     const pw = 'NewMarkaz!2';
     expect(resetPasswordSchema.safeParse({ password: pw, confirmPassword: pw }).success).toBe(true);
     const mismatch = resetPasswordSchema.safeParse({ password: pw, confirmPassword: 'Other!23' });
     expect(mismatch.success).toBe(false);
-    if (!mismatch.success) expect(mismatch.error.issues.map((i) => i.message)).toContain('password_mismatch');
+    if (!mismatch.success)
+      expect(mismatch.error.issues.map((i) => i.message)).toContain('password_mismatch');
   });
   it('validates the sign-up schema incl. confirm + consent', () => {
     const base = {

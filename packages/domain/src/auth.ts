@@ -103,7 +103,9 @@ export const resetPasswordSchema = z
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 /** Build the Supabase user_metadata passed to signUp (full name + consent). */
-export function buildSignupMetadata(input: Pick<SignUpInput, 'fullName' | 'acceptTerms' | 'acceptPrivacy'>) {
+export function buildSignupMetadata(
+  input: Pick<SignUpInput, 'fullName' | 'acceptTerms' | 'acceptPrivacy'>,
+) {
   return {
     full_name: input.fullName.trim(),
     terms_accepted: input.acceptTerms === true,
@@ -125,13 +127,21 @@ export type AuthErrorKey =
   | 'provider_unavailable'
   | 'generic';
 
-export function mapAuthError(err: { message?: string; status?: number; code?: string } | null): AuthErrorKey {
+export function mapAuthError(
+  err: { message?: string; status?: number; code?: string } | null,
+): AuthErrorKey {
   if (!err) return 'generic';
-  if (err.status === 429 || err.code === 'over_request_rate_limit' || err.code === 'over_email_send_rate_limit')
+  if (
+    err.status === 429 ||
+    err.code === 'over_request_rate_limit' ||
+    err.code === 'over_email_send_rate_limit'
+  )
     return 'rate_limited';
   const m = (err.message ?? '').toLowerCase();
-  if (m.includes('email not confirmed') || err.code === 'email_not_confirmed') return 'email_not_confirmed';
-  if (m.includes('invalid login credentials') || err.code === 'invalid_credentials') return 'invalid_credentials';
+  if (m.includes('email not confirmed') || err.code === 'email_not_confirmed')
+    return 'email_not_confirmed';
+  if (m.includes('invalid login credentials') || err.code === 'invalid_credentials')
+    return 'invalid_credentials';
   if (m.includes('weak password') || err.code === 'weak_password') return 'weak_password';
   if (m.includes('expired')) return 'expired_code';
   if (m.includes('token') || m.includes('otp') || m.includes('invalid')) return 'invalid_code';
@@ -145,7 +155,9 @@ export function mapAuthError(err: { message?: string; status?: number; code?: st
  * user with an empty identities array and no error. Detect that to show safe
  * "account may exist" copy without ever querying the profiles table.
  */
-export function isLikelyExistingAccount(user: { identities?: unknown[] | null } | null | undefined): boolean {
+export function isLikelyExistingAccount(
+  user: { identities?: unknown[] | null } | null | undefined,
+): boolean {
   return !!user && Array.isArray(user.identities) && user.identities.length === 0;
 }
 

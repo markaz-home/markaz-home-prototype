@@ -13,7 +13,15 @@ export interface FormFieldProps {
 }
 
 /** Accessible label + control + error wiring. */
-export function FormField({ id, label, error, hint, required, children, className }: FormFieldProps) {
+export function FormField({
+  id,
+  label,
+  error,
+  hint,
+  required,
+  children,
+  className,
+}: FormFieldProps) {
   const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined;
   return (
     <div className={cn('space-y-2', className)}>
@@ -23,12 +31,12 @@ export function FormField({ id, label, error, hint, required, children, classNam
       </Label>
       <div aria-describedby={describedBy}>{children}</div>
       {hint && !error ? (
-        <p id={`${id}-hint`} className="text-xs text-muted-foreground">
+        <p id={`${id}-hint`} className="text-muted-foreground text-xs">
           {hint}
         </p>
       ) : null}
       {error ? (
-        <p id={`${id}-error`} role="alert" className="text-xs font-medium text-destructive">
+        <p id={`${id}-error`} role="alert" className="text-destructive text-xs font-medium">
           {error}
         </p>
       ) : null}

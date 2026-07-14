@@ -27,7 +27,9 @@ async function fillValid(user: ReturnType<typeof userEvent.setup>) {
 }
 
 beforeEach(() => {
-  signUp.mockReset().mockResolvedValue({ data: { user: { identities: [{ id: 'x' }] } }, error: null });
+  signUp
+    .mockReset()
+    .mockResolvedValue({ data: { user: { identities: [{ id: 'x' }] } }, error: null });
   push.mockReset();
 });
 

@@ -19,8 +19,20 @@ const CHECK_ITEMS = [
   ['investmentVisibility', 'checkItemInvestment'],
 ] as const;
 
-const PUBLIC_ITEMS = ['publicPhotos', 'publicPrice', 'publicLocation', 'publicFacts', 'publicInvestment'] as const;
-const PRIVATE_ITEMS = ['privateDocument', 'privateUnit', 'privateContact', 'privateOccupancy', 'privateVerification'] as const;
+const PUBLIC_ITEMS = [
+  'publicPhotos',
+  'publicPrice',
+  'publicLocation',
+  'publicFacts',
+  'publicInvestment',
+] as const;
+const PRIVATE_ITEMS = [
+  'privateDocument',
+  'privateUnit',
+  'privateContact',
+  'privateOccupancy',
+  'privateVerification',
+] as const;
 
 export function PublishFlow({ listingId }: { listingId: string }) {
   const t = useTranslations('publication');
@@ -54,15 +66,17 @@ export function PublishFlow({ listingId }: { listingId: string }) {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
-        <Link href="/sell" className="hover:text-foreground">{t('returnToListings')}</Link>
+      <nav aria-label="Breadcrumb" className="text-muted-foreground text-sm">
+        <Link href="/sell" className="hover:text-foreground">
+          {t('returnToListings')}
+        </Link>
       </nav>
 
       {!showConfirm ? (
         <>
           <header>
             <h1 className="font-display text-3xl font-semibold">{t('checklistTitle')}</h1>
-            <p className="mt-2 text-muted-foreground">{t('checklistBody')}</p>
+            <p className="text-muted-foreground mt-2">{t('checklistBody')}</p>
           </header>
 
           <Card>
@@ -70,19 +84,31 @@ export function PublishFlow({ listingId }: { listingId: string }) {
               {CHECK_ITEMS.map(([key, labelKey]) => {
                 const status = items[key];
                 return (
-                  <div key={key} className="flex items-center justify-between gap-3 py-3 first:pt-0">
+                  <div
+                    key={key}
+                    className="flex items-center justify-between gap-3 py-3 first:pt-0"
+                  >
                     <span className="flex items-center gap-2 text-sm">
                       {status === 'COMPLETE' ? (
-                        <CheckCircle2 className="h-5 w-5 text-success" aria-hidden />
+                        <CheckCircle2 className="text-success h-5 w-5" aria-hidden />
                       ) : status === 'OPTIONAL' ? (
-                        <MinusCircle className="h-5 w-5 text-muted-foreground" aria-hidden />
+                        <MinusCircle className="text-muted-foreground h-5 w-5" aria-hidden />
                       ) : (
-                        <Circle className="h-5 w-5 text-warning" aria-hidden />
+                        <Circle className="text-warning h-5 w-5" aria-hidden />
                       )}
                       {t(labelKey)}
                     </span>
-                    <span className={cn('text-xs font-medium', status === 'INCOMPLETE' && 'text-warning')}>
-                      {status === 'COMPLETE' ? t('checkComplete') : status === 'OPTIONAL' ? t('checkNotIncluded') : t('checkActionRequired')}
+                    <span
+                      className={cn(
+                        'text-xs font-medium',
+                        status === 'INCOMPLETE' && 'text-warning',
+                      )}
+                    >
+                      {status === 'COMPLETE'
+                        ? t('checkComplete')
+                        : status === 'OPTIONAL'
+                          ? t('checkNotIncluded')
+                          : t('checkActionRequired')}
                     </span>
                   </div>
                 );
@@ -91,35 +117,49 @@ export function PublishFlow({ listingId }: { listingId: string }) {
           </Card>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Summary title={t('willBePublic')} items={PUBLIC_ITEMS.map((k) => t(k))} tone="public" />
-            <Summary title={t('willStayPrivate')} items={PRIVATE_ITEMS.map((k) => t(k))} tone="private" />
+            <Summary
+              title={t('willBePublic')}
+              items={PUBLIC_ITEMS.map((k) => t(k))}
+              tone="public"
+            />
+            <Summary
+              title={t('willStayPrivate')}
+              items={PRIVATE_ITEMS.map((k) => t(k))}
+              tone="private"
+            />
           </div>
 
           <Alert>
-            <p className="text-sm">{eligible ? t('checklistComplete') : t('checklistIncomplete')}</p>
+            <p className="text-sm">
+              {eligible ? t('checklistComplete') : t('checklistIncomplete')}
+            </p>
           </Alert>
 
           <div className="flex flex-wrap gap-3">
-            <Button onClick={() => setShowConfirm(true)} disabled={!eligible}>{t('continueConfirm')}</Button>
-            <Button asChild variant="outline"><Link href={`/sell/listings/${listingId}/preview`}>{t('preview')}</Link></Button>
+            <Button onClick={() => setShowConfirm(true)} disabled={!eligible}>
+              {t('continueConfirm')}
+            </Button>
+            <Button asChild variant="outline">
+              <Link href={`/sell/listings/${listingId}/preview`}>{t('preview')}</Link>
+            </Button>
           </div>
         </>
       ) : (
         <>
           <Alert>
             <p className="font-medium">{t('simTitle')}</p>
-            <p className="text-sm text-muted-foreground">{t('simBody')}</p>
+            <p className="text-muted-foreground text-sm">{t('simBody')}</p>
           </Alert>
 
           <header>
             <h1 className="font-display text-3xl font-semibold">{t('confirmTitle')}</h1>
-            <p className="mt-2 text-muted-foreground">{t('confirmBody')}</p>
+            <p className="text-muted-foreground mt-2">{t('confirmBody')}</p>
           </header>
 
           <Card>
             <CardContent className="space-y-3 pt-6 text-sm">
               <p>{t('confirmPrivacy')}</p>
-              <ul className="list-disc space-y-1 ps-5 text-muted-foreground">
+              <ul className="text-muted-foreground list-disc space-y-1 ps-5">
                 <li>{t('confirmBullet1')}</li>
                 <li>{t('confirmBullet2')}</li>
                 <li>{t('confirmBullet3')}</li>
@@ -133,16 +173,31 @@ export function PublishFlow({ listingId }: { listingId: string }) {
               type="checkbox"
               className="mt-1"
               checked={confirmed}
-              onChange={(e) => { setConfirmed(e.target.checked); setCheckboxError(false); }}
+              onChange={(e) => {
+                setConfirmed(e.target.checked);
+                setCheckboxError(false);
+              }}
             />
             <span>{t('checkbox')}</span>
           </label>
-          {checkboxError && <p className="text-sm text-destructive" role="alert">{t('checkboxError')}</p>}
-          {submitError && <Alert variant="destructive"><p className="text-sm">{submitError}</p></Alert>}
+          {checkboxError && (
+            <p className="text-destructive text-sm" role="alert">
+              {t('checkboxError')}
+            </p>
+          )}
+          {submitError && (
+            <Alert variant="destructive">
+              <p className="text-sm">{submitError}</p>
+            </Alert>
+          )}
 
           <div className="flex flex-wrap gap-3">
-            <Button onClick={onSubmit} loading={submit.isPending}>{t('submit')}</Button>
-            <Button variant="outline" onClick={() => setShowConfirm(false)}>{t('backToPreview')}</Button>
+            <Button onClick={onSubmit} loading={submit.isPending}>
+              {t('submit')}
+            </Button>
+            <Button variant="outline" onClick={() => setShowConfirm(false)}>
+              {t('backToPreview')}
+            </Button>
           </div>
         </>
       )}
@@ -150,12 +205,22 @@ export function PublishFlow({ listingId }: { listingId: string }) {
   );
 }
 
-function Summary({ title, items, tone }: { title: string; items: string[]; tone: 'public' | 'private' }) {
+function Summary({
+  title,
+  items,
+  tone,
+}: {
+  title: string;
+  items: string[];
+  tone: 'public' | 'private';
+}) {
   return (
     <div className={cn('rounded-md border p-4', tone === 'private' && 'bg-muted/40')}>
       <p className="text-sm font-semibold">{title}</p>
-      <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-        {items.map((i) => <li key={i}>{i}</li>)}
+      <ul className="text-muted-foreground mt-2 space-y-1 text-sm">
+        {items.map((i) => (
+          <li key={i}>{i}</li>
+        ))}
       </ul>
     </div>
   );

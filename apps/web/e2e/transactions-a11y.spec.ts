@@ -34,9 +34,18 @@ test.afterAll(async () => {
 
 async function assertNoSeriousViolations(page: Page, label: string): Promise<void> {
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
-  const serious = results.violations.filter((v) => v.impact === 'critical' || v.impact === 'serious');
+  const serious = results.violations.filter(
+    (v) => v.impact === 'critical' || v.impact === 'serious',
+  );
   if (serious.length) {
-    console.error(`[axe:${label}]`, JSON.stringify(serious.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length })), null, 2));
+    console.error(
+      `[axe:${label}]`,
+      JSON.stringify(
+        serious.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length })),
+        null,
+        2,
+      ),
+    );
   }
   expect(serious, `axe serious/critical violations on ${label}`).toEqual([]);
 }

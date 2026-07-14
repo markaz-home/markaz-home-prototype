@@ -13,7 +13,12 @@ let ids: DemoIds | null = null;
 const createCaller = createCallerFactory(appRouter);
 
 function callerFor(userId: string) {
-  const ctx: Context = { db: getAppDb(), user: { id: userId, accountType: 'CUSTOMER' }, requestId: 'test', log: logger };
+  const ctx: Context = {
+    db: getAppDb(),
+    user: { id: userId, accountType: 'CUSTOMER' },
+    requestId: 'test',
+    log: logger,
+  };
   return createCaller(ctx);
 }
 
@@ -43,20 +48,44 @@ beforeAll(async () => {
 afterAll(async () => {
   if (ids) {
     const a = callerFor(ids.customerA);
-    for (const id of created) await a.listing.delete({ listingId: id, confirm: true } as never).catch(() => {});
+    for (const id of created)
+      await a.listing.delete({ listingId: id, confirm: true } as never).catch(() => {});
   }
   await closeConnections();
 });
 
 async function drive(a: ReturnType<typeof callerFor>, listingId: string) {
   await a.listing.saveDetails({ listingId, ...VALID_DETAILS });
-  await a.listing.document.register({ listingId, documentType: 'TITLE_DEED', storagePath: `${listingId}/doc.pdf`, originalName: 'Fictional_Title_Deed.pdf', contentType: 'application/pdf', sizeBytes: 1024 });
+  await a.listing.document.register({
+    listingId,
+    documentType: 'TITLE_DEED',
+    storagePath: `${listingId}/doc.pdf`,
+    originalName: 'Fictional_Title_Deed.pdf',
+    contentType: 'application/pdf',
+    sizeBytes: 1024,
+  });
   await a.listing.verification.start({ listingId });
   await a.listing.verification.status({ listingId });
-  await a.listing.saveSettings({ listingId, askingPriceAed: 2_100_000, minNotificationPriceAed: 1_950_000 });
-  await a.listing.investment.save({ listingId, originalPurchasePriceAed: 1_750_000, renovationCostsAed: 50_000, purchaseDate: '2022-06-29', visible: true });
+  await a.listing.saveSettings({
+    listingId,
+    askingPriceAed: 2_100_000,
+    minNotificationPriceAed: 1_950_000,
+  });
+  await a.listing.investment.save({
+    listingId,
+    originalPurchasePriceAed: 1_750_000,
+    renovationCostsAed: 50_000,
+    purchaseDate: '2022-06-29',
+    visible: true,
+  });
   await a.listing.formA.complete({ listingId, confirm: true });
-  await a.listing.photos.register({ listingId, storagePath: `${listingId}/p1.jpg`, originalName: 'p1.jpg', contentType: 'image/jpeg', sizeBytes: 2048 });
+  await a.listing.photos.register({
+    listingId,
+    storagePath: `${listingId}/p1.jpg`,
+    originalName: 'p1.jpg',
+    contentType: 'image/jpeg',
+    sizeBytes: 2048,
+  });
   await a.listing.photos.complete({ listingId });
   await a.listing.permit.submit({ listingId, confirm: true });
   await a.listing.permit.status({ listingId });
@@ -88,7 +117,9 @@ describe('listing journey (backend)', () => {
     const { listingId } = await a.listing.create();
     created.push(listingId);
     await expect(b.listing.get({ listingId })).rejects.toMatchObject({ code: 'NOT_FOUND' });
-    await expect(b.listing.saveSettings({ listingId, askingPriceAed: 1, minNotificationPriceAed: 1 })).rejects.toBeTruthy();
+    await expect(
+      b.listing.saveSettings({ listingId, askingPriceAed: 1, minNotificationPriceAed: 1 }),
+    ).rejects.toBeTruthy();
   });
 
   it('server readiness blocks markReady until every required section is complete', async () => {
@@ -106,7 +137,11 @@ describe('listing journey (backend)', () => {
     const { listingId } = await a.listing.create();
     created.push(listingId);
     await a.listing.saveDetails({ listingId, ...VALID_DETAILS });
-    await a.listing.document.register({ listingId, documentType: 'TITLE_DEED', storagePath: `${listingId}/d.pdf` });
+    await a.listing.document.register({
+      listingId,
+      documentType: 'TITLE_DEED',
+      storagePath: `${listingId}/d.pdf`,
+    });
     await a.listing.verification.start({ listingId, demoOutcome: 'FAILURE' });
     const failed = await a.listing.verification.status({ listingId });
     expect(failed.status).toBe('FAILED_DEMO');
@@ -139,13 +174,21 @@ describe('listing journey (backend)', () => {
     const { listingId } = await a.listing.create();
     created.push(listingId);
     await a.listing.saveDetails({ listingId, ...VALID_DETAILS });
-    await a.listing.document.register({ listingId, documentType: 'TITLE_DEED', storagePath: `${listingId}/d1.pdf` });
+    await a.listing.document.register({
+      listingId,
+      documentType: 'TITLE_DEED',
+      storagePath: `${listingId}/d1.pdf`,
+    });
     await a.listing.verification.start({ listingId });
     await a.listing.verification.status({ listingId });
     let g = await a.listing.get({ listingId });
     expect(g.verification.status).toBe('VERIFIED_DEMO');
     // replace → verification reset, state back to DOCUMENT_UPLOADED
-    await a.listing.document.register({ listingId, documentType: 'OQOOD', storagePath: `${listingId}/d2.pdf` });
+    await a.listing.document.register({
+      listingId,
+      documentType: 'OQOOD',
+      storagePath: `${listingId}/d2.pdf`,
+    });
     g = await a.listing.get({ listingId });
     expect(g.state).toBe('DOCUMENT_UPLOADED');
     expect(g.verification.status).toBe('NOT_STARTED');

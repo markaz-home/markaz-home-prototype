@@ -1,9 +1,11 @@
 # ADR-0019 — Canonical transaction model (Week 5)
 
 ## Status
+
 Accepted (Week 5).
 
 ## Context
+
 Week 1 shipped an empty placeholder `transactions` table (+ `transaction_stage_history`, a
 `transaction_stage` enum of `OFFER…COMPLETE_DEMO`) with a **now-broken FK** `offer_id → offers`
 (the `offers` table was dropped in migration `…0804`). It had participant-read/admin-write RLS
@@ -11,6 +13,7 @@ and no state engine. Week 5 needs one canonical, secure transaction per accepted
 with persisted milestones and server-authoritative transitions.
 
 ## Decision
+
 **Supersede** the placeholder via forward-only migrations `…0808`/`…0809`/`…0810` and build one
 canonical model:
 
@@ -31,6 +34,7 @@ The old `transaction_stage`/`transaction_stage_history` and `domain/transaction.
 are removed; `admin-overview.ts` metrics are repointed to the new `status` column.
 
 ## Consequences
+
 - One canonical transaction system; no competing model or dead scaffolding.
 - Idempotent creation is DB-guaranteed; duplicate `ensure_transaction` returns the existing row.
 - Customers cannot forge identity/amount/status (RLS + immutability trigger); verified by

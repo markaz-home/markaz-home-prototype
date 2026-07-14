@@ -2,17 +2,17 @@
 
 ## Thread states (`offer_thread_status`)
 
-| State | Meaning | next_actor |
-|---|---|---|
-| `DRAFT` | transient, during creation only | BUYER |
-| `AWAITING_SELLER` | current proposal was submitted by the buyer | SELLER |
-| `AWAITING_BUYER` | current proposal was submitted by the seller | BUYER |
-| `ACCEPTED` | current proposal accepted | NONE |
-| `REJECTED` | seller or buyer rejected | NONE |
-| `WITHDRAWN` | buyer withdrew | NONE |
-| `EXPIRED` | current proposal expired (server time) | NONE |
-| `CLOSED_OTHER_ACCEPTED` | another thread on the listing was accepted | NONE |
-| `CLOSED_LISTING_UNAVAILABLE` | listing paused / materially changed | NONE |
+| State                        | Meaning                                      | next_actor |
+| ---------------------------- | -------------------------------------------- | ---------- |
+| `DRAFT`                      | transient, during creation only              | BUYER      |
+| `AWAITING_SELLER`            | current proposal was submitted by the buyer  | SELLER     |
+| `AWAITING_BUYER`             | current proposal was submitted by the seller | BUYER      |
+| `ACCEPTED`                   | current proposal accepted                    | NONE       |
+| `REJECTED`                   | seller or buyer rejected                     | NONE       |
+| `WITHDRAWN`                  | buyer withdrew                               | NONE       |
+| `EXPIRED`                    | current proposal expired (server time)       | NONE       |
+| `CLOSED_OTHER_ACCEPTED`      | another thread on the listing was accepted   | NONE       |
+| `CLOSED_LISTING_UNAVAILABLE` | listing paused / materially changed          | NONE       |
 
 ## Proposal states (`offer_proposal_status`)
 

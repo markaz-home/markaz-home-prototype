@@ -41,9 +41,9 @@ export function UaePassFlow({ initialStatus }: { initialStatus: IdentityVerifica
         {status === 'NOT_STARTED' ? (
           <>
             <AuthHeading title={t('introTitle')} description={t('introBody')} />
-            <div className="rounded-lg border border-dashed bg-brand-100/50 p-4 text-sm">
+            <div className="bg-brand-100/50 rounded-lg border border-dashed p-4 text-sm">
               <p className="font-medium">{t('whatHappensTitle')}</p>
-              <ul className="mt-2 list-disc space-y-1 ps-5 text-muted-foreground">
+              <ul className="text-muted-foreground mt-2 list-disc space-y-1 ps-5">
                 <li>{t('whatHappens1')}</li>
                 <li>{t('whatHappens2')}</li>
                 <li>{t('whatHappens3')}</li>
@@ -70,14 +70,19 @@ export function UaePassFlow({ initialStatus }: { initialStatus: IdentityVerifica
                 {t('pendingBody')}
               </span>
             </Alert>
-            <div className="rounded-lg border border-dashed bg-brand-100/50 p-4">
+            <div className="bg-brand-100/50 rounded-lg border border-dashed p-4">
               <p className="text-sm font-medium">{t('controlsTitle')}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{t('controlsBody')}</p>
+              <p className="text-muted-foreground mt-1 text-xs">{t('controlsBody')}</p>
               <div className="mt-3 flex flex-col gap-2 sm:flex-row">
                 <Button className="flex-1" loading={pending} onClick={() => go('VERIFIED_DEMO')}>
                   {t('approve')}
                 </Button>
-                <Button variant="outline" className="flex-1" disabled={pending} onClick={() => go('FAILED_DEMO')}>
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  disabled={pending}
+                  onClick={() => go('FAILED_DEMO')}
+                >
                   {t('reject')}
                 </Button>
               </div>

@@ -16,7 +16,9 @@ const { storeOfferIntent, replace, submitMutateAsync, Q } = h;
 vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({ replace: h.replace, push: vi.fn(), refresh: vi.fn() }),
   usePathname: () => '/',
-  Link: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a>,
+  Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
+  ),
 }));
 vi.mock('@/lib/offer-intent', () => ({ storeOfferIntent: h.storeOfferIntent }));
 vi.mock('@markaz/realtime', () => ({ useOfferThreadChannel: () => ({ status: 'connected' }) }));
@@ -33,7 +35,9 @@ vi.mock('@/trpc/react', () => ({
     }),
     offers: {
       eligibility: { useQuery: () => h.Q.eligibility },
-      submitInitialProposal: { useMutation: () => ({ mutateAsync: h.submitMutateAsync, isPending: false }) },
+      submitInitialProposal: {
+        useMutation: () => ({ mutateAsync: h.submitMutateAsync, isPending: false }),
+      },
       getBuyerThreads: { useQuery: () => h.Q.buyerThreads },
       getSellerInbox: { useQuery: () => h.Q.sellerInbox },
       getThread: { useQuery: () => h.Q.thread },
@@ -56,7 +60,17 @@ import { OfferForm } from '@/components/offers/offer-form';
 import { OffersHub } from '@/components/offers/offers-hub';
 import { OfferThread } from '@/components/offers/offer-thread';
 
-const property = { headline: 'Bright 2-bedroom apartment in Marina Gate', askingPriceAed: 2_400_000, bedrooms: 2, bathrooms: 2, community: 'Dubai Marina', emirate: 'Dubai', coverUrl: null, publicId: 'mkz-x', slug: 's' };
+const property = {
+  headline: 'Bright 2-bedroom apartment in Marina Gate',
+  askingPriceAed: 2_400_000,
+  bedrooms: 2,
+  bathrooms: 2,
+  community: 'Dubai Marina',
+  emirate: 'Dubai',
+  coverUrl: null,
+  publicId: 'mkz-x',
+  slug: 's',
+};
 
 beforeEach(() => {
   storeOfferIntent.mockReset();
@@ -78,7 +92,10 @@ describe('MakeOfferButton', () => {
   });
 
   it('authenticated with an active thread shows "View your offer"', () => {
-    Q.eligibility = { isLoading: false, data: { eligible: false, reason: 'ACTIVE_THREAD', threadId: 't1' } };
+    Q.eligibility = {
+      isLoading: false,
+      data: { eligible: false, reason: 'ACTIVE_THREAD', threadId: 't1' },
+    };
     renderWithIntl(<MakeOfferButton publicId="mkz-x" slug="s" isAuthenticated />);
     expect(screen.getByRole('link', { name: /view your offer/i })).toBeInTheDocument();
   });
@@ -115,7 +132,15 @@ describe('OffersHub', () => {
       isError: false,
       refetch: vi.fn(),
       data: [
-        { threadId: 't1', statusKey: 'waitingSeller', isActionable: false, lastActivityAt: new Date().toISOString(), property, currentProposal: { amountAed: 2_250_000 }, comparison: { pct: 6.3, direction: 'BELOW' } },
+        {
+          threadId: 't1',
+          statusKey: 'waitingSeller',
+          isActionable: false,
+          lastActivityAt: new Date().toISOString(),
+          property,
+          currentProposal: { amountAed: 2_250_000 },
+          comparison: { pct: 6.3, direction: 'BELOW' },
+        },
       ],
     };
     renderWithIntl(<OffersHub initialView="made" />);
@@ -126,14 +151,43 @@ describe('OffersHub', () => {
 
 describe('OfferThread', () => {
   const baseThread = {
-    threadId: 't1', version: 1, status: 'AWAITING_SELLER', statusKey: 'responseNeeded', nextActor: 'SELLER',
-    isActionable: true, closedReason: null, expiresAt: null, lastActivityAt: new Date().toISOString(), createdAt: new Date().toISOString(),
-    property, currentProposal: { id: 'p1', bySide: 'BUYER', byYou: false, amountAed: 2_300_000, status: 'CURRENT', expiresAt: null, createdAt: new Date().toISOString() },
+    threadId: 't1',
+    version: 1,
+    status: 'AWAITING_SELLER',
+    statusKey: 'responseNeeded',
+    nextActor: 'SELLER',
+    isActionable: true,
+    closedReason: null,
+    expiresAt: null,
+    lastActivityAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    property,
+    currentProposal: {
+      id: 'p1',
+      bySide: 'BUYER',
+      byYou: false,
+      amountAed: 2_300_000,
+      status: 'CURRENT',
+      expiresAt: null,
+      createdAt: new Date().toISOString(),
+    },
     comparison: { absDiff: 100_000, pct: 4.2, direction: 'BELOW' },
   };
 
   it('seller perspective shows Accept / Counter / Reject', () => {
-    Q.thread = { isLoading: false, isError: false, data: { thread: { ...baseThread, perspective: 'SELLER', buyerLabel: '01', threshold: 'AT_OR_ABOVE' }, timeline: [] } };
+    Q.thread = {
+      isLoading: false,
+      isError: false,
+      data: {
+        thread: {
+          ...baseThread,
+          perspective: 'SELLER',
+          buyerLabel: '01',
+          threshold: 'AT_OR_ABOVE',
+        },
+        timeline: [],
+      },
+    };
     renderWithIntl(<OfferThread threadId="t1" />);
     expect(screen.getByRole('button', { name: 'Accept offer' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Make counteroffer' })).toBeInTheDocument();
@@ -141,10 +195,28 @@ describe('OfferThread', () => {
   });
 
   it('accepted thread shows the Week-5 handoff, no transaction UI', () => {
-    Q.thread = { isLoading: false, isError: false, data: { thread: { ...baseThread, perspective: 'SELLER', buyerLabel: '01', threshold: null, status: 'ACCEPTED', statusKey: 'accepted', nextActor: 'NONE', isActionable: false }, timeline: [] } };
+    Q.thread = {
+      isLoading: false,
+      isError: false,
+      data: {
+        thread: {
+          ...baseThread,
+          perspective: 'SELLER',
+          buyerLabel: '01',
+          threshold: null,
+          status: 'ACCEPTED',
+          statusKey: 'accepted',
+          nextActor: 'NONE',
+          isActionable: false,
+        },
+        timeline: [],
+      },
+    };
     renderWithIntl(<OfferThread threadId="t1" />);
     expect(screen.getByRole('heading', { name: 'Offer accepted' })).toBeInTheDocument();
-    expect(screen.getByText(/transaction setup will continue in the next stage/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/transaction setup will continue in the next stage/i),
+    ).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /pay deposit|create transaction/i })).toBeNull();
   });
 

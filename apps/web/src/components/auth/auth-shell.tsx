@@ -48,8 +48,8 @@ export function AuthHeading({
   return (
     <div className="space-y-3">
       {progress}
-      <h1 className="font-display text-3xl font-medium tracking-tight text-brand-900">{title}</h1>
-      {description ? <p className="text-pretty text-muted-foreground">{description}</p> : null}
+      <h1 className="font-display text-brand-900 text-3xl font-medium tracking-tight">{title}</h1>
+      {description ? <p className="text-muted-foreground text-pretty">{description}</p> : null}
     </div>
   );
 }

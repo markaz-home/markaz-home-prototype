@@ -15,8 +15,15 @@ import { useRouter } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 
 const KNOWN = new Set([
-  'OFFER_RECEIVED', 'OFFER_COUNTER_SELLER', 'OFFER_COUNTER_BUYER', 'OFFER_ACCEPTED',
-  'OFFER_REJECTED', 'OFFER_WITHDRAWN', 'OFFER_CLOSED_OTHER', 'OFFER_LISTING_UNAVAILABLE', 'OFFER_EXPIRED',
+  'OFFER_RECEIVED',
+  'OFFER_COUNTER_SELLER',
+  'OFFER_COUNTER_BUYER',
+  'OFFER_ACCEPTED',
+  'OFFER_REJECTED',
+  'OFFER_WITHDRAWN',
+  'OFFER_CLOSED_OTHER',
+  'OFFER_LISTING_UNAVAILABLE',
+  'OFFER_EXPIRED',
 ]);
 
 /** Header notification bell with unread count + compact menu (offers-design-spec §30).
@@ -41,10 +48,15 @@ export function NotificationBell() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative" aria-label={`${t('title')}${unread > 0 ? ` (${unread})` : ''}`}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative"
+          aria-label={`${t('title')}${unread > 0 ? ` (${unread})` : ''}`}
+        >
           <Bell className="h-5 w-5" aria-hidden />
           {unread > 0 ? (
-            <span className="absolute -end-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+            <span className="bg-primary text-primary-foreground absolute -end-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold">
               {unread > 99 ? '99+' : unread}
             </span>
           ) : null}
@@ -56,7 +68,7 @@ export function NotificationBell() {
           {unread > 0 ? (
             <button
               type="button"
-              className="me-2 text-xs text-primary underline"
+              className="text-primary me-2 text-xs underline"
               onClick={async () => {
                 await markAll.mutateAsync().catch(() => {});
                 void utils.offers.getUnreadCounts.invalidate();
@@ -69,7 +81,7 @@ export function NotificationBell() {
         </div>
         <DropdownMenuSeparator />
         {!list.data || list.data.length === 0 ? (
-          <p className="px-2 py-6 text-center text-sm text-muted-foreground">{t('empty')}</p>
+          <p className="text-muted-foreground px-2 py-6 text-center text-sm">{t('empty')}</p>
         ) : (
           list.data.map((n) => (
             <DropdownMenuItem
@@ -78,7 +90,9 @@ export function NotificationBell() {
               className={n.read ? 'opacity-70' : 'font-medium'}
             >
               <span className="flex items-center gap-2">
-                {!n.read ? <span className="h-2 w-2 shrink-0 rounded-full bg-primary" aria-hidden /> : null}
+                {!n.read ? (
+                  <span className="bg-primary h-2 w-2 shrink-0 rounded-full" aria-hidden />
+                ) : null}
                 {KNOWN.has(n.kind) ? t(n.kind as 'OFFER_RECEIVED') : t('view')}
               </span>
             </DropdownMenuItem>
@@ -95,7 +109,10 @@ export function OffersNavBadge() {
   const n = counts.data?.actionNeeded ?? 0;
   if (n <= 0) return null;
   return (
-    <span className="ms-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground" aria-hidden>
+    <span
+      className="bg-primary text-primary-foreground ms-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold"
+      aria-hidden
+    >
       {n > 99 ? '99+' : n}
     </span>
   );

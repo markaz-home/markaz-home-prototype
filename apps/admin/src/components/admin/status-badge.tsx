@@ -16,11 +16,23 @@ const TONE: Record<StatusTone, { cls: string; Icon: typeof Circle }> = {
  * Status badge — text + icon, never colour-only (spec §37, §41 a11y). Tone is a
  * semantic role, not a raw enum; callers map enum → tone + label.
  */
-export function StatusBadge({ tone = 'neutral', label, className }: { tone?: StatusTone; label: string; className?: string }) {
+export function StatusBadge({
+  tone = 'neutral',
+  label,
+  className,
+}: {
+  tone?: StatusTone;
+  label: string;
+  className?: string;
+}) {
   const { cls, Icon } = TONE[tone];
   return (
     <span
-      className={cn('inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium', cls, className)}
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium',
+        cls,
+        className,
+      )}
     >
       <Icon className="h-3.5 w-3.5" aria-hidden />
       {label}

@@ -67,13 +67,7 @@ export function SaveButton({
     }
   }
 
-  const label = busy
-    ? saved
-      ? t('saving')
-      : t('removing')
-    : saved
-      ? t('saved')
-      : t('save');
+  const label = busy ? (saved ? t('saving') : t('removing')) : saved ? t('saved') : t('save');
 
   return (
     <>
@@ -100,7 +94,7 @@ export function SaveButton({
           <DialogHeader>
             <DialogTitle>{t('authTitle')}</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">{t('authBody')}</p>
+          <p className="text-muted-foreground text-sm">{t('authBody')}</p>
           <DialogFooter className="flex-col gap-2 sm:flex-col">
             <Button asChild className="w-full">
               <Link href="/sign-in">{t('signIn')}</Link>

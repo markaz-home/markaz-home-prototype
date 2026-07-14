@@ -47,7 +47,12 @@ export const RESTRICT_REASONS = [
   'OTHER',
 ] as const;
 export const restrictReasonSchema = z.enum(RESTRICT_REASONS);
-export const RESTORE_REASONS = ['REVIEW_COMPLETED', 'ISSUE_RESOLVED', 'APPLIED_IN_ERROR', 'OTHER'] as const;
+export const RESTORE_REASONS = [
+  'REVIEW_COMPLETED',
+  'ISSUE_RESOLVED',
+  'APPLIED_IN_ERROR',
+  'OTHER',
+] as const;
 export const restoreReasonSchema = z.enum(RESTORE_REASONS);
 
 // ---- Admin notes (spec §16) -----------------------------------------------

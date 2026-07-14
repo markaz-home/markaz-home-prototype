@@ -23,11 +23,7 @@ export type Profile = z.infer<typeof profileSchema>;
  * Never collects password, phone, Emirates ID, passport, or buyer/seller role.
  */
 export const profileSetupSchema = z.object({
-  fullName: z
-    .string()
-    .trim()
-    .min(2, 'full_name_too_short')
-    .max(120, 'full_name_too_long'),
+  fullName: z.string().trim().min(2, 'full_name_too_short').max(120, 'full_name_too_long'),
   acceptTerms: z.literal(true, {
     errorMap: () => ({ message: 'terms_required' }),
   }),

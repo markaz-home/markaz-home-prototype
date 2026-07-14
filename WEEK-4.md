@@ -2,7 +2,7 @@
 
 Week 4 adds a complete, **non-binding** offer and negotiation experience between
 `CUSTOMER`s on `LIVE` listings, built on the Week 1–3 foundation. Buyer and Seller
-remain *journeys* of one account — there is no Buyer/Seller role or mode switch.
+remain _journeys_ of one account — there is no Buyer/Seller role or mode switch.
 The milestone may reach an `ACCEPTED` offer and shows a clear **Week 5 handoff**; it
 builds **no** transaction, escrow, payment, MOU, legal, chat, or contact-exchange.
 
@@ -50,12 +50,12 @@ test suite. The Week-1 flat `offers`/`counter_offers` stub tables were **replace
 
 ## 3. Final routes
 
-| Route | Who | Purpose |
-|---|---|---|
-| `/[locale]/properties/[publicId]/[slug]/offer` | buyer | Offer creation (amount → review → submit) |
-| `/[locale]/offers?view=made\|received` | customer | Unified Offers hub (tabs + filters) |
-| `/[locale]/offers/[offerThreadId]` | participant | Shared, perspective-aware thread + timeline |
-| `/[locale]/sell/listings/[listingId]/offers` | owner | Listing-specific seller offer management |
+| Route                                          | Who         | Purpose                                     |
+| ---------------------------------------------- | ----------- | ------------------------------------------- |
+| `/[locale]/properties/[publicId]/[slug]/offer` | buyer       | Offer creation (amount → review → submit)   |
+| `/[locale]/offers?view=made\|received`         | customer    | Unified Offers hub (tabs + filters)         |
+| `/[locale]/offers/[offerThreadId]`             | participant | Shared, perspective-aware thread + timeline |
+| `/[locale]/sell/listings/[listingId]/offers`   | owner       | Listing-specific seller offer management    |
 
 Anonymous Make-an-Offer stores a safe intent (`lib/offer-intent.ts`, publicId + allow-listed
 return route only — never an amount) and returns after sign-in (`OfferIntentRedirect`).
@@ -63,17 +63,18 @@ return route only — never an amount) and returns after sign-in (`OfferIntentRe
 ## 4. Canonical offer architecture
 
 Migrations `…0804_offers.sql` + `…0805_offers_rls_no_force.sql` + `…0806_offer_counter_enum_fix.sql`
-+ `…0807_listing_under_offer_fn.sql`.
 
-- **Tables:** `offer_threads`, `offer_proposals` (immutable), `offer_events` (participant
+- `…0807_listing_under_offer_fn.sql`.
+
+* **Tables:** `offer_threads`, `offer_proposals` (immutable), `offer_events` (participant
   timeline). Reuses `notifications` (in-app) + `audit_events` (private). **Verified live:**
   the three canonical tables exist; the old flat model does not.
-- **Enums:** `offer_thread_status`, `offer_next_actor`, `offer_proposal_status`,
+* **Enums:** `offer_thread_status`, `offer_next_actor`, `offer_proposal_status`,
   `offer_side`, `offer_event_type`.
-- **Constraints:** `buyer <> seller` CHECK; identity/money columns immutable (guard triggers);
+* **Constraints:** `buyer <> seller` CHECK; identity/money columns immutable (guard triggers);
   **partial unique index** `uniq_active_thread_per_buyer_listing`; **partial unique index**
   `uniq_accepted_thread_per_listing` (DB-enforced single accepted offer).
-- **All writes go through `SECURITY DEFINER` functions** — `create_offer`, `submit_counter`,
+* **All writes go through `SECURITY DEFINER` functions** — `create_offer`, `submit_counter`,
   `accept_offer`, `reject_offer`, `withdraw_offer`, `close_listing_offers`, `expire_due_offers`,
   `mark_offer_viewed`. Customers have **read-only** RLS on the offer tables and **no** direct
   write path. The actor is derived from `auth.uid()`; `created_by_side` from membership.
@@ -156,7 +157,7 @@ it **refetches authoritative state** (never applies the payload; rows carry only
 id/type/timestamp). RLS scopes `postgres_changes` delivery to participants (anonymous receive
 nothing — ADR-0018). Reconnect refetches; duplicates are idempotent; stale actions fail
 server-side on the `version` check. A connection banner surfaces reconnecting/stale.
-*Executed-evidence gap:* participant-scoped **delivery** is asserted by design + the RLS
+_Executed-evidence gap:_ participant-scoped **delivery** is asserted by design + the RLS
 tests, but a live two-subscriber realtime delivery test is not yet automated (see §21).
 
 ## 14. RLS and privacy
@@ -187,7 +188,7 @@ snapshot on every counter/accept; a materially-changed listing raises `LISTING_C
 **Verified live** (integration `offers-listing-changes.test.ts`, 4 tests): pausing closes
 both competing threads and a subsequent counter is `NOT_ACTIONABLE`; a `version` bump blocks
 both a counter and an acceptance (`LISTING_CHANGED`) with the thread left intact; a paused
-listing blocks new offers (`LISTING_UNAVAILABLE`). *Note:* there is no material-edit-**while-LIVE**
+listing blocks new offers (`LISTING_UNAVAILABLE`). _Note:_ there is no material-edit-**while-LIVE**
 mutation — a material change requires pause/republish (which bumps `publication_version`);
 that is intentional for this milestone.
 
@@ -195,14 +196,14 @@ that is intentional for this milestone.
 
 Run from a clean stack (`pnpm supabase db reset`) with Docker up.
 
-| Layer | Count | Location | Status |
-|---|---|---|---|
-| Unit (domain) | 97 (offer 22 + notification 5) | `packages/domain/src/__tests__/{offer,notification}.test.ts` | ✅ pass |
-| Unit (api projection) | 4 | `packages/api/src/__tests__/offer-projection.test.ts` | ✅ pass |
-| Component | 49 (offers 9 + notifications 6) | `apps/web/src/__tests__/{offers,notifications}.test.tsx` | ✅ pass |
-| **Integration (live DB)** | **29** | `tests/integration/offers-{negotiation,rls,concurrency,listing-changes}.test.ts` | ✅ pass |
-| **E2E (Playwright)** | **7** | `apps/web/e2e/offers.spec.ts` | ✅ **executed, all pass** |
-| **Accessibility (axe)** | **4 scans** | `apps/web/e2e/offers-a11y.spec.ts` | ✅ **executed, 0 serious/critical** |
+| Layer                     | Count                           | Location                                                                         | Status                              |
+| ------------------------- | ------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------- |
+| Unit (domain)             | 97 (offer 22 + notification 5)  | `packages/domain/src/__tests__/{offer,notification}.test.ts`                     | ✅ pass                             |
+| Unit (api projection)     | 4                               | `packages/api/src/__tests__/offer-projection.test.ts`                            | ✅ pass                             |
+| Component                 | 49 (offers 9 + notifications 6) | `apps/web/src/__tests__/{offers,notifications}.test.tsx`                         | ✅ pass                             |
+| **Integration (live DB)** | **29**                          | `tests/integration/offers-{negotiation,rls,concurrency,listing-changes}.test.ts` | ✅ pass                             |
+| **E2E (Playwright)**      | **7**                           | `apps/web/e2e/offers.spec.ts`                                                    | ✅ **executed, all pass**           |
+| **Accessibility (axe)**   | **4 scans**                     | `apps/web/e2e/offers-a11y.spec.ts`                                               | ✅ **executed, 0 serious/critical** |
 
 Full `pnpm test` (with local stack up): **197 tests, all passing** — domain 97, web 49,
 integration 29, admin 7, i18n 6, auth 5, api 4. `pnpm typecheck` 12/12, `pnpm lint` 11/11
@@ -222,11 +223,12 @@ eligibility check that showed the offer form on an under-offer listing to non-pa
 
 Integration `offers-concurrency.test.ts` (live DB): two simultaneous `accept_offer` calls
 are fired with `Promise.all` on separate connections.
+
 - **Two competing threads, same listing** → exactly **1** winner; the other thread ends
   `CLOSED_OTHER_ACCEPTED`; final state has exactly one `ACCEPTED` and zero `AWAITING_*`.
 - **Same thread, two accepts** → exactly **1** winner; exactly one `ACCEPTED` thread.
-Losers fail with `STALE`/`ALREADY_ACCEPTED`/`NOT_ACTIONABLE`/serialization — never a second
-acceptance. **No partial state observed.**
+  Losers fail with `STALE`/`ALREADY_ACCEPTED`/`NOT_ACTIONABLE`/serialization — never a second
+  acceptance. **No partial state observed.**
 
 ## 18. Accessibility results
 
@@ -244,7 +246,7 @@ money inputs, and Radix dialog focus traps.
 i18n parity is **exact**: 232 `offers.*` keys in both `en.json` and `ar.json` (0 missing
 either direction). `dir=rtl` is set at `<html>` for `ar`; components use logical CSS
 properties; money is forced `dir="ltr"`. Arabic copy is **draft** pending professional +
-legal review (spec §39). *Executed-evidence gap:* no automated AR-RTL e2e yet.
+legal review (spec §39). _Executed-evidence gap:_ no automated AR-RTL e2e yet.
 
 ## 20. Mobile evidence
 
@@ -256,12 +258,12 @@ Offer components use responsive Tailwind breakpoints (thread collapses to single
 - **Fixed during audit (was a showstopper):** `submit_counter` assigned `text` CASE results
   to enum columns (`status`, `next_actor`, `event_type`) with no cast → **every buyer/seller
   counter raised at runtime** (`column "status" is of type offer_thread_status but expression
-  is of type text`). Undetected because the SQL had never been executed against a live DB and
+is of type text`). Undetected because the SQL had never been executed against a live DB and
   no integration tests existed. Fixed in migration `…0806` (casts) + covered by integration
   tests. **Prior versions of this file that implied the negotiation flow was verified were
   incorrect.**
 - **Fixed during E2E execution — eligibility RLS leak.** `offers.eligibility` resolved
-  UNDER_OFFER by reading `offer_threads` under the *caller's* RLS context; a non-participant
+  UNDER*OFFER by reading `offer_threads` under the \_caller's* RLS context; a non-participant
   buyer cannot see the (private) accepted thread, so the offer form was shown on an under-offer
   listing (submission was still blocked by `create_offer`, so not exploitable — a UX defect).
   Fixed with a `SECURITY DEFINER` `listing_has_accepted_offer()` helper (migration `…0807`) used
@@ -287,31 +289,31 @@ handoff and no pay/create-transaction controls (component-tested). `transactions
 
 ## 23. Final acceptance checklist
 
-| Criterion | State | Evidence |
-|---|---|---|
-| One canonical offer model | ✅ | §4, live schema check |
-| Old flat scaffolding superseded | ✅ | §5, live check (tables/type absent) |
-| Proposals immutable; counters preserve history | ✅ | §7, integration |
-| Buyer submit / seller counter / buyer counter | ✅ | integration (counter bug fixed in …0806) |
-| Seller accepts buyer / buyer accepts seller counter | ✅ | integration |
-| Seller reject / buyer withdraw | ✅ | functions verified; reject+withdraw exercised |
-| Only current actor can act | ✅ | §8, integration `NOT_YOUR_TURN` |
-| Single accepted offer DB-enforced | ✅ | §9, partial unique index (live) |
-| Concurrent acceptance → one winner | ✅ | §17, concurrency integration |
-| Other threads close; new offers blocked; Under Offer | ✅ | §9/§10, integration |
-| Week 5 handoff appears; no transaction workflow | ✅ | §22 |
-| Threshold private; below-threshold visible to seller | ✅ | §11, integration |
-| Notifications reuse canonical table; badge from thread state | ✅ | §12 |
-| Pause closes offers; material change blocks stale accept | ✅ | §15, integration |
-| Account notifications page | ✅ | §12/§21, 6 component tests |
-| Realtime participant-scoped | ✅ | §13, RLS tests + E2E privacy spec |
-| RLS blocks cross-user; forgery blocked; private data safe | ✅ | §14, 13 RLS tests + E2E |
-| English / Arabic / RTL / Mobile | ✅ | §19/§20, AR-RTL E2E passing |
-| Accessibility passes | ✅ | §18, axe 4/4, 0 serious/critical |
-| Lint / Typecheck / Web build / Admin build | ✅ | §16 |
-| Complete tests pass | ✅ | §16 — 197 unit/component/integration + 7 E2E + 4 axe |
-| `WEEK-4.md` complete + internally consistent | ✅ | this revision |
-| Ready for Week 5 without offer restructuring | ✅ | schema + handoff stable |
+| Criterion                                                    | State | Evidence                                             |
+| ------------------------------------------------------------ | ----- | ---------------------------------------------------- |
+| One canonical offer model                                    | ✅    | §4, live schema check                                |
+| Old flat scaffolding superseded                              | ✅    | §5, live check (tables/type absent)                  |
+| Proposals immutable; counters preserve history               | ✅    | §7, integration                                      |
+| Buyer submit / seller counter / buyer counter                | ✅    | integration (counter bug fixed in …0806)             |
+| Seller accepts buyer / buyer accepts seller counter          | ✅    | integration                                          |
+| Seller reject / buyer withdraw                               | ✅    | functions verified; reject+withdraw exercised        |
+| Only current actor can act                                   | ✅    | §8, integration `NOT_YOUR_TURN`                      |
+| Single accepted offer DB-enforced                            | ✅    | §9, partial unique index (live)                      |
+| Concurrent acceptance → one winner                           | ✅    | §17, concurrency integration                         |
+| Other threads close; new offers blocked; Under Offer         | ✅    | §9/§10, integration                                  |
+| Week 5 handoff appears; no transaction workflow              | ✅    | §22                                                  |
+| Threshold private; below-threshold visible to seller         | ✅    | §11, integration                                     |
+| Notifications reuse canonical table; badge from thread state | ✅    | §12                                                  |
+| Pause closes offers; material change blocks stale accept     | ✅    | §15, integration                                     |
+| Account notifications page                                   | ✅    | §12/§21, 6 component tests                           |
+| Realtime participant-scoped                                  | ✅    | §13, RLS tests + E2E privacy spec                    |
+| RLS blocks cross-user; forgery blocked; private data safe    | ✅    | §14, 13 RLS tests + E2E                              |
+| English / Arabic / RTL / Mobile                              | ✅    | §19/§20, AR-RTL E2E passing                          |
+| Accessibility passes                                         | ✅    | §18, axe 4/4, 0 serious/critical                     |
+| Lint / Typecheck / Web build / Admin build                   | ✅    | §16                                                  |
+| Complete tests pass                                          | ✅    | §16 — 197 unit/component/integration + 7 E2E + 4 axe |
+| `WEEK-4.md` complete + internally consistent                 | ✅    | this revision                                        |
+| Ready for Week 5 without offer restructuring                 | ✅    | schema + handoff stable                              |
 
 **Verdict:** the offer **data model, security boundary, single-acceptance, concurrency,
 pause/material-change guards, privacy, notifications, English/Arabic/RTL, and accessibility are

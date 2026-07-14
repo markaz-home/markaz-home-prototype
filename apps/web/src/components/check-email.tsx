@@ -14,17 +14,23 @@ export function CheckEmail() {
   const email = params.get('email') ?? '';
   return (
     <AuthShell narrow>
-      <SuccessPanel title={t('checkEmailTitle')} description={t('sentCode', { email: maskEmail(email) })}>
-        <p className="text-sm text-muted-foreground">{t('checkEmailBody')}</p>
+      <SuccessPanel
+        title={t('checkEmailTitle')}
+        description={t('sentCode', { email: maskEmail(email) })}
+      >
+        <p className="text-muted-foreground text-sm">{t('checkEmailBody')}</p>
         <div className="flex flex-col gap-3 pt-2">
           <Button asChild>
             <Link href={`/verify-email?email=${encodeURIComponent(email)}`}>{t('enterCode')}</Link>
           </Button>
-          <Link href="/sign-up" className="text-center text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            href="/sign-up"
+            className="text-muted-foreground hover:text-foreground text-center text-sm"
+          >
             {t('changeEmail')}
           </Link>
         </div>
-        <p className="pt-2 text-xs text-muted-foreground">{t('help')}</p>
+        <p className="text-muted-foreground pt-2 text-xs">{t('help')}</p>
       </SuccessPanel>
     </AuthShell>
   );

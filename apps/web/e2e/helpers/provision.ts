@@ -18,7 +18,8 @@ import postgres from 'postgres';
 
 const SUPABASE_URL = process.env.SUPABASE_URL ?? 'http://127.0.0.1:54321';
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? '';
-const DB_URL = process.env.TEST_DATABASE_URL ?? 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
+const DB_URL =
+  process.env.TEST_DATABASE_URL ?? 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
 
 function assertLoopback(url: string): void {
   const host = new URL(url).hostname;
@@ -30,7 +31,9 @@ assertLoopback(DB_URL);
 
 export const DEFAULT_PASSWORD = 'Aa1!aaaa'; // satisfies the §10.5 policy (8+, upper/lower/number/special)
 
-const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } });
+const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
+  auth: { autoRefreshToken: false, persistSession: false },
+});
 const sql = postgres(DB_URL, { max: 4, onnotice: () => {}, prepare: false });
 
 const createdUsers: string[] = [];
@@ -124,56 +127,129 @@ async function txVersion(txId: string): Promise<number> {
 }
 
 /** Create an accepted offer for (buyer, seller) on a listing and ensure its transaction. */
-export async function acceptedTransaction(buyerId: string, sellerId: string, listingId: string): Promise<string> {
+export async function acceptedTransaction(
+  buyerId: string,
+  sellerId: string,
+  listingId: string,
+): Promise<string> {
   const threadId = await asRole(buyerId, async (tx) => {
     const [t] = await tx`select id from public.create_offer(${listingId}::uuid, 2000000, null)`;
     return (t as { id: string }).id;
   });
-  const meta = await sql`select current_proposal_id, version from public.offer_threads where id = ${threadId}`;
+  const meta =
+    await sql`select current_proposal_id, version from public.offer_threads where id = ${threadId}`;
   const m = meta[0] as { current_proposal_id: string; version: number };
-  await asRole(sellerId, (tx) => tx`select public.accept_offer(${threadId}::uuid, ${m.current_proposal_id}::uuid, ${m.version})`);
+  await asRole(
+    sellerId,
+    (tx) =>
+      tx`select public.accept_offer(${threadId}::uuid, ${m.current_proposal_id}::uuid, ${m.version})`,
+  );
   return asRole(buyerId, async (tx) => {
     const [t] = await tx`select id from public.ensure_transaction(${threadId}::uuid)`;
     return (t as { id: string }).id;
   });
 }
 
-async function stepTx(txId: string, userId: string, run: (tx: typeof sql, v: number) => Promise<unknown>): Promise<void> {
+async function stepTx(
+  txId: string,
+  userId: string,
+  run: (tx: typeof sql, v: number) => Promise<unknown>,
+): Promise<void> {
   const v = await txVersion(txId);
   await asRole(userId, (tx) => run(tx, v));
 }
 
 /** Drive to the DEPOSIT stage (both details confirmed + cash route). */
-export async function driveToDeposit(txId: string, buyerId: string, sellerId: string): Promise<void> {
-  await stepTx(txId, buyerId, (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'BUYER_CONFIRM_DETAILS', ${v})`);
-  await stepTx(txId, sellerId, (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'SELLER_CONFIRM_DETAILS', ${v})`);
-  await stepTx(txId, buyerId, (tx, v) => tx`select public.tx_select_route(${txId}::uuid, 'CASH', ${v})`);
+export async function driveToDeposit(
+  txId: string,
+  buyerId: string,
+  sellerId: string,
+): Promise<void> {
+  await stepTx(
+    txId,
+    buyerId,
+    (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'BUYER_CONFIRM_DETAILS', ${v})`,
+  );
+  await stepTx(
+    txId,
+    sellerId,
+    (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'SELLER_CONFIRM_DETAILS', ${v})`,
+  );
+  await stepTx(
+    txId,
+    buyerId,
+    (tx, v) => tx`select public.tx_select_route(${txId}::uuid, 'CASH', ${v})`,
+  );
 }
 
 /** Drive to the DOCUMENTS stage (deposit confirmed). */
-export async function driveToDocuments(txId: string, buyerId: string, sellerId: string): Promise<void> {
+export async function driveToDocuments(
+  txId: string,
+  buyerId: string,
+  sellerId: string,
+): Promise<void> {
   await driveToDeposit(txId, buyerId, sellerId);
   await stepTx(txId, buyerId, (tx, v) => tx`select public.tx_confirm_deposit(${txId}::uuid, ${v})`);
 }
 
 /** Drive a transaction (via the SQL engine) to the COMPLETION stage, leaving both
  * completion confirmations for the UI to perform. */
-export async function driveToCompletion(txId: string, buyerId: string, sellerId: string): Promise<void> {
-  const step = (userId: string, run: (tx: typeof sql, v: number) => Promise<unknown>) => stepTx(txId, userId, run);
-  await step(buyerId, (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'BUYER_CONFIRM_DETAILS', ${v})`);
-  await step(sellerId, (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'SELLER_CONFIRM_DETAILS', ${v})`);
+export async function driveToCompletion(
+  txId: string,
+  buyerId: string,
+  sellerId: string,
+): Promise<void> {
+  const step = (userId: string, run: (tx: typeof sql, v: number) => Promise<unknown>) =>
+    stepTx(txId, userId, run);
+  await step(
+    buyerId,
+    (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'BUYER_CONFIRM_DETAILS', ${v})`,
+  );
+  await step(
+    sellerId,
+    (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'SELLER_CONFIRM_DETAILS', ${v})`,
+  );
   await step(buyerId, (tx, v) => tx`select public.tx_select_route(${txId}::uuid, 'CASH', ${v})`);
   await step(buyerId, (tx, v) => tx`select public.tx_confirm_deposit(${txId}::uuid, ${v})`);
-  await asRole(buyerId, (tx) => tx`select id from public.tx_register_document(${txId}::uuid, 'BUYER_IDENTITY', ${`${txId}/${buyerId}/id.pdf`}, 'id.pdf', 'application/pdf', 1000)`);
-  await asRole(sellerId, (tx) => tx`select id from public.tx_register_document(${txId}::uuid, 'SELLER_IDENTITY', ${`${txId}/${sellerId}/id.pdf`}, 'id.pdf', 'application/pdf', 1000)`);
-  await step(buyerId, (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'BUYER_DOCUMENTS', ${v})`);
-  await step(sellerId, (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'SELLER_DOCUMENTS', ${v})`);
-  await step(buyerId, (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'BUYER_REVIEW_SUMMARY', ${v})`);
-  await step(sellerId, (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'SELLER_REVIEW_SUMMARY', ${v})`);
+  await asRole(
+    buyerId,
+    (tx) =>
+      tx`select id from public.tx_register_document(${txId}::uuid, 'BUYER_IDENTITY', ${`${txId}/${buyerId}/id.pdf`}, 'id.pdf', 'application/pdf', 1000)`,
+  );
+  await asRole(
+    sellerId,
+    (tx) =>
+      tx`select id from public.tx_register_document(${txId}::uuid, 'SELLER_IDENTITY', ${`${txId}/${sellerId}/id.pdf`}, 'id.pdf', 'application/pdf', 1000)`,
+  );
+  await step(
+    buyerId,
+    (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'BUYER_DOCUMENTS', ${v})`,
+  );
+  await step(
+    sellerId,
+    (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'SELLER_DOCUMENTS', ${v})`,
+  );
+  await step(
+    buyerId,
+    (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'BUYER_REVIEW_SUMMARY', ${v})`,
+  );
+  await step(
+    sellerId,
+    (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'SELLER_REVIEW_SUMMARY', ${v})`,
+  );
   await step(buyerId, (tx, v) => tx`select public.tx_run_due_diligence(${txId}::uuid, ${v})`);
-  await step(sellerId, (tx, v) => tx`select public.tx_propose_transfer_date(${txId}::uuid, (current_date + 10), ${v})`);
-  await step(buyerId, (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'BUYER_CONFIRM_READINESS', ${v})`);
-  await step(sellerId, (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'SELLER_CONFIRM_READINESS', ${v})`);
+  await step(
+    sellerId,
+    (tx, v) => tx`select public.tx_propose_transfer_date(${txId}::uuid, (current_date + 10), ${v})`,
+  );
+  await step(
+    buyerId,
+    (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'BUYER_CONFIRM_READINESS', ${v})`,
+  );
+  await step(
+    sellerId,
+    (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'SELLER_CONFIRM_READINESS', ${v})`,
+  );
   await step(buyerId, (tx, v) => tx`select public.tx_create_appointment(${txId}::uuid, ${v})`);
 }
 
@@ -184,7 +260,8 @@ export async function driveToCompletion(txId: string, buyerId: string, sellerId:
  */
 export async function teardown(): Promise<void> {
   try {
-    if (createdListings.length) await sql`delete from public.listings where id in ${sql(createdListings)}`;
+    if (createdListings.length)
+      await sql`delete from public.listings where id in ${sql(createdListings)}`;
     for (const id of createdUsers) await admin.auth.admin.deleteUser(id).catch(() => {});
   } finally {
     createdListings.length = 0;

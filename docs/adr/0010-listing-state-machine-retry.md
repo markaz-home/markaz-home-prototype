@@ -29,7 +29,7 @@ The strict forward machine cannot express these moves, and we explicitly do
 Keep the forward machine, and add two **explicit, server-only** mechanisms:
 
 1. **Failures do not transition the listing.** A failed simulation updates the
-   *record* (`verifications` / `permit_records`) `status = FAILED_DEMO` and the
+   _record_ (`verifications` / `permit_records`) `status = FAILED_DEMO` and the
    listing stays on its current state. Retry re-runs the simulation. The customer
    never reaches `REJECTED` through the wizard.
 

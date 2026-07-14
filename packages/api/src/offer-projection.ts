@@ -138,8 +138,7 @@ function baseThread(
     createdAt: thread.createdAt.toISOString(),
     property: offerPropertySummary(property),
     currentProposal: current ? mapProposal(current, perspective) : null,
-    comparison:
-      currentAmount != null && asking > 0 ? offerComparison(currentAmount, asking) : null,
+    comparison: currentAmount != null && asking > 0 ? offerComparison(currentAmount, asking) : null,
   };
 }
 
@@ -152,7 +151,10 @@ export function toBuyerThread(args: {
   current: ProposalInput | null;
   property: OfferPropertyInput;
 }) {
-  return { ...baseThread(args.thread, args.current, args.property, 'BUYER'), perspective: 'BUYER' as const };
+  return {
+    ...baseThread(args.thread, args.current, args.property, 'BUYER'),
+    perspective: 'BUYER' as const,
+  };
 }
 
 /**

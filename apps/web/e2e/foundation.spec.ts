@@ -28,9 +28,7 @@ test.describe('foundation', () => {
 
   test('landing has no critical accessibility violations', async ({ page }) => {
     await page.goto('/en');
-    const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa'])
-      .analyze();
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     const serious = results.violations.filter(
       (v) => v.impact === 'critical' || v.impact === 'serious',
     );

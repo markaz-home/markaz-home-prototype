@@ -14,13 +14,13 @@ export function AuthCard({
 }) {
   const t = useTranslations('admin');
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-muted/30 p-4">
+    <div className="bg-muted/30 flex min-h-dvh flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-            <ShieldCheck className="h-4 w-4 text-primary" aria-hidden /> {t('appName')}
+          <span className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
+            <ShieldCheck className="text-primary h-4 w-4" aria-hidden /> {t('appName')}
           </span>
-          <CardTitle className="font-display text-2xl text-brand-900">{title}</CardTitle>
+          <CardTitle className="font-display text-brand-900 text-2xl">{title}</CardTitle>
           {description ? <CardDescription>{description}</CardDescription> : null}
         </CardHeader>
         <CardContent className="space-y-4">{children}</CardContent>

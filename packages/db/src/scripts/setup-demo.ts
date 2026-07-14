@@ -58,7 +58,9 @@ async function main() {
   }
   if (!ADMIN_PASSWORD) fail('BOOTSTRAP_ADMIN_EMAIL set but BOOTSTRAP_ADMIN_PASSWORD is missing.');
   if (!SUPABASE_URL || !SERVICE_KEY || !DB_URL) {
-    fail('Missing NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / DATABASE_URL. See .env.example.');
+    fail(
+      'Missing NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / DATABASE_URL. See .env.example.',
+    );
   }
 
   const admin = createClient(SUPABASE_URL!, SERVICE_KEY!, {

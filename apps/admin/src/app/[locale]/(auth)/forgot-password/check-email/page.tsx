@@ -12,8 +12,10 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   return (
     <AdminAuthShell>
       <SuccessPanel title={t('sentTitle')} description={t('sentBody')}>
-        <p className="text-sm text-muted-foreground">{t('sentHelp')}</p>
-        <Button asChild className="mt-2 w-full"><Link href="/login">{ta('returnSignIn')}</Link></Button>
+        <p className="text-muted-foreground text-sm">{t('sentHelp')}</p>
+        <Button asChild className="mt-2 w-full">
+          <Link href="/login">{ta('returnSignIn')}</Link>
+        </Button>
       </SuccessPanel>
     </AdminAuthShell>
   );

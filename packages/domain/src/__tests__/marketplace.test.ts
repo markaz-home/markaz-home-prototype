@@ -10,7 +10,12 @@ import {
 
 describe('marketplaceQuerySchema', () => {
   it('coerces string query params to typed values and defaults sort/page', () => {
-    const parsed = marketplaceQuerySchema.parse({ minPrice: '1000000', maxPrice: '2000000', beds: '2', page: '3' });
+    const parsed = marketplaceQuerySchema.parse({
+      minPrice: '1000000',
+      maxPrice: '2000000',
+      beds: '2',
+      page: '3',
+    });
     expect(parsed.minPrice).toBe(1_000_000);
     expect(parsed.maxPrice).toBe(2_000_000);
     expect(parsed.beds).toBe('2');
@@ -49,7 +54,11 @@ describe('parseMarketplaceQuery (lenient URL parse)', () => {
   });
 
   it('keeps a valid query intact', () => {
-    const parsed = parseMarketplaceQuery({ type: 'APARTMENT', minPrice: '500000', sort: 'PRICE_ASC' });
+    const parsed = parseMarketplaceQuery({
+      type: 'APARTMENT',
+      minPrice: '500000',
+      sort: 'PRICE_ASC',
+    });
     expect(parsed.type).toBe('APARTMENT');
     expect(parsed.minPrice).toBe(500_000);
     expect(parsed.sort).toBe('PRICE_ASC');

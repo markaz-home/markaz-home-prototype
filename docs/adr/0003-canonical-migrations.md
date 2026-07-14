@@ -7,7 +7,7 @@
 
 We use Drizzle ORM for typed queries, and Supabase for auth/realtime/storage.
 Both can generate or apply schema changes. If two mechanisms apply schema
-(Drizzle migrations *and* Supabase SQL migrations), they will drift, and
+(Drizzle migrations _and_ Supabase SQL migrations), they will drift, and
 RLS policies, triggers, grants, and Supabase-specific objects (auth/storage
 schemas, realtime publication) do not map cleanly onto ORM-generated migrations.
 

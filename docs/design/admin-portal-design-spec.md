@@ -312,24 +312,24 @@ One Admin account may hold all capabilities in the prototype, but every action a
 
 ## 5.2 Capability behaviour
 
-| Capability | Read or action | Key controls |
-|---|---|---|
-| `VIEW_OVERVIEW` | Read | Dashboard and queues |
-| `VIEW_CUSTOMERS` | Read | Customer list/profile |
-| `MANAGE_CUSTOMER_STATUS` | Consequential | Restrict/restore |
-| `VIEW_LISTINGS` | Read | Listings/detail |
-| `REVIEW_PUBLICATION` | Consequential | Approve, return, retry |
-| `MANAGE_LISTING_AVAILABILITY` | Consequential | Pause/resume/block |
-| `VIEW_OFFERS` | Read | Offer list/detail |
-| `CLOSE_INVALID_OFFER` | Consequential | Operational close only |
-| `VIEW_TRANSACTIONS` | Read | Transaction list/detail |
-| `MANAGE_TRANSACTION_RECOVERY` | Consequential | Retry, pause, resume, fail |
-| `VIEW_VERIFICATIONS` | Read | Verification queue/detail |
-| `RETRY_SIMULATION` | Consequential | Retry supported simulation |
-| `VIEW_PRIVATE_DOCUMENT_METADATA` | Read | Metadata and status |
-| `ACCESS_PRIVATE_DOCUMENT` | Sensitive | Temporary view session |
-| `VIEW_AUDIT_LOGS` | Read | Global and entity audit |
-| `ADD_ADMIN_NOTES` | Write | Append operational note |
+| Capability                       | Read or action | Key controls               |
+| -------------------------------- | -------------- | -------------------------- |
+| `VIEW_OVERVIEW`                  | Read           | Dashboard and queues       |
+| `VIEW_CUSTOMERS`                 | Read           | Customer list/profile      |
+| `MANAGE_CUSTOMER_STATUS`         | Consequential  | Restrict/restore           |
+| `VIEW_LISTINGS`                  | Read           | Listings/detail            |
+| `REVIEW_PUBLICATION`             | Consequential  | Approve, return, retry     |
+| `MANAGE_LISTING_AVAILABILITY`    | Consequential  | Pause/resume/block         |
+| `VIEW_OFFERS`                    | Read           | Offer list/detail          |
+| `CLOSE_INVALID_OFFER`            | Consequential  | Operational close only     |
+| `VIEW_TRANSACTIONS`              | Read           | Transaction list/detail    |
+| `MANAGE_TRANSACTION_RECOVERY`    | Consequential  | Retry, pause, resume, fail |
+| `VIEW_VERIFICATIONS`             | Read           | Verification queue/detail  |
+| `RETRY_SIMULATION`               | Consequential  | Retry supported simulation |
+| `VIEW_PRIVATE_DOCUMENT_METADATA` | Read           | Metadata and status        |
+| `ACCESS_PRIVATE_DOCUMENT`        | Sensitive      | Temporary view session     |
+| `VIEW_AUDIT_LOGS`                | Read           | Global and entity audit    |
+| `ADD_ADMIN_NOTES`                | Write          | Append operational note    |
 
 ## 5.3 Missing capability
 
@@ -346,23 +346,23 @@ Copy:
 
 ## 5.4 Confirmation and reason policy
 
-| Action | Confirmation | Reason required | Reversible |
-|---|---:|---:|---:|
-| Restrict customer | Yes | Yes | Yes |
-| Restore customer | Yes | Yes | N/A |
-| Approve publication | Yes | No; optional note | No direct undo; pause later |
-| Return for changes | Yes | Yes | Customer resubmits |
-| Retry publication preparation | Yes | No | Retry-safe |
-| Pause listing | Yes | Yes | Yes |
-| Resume listing | Yes | Yes | Yes if eligible |
-| Block publication | Yes | Yes | Yes through review |
-| Access private document | Yes | Yes | Access expires |
-| Close invalid offer | Yes | Yes | No casual reopen |
-| Retry transaction step | Yes | No; optional note | Retry-safe |
-| Pause transaction | Yes | Yes | Yes |
-| Resume transaction | Yes | Yes | Yes if valid |
-| Mark transaction failed | Yes | Yes | Restricted recovery only |
-| Add Admin note | Submit confirmation not required | Category required | Append correction only |
+| Action                        |                     Confirmation |   Reason required |                  Reversible |
+| ----------------------------- | -------------------------------: | ----------------: | --------------------------: |
+| Restrict customer             |                              Yes |               Yes |                         Yes |
+| Restore customer              |                              Yes |               Yes |                         N/A |
+| Approve publication           |                              Yes | No; optional note | No direct undo; pause later |
+| Return for changes            |                              Yes |               Yes |          Customer resubmits |
+| Retry publication preparation |                              Yes |                No |                  Retry-safe |
+| Pause listing                 |                              Yes |               Yes |                         Yes |
+| Resume listing                |                              Yes |               Yes |             Yes if eligible |
+| Block publication             |                              Yes |               Yes |          Yes through review |
+| Access private document       |                              Yes |               Yes |              Access expires |
+| Close invalid offer           |                              Yes |               Yes |            No casual reopen |
+| Retry transaction step        |                              Yes | No; optional note |                  Retry-safe |
+| Pause transaction             |                              Yes |               Yes |                         Yes |
+| Resume transaction            |                              Yes |               Yes |                Yes if valid |
+| Mark transaction failed       |                              Yes |               Yes |    Restricted recovery only |
+| Add Admin note                | Submit confirmation not required | Category required |      Append correction only |
 
 ---
 
@@ -894,18 +894,18 @@ Restriction does **not** delete the account or change identity data.
 
 ## 15.2 What restriction blocks
 
-| Area | Behaviour |
-|---|---|
-| Sign-in | Allowed so customer can view existing records and required notices |
-| New listing creation | Blocked |
-| Listing publication/resume | Blocked |
-| New offers | Blocked |
-| Counter, accept, reject or withdraw offers | Blocked pending review |
-| Existing transaction access | Allowed |
-| Required transaction tasks | Allowed unless transaction is separately paused |
-| Saved properties | Read/remove allowed; new save may remain allowed |
-| Public listing visibility | Unchanged automatically |
-| New offers on customer-owned listings | Blocked through derived availability until restored or listing reviewed |
+| Area                                       | Behaviour                                                               |
+| ------------------------------------------ | ----------------------------------------------------------------------- |
+| Sign-in                                    | Allowed so customer can view existing records and required notices      |
+| New listing creation                       | Blocked                                                                 |
+| Listing publication/resume                 | Blocked                                                                 |
+| New offers                                 | Blocked                                                                 |
+| Counter, accept, reject or withdraw offers | Blocked pending review                                                  |
+| Existing transaction access                | Allowed                                                                 |
+| Required transaction tasks                 | Allowed unless transaction is separately paused                         |
+| Saved properties                           | Read/remove allowed; new save may remain allowed                        |
+| Public listing visibility                  | Unchanged automatically                                                 |
+| New offers on customer-owned listings      | Blocked through derived availability until restored or listing reviewed |
 
 This avoids silently pausing or deleting public records while preventing new negotiation activity.
 
@@ -1156,14 +1156,14 @@ Use a two-column comparison on desktop:
 
 Examples:
 
-| Field | Public | Private / Admin |
-|---|---|---|
-| Community | Visible | — |
-| Building | Visible if approved | Source value |
-| Unit number | Not visible | Owner/Admin only |
-| Asking price | Visible | Change history |
-| Ownership document | Not visible | Metadata only |
-| Permit result | Public-safe demo label | Internal simulation record |
+| Field              | Public                 | Private / Admin            |
+| ------------------ | ---------------------- | -------------------------- |
+| Community          | Visible                | —                          |
+| Building           | Visible if approved    | Source value               |
+| Unit number        | Not visible            | Owner/Admin only           |
+| Asking price       | Visible                | Change history             |
+| Ownership document | Not visible            | Metadata only              |
+| Permit result      | Public-safe demo label | Internal simulation record |
 
 Mobile uses stacked field groups.
 
@@ -2150,28 +2150,28 @@ Never include bulk:
 
 # 36. Loading, Empty, Error and Conflict States
 
-| Context | State and copy |
-|---|---|
-| Dashboard loading | Metric and queue skeletons; announce `Loading operational overview.` |
-| Partial dashboard failure | `Some operational information could not be loaded.` |
-| Search loading | Inline results skeleton; preserve query |
-| No search results | `No matching records.` |
-| Customer unavailable | `This customer record is not available.` |
-| Listing unavailable | `This listing is not available or you do not have permission to view it.` |
-| Publication loading | Preview/checklist skeleton |
-| Publication conflict | `Publication review already completed.` |
-| Offer unavailable | `This offer is not available.` |
-| Transaction unavailable | `This transaction is not available.` |
-| Document access loading | `Preparing secure document view…` |
-| Signed link failure | `We could not create a secure document view.` |
-| Retry failure | `The system step could not be retried. Review the latest status before trying again.` |
-| Action pending | Progressive button label and disabled repeat |
-| Action completed | Result banner with audit note |
-| Action conflict | `This record changed before your action completed.` |
-| Realtime disconnected | Non-blocking stale banner + Refresh |
-| Session expired | Existing Admin sign-in with safe return |
-| Permission denied | Capability-specific safe state |
-| Generic failure | `We could not complete this operational action.` |
+| Context                   | State and copy                                                                        |
+| ------------------------- | ------------------------------------------------------------------------------------- |
+| Dashboard loading         | Metric and queue skeletons; announce `Loading operational overview.`                  |
+| Partial dashboard failure | `Some operational information could not be loaded.`                                   |
+| Search loading            | Inline results skeleton; preserve query                                               |
+| No search results         | `No matching records.`                                                                |
+| Customer unavailable      | `This customer record is not available.`                                              |
+| Listing unavailable       | `This listing is not available or you do not have permission to view it.`             |
+| Publication loading       | Preview/checklist skeleton                                                            |
+| Publication conflict      | `Publication review already completed.`                                               |
+| Offer unavailable         | `This offer is not available.`                                                        |
+| Transaction unavailable   | `This transaction is not available.`                                                  |
+| Document access loading   | `Preparing secure document view…`                                                     |
+| Signed link failure       | `We could not create a secure document view.`                                         |
+| Retry failure             | `The system step could not be retried. Review the latest status before trying again.` |
+| Action pending            | Progressive button label and disabled repeat                                          |
+| Action completed          | Result banner with audit note                                                         |
+| Action conflict           | `This record changed before your action completed.`                                   |
+| Realtime disconnected     | Non-blocking stale banner + Refresh                                                   |
+| Session expired           | Existing Admin sign-in with safe return                                               |
+| Permission denied         | Capability-specific safe state                                                        |
+| Generic failure           | `We could not complete this operational action.`                                      |
 
 Never render blank screens or raw technical error bodies.
 
@@ -2181,77 +2181,77 @@ Never render blank screens or raw technical error bodies.
 
 Every component uses shared MARKAZ tokens and logical CSS properties.
 
-| Component | Purpose / anatomy | Variants and states | Behaviour, permission, accessibility, responsive and RTL |
-|---|---|---|---|
-| Admin Application Shell | Sidebar, header, main, utility region | Expanded, collapsed, mobile | Landmarks; skip link; mirrored RTL; capability-filtered nav |
-| Admin Sidebar | Primary operations navigation | Expanded/collapsed, badges | `aria-current`; tooltip labels; mobile sheet reuse |
-| Admin Header | Page context, global search, notifications, account | Desktop/mobile | Search shortcut; logical placement; sticky only if content remains usable |
-| Global Search | Query field and grouped results | Loading, results, empty, error | Combobox semantics; keyboard navigation; LTR references |
-| Action-Needed Badge | Authoritative unresolved count | Zero/number/99+ | Accessible count label; not tied to unread state |
-| Operational Metric Card | Count, context, destination | Standard/attention/partial | No vanity charts; link has descriptive label |
-| Queue Card | Queue name, count, preview rows | Empty/loading/error | Refetch on Realtime; mobile full-width |
-| Filter Bar | Search, filters, clear | Desktop toolbar/mobile sheet | Labels persistent; URL state; RTL ordering |
-| Filter Chip | Active filter summary and remove | Default/focus | Remove button labelled; logical close icon |
-| Admin Data Table | Structured operational records | Loading/empty/partial | Semantic table; sortable headers; mobile card transform |
-| Responsive Record Card | Mobile equivalent of table row | Default/attention/closed | Clear heading and one primary action |
-| Status Badge | Short state label | Info/attention/failed/complete/neutral | Text + icon; no colour-only meaning |
-| Attention Indicator | Explains why action is needed | Warning/failure/follow-up | Tooltip not sole explanation |
-| Entity Summary Header | Identity, state, facts, primary action | Customer/listing/offer/transaction | One `h1`; compact mobile arrangement |
-| Customer Summary | Name, safe email, status, counts | Active/restricted | No personal identity overreach |
-| Listing Summary | Cover, location, state, owner | Draft/live/paused/sold-demo | Image alt; public link where safe |
-| Offer Summary | Property, current amount, state, next actor | Active/accepted/closed | Amount LTR in RTL; read-only Admin default |
-| Transaction Summary | Reference, property, participants, stage | Active/failed/completed | Immutable facts visually separated |
-| Verification Summary | Type, outcome, attempts, entity | Pending/failed/completed/superseded | Simulation badge required |
-| Public/Private Data Section | Separates field visibility | Public/owner/Admin | Clear headings; stacked mobile |
-| Admin Note Panel | Note list and add form | Empty/follow-up/correction | Separate from audit; privacy warning |
-| Add-Note Form | Category, content, follow-up | Valid/error/submitting | 1,000-char count; reason association |
-| Entity Activity Timeline | Filtered immutable events | Loading/earlier events | List semantics; newest first in Admin |
-| Audit Event Row | Time, actor, event, entity, result | Success/failure/partial | Read-only; safe metadata |
-| Publication Checklist | Eligibility rows | Pass/fail/warning | Text and icon; links to evidence |
-| Review Action Panel | Review state, consequences, actions | Approve/return/retry/resolved | Sticky desktop; sheet mobile; capability gating |
-| Return-for-Changes Dialog | Reason, customer summary, Admin note | Validation/loading/conflict | Focus trap; preview customer copy |
-| Pause Confirmation Dialog | Consequences, reason, notification | Listing/transaction | Explicit impact; no generic state dropdown |
-| Resume Confirmation Dialog | Eligibility and result | Listing/transaction | Disabled if server eligibility fails |
-| Document Metadata Row | Safe file metadata and access | Available/processing/removed | No path; access capability check |
-| Private-Document Access Dialog | Purpose, warning, checkbox | Ready/loading/error | Reason required; focus trap; access audited |
-| Retry System-Step Dialog | Failure context and retry action | Publication/verification/transaction | Retry-safe only; no customer task completion |
-| Mark-Failed Dialog | Reason and customer effect | Transaction only | Consequential red restrained; explicit irreversibility |
-| Admin Reason Selector | Approved categories | Required/invalid | Radio/select with helper; no hidden default |
-| Admin Action Result Banner | Result and secondary issue | Success/partial/failure | Focus after navigation; linked audit event optional |
-| Realtime Queue Indicator | Connection state | Reconnecting/stale/recovered | Hidden healthy; polite announcements |
-| Access-Denied State | Blocks customer or missing capability | Account/capability | No protected content rendered first |
-| Mobile Admin Navigation | Full-height navigation sheet | Open/closed | Focus trap; safe-area; mirrors RTL |
+| Component                      | Purpose / anatomy                                   | Variants and states                    | Behaviour, permission, accessibility, responsive and RTL                  |
+| ------------------------------ | --------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------- |
+| Admin Application Shell        | Sidebar, header, main, utility region               | Expanded, collapsed, mobile            | Landmarks; skip link; mirrored RTL; capability-filtered nav               |
+| Admin Sidebar                  | Primary operations navigation                       | Expanded/collapsed, badges             | `aria-current`; tooltip labels; mobile sheet reuse                        |
+| Admin Header                   | Page context, global search, notifications, account | Desktop/mobile                         | Search shortcut; logical placement; sticky only if content remains usable |
+| Global Search                  | Query field and grouped results                     | Loading, results, empty, error         | Combobox semantics; keyboard navigation; LTR references                   |
+| Action-Needed Badge            | Authoritative unresolved count                      | Zero/number/99+                        | Accessible count label; not tied to unread state                          |
+| Operational Metric Card        | Count, context, destination                         | Standard/attention/partial             | No vanity charts; link has descriptive label                              |
+| Queue Card                     | Queue name, count, preview rows                     | Empty/loading/error                    | Refetch on Realtime; mobile full-width                                    |
+| Filter Bar                     | Search, filters, clear                              | Desktop toolbar/mobile sheet           | Labels persistent; URL state; RTL ordering                                |
+| Filter Chip                    | Active filter summary and remove                    | Default/focus                          | Remove button labelled; logical close icon                                |
+| Admin Data Table               | Structured operational records                      | Loading/empty/partial                  | Semantic table; sortable headers; mobile card transform                   |
+| Responsive Record Card         | Mobile equivalent of table row                      | Default/attention/closed               | Clear heading and one primary action                                      |
+| Status Badge                   | Short state label                                   | Info/attention/failed/complete/neutral | Text + icon; no colour-only meaning                                       |
+| Attention Indicator            | Explains why action is needed                       | Warning/failure/follow-up              | Tooltip not sole explanation                                              |
+| Entity Summary Header          | Identity, state, facts, primary action              | Customer/listing/offer/transaction     | One `h1`; compact mobile arrangement                                      |
+| Customer Summary               | Name, safe email, status, counts                    | Active/restricted                      | No personal identity overreach                                            |
+| Listing Summary                | Cover, location, state, owner                       | Draft/live/paused/sold-demo            | Image alt; public link where safe                                         |
+| Offer Summary                  | Property, current amount, state, next actor         | Active/accepted/closed                 | Amount LTR in RTL; read-only Admin default                                |
+| Transaction Summary            | Reference, property, participants, stage            | Active/failed/completed                | Immutable facts visually separated                                        |
+| Verification Summary           | Type, outcome, attempts, entity                     | Pending/failed/completed/superseded    | Simulation badge required                                                 |
+| Public/Private Data Section    | Separates field visibility                          | Public/owner/Admin                     | Clear headings; stacked mobile                                            |
+| Admin Note Panel               | Note list and add form                              | Empty/follow-up/correction             | Separate from audit; privacy warning                                      |
+| Add-Note Form                  | Category, content, follow-up                        | Valid/error/submitting                 | 1,000-char count; reason association                                      |
+| Entity Activity Timeline       | Filtered immutable events                           | Loading/earlier events                 | List semantics; newest first in Admin                                     |
+| Audit Event Row                | Time, actor, event, entity, result                  | Success/failure/partial                | Read-only; safe metadata                                                  |
+| Publication Checklist          | Eligibility rows                                    | Pass/fail/warning                      | Text and icon; links to evidence                                          |
+| Review Action Panel            | Review state, consequences, actions                 | Approve/return/retry/resolved          | Sticky desktop; sheet mobile; capability gating                           |
+| Return-for-Changes Dialog      | Reason, customer summary, Admin note                | Validation/loading/conflict            | Focus trap; preview customer copy                                         |
+| Pause Confirmation Dialog      | Consequences, reason, notification                  | Listing/transaction                    | Explicit impact; no generic state dropdown                                |
+| Resume Confirmation Dialog     | Eligibility and result                              | Listing/transaction                    | Disabled if server eligibility fails                                      |
+| Document Metadata Row          | Safe file metadata and access                       | Available/processing/removed           | No path; access capability check                                          |
+| Private-Document Access Dialog | Purpose, warning, checkbox                          | Ready/loading/error                    | Reason required; focus trap; access audited                               |
+| Retry System-Step Dialog       | Failure context and retry action                    | Publication/verification/transaction   | Retry-safe only; no customer task completion                              |
+| Mark-Failed Dialog             | Reason and customer effect                          | Transaction only                       | Consequential red restrained; explicit irreversibility                    |
+| Admin Reason Selector          | Approved categories                                 | Required/invalid                       | Radio/select with helper; no hidden default                               |
+| Admin Action Result Banner     | Result and secondary issue                          | Success/partial/failure                | Focus after navigation; linked audit event optional                       |
+| Realtime Queue Indicator       | Connection state                                    | Reconnecting/stale/recovered           | Hidden healthy; polite announcements                                      |
+| Access-Denied State            | Blocks customer or missing capability               | Account/capability                     | No protected content rendered first                                       |
+| Mobile Admin Navigation        | Full-height navigation sheet                        | Open/closed                            | Focus trap; safe-area; mirrors RTL                                        |
 
 ---
 
 # 38. Validation Matrix
 
-| Screen | Field/action | Rule | Trigger | English message | Placement | Clear condition | Blocking? | Capability | Arabic review |
-|---|---|---|---|---|---|---|---:|---|---|
-| Search | Customer not found | No accessible match | Submit/results | `No matching customer record was found.` | Results state | New query | No | Relevant view | Language |
-| Customer | Restrict active status | Only ACTIVE → RESTRICTED | Confirm | `Customer actions are already restricted.` | Dialog alert | Refresh | Yes | MANAGE_CUSTOMER_STATUS | Language |
-| Customer | Restore not allowed | Must be restricted | Confirm | `This customer does not currently have an action restriction.` | Dialog | Refresh | Yes | MANAGE_CUSTOMER_STATUS | Language |
-| Listing | State changed | Expected version/state | Action | `The listing state changed before this action completed.` | Page alert | Refresh | Yes | Action capability | Language |
-| Publication | Checklist incomplete | Server checklist pass | Approve | `Complete or resolve the failed publication checks before approval.` | Review panel | Checks pass | Yes | REVIEW_PUBLICATION | Language |
-| Publication | Already resolved | Pending only | Approve/return | `This publication review has already been resolved.` | Page alert | Refresh | Yes | REVIEW_PUBLICATION | Language |
-| Publication | Photo retry failed | Retryable preparation | Retry result | `Public-photo preparation failed again. The listing remains unavailable.` | Result banner | Later success | Yes | REVIEW_PUBLICATION | Language |
-| Publication | Reason missing | Return requires category | Submit | `Select a reason for returning this listing.` | Under selector | Reason selected | Yes | REVIEW_PUBLICATION | Language + compliance |
-| Listing | Pause conflict | Must be LIVE | Confirm | `This listing can no longer be paused from its current state.` | Dialog alert | Refresh | Yes | MANAGE_LISTING_AVAILABILITY | Language |
-| Listing | Resume invalid | Eligibility required | Confirm | `Resolve the listing requirements before resuming it.` | Dialog + checklist | Eligible | Yes | MANAGE_LISTING_AVAILABILITY | Language |
-| Offer | Terminal | Operational close active-only | Confirm | `This offer thread is already closed.` | Dialog | Refresh | Yes | CLOSE_INVALID_OFFER | Language |
-| Offer | Owner mismatch | Related listing ownership invalid | Load/action | `The offer relationship could not be verified.` | Safe error panel | Data corrected | Yes | VIEW_OFFERS | Security + language |
-| Transaction | State changed | Expected version | Action | `The transaction progressed before this action completed.` | Page alert | Refresh | Yes | Recovery capability | Language |
-| Transaction | Retry not allowed | System task retryable | Open/confirm | `This step cannot be retried from the current transaction state.` | Dialog | Valid state | Yes | MANAGE_TRANSACTION_RECOVERY | Language |
-| Transaction | Completion missing | Required tasks complete | Resolve | `Required participant and system tasks are still incomplete.` | Milestone panel | Complete | Yes | MANAGE_TRANSACTION_RECOVERY | Language |
-| Cancellation | Already resolved | Pending only | Resolve | `This cancellation has already been resolved.` | Dialog alert | Refresh | Yes | MANAGE_TRANSACTION_RECOVERY | Language |
-| Document | Unavailable | File exists and permitted | Open | `This document is no longer available.` | Metadata row/panel | New document | Yes | ACCESS_PRIVATE_DOCUMENT | Security + language |
-| Document | Access reason missing | Reason required | Submit | `Select an operational reason for accessing this document.` | Under selector | Selected | Yes | ACCESS_PRIVATE_DOCUMENT | Compliance + language |
-| Note | Empty | 3–1,000 chars | Submit | `Enter an Admin note.` | Under field | Valid note | Yes | ADD_ADMIN_NOTES | Language |
-| Note | Too long | ≤1,000 chars | Input/submit | `Admin note must be 1,000 characters or fewer.` | Under field | Within max | Yes | ADD_ADMIN_NOTES | Language |
-| Any action | Capability missing | Capability required | Open/server response | `Your Admin account does not have permission to perform this action.` | Permission panel | Capability granted | Yes | Varies | Security + language |
-| Any action | Session expired | Valid Admin session | Request | `Your Admin session has expired. Sign in again to continue.` | Session notice | Sign in | Yes | N/A | Security + language |
-| Realtime | Disconnected | Connection unavailable | Connection event | `Live updates are delayed. Refresh to confirm the latest state.` | Page banner | Reconnected | No | View capability | Language |
-| Any action | Stale two-tab action | Version mismatch | Mutation | `Another action was completed first. Review the latest state.` | Result alert | Refresh | Yes | Varies | Language |
+| Screen       | Field/action           | Rule                              | Trigger              | English message                                                           | Placement          | Clear condition    | Blocking? | Capability                  | Arabic review         |
+| ------------ | ---------------------- | --------------------------------- | -------------------- | ------------------------------------------------------------------------- | ------------------ | ------------------ | --------: | --------------------------- | --------------------- |
+| Search       | Customer not found     | No accessible match               | Submit/results       | `No matching customer record was found.`                                  | Results state      | New query          |        No | Relevant view               | Language              |
+| Customer     | Restrict active status | Only ACTIVE → RESTRICTED          | Confirm              | `Customer actions are already restricted.`                                | Dialog alert       | Refresh            |       Yes | MANAGE_CUSTOMER_STATUS      | Language              |
+| Customer     | Restore not allowed    | Must be restricted                | Confirm              | `This customer does not currently have an action restriction.`            | Dialog             | Refresh            |       Yes | MANAGE_CUSTOMER_STATUS      | Language              |
+| Listing      | State changed          | Expected version/state            | Action               | `The listing state changed before this action completed.`                 | Page alert         | Refresh            |       Yes | Action capability           | Language              |
+| Publication  | Checklist incomplete   | Server checklist pass             | Approve              | `Complete or resolve the failed publication checks before approval.`      | Review panel       | Checks pass        |       Yes | REVIEW_PUBLICATION          | Language              |
+| Publication  | Already resolved       | Pending only                      | Approve/return       | `This publication review has already been resolved.`                      | Page alert         | Refresh            |       Yes | REVIEW_PUBLICATION          | Language              |
+| Publication  | Photo retry failed     | Retryable preparation             | Retry result         | `Public-photo preparation failed again. The listing remains unavailable.` | Result banner      | Later success      |       Yes | REVIEW_PUBLICATION          | Language              |
+| Publication  | Reason missing         | Return requires category          | Submit               | `Select a reason for returning this listing.`                             | Under selector     | Reason selected    |       Yes | REVIEW_PUBLICATION          | Language + compliance |
+| Listing      | Pause conflict         | Must be LIVE                      | Confirm              | `This listing can no longer be paused from its current state.`            | Dialog alert       | Refresh            |       Yes | MANAGE_LISTING_AVAILABILITY | Language              |
+| Listing      | Resume invalid         | Eligibility required              | Confirm              | `Resolve the listing requirements before resuming it.`                    | Dialog + checklist | Eligible           |       Yes | MANAGE_LISTING_AVAILABILITY | Language              |
+| Offer        | Terminal               | Operational close active-only     | Confirm              | `This offer thread is already closed.`                                    | Dialog             | Refresh            |       Yes | CLOSE_INVALID_OFFER         | Language              |
+| Offer        | Owner mismatch         | Related listing ownership invalid | Load/action          | `The offer relationship could not be verified.`                           | Safe error panel   | Data corrected     |       Yes | VIEW_OFFERS                 | Security + language   |
+| Transaction  | State changed          | Expected version                  | Action               | `The transaction progressed before this action completed.`                | Page alert         | Refresh            |       Yes | Recovery capability         | Language              |
+| Transaction  | Retry not allowed      | System task retryable             | Open/confirm         | `This step cannot be retried from the current transaction state.`         | Dialog             | Valid state        |       Yes | MANAGE_TRANSACTION_RECOVERY | Language              |
+| Transaction  | Completion missing     | Required tasks complete           | Resolve              | `Required participant and system tasks are still incomplete.`             | Milestone panel    | Complete           |       Yes | MANAGE_TRANSACTION_RECOVERY | Language              |
+| Cancellation | Already resolved       | Pending only                      | Resolve              | `This cancellation has already been resolved.`                            | Dialog alert       | Refresh            |       Yes | MANAGE_TRANSACTION_RECOVERY | Language              |
+| Document     | Unavailable            | File exists and permitted         | Open                 | `This document is no longer available.`                                   | Metadata row/panel | New document       |       Yes | ACCESS_PRIVATE_DOCUMENT     | Security + language   |
+| Document     | Access reason missing  | Reason required                   | Submit               | `Select an operational reason for accessing this document.`               | Under selector     | Selected           |       Yes | ACCESS_PRIVATE_DOCUMENT     | Compliance + language |
+| Note         | Empty                  | 3–1,000 chars                     | Submit               | `Enter an Admin note.`                                                    | Under field        | Valid note         |       Yes | ADD_ADMIN_NOTES             | Language              |
+| Note         | Too long               | ≤1,000 chars                      | Input/submit         | `Admin note must be 1,000 characters or fewer.`                           | Under field        | Within max         |       Yes | ADD_ADMIN_NOTES             | Language              |
+| Any action   | Capability missing     | Capability required               | Open/server response | `Your Admin account does not have permission to perform this action.`     | Permission panel   | Capability granted |       Yes | Varies                      | Security + language   |
+| Any action   | Session expired        | Valid Admin session               | Request              | `Your Admin session has expired. Sign in again to continue.`              | Session notice     | Sign in            |       Yes | N/A                         | Security + language   |
+| Realtime     | Disconnected           | Connection unavailable            | Connection event     | `Live updates are delayed. Refresh to confirm the latest state.`          | Page banner        | Reconnected        |        No | View capability             | Language              |
+| Any action   | Stale two-tab action   | Version mismatch                  | Mutation             | `Another action was completed first. Review the latest state.`            | Result alert       | Refresh            |       Yes | Varies                      | Language              |
 
 ---
 
@@ -2288,17 +2288,17 @@ Every component uses shared MARKAZ tokens and logical CSS properties.
 
 ## 39.4 Maximum widths
 
-| Screen | Max width |
-|---|---:|
-| Dashboard | 1600 px |
-| List/table pages | 1600 px |
-| Customer detail | 1440 px |
-| Listing detail | 1520 px |
-| Publication review | 1480 px |
-| Offer detail | 1440 px |
-| Transaction detail | 1560 px |
-| Audit log | 1600 px |
-| Focused error/access state | 560 px |
+| Screen                     | Max width |
+| -------------------------- | --------: |
+| Dashboard                  |   1600 px |
+| List/table pages           |   1600 px |
+| Customer detail            |   1440 px |
+| Listing detail             |   1520 px |
+| Publication review         |   1480 px |
+| Offer detail               |   1440 px |
+| Transaction detail         |   1560 px |
+| Audit log                  |   1600 px |
+| Focused error/access state |    560 px |
 
 ## 39.5 Touch and safe areas
 
@@ -2559,150 +2559,150 @@ A consequential operation must not be presented as fully successful if its requi
 
 ## 44.1 Foundation
 
-| Key | English |
-|---|---|
-| `admin.brand` | MARKAZ Operations |
-| `admin.overview.title` | Operations overview |
-| `admin.overview.description` | Review operational activity and records that need attention. |
-| `admin.refresh` | Refresh |
-| `admin.updated` | Updated just now |
-| `admin.search.placeholder` | Search customers, listings, offers or transactions |
-| `admin.accessDenied.title` | Access denied |
-| `admin.accessDenied.body` | This account does not have permission to access MARKAZ Operations. |
-| `admin.permission.title` | Permission required |
-| `admin.permission.body` | Your Admin account can view this record but cannot perform this action. |
+| Key                          | English                                                                 |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| `admin.brand`                | MARKAZ Operations                                                       |
+| `admin.overview.title`       | Operations overview                                                     |
+| `admin.overview.description` | Review operational activity and records that need attention.            |
+| `admin.refresh`              | Refresh                                                                 |
+| `admin.updated`              | Updated just now                                                        |
+| `admin.search.placeholder`   | Search customers, listings, offers or transactions                      |
+| `admin.accessDenied.title`   | Access denied                                                           |
+| `admin.accessDenied.body`    | This account does not have permission to access MARKAZ Operations.      |
+| `admin.permission.title`     | Permission required                                                     |
+| `admin.permission.body`      | Your Admin account can view this record but cannot perform this action. |
 
 ## 44.2 Queues and empty states
 
-| Key | English |
-|---|---|
-| `queue.publication` | Publication reviews pending |
-| `queue.publicationFailed` | Failed publication attempts |
-| `queue.transaction` | Transactions blocked or failed |
-| `queue.verification` | Verification failures |
-| `queue.pausedListings` | Listings paused by Admin |
-| `queue.empty` | No records currently need attention. |
-| `search.emptyTitle` | No matching records |
-| `search.emptyBody` | Check the spelling, use a full reference, or try a broader search. |
+| Key                       | English                                                            |
+| ------------------------- | ------------------------------------------------------------------ |
+| `queue.publication`       | Publication reviews pending                                        |
+| `queue.publicationFailed` | Failed publication attempts                                        |
+| `queue.transaction`       | Transactions blocked or failed                                     |
+| `queue.verification`      | Verification failures                                              |
+| `queue.pausedListings`    | Listings paused by Admin                                           |
+| `queue.empty`             | No records currently need attention.                               |
+| `search.emptyTitle`       | No matching records                                                |
+| `search.emptyBody`        | Check the spelling, use a full reference, or try a broader search. |
 
 ## 44.3 Customers
 
-| Key | English |
-|---|---|
-| `customers.title` | Customers |
-| `customers.search` | Search customers |
-| `customer.status.active` | Active |
-| `customer.status.restricted` | Actions restricted |
-| `customer.restrict.title` | Restrict customer actions? |
-| `customer.restrict.body` | The customer will still be able to sign in and view existing records, but they will not be able to create listings, publish listings, or take part in offer negotiations until access is restored. |
-| `customer.restrict.action` | Restrict actions |
-| `customer.restore.title` | Restore customer actions? |
-| `customer.restore.body` | The customer will be able to create listings and participate in offers again. Existing listing and transaction states will not change automatically. |
-| `customer.restore.action` | Restore actions |
-| `customer.restricted.customerTitle` | Some account actions are temporarily unavailable |
-| `customer.restricted.customerBody` | You can still view your existing records and complete permitted transaction steps. Contact MARKAZ support for assistance. |
+| Key                                 | English                                                                                                                                                                                            |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `customers.title`                   | Customers                                                                                                                                                                                          |
+| `customers.search`                  | Search customers                                                                                                                                                                                   |
+| `customer.status.active`            | Active                                                                                                                                                                                             |
+| `customer.status.restricted`        | Actions restricted                                                                                                                                                                                 |
+| `customer.restrict.title`           | Restrict customer actions?                                                                                                                                                                         |
+| `customer.restrict.body`            | The customer will still be able to sign in and view existing records, but they will not be able to create listings, publish listings, or take part in offer negotiations until access is restored. |
+| `customer.restrict.action`          | Restrict actions                                                                                                                                                                                   |
+| `customer.restore.title`            | Restore customer actions?                                                                                                                                                                          |
+| `customer.restore.body`             | The customer will be able to create listings and participate in offers again. Existing listing and transaction states will not change automatically.                                               |
+| `customer.restore.action`           | Restore actions                                                                                                                                                                                    |
+| `customer.restricted.customerTitle` | Some account actions are temporarily unavailable                                                                                                                                                   |
+| `customer.restricted.customerBody`  | You can still view your existing records and complete permitted transaction steps. Contact MARKAZ support for assistance.                                                                          |
 
 ## 44.4 Notes
 
-| Key | English |
-|---|---|
-| `note.title` | Admin notes |
-| `note.add` | Add note |
-| `note.category` | Note category |
-| `note.label` | Operational note |
-| `note.privacy` | Do not include passwords, authentication tokens, payment details, identity numbers, or document contents. |
-| `note.empty` | No Admin notes have been added. |
+| Key             | English                                                                                                   |
+| --------------- | --------------------------------------------------------------------------------------------------------- |
+| `note.title`    | Admin notes                                                                                               |
+| `note.add`      | Add note                                                                                                  |
+| `note.category` | Note category                                                                                             |
+| `note.label`    | Operational note                                                                                          |
+| `note.privacy`  | Do not include passwords, authentication tokens, payment details, identity numbers, or document contents. |
+| `note.empty`    | No Admin notes have been added.                                                                           |
 
 ## 44.5 Listings and publication
 
-| Key | English |
-|---|---|
-| `listings.title` | Listings |
-| `listing.review` | Review listing |
-| `publication.title` | Publication review |
-| `publication.queueTitle` | Publication queue |
-| `publication.pending` | Awaiting review |
-| `publication.disclosureTitle` | Publication review simulated |
-| `publication.disclosureBody` | This prototype does not perform a real regulatory or legal publication review. |
-| `publication.approve` | Approve in demo |
-| `publication.approveTitle` | Approve this listing in demo? |
-| `publication.approveBody` | The property will become visible in the MARKAZ marketplace after public-photo preparation completes. |
-| `publication.return` | Return for changes |
-| `publication.returnTitle` | Return this listing for changes? |
-| `publication.returnBody` | The owner will be asked to update the selected areas before submitting again. |
-| `publication.retry` | Retry preparation |
-| `publication.retryTitle` | Retry publication preparation? |
-| `publication.retryBody` | MARKAZ will retry creating the public photo set. The listing will remain unavailable until every required photograph is ready. |
-| `listing.pause` | Pause listing |
-| `listing.pauseTitle` | Pause this listing? |
-| `listing.resume` | Resume listing |
-| `listing.resumeTitle` | Resume this listing? |
-| `listing.blocked` | Publication blocked |
+| Key                           | English                                                                                                                        |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `listings.title`              | Listings                                                                                                                       |
+| `listing.review`              | Review listing                                                                                                                 |
+| `publication.title`           | Publication review                                                                                                             |
+| `publication.queueTitle`      | Publication queue                                                                                                              |
+| `publication.pending`         | Awaiting review                                                                                                                |
+| `publication.disclosureTitle` | Publication review simulated                                                                                                   |
+| `publication.disclosureBody`  | This prototype does not perform a real regulatory or legal publication review.                                                 |
+| `publication.approve`         | Approve in demo                                                                                                                |
+| `publication.approveTitle`    | Approve this listing in demo?                                                                                                  |
+| `publication.approveBody`     | The property will become visible in the MARKAZ marketplace after public-photo preparation completes.                           |
+| `publication.return`          | Return for changes                                                                                                             |
+| `publication.returnTitle`     | Return this listing for changes?                                                                                               |
+| `publication.returnBody`      | The owner will be asked to update the selected areas before submitting again.                                                  |
+| `publication.retry`           | Retry preparation                                                                                                              |
+| `publication.retryTitle`      | Retry publication preparation?                                                                                                 |
+| `publication.retryBody`       | MARKAZ will retry creating the public photo set. The listing will remain unavailable until every required photograph is ready. |
+| `listing.pause`               | Pause listing                                                                                                                  |
+| `listing.pauseTitle`          | Pause this listing?                                                                                                            |
+| `listing.resume`              | Resume listing                                                                                                                 |
+| `listing.resumeTitle`         | Resume this listing?                                                                                                           |
+| `listing.blocked`             | Publication blocked                                                                                                            |
 
 ## 44.6 Verification and documents
 
-| Key | English |
-|---|---|
-| `verification.title` | Verifications |
-| `verification.failed` | Failed in demo |
-| `verification.retry` | Retry simulated check |
-| `verification.disclosure` | This is a prototype simulation and not an official verification. |
-| `document.metadata` | Document metadata |
-| `document.view` | View private document |
-| `document.accessTitle` | View private document? |
-| `document.accessBody` | Access is temporary and will be recorded. View this file only for the selected operational purpose. |
+| Key                       | English                                                                                             |
+| ------------------------- | --------------------------------------------------------------------------------------------------- |
+| `verification.title`      | Verifications                                                                                       |
+| `verification.failed`     | Failed in demo                                                                                      |
+| `verification.retry`      | Retry simulated check                                                                               |
+| `verification.disclosure` | This is a prototype simulation and not an official verification.                                    |
+| `document.metadata`       | Document metadata                                                                                   |
+| `document.view`           | View private document                                                                               |
+| `document.accessTitle`    | View private document?                                                                              |
+| `document.accessBody`     | Access is temporary and will be recorded. View this file only for the selected operational purpose. |
 | `document.accessCheckbox` | I understand that this document may contain private information and that my access will be audited. |
-| `document.open` | Open secure view |
-| `document.expiredTitle` | Secure document access has expired |
-| `document.expiredBody` | Request a new temporary view if you still need this document for an authorised operational purpose. |
+| `document.open`           | Open secure view                                                                                    |
+| `document.expiredTitle`   | Secure document access has expired                                                                  |
+| `document.expiredBody`    | Request a new temporary view if you still need this document for an authorised operational purpose. |
 
 ## 44.7 Offers
 
-| Key | English |
-|---|---|
-| `adminOffers.title` | Offer oversight |
-| `adminOffers.description` | Review negotiation state and related operational records. |
-| `adminOffers.close` | Close invalid thread |
-| `adminOffers.closeTitle` | Close this offer thread? |
-| `adminOffers.closeBody` | The negotiation will become non-actionable. Proposal history and audit records will remain unchanged. |
-| `adminOffers.readOnly` | Offer negotiation is read-only in MARKAZ Operations. |
+| Key                       | English                                                                                               |
+| ------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `adminOffers.title`       | Offer oversight                                                                                       |
+| `adminOffers.description` | Review negotiation state and related operational records.                                             |
+| `adminOffers.close`       | Close invalid thread                                                                                  |
+| `adminOffers.closeTitle`  | Close this offer thread?                                                                              |
+| `adminOffers.closeBody`   | The negotiation will become non-actionable. Proposal history and audit records will remain unchanged. |
+| `adminOffers.readOnly`    | Offer negotiation is read-only in MARKAZ Operations.                                                  |
 
 ## 44.8 Transactions
 
-| Key | English |
-|---|---|
-| `adminTransactions.title` | Transactions |
-| `transaction.blocked` | Transaction blocked |
-| `transaction.retry` | Retry system step |
-| `transaction.retryTitle` | Retry this system step? |
-| `transaction.retryBody` | MARKAZ will retry the failed prototype process. Customer confirmations will not be changed. |
-| `transaction.pause` | Pause transaction progress |
-| `transaction.pauseTitle` | Pause transaction progress? |
-| `transaction.resume` | Resume transaction progress |
-| `transaction.resumeTitle` | Resume transaction progress? |
-| `transaction.markFailed` | Mark transaction failed |
-| `transaction.markFailedTitle` | Mark this transaction as failed? |
-| `transaction.markFailedBody` | The transaction will stop progressing. Participant records and history will remain available. |
-| `transaction.customerPausedTitle` | Transaction progress is temporarily paused |
-| `transaction.customerPausedBody` | Existing information remains available. MARKAZ Operations is reviewing the next step. |
-| `transaction.customerFailedTitle` | Transaction could not continue in this demo |
-| `transaction.customerFailedBody` | MARKAZ Operations has recorded an issue. No real payment or property transfer occurred. |
+| Key                               | English                                                                                       |
+| --------------------------------- | --------------------------------------------------------------------------------------------- |
+| `adminTransactions.title`         | Transactions                                                                                  |
+| `transaction.blocked`             | Transaction blocked                                                                           |
+| `transaction.retry`               | Retry system step                                                                             |
+| `transaction.retryTitle`          | Retry this system step?                                                                       |
+| `transaction.retryBody`           | MARKAZ will retry the failed prototype process. Customer confirmations will not be changed.   |
+| `transaction.pause`               | Pause transaction progress                                                                    |
+| `transaction.pauseTitle`          | Pause transaction progress?                                                                   |
+| `transaction.resume`              | Resume transaction progress                                                                   |
+| `transaction.resumeTitle`         | Resume transaction progress?                                                                  |
+| `transaction.markFailed`          | Mark transaction failed                                                                       |
+| `transaction.markFailedTitle`     | Mark this transaction as failed?                                                              |
+| `transaction.markFailedBody`      | The transaction will stop progressing. Participant records and history will remain available. |
+| `transaction.customerPausedTitle` | Transaction progress is temporarily paused                                                    |
+| `transaction.customerPausedBody`  | Existing information remains available. MARKAZ Operations is reviewing the next step.         |
+| `transaction.customerFailedTitle` | Transaction could not continue in this demo                                                   |
+| `transaction.customerFailedBody`  | MARKAZ Operations has recorded an issue. No real payment or property transfer occurred.       |
 
 ## 44.9 Audit and system
 
-| Key | English |
-|---|---|
-| `audit.title` | Audit log |
-| `audit.description` | Review immutable system, customer, and Admin activity. |
-| `realtime.reconnecting` | Reconnecting to operational updates… |
-| `realtime.stale` | Live updates are delayed. Refresh to confirm the latest operational state. |
-| `realtime.recovered` | Operational data is up to date. |
-| `error.staleTitle` | This record has changed |
-| `error.staleBody` | Another action was completed first. Review the latest state before continuing. |
-| `error.genericTitle` | Operational action could not be completed |
-| `error.genericBody` | Review the latest entity state and try again. |
-| `error.partialTitle` | Action completed with a notification issue |
-| `error.partialBody` | The entity state was updated. The customer notification could not be created and has been recorded for follow-up. |
+| Key                     | English                                                                                                           |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `audit.title`           | Audit log                                                                                                         |
+| `audit.description`     | Review immutable system, customer, and Admin activity.                                                            |
+| `realtime.reconnecting` | Reconnecting to operational updates…                                                                              |
+| `realtime.stale`        | Live updates are delayed. Refresh to confirm the latest operational state.                                        |
+| `realtime.recovered`    | Operational data is up to date.                                                                                   |
+| `error.staleTitle`      | This record has changed                                                                                           |
+| `error.staleBody`       | Another action was completed first. Review the latest state before continuing.                                    |
+| `error.genericTitle`    | Operational action could not be completed                                                                         |
+| `error.genericBody`     | Review the latest entity state and try again.                                                                     |
+| `error.partialTitle`    | Action completed with a notification issue                                                                        |
+| `error.partialBody`     | The entity state was updated. The customer notification could not be created and has been recorded for follow-up. |
 
 ---
 
@@ -2710,43 +2710,43 @@ A consequential operation must not be presented as fully successful if its requi
 
 **Status:** Draft only. Professional Arabic review is required. Compliance, legal, privacy, account restriction, document access, publication and transaction-failure wording require specialist review.
 
-| English | Draft Arabic | Review |
-|---|---|---|
-| MARKAZ Operations | عمليات MARKAZ | Brand + language |
-| Operations overview | نظرة عامة على العمليات | Language |
-| Customers | العملاء | Language |
-| Listings | العقارات المدرجة | Property + language |
-| Publication | النشر | Property + compliance |
-| Offers | العروض | Property + legal |
-| Transactions | المعاملات | Property + legal |
-| Verifications | عمليات التحقق | Compliance + language |
-| Audit log | سجل التدقيق | Compliance + language |
-| Search customers, listings, offers or transactions | ابحث عن العملاء أو العقارات أو العروض أو المعاملات | Language |
-| Access denied | تم رفض الوصول | Security + language |
-| Permission required | صلاحية إضافية مطلوبة | Security + language |
-| Actions restricted | الإجراءات مقيّدة | Compliance + language |
-| Restrict customer actions? | هل تريد تقييد إجراءات العميل؟ | Compliance + legal |
-| Restore customer actions? | هل تريد استعادة إجراءات العميل؟ | Compliance + legal |
-| Admin notes | ملاحظات الإدارة | Language |
-| Add note | إضافة ملاحظة | Language |
-| Publication review | مراجعة النشر | Property + compliance |
-| Publication review simulated | محاكاة مراجعة النشر | Compliance + legal |
-| Approve in demo | اعتماد ضمن العرض التجريبي | Compliance + language |
-| Return for changes | إعادة لإجراء تعديلات | Language |
-| Retry preparation | إعادة محاولة التجهيز | Language |
-| Pause listing | إيقاف عرض العقار مؤقتًا | Property + language |
-| Resume listing | استئناف عرض العقار | Property + language |
-| Failed in demo | فشل ضمن المحاكاة | Language |
-| View private document | عرض مستند خاص | Privacy + language |
-| Open secure view | فتح عرض آمن | Security + language |
-| Offer oversight | الإشراف على العروض | Legal + language |
-| Close invalid thread | إغلاق مسار عرض غير صالح | Product + legal |
-| Transaction blocked | المعاملة متوقفة | Legal + language |
-| Retry system step | إعادة محاولة خطوة النظام | Language |
-| Pause transaction progress | إيقاف تقدم المعاملة مؤقتًا | Legal + language |
-| Mark transaction failed | تسجيل تعذر استمرار المعاملة | Legal + language |
-| Reconnecting to operational updates… | جارٍ إعادة الاتصال بالتحديثات التشغيلية… | Language |
-| Operational action could not be completed | تعذر إكمال الإجراء التشغيلي | Language |
+| English                                            | Draft Arabic                                       | Review                |
+| -------------------------------------------------- | -------------------------------------------------- | --------------------- |
+| MARKAZ Operations                                  | عمليات MARKAZ                                      | Brand + language      |
+| Operations overview                                | نظرة عامة على العمليات                             | Language              |
+| Customers                                          | العملاء                                            | Language              |
+| Listings                                           | العقارات المدرجة                                   | Property + language   |
+| Publication                                        | النشر                                              | Property + compliance |
+| Offers                                             | العروض                                             | Property + legal      |
+| Transactions                                       | المعاملات                                          | Property + legal      |
+| Verifications                                      | عمليات التحقق                                      | Compliance + language |
+| Audit log                                          | سجل التدقيق                                        | Compliance + language |
+| Search customers, listings, offers or transactions | ابحث عن العملاء أو العقارات أو العروض أو المعاملات | Language              |
+| Access denied                                      | تم رفض الوصول                                      | Security + language   |
+| Permission required                                | صلاحية إضافية مطلوبة                               | Security + language   |
+| Actions restricted                                 | الإجراءات مقيّدة                                   | Compliance + language |
+| Restrict customer actions?                         | هل تريد تقييد إجراءات العميل؟                      | Compliance + legal    |
+| Restore customer actions?                          | هل تريد استعادة إجراءات العميل؟                    | Compliance + legal    |
+| Admin notes                                        | ملاحظات الإدارة                                    | Language              |
+| Add note                                           | إضافة ملاحظة                                       | Language              |
+| Publication review                                 | مراجعة النشر                                       | Property + compliance |
+| Publication review simulated                       | محاكاة مراجعة النشر                                | Compliance + legal    |
+| Approve in demo                                    | اعتماد ضمن العرض التجريبي                          | Compliance + language |
+| Return for changes                                 | إعادة لإجراء تعديلات                               | Language              |
+| Retry preparation                                  | إعادة محاولة التجهيز                               | Language              |
+| Pause listing                                      | إيقاف عرض العقار مؤقتًا                            | Property + language   |
+| Resume listing                                     | استئناف عرض العقار                                 | Property + language   |
+| Failed in demo                                     | فشل ضمن المحاكاة                                   | Language              |
+| View private document                              | عرض مستند خاص                                      | Privacy + language    |
+| Open secure view                                   | فتح عرض آمن                                        | Security + language   |
+| Offer oversight                                    | الإشراف على العروض                                 | Legal + language      |
+| Close invalid thread                               | إغلاق مسار عرض غير صالح                            | Product + legal       |
+| Transaction blocked                                | المعاملة متوقفة                                    | Legal + language      |
+| Retry system step                                  | إعادة محاولة خطوة النظام                           | Language              |
+| Pause transaction progress                         | إيقاف تقدم المعاملة مؤقتًا                         | Legal + language      |
+| Mark transaction failed                            | تسجيل تعذر استمرار المعاملة                        | Legal + language      |
+| Reconnecting to operational updates…               | جارٍ إعادة الاتصال بالتحديثات التشغيلية…           | Language              |
+| Operational action could not be completed          | تعذر إكمال الإجراء التشغيلي                        | Language              |
 
 Do not represent these translations as approved until reviewed.
 
@@ -2756,70 +2756,70 @@ Do not represent these translations as approved until reviewed.
 
 ## 46.1 Screen handoff table
 
-| Route | Screen | Capability | Entity/state | Sensitive data | Primary action | Loading / empty / errors | Transition / event | Key implementation notes |
-|---|---|---|---|---|---|---|---|---|
-| `/login` | Admin sign-in | None | No session | Credentials | Sign in | Generic auth states | Admin session | Reuse final auth spec; no signup |
-| `/access-denied` | Access denied | None | Non-Admin | None | Sign out | Static | None | Render before portal data |
-| `/overview` | Dashboard | VIEW_OVERVIEW | Mixed | Safe aggregates | Open queue | Partial failures | Realtime refetch | Counts authoritative |
-| `/search` | Global search | Relevant view | Mixed | Safe previews | Open result | Loading/empty/error | None | Permission-filtered grouping |
-| Global mobile | Mobile nav | Varies | N/A | None | Navigate | Open/closed | None | Full-height sheet |
-| `/customers` | Customer list | VIEW_CUSTOMERS | Mixed | Safe email | View customer | Loading/empty/error | None | Page pagination |
-| Customer filters | Filter sheet | VIEW_CUSTOMERS | Mixed | None | Apply filters | Validation | URL state | Mobile full sheet |
-| `/customers/[id]` | Customer profile | VIEW_CUSTOMERS | Active/restricted | Profile + related summaries | Contextual | Missing/forbidden | None | Sections/tabs |
-| Dialog | Restrict customer | MANAGE_CUSTOMER_STATUS | ACTIVE | Operational reason | Restrict actions | Validation/conflict | Restriction + notification + audit | Expected version |
-| Dialog | Restore customer | MANAGE_CUSTOMER_STATUS | RESTRICTED | Operational reason | Restore actions | Validation/conflict | Restore + notification + audit | No automatic listing transition |
-| Customer section | Admin notes | ADD_ADMIN_NOTES | Any | Admin-only note | Add note | Empty/validation | Note + audit | Append-only |
-| Customer section | Activity timeline | VIEW_AUDIT_LOGS or scoped view | Any | Safe events | Load earlier | Loading | None | Notes excluded |
-| `/listings` | Listing list | VIEW_LISTINGS | Mixed | Safe list fields | View listing | Loading/empty/error | None | No row mutation |
-| Listing filters | Filter sheet | VIEW_LISTINGS | Mixed | None | Apply | Validation | URL | Mobile cards |
-| `/listings/[id]` | Listing detail | VIEW_LISTINGS | Any | Public/owner/Admin zones | Contextual | Missing/error | None | Label visibility zones |
-| Listing section | Public/private comparison | VIEW_LISTINGS | Any | Private fields | None | Loading | None | Never in public route |
-| `/publication` | Publication queue | REVIEW_PUBLICATION | Pending/failed | Review summaries | Open review | Loading/empty | Realtime queue | Same request model |
-| `/publication/[id]` | Publication review | REVIEW_PUBLICATION | PENDING/failed | Private review data | Approve/return/retry | Conflict | Publication transition | Sticky action panel |
-| Dialog | Approve publication | REVIEW_PUBLICATION | Eligible PENDING | None extra | Approve in demo | Eligibility/conflict | LIVE + audit/notification | Canonical service |
-| Dialog | Return for changes | REVIEW_PUBLICATION | PENDING | Reason + note | Return | Validation/conflict | REJECTED_DEMO request outcome | Customer summary separate |
-| Review state | Photo-processing failure | REVIEW_PUBLICATION | Retryable failure | Safe category | Retry | Retry failure | New attempt/audit | No raw storage error |
-| Dialog | Retry publication | REVIEW_PUBLICATION | Retryable | None | Retry preparation | Loading/conflict | Pipeline retry | Idempotent |
-| Dialog | Pause listing | MANAGE_LISTING_AVAILABILITY | LIVE | Reason | Pause | Conflict | PAUSED + offers close | Explain effects |
-| Dialog | Resume listing | MANAGE_LISTING_AVAILABILITY | PAUSED eligible | Reason | Resume | Eligibility error | LIVE | Closed offers stay closed |
-| Listing state | Blocked | MANAGE_LISTING_AVAILABILITY | Non-live/review | Reason | Review block | Conflict | Block flag | Not arbitrary enum |
-| `/verifications` | Verification queue | VIEW_VERIFICATIONS | Mixed | Safe status | Open | Loading/empty | Realtime | Simulation labels |
-| `/verifications/[id]` | Verification detail | VIEW_VERIFICATIONS | Any | Safe metadata | Retry if allowed | Error/conflict | New attempt | Prior immutable |
-| Entity section | Ownership metadata | VIEW_PRIVATE_DOCUMENT_METADATA | Any | Metadata | Request view | Removed/unavailable | Access audit if opened | No path |
-| Entity section | Transaction-document metadata | VIEW_PRIVATE_DOCUMENT_METADATA | Any | Metadata | Request view | Processing/error | Access audit | Visibility category |
-| Dialog | Private document access | ACCESS_PRIVATE_DOCUMENT | Available | Document content after action | Open secure view | Reason/error | Access event | Five-minute URL |
-| State | Signed-link expired | ACCESS_PRIVATE_DOCUMENT | Expired | None | Request new view | Static | New access event | Never expose URL |
-| `/offers` | Offer list | VIEW_OFFERS | Mixed | Negotiation summaries | View offer | Loading/empty | Realtime | Read-only |
-| Offer filters | Filters | VIEW_OFFERS | Mixed | None | Apply | N/A | URL | No action ranking |
-| `/offers/[id]` | Offer detail | VIEW_OFFERS | Any | Participants/proposals | Related record | Missing/conflict | None | Allow-list projection |
-| Offer section | Proposal timeline | VIEW_OFFERS | Any | Amount/history | None | Loading | None | Immutable |
-| Offer detail | Accepted view | VIEW_OFFERS | ACCEPTED | Accepted amount | View transaction | Missing tx | None | No mutation |
-| Offer detail | Closed thread | VIEW_OFFERS | Terminal | Safe reason | Return | N/A | None | Read-only |
-| Dialog | Invalid close | CLOSE_INVALID_OFFER | Active inconsistent | Reason | Close thread | Conflict | CLOSED + audit/notification | Strict categories |
-| `/transactions` | Transaction list | VIEW_TRANSACTIONS | Mixed | Safe summaries | View transaction | Loading/empty | Realtime | Attention-first sort |
-| Transaction filters | Filters | VIEW_TRANSACTIONS | Mixed | None | Apply | N/A | URL | Mobile sheet |
-| `/transactions/[id]` | Transaction detail | VIEW_TRANSACTIONS | Any | Participant and workflow data | Contextual recovery | Missing/conflict | None | Immutable facts |
-| Transaction section | Current milestone | VIEW_TRANSACTIONS | Active | Tasks | None | Loading | None | Actor labels |
-| Transaction section | Buyer/seller tasks | VIEW_TRANSACTIONS | Active | Completion status | None | Partial | None | Admin cannot complete |
-| Transaction section | Documents | VIEW_PRIVATE_DOCUMENT_METADATA | Active | Metadata | Request view | Unavailable | Access | Privacy categories |
-| Transaction section | Deposit state | VIEW_TRANSACTIONS | Deposit | Demo amount/status | None | Failure | None | No real payment claims |
-| Transaction section | Cancellation pending | VIEW_TRANSACTIONS | Pending | Reason/status | Resolve conflict if allowed | Conflict | Canonical cancellation | No invented consent |
-| Transaction state | Failed | VIEW_TRANSACTIONS | FAILED | Safe failure | Review recovery | N/A | None | Customer-safe copy |
-| Dialog | Retry step | MANAGE_TRANSACTION_RECOVERY | Retryable | Failure category | Retry | Conflict/retry failure | Task attempt + audit | System tasks only |
-| Dialog | Pause transaction | MANAGE_TRANSACTION_RECOVERY | Active | Reason | Pause | Conflict | Operational pause | Participant access remains |
-| Dialog | Resume transaction | MANAGE_TRANSACTION_RECOVERY | Paused eligible | Reason | Resume | Eligibility | Progress resumes | No task completion |
-| Dialog | Mark failed | MANAGE_TRANSACTION_RECOVERY | Unrecoverable | Reason | Mark failed | Conflict | FAILED + notification/audit | Consequential |
-| Transaction state | Completed demo | VIEW_TRANSACTIONS | COMPLETED_DEMO | History | None | N/A | None | Read-only |
-| `/audit` | Global audit | VIEW_AUDIT_LOGS | Mixed | Approved metadata | Filter/open | Loading/empty | None | Read-only |
-| Audit filters | Filters | VIEW_AUDIT_LOGS | Mixed | None | Apply | Validation | URL | 30-day default |
-| `/audit/[id]` | Audit detail | VIEW_AUDIT_LOGS | Event | Safe metadata | Related entity | Missing | None | No raw payload |
-| Banner | Realtime disconnected | Any view | Stale | None | Refresh | Connection | Refetch | Non-blocking |
-| Alert | Stale Admin action | Action capability | Version conflict | None | Review latest | Conflict | None | Never replay automatically |
-| State | Permission denied | Missing capability | Any | None | Return | Static | None | No sensitive disclosure |
-| Boundary | Generic operational failure | Any | Any | Safe reference | Retry | Error | None | No stack trace |
-| RTL | Arabic dashboard | VIEW_OVERVIEW | Mixed | Safe | Queue navigation | Same states | None | Mirrored layout |
-| RTL | Arabic publication review | REVIEW_PUBLICATION | PENDING | Review data | Approve/return | Same | Same | Bidi-safe refs |
-| RTL | Arabic transaction detail | VIEW_TRANSACTIONS | Active | Workflow data | Recovery where allowed | Same | Same | Amounts and refs LTR |
+| Route                 | Screen                        | Capability                     | Entity/state        | Sensitive data                | Primary action              | Loading / empty / errors | Transition / event                 | Key implementation notes         |
+| --------------------- | ----------------------------- | ------------------------------ | ------------------- | ----------------------------- | --------------------------- | ------------------------ | ---------------------------------- | -------------------------------- |
+| `/login`              | Admin sign-in                 | None                           | No session          | Credentials                   | Sign in                     | Generic auth states      | Admin session                      | Reuse final auth spec; no signup |
+| `/access-denied`      | Access denied                 | None                           | Non-Admin           | None                          | Sign out                    | Static                   | None                               | Render before portal data        |
+| `/overview`           | Dashboard                     | VIEW_OVERVIEW                  | Mixed               | Safe aggregates               | Open queue                  | Partial failures         | Realtime refetch                   | Counts authoritative             |
+| `/search`             | Global search                 | Relevant view                  | Mixed               | Safe previews                 | Open result                 | Loading/empty/error      | None                               | Permission-filtered grouping     |
+| Global mobile         | Mobile nav                    | Varies                         | N/A                 | None                          | Navigate                    | Open/closed              | None                               | Full-height sheet                |
+| `/customers`          | Customer list                 | VIEW_CUSTOMERS                 | Mixed               | Safe email                    | View customer               | Loading/empty/error      | None                               | Page pagination                  |
+| Customer filters      | Filter sheet                  | VIEW_CUSTOMERS                 | Mixed               | None                          | Apply filters               | Validation               | URL state                          | Mobile full sheet                |
+| `/customers/[id]`     | Customer profile              | VIEW_CUSTOMERS                 | Active/restricted   | Profile + related summaries   | Contextual                  | Missing/forbidden        | None                               | Sections/tabs                    |
+| Dialog                | Restrict customer             | MANAGE_CUSTOMER_STATUS         | ACTIVE              | Operational reason            | Restrict actions            | Validation/conflict      | Restriction + notification + audit | Expected version                 |
+| Dialog                | Restore customer              | MANAGE_CUSTOMER_STATUS         | RESTRICTED          | Operational reason            | Restore actions             | Validation/conflict      | Restore + notification + audit     | No automatic listing transition  |
+| Customer section      | Admin notes                   | ADD_ADMIN_NOTES                | Any                 | Admin-only note               | Add note                    | Empty/validation         | Note + audit                       | Append-only                      |
+| Customer section      | Activity timeline             | VIEW_AUDIT_LOGS or scoped view | Any                 | Safe events                   | Load earlier                | Loading                  | None                               | Notes excluded                   |
+| `/listings`           | Listing list                  | VIEW_LISTINGS                  | Mixed               | Safe list fields              | View listing                | Loading/empty/error      | None                               | No row mutation                  |
+| Listing filters       | Filter sheet                  | VIEW_LISTINGS                  | Mixed               | None                          | Apply                       | Validation               | URL                                | Mobile cards                     |
+| `/listings/[id]`      | Listing detail                | VIEW_LISTINGS                  | Any                 | Public/owner/Admin zones      | Contextual                  | Missing/error            | None                               | Label visibility zones           |
+| Listing section       | Public/private comparison     | VIEW_LISTINGS                  | Any                 | Private fields                | None                        | Loading                  | None                               | Never in public route            |
+| `/publication`        | Publication queue             | REVIEW_PUBLICATION             | Pending/failed      | Review summaries              | Open review                 | Loading/empty            | Realtime queue                     | Same request model               |
+| `/publication/[id]`   | Publication review            | REVIEW_PUBLICATION             | PENDING/failed      | Private review data           | Approve/return/retry        | Conflict                 | Publication transition             | Sticky action panel              |
+| Dialog                | Approve publication           | REVIEW_PUBLICATION             | Eligible PENDING    | None extra                    | Approve in demo             | Eligibility/conflict     | LIVE + audit/notification          | Canonical service                |
+| Dialog                | Return for changes            | REVIEW_PUBLICATION             | PENDING             | Reason + note                 | Return                      | Validation/conflict      | REJECTED_DEMO request outcome      | Customer summary separate        |
+| Review state          | Photo-processing failure      | REVIEW_PUBLICATION             | Retryable failure   | Safe category                 | Retry                       | Retry failure            | New attempt/audit                  | No raw storage error             |
+| Dialog                | Retry publication             | REVIEW_PUBLICATION             | Retryable           | None                          | Retry preparation           | Loading/conflict         | Pipeline retry                     | Idempotent                       |
+| Dialog                | Pause listing                 | MANAGE_LISTING_AVAILABILITY    | LIVE                | Reason                        | Pause                       | Conflict                 | PAUSED + offers close              | Explain effects                  |
+| Dialog                | Resume listing                | MANAGE_LISTING_AVAILABILITY    | PAUSED eligible     | Reason                        | Resume                      | Eligibility error        | LIVE                               | Closed offers stay closed        |
+| Listing state         | Blocked                       | MANAGE_LISTING_AVAILABILITY    | Non-live/review     | Reason                        | Review block                | Conflict                 | Block flag                         | Not arbitrary enum               |
+| `/verifications`      | Verification queue            | VIEW_VERIFICATIONS             | Mixed               | Safe status                   | Open                        | Loading/empty            | Realtime                           | Simulation labels                |
+| `/verifications/[id]` | Verification detail           | VIEW_VERIFICATIONS             | Any                 | Safe metadata                 | Retry if allowed            | Error/conflict           | New attempt                        | Prior immutable                  |
+| Entity section        | Ownership metadata            | VIEW_PRIVATE_DOCUMENT_METADATA | Any                 | Metadata                      | Request view                | Removed/unavailable      | Access audit if opened             | No path                          |
+| Entity section        | Transaction-document metadata | VIEW_PRIVATE_DOCUMENT_METADATA | Any                 | Metadata                      | Request view                | Processing/error         | Access audit                       | Visibility category              |
+| Dialog                | Private document access       | ACCESS_PRIVATE_DOCUMENT        | Available           | Document content after action | Open secure view            | Reason/error             | Access event                       | Five-minute URL                  |
+| State                 | Signed-link expired           | ACCESS_PRIVATE_DOCUMENT        | Expired             | None                          | Request new view            | Static                   | New access event                   | Never expose URL                 |
+| `/offers`             | Offer list                    | VIEW_OFFERS                    | Mixed               | Negotiation summaries         | View offer                  | Loading/empty            | Realtime                           | Read-only                        |
+| Offer filters         | Filters                       | VIEW_OFFERS                    | Mixed               | None                          | Apply                       | N/A                      | URL                                | No action ranking                |
+| `/offers/[id]`        | Offer detail                  | VIEW_OFFERS                    | Any                 | Participants/proposals        | Related record              | Missing/conflict         | None                               | Allow-list projection            |
+| Offer section         | Proposal timeline             | VIEW_OFFERS                    | Any                 | Amount/history                | None                        | Loading                  | None                               | Immutable                        |
+| Offer detail          | Accepted view                 | VIEW_OFFERS                    | ACCEPTED            | Accepted amount               | View transaction            | Missing tx               | None                               | No mutation                      |
+| Offer detail          | Closed thread                 | VIEW_OFFERS                    | Terminal            | Safe reason                   | Return                      | N/A                      | None                               | Read-only                        |
+| Dialog                | Invalid close                 | CLOSE_INVALID_OFFER            | Active inconsistent | Reason                        | Close thread                | Conflict                 | CLOSED + audit/notification        | Strict categories                |
+| `/transactions`       | Transaction list              | VIEW_TRANSACTIONS              | Mixed               | Safe summaries                | View transaction            | Loading/empty            | Realtime                           | Attention-first sort             |
+| Transaction filters   | Filters                       | VIEW_TRANSACTIONS              | Mixed               | None                          | Apply                       | N/A                      | URL                                | Mobile sheet                     |
+| `/transactions/[id]`  | Transaction detail            | VIEW_TRANSACTIONS              | Any                 | Participant and workflow data | Contextual recovery         | Missing/conflict         | None                               | Immutable facts                  |
+| Transaction section   | Current milestone             | VIEW_TRANSACTIONS              | Active              | Tasks                         | None                        | Loading                  | None                               | Actor labels                     |
+| Transaction section   | Buyer/seller tasks            | VIEW_TRANSACTIONS              | Active              | Completion status             | None                        | Partial                  | None                               | Admin cannot complete            |
+| Transaction section   | Documents                     | VIEW_PRIVATE_DOCUMENT_METADATA | Active              | Metadata                      | Request view                | Unavailable              | Access                             | Privacy categories               |
+| Transaction section   | Deposit state                 | VIEW_TRANSACTIONS              | Deposit             | Demo amount/status            | None                        | Failure                  | None                               | No real payment claims           |
+| Transaction section   | Cancellation pending          | VIEW_TRANSACTIONS              | Pending             | Reason/status                 | Resolve conflict if allowed | Conflict                 | Canonical cancellation             | No invented consent              |
+| Transaction state     | Failed                        | VIEW_TRANSACTIONS              | FAILED              | Safe failure                  | Review recovery             | N/A                      | None                               | Customer-safe copy               |
+| Dialog                | Retry step                    | MANAGE_TRANSACTION_RECOVERY    | Retryable           | Failure category              | Retry                       | Conflict/retry failure   | Task attempt + audit               | System tasks only                |
+| Dialog                | Pause transaction             | MANAGE_TRANSACTION_RECOVERY    | Active              | Reason                        | Pause                       | Conflict                 | Operational pause                  | Participant access remains       |
+| Dialog                | Resume transaction            | MANAGE_TRANSACTION_RECOVERY    | Paused eligible     | Reason                        | Resume                      | Eligibility              | Progress resumes                   | No task completion               |
+| Dialog                | Mark failed                   | MANAGE_TRANSACTION_RECOVERY    | Unrecoverable       | Reason                        | Mark failed                 | Conflict                 | FAILED + notification/audit        | Consequential                    |
+| Transaction state     | Completed demo                | VIEW_TRANSACTIONS              | COMPLETED_DEMO      | History                       | None                        | N/A                      | None                               | Read-only                        |
+| `/audit`              | Global audit                  | VIEW_AUDIT_LOGS                | Mixed               | Approved metadata             | Filter/open                 | Loading/empty            | None                               | Read-only                        |
+| Audit filters         | Filters                       | VIEW_AUDIT_LOGS                | Mixed               | None                          | Apply                       | Validation               | URL                                | 30-day default                   |
+| `/audit/[id]`         | Audit detail                  | VIEW_AUDIT_LOGS                | Event               | Safe metadata                 | Related entity              | Missing                  | None                               | No raw payload                   |
+| Banner                | Realtime disconnected         | Any view                       | Stale               | None                          | Refresh                     | Connection               | Refetch                            | Non-blocking                     |
+| Alert                 | Stale Admin action            | Action capability              | Version conflict    | None                          | Review latest               | Conflict                 | None                               | Never replay automatically       |
+| State                 | Permission denied             | Missing capability             | Any                 | None                          | Return                      | Static                   | None                               | No sensitive disclosure          |
+| Boundary              | Generic operational failure   | Any                            | Any                 | Safe reference                | Retry                       | Error                    | None                               | No stack trace                   |
+| RTL                   | Arabic dashboard              | VIEW_OVERVIEW                  | Mixed               | Safe                          | Queue navigation            | Same states              | None                               | Mirrored layout                  |
+| RTL                   | Arabic publication review     | REVIEW_PUBLICATION             | PENDING             | Review data                   | Approve/return              | Same                     | Same                               | Bidi-safe refs                   |
+| RTL                   | Arabic transaction detail     | VIEW_TRANSACTIONS              | Active              | Workflow data                 | Recovery where allowed      | Same                     | Same                               | Amounts and refs LTR             |
 
 ## 46.2 Requirement labels
 
@@ -2844,53 +2844,53 @@ Use these labels in engineering tickets:
 
 ## Priority P0 — approve before engineering begins
 
-| Mockup | View | Capability | Entity state | Key interaction | Sensitive-data considerations | Why approval is required | Engineering must not invent |
-|---|---|---|---|---|---|---|---|
-| 1. Admin dashboard | Desktop | VIEW_OVERVIEW | Mixed | Queue navigation | Safe aggregates only | Establishes entire Admin visual system | Metric hierarchy, queue layout, density |
-| 2. Customer list | Desktop | VIEW_CUSTOMERS | Mixed | Search/filter/open | Safe email and counts | Defines table pattern | Columns, attention treatment, filter density |
-| 3. Customer profile | Desktop | VIEW_CUSTOMERS | Active/restricted | Investigate/restrict | Profile boundaries | Establishes entity-detail pattern | Section order, summary density, notes placement |
-| 4. Listing list | Desktop | VIEW_LISTINGS | Mixed | Filter/open | No private unit data | Core operational table | Columns, status balance, attention priority |
-| 5. Listing detail | Desktop | VIEW_LISTINGS | LIVE/PAUSED | Investigate | Public/owner/Admin separation | Most complex listing oversight screen | Visibility zones, sections, action panel |
-| 6. Publication queue | Desktop | REVIEW_PUBLICATION | Pending/failed | Open review | Safe review summary | Defines primary operational queue | Row hierarchy, failure categories, queue age |
-| 7. Publication review | Desktop | REVIEW_PUBLICATION | PENDING | Approve/return/retry | Private review data | Consequential workflow | Preview/checklist/action layout |
-| 8. Return-for-changes dialog | Desktop modal | REVIEW_PUBLICATION | PENDING | Select reason | Customer vs Admin note separation | Critical customer communication | Reason pattern, note boundaries, copy preview |
-| 9. Private-document access | Desktop modal | ACCESS_PRIVATE_DOCUMENT | Available | Reason + acknowledgement | Highly sensitive | Security-critical interaction | Warning, reason, checkbox, action order |
-| 10. Offer-thread list | Desktop | VIEW_OFFERS | Mixed | Filter/open | Competing offer privacy | Defines read-only offer oversight | Columns and identity treatment |
-| 11. Offer detail | Desktop | VIEW_OFFERS | Active/accepted | Investigate | Participant and amount data | Must remain non-interventionist | Timeline and operational boundaries |
-| 12. Transaction list | Desktop | VIEW_TRANSACTIONS | Mixed | Attention filtering | Participant-safe data | High-volume queue | Stage, next actor, progress, issue columns |
-| 13. Transaction detail | Desktop | VIEW_TRANSACTIONS | Active | Investigate/recovery | Documents and participant tasks | Densest Admin screen | Stage tracker, task grouping, recovery panel |
-| 14. Failed transaction recovery | Desktop | MANAGE_TRANSACTION_RECOVERY | Retryable failure | Retry/pause/fail | Safe diagnostics | Consequential operational logic | Failure hierarchy and action limits |
-| 15. Audit log | Desktop | VIEW_AUDIT_LOGS | Mixed | Filter/open | Safe metadata | Defines auditability surface | Columns, filters, detail interaction |
+| Mockup                          | View          | Capability                  | Entity state      | Key interaction          | Sensitive-data considerations     | Why approval is required               | Engineering must not invent                     |
+| ------------------------------- | ------------- | --------------------------- | ----------------- | ------------------------ | --------------------------------- | -------------------------------------- | ----------------------------------------------- |
+| 1. Admin dashboard              | Desktop       | VIEW_OVERVIEW               | Mixed             | Queue navigation         | Safe aggregates only              | Establishes entire Admin visual system | Metric hierarchy, queue layout, density         |
+| 2. Customer list                | Desktop       | VIEW_CUSTOMERS              | Mixed             | Search/filter/open       | Safe email and counts             | Defines table pattern                  | Columns, attention treatment, filter density    |
+| 3. Customer profile             | Desktop       | VIEW_CUSTOMERS              | Active/restricted | Investigate/restrict     | Profile boundaries                | Establishes entity-detail pattern      | Section order, summary density, notes placement |
+| 4. Listing list                 | Desktop       | VIEW_LISTINGS               | Mixed             | Filter/open              | No private unit data              | Core operational table                 | Columns, status balance, attention priority     |
+| 5. Listing detail               | Desktop       | VIEW_LISTINGS               | LIVE/PAUSED       | Investigate              | Public/owner/Admin separation     | Most complex listing oversight screen  | Visibility zones, sections, action panel        |
+| 6. Publication queue            | Desktop       | REVIEW_PUBLICATION          | Pending/failed    | Open review              | Safe review summary               | Defines primary operational queue      | Row hierarchy, failure categories, queue age    |
+| 7. Publication review           | Desktop       | REVIEW_PUBLICATION          | PENDING           | Approve/return/retry     | Private review data               | Consequential workflow                 | Preview/checklist/action layout                 |
+| 8. Return-for-changes dialog    | Desktop modal | REVIEW_PUBLICATION          | PENDING           | Select reason            | Customer vs Admin note separation | Critical customer communication        | Reason pattern, note boundaries, copy preview   |
+| 9. Private-document access      | Desktop modal | ACCESS_PRIVATE_DOCUMENT     | Available         | Reason + acknowledgement | Highly sensitive                  | Security-critical interaction          | Warning, reason, checkbox, action order         |
+| 10. Offer-thread list           | Desktop       | VIEW_OFFERS                 | Mixed             | Filter/open              | Competing offer privacy           | Defines read-only offer oversight      | Columns and identity treatment                  |
+| 11. Offer detail                | Desktop       | VIEW_OFFERS                 | Active/accepted   | Investigate              | Participant and amount data       | Must remain non-interventionist        | Timeline and operational boundaries             |
+| 12. Transaction list            | Desktop       | VIEW_TRANSACTIONS           | Mixed             | Attention filtering      | Participant-safe data             | High-volume queue                      | Stage, next actor, progress, issue columns      |
+| 13. Transaction detail          | Desktop       | VIEW_TRANSACTIONS           | Active            | Investigate/recovery     | Documents and participant tasks   | Densest Admin screen                   | Stage tracker, task grouping, recovery panel    |
+| 14. Failed transaction recovery | Desktop       | MANAGE_TRANSACTION_RECOVERY | Retryable failure | Retry/pause/fail         | Safe diagnostics                  | Consequential operational logic        | Failure hierarchy and action limits             |
+| 15. Audit log                   | Desktop       | VIEW_AUDIT_LOGS             | Mixed             | Filter/open              | Safe metadata                     | Defines auditability surface           | Columns, filters, detail interaction            |
 
 ## Priority P1 — approve during implementation
 
-| Mockup | View | Capability | Entity state | Key interaction | Why | Engineering must not invent |
-|---|---|---|---|---|---|---|
-| 16. Admin dashboard | Tablet | VIEW_OVERVIEW | Mixed | Queue navigation | Validates collapsed navigation and density | Breakpoint behaviour |
-| 17. Mobile Admin navigation | Mobile | Mixed | N/A | Open/navigate | Ensures portal remains usable | Sheet hierarchy and counts |
-| 18. Arabic RTL dashboard | Desktop | VIEW_OVERVIEW | Mixed | Queue navigation | Validates overall RTL foundation | Sidebar mirroring, metrics, mixed refs |
-| 19. Arabic RTL publication review | Desktop | REVIEW_PUBLICATION | PENDING | Approve/return | Complex RTL action layout | Preview/checklist/dialog direction |
-| 20. Arabic RTL transaction detail | Desktop/mobile | VIEW_TRANSACTIONS | Active | Investigate | Most complex mixed numeric screen | Stage order, amounts, refs, action panel |
+| Mockup                            | View           | Capability         | Entity state | Key interaction  | Why                                        | Engineering must not invent              |
+| --------------------------------- | -------------- | ------------------ | ------------ | ---------------- | ------------------------------------------ | ---------------------------------------- |
+| 16. Admin dashboard               | Tablet         | VIEW_OVERVIEW      | Mixed        | Queue navigation | Validates collapsed navigation and density | Breakpoint behaviour                     |
+| 17. Mobile Admin navigation       | Mobile         | Mixed              | N/A          | Open/navigate    | Ensures portal remains usable              | Sheet hierarchy and counts               |
+| 18. Arabic RTL dashboard          | Desktop        | VIEW_OVERVIEW      | Mixed        | Queue navigation | Validates overall RTL foundation           | Sidebar mirroring, metrics, mixed refs   |
+| 19. Arabic RTL publication review | Desktop        | REVIEW_PUBLICATION | PENDING      | Approve/return   | Complex RTL action layout                  | Preview/checklist/dialog direction       |
+| 20. Arabic RTL transaction detail | Desktop/mobile | VIEW_TRANSACTIONS  | Active       | Investigate      | Most complex mixed numeric screen          | Stage order, amounts, refs, action panel |
 
 ---
 
 # 48. Open Product Decisions
 
-| Decision | Recommendation | Owner |
-|---|---|---|
-| Capability assignment UI | Not included; capabilities provisioned server-side | Engineering/product |
-| Customer restriction model | Narrow `ACTIONS_RESTRICTED` overlay as defined | Product/security |
-| Publication auto-resolution | Non-production/test only; manual queue uses same request model | Product/engineering |
-| Document download | Disabled by default; temporary view only | Security/legal |
-| Signed view duration | Five minutes | Security |
-| Audit retention/date range | UI defaults 30 days; backend policy required | Security/legal |
-| Admin note correction | Append-only correction note | Product/compliance |
-| Offer operational close | Strict inconsistency repair only | Product/legal |
-| Transaction notification partial failure | Domain state remains; follow-up recorded | Architecture |
-| Admin notification recipient support | Reuse canonical notification table if safe | Engineering |
-| Arabic copy | Draft only | Professional Arabic + legal/compliance |
-| Admin support contact wording | Requires operational owner | Operations |
-| Shared demo seed | Explicitly not required | Locked decision |
+| Decision                                 | Recommendation                                                 | Owner                                  |
+| ---------------------------------------- | -------------------------------------------------------------- | -------------------------------------- |
+| Capability assignment UI                 | Not included; capabilities provisioned server-side             | Engineering/product                    |
+| Customer restriction model               | Narrow `ACTIONS_RESTRICTED` overlay as defined                 | Product/security                       |
+| Publication auto-resolution              | Non-production/test only; manual queue uses same request model | Product/engineering                    |
+| Document download                        | Disabled by default; temporary view only                       | Security/legal                         |
+| Signed view duration                     | Five minutes                                                   | Security                               |
+| Audit retention/date range               | UI defaults 30 days; backend policy required                   | Security/legal                         |
+| Admin note correction                    | Append-only correction note                                    | Product/compliance                     |
+| Offer operational close                  | Strict inconsistency repair only                               | Product/legal                          |
+| Transaction notification partial failure | Domain state remains; follow-up recorded                       | Architecture                           |
+| Admin notification recipient support     | Reuse canonical notification table if safe                     | Engineering                            |
+| Arabic copy                              | Draft only                                                     | Professional Arabic + legal/compliance |
+| Admin support contact wording            | Requires operational owner                                     | Operations                             |
+| Shared demo seed                         | Explicitly not required                                        | Locked decision                        |
 
 ---
 

@@ -19,7 +19,14 @@ describe('StatusBadge (spec §37 — text + icon, never colour-only)', () => {
 describe('ReasonSelect (spec §37 — no hidden default)', () => {
   it('forces an explicit choice with an empty first option and lists every approved reason', () => {
     renderWithIntl(
-      <ReasonSelect id="r" label="Reason" basePath="customer.restrict.reason" values={RESTRICT_REASONS} value="" onChange={() => {}} />,
+      <ReasonSelect
+        id="r"
+        label="Reason"
+        basePath="customer.restrict.reason"
+        values={RESTRICT_REASONS}
+        value=""
+        onChange={() => {}}
+      />,
     );
     const select = screen.getByLabelText('Reason') as HTMLSelectElement;
     // first option is the empty placeholder, then one per reason
@@ -31,7 +38,14 @@ describe('ReasonSelect (spec §37 — no hidden default)', () => {
   it('emits the raw enum value on change', () => {
     const onChange = vi.fn();
     renderWithIntl(
-      <ReasonSelect id="r" label="Reason" basePath="customer.restrict.reason" values={RESTRICT_REASONS} value="" onChange={onChange} />,
+      <ReasonSelect
+        id="r"
+        label="Reason"
+        basePath="customer.restrict.reason"
+        values={RESTRICT_REASONS}
+        value=""
+        onChange={onChange}
+      />,
     );
     fireEvent.change(screen.getByLabelText('Reason'), { target: { value: 'OTHER' } });
     expect(onChange).toHaveBeenCalledWith('OTHER');
@@ -42,7 +56,13 @@ describe('ActionDialog (spec §37 — confirmation shell)', () => {
   it('opens on trigger, runs onSubmit, and closes on success', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined);
     renderWithIntl(
-      <ActionDialog triggerLabel="Restrict" title="Restrict customer" body="This is recorded." submitLabel="Confirm" onSubmit={onSubmit}>
+      <ActionDialog
+        triggerLabel="Restrict"
+        title="Restrict customer"
+        body="This is recorded."
+        submitLabel="Confirm"
+        onSubmit={onSubmit}
+      >
         <p>body content</p>
       </ActionDialog>,
     );
@@ -56,7 +76,13 @@ describe('ActionDialog (spec §37 — confirmation shell)', () => {
   it('surfaces the error and stays open when onSubmit rejects', async () => {
     const onSubmit = vi.fn().mockRejectedValue(new Error('ALREADY_RESTRICTED'));
     renderWithIntl(
-      <ActionDialog triggerLabel="Restrict" title="Restrict customer" body="This is recorded." submitLabel="Confirm" onSubmit={onSubmit} />,
+      <ActionDialog
+        triggerLabel="Restrict"
+        title="Restrict customer"
+        body="This is recorded."
+        submitLabel="Confirm"
+        onSubmit={onSubmit}
+      />,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Restrict' }));
     fireEvent.click(await screen.findByRole('button', { name: 'Confirm' }));
@@ -66,7 +92,14 @@ describe('ActionDialog (spec §37 — confirmation shell)', () => {
 
   it('disables the submit button when canSubmit is false', async () => {
     renderWithIntl(
-      <ActionDialog triggerLabel="Open" title="T" body="B" submitLabel="Go" canSubmit={false} onSubmit={vi.fn()} />,
+      <ActionDialog
+        triggerLabel="Open"
+        title="T"
+        body="B"
+        submitLabel="Go"
+        canSubmit={false}
+        onSubmit={vi.fn()}
+      />,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));
     expect(await screen.findByRole('button', { name: 'Go' })).toBeDisabled();

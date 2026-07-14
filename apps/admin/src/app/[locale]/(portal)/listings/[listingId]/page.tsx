@@ -6,20 +6,36 @@ import { DataSection, Field, FieldGrid } from '@/components/admin/detail';
 import { StatusBadge } from '@/components/admin/status-badge';
 import { NotesPanel } from '@/components/admin/notes-panel';
 import { PauseListingAction, ResumeListingAction } from '@/components/admin/entity-actions';
-import { listingStateLabel, publicationStatusLabel, formatAed, formatWhen } from '@/components/admin/labels';
+import {
+  listingStateLabel,
+  publicationStatusLabel,
+  formatAed,
+  formatWhen,
+} from '@/components/admin/labels';
 
-export default async function ListingDetailPage({ params }: { params: Promise<{ locale: string; listingId: string }> }) {
+export default async function ListingDetailPage({
+  params,
+}: {
+  params: Promise<{ locale: string; listingId: string }>;
+}) {
   const { locale, listingId } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('admin');
 
-  let l: Awaited<ReturnType<Awaited<ReturnType<typeof getServerApi>>['admin']['listings']['get']>> | null = null;
+  let l: Awaited<
+    ReturnType<Awaited<ReturnType<typeof getServerApi>>['admin']['listings']['get']>
+  > | null = null;
   try {
     l = await (await getServerApi()).admin.listings.get({ id: listingId });
   } catch {
     l = null;
   }
-  if (!l) return <PageShell maxWidth={560}><EmptyState title={t('listings.unavailable')} /></PageShell>;
+  if (!l)
+    return (
+      <PageShell maxWidth={560}>
+        <EmptyState title={t('listings.unavailable')} />
+      </PageShell>
+    );
 
   const state = listingStateLabel(l.state);
   const canPause = l.state === 'LIVE';
@@ -41,13 +57,25 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
         <div className="space-y-6 lg:col-span-2">
           <DataSection title={t('listings.title')}>
             <FieldGrid>
-              <Field label={t('listings.col.state')} value={<StatusBadge tone={state.tone} label={t(state.key)} />} />
+              <Field
+                label={t('listings.col.state')}
+                value={<StatusBadge tone={state.tone} label={t(state.key)} />}
+              />
               <Field label={t('listing.askingPrice')} value={formatAed(l.askingPriceAed)} ltr />
-              {l.pausedAt ? <Field label={t('listing.pausedSince')} value={formatWhen(l.pausedAt)} /> : null}
+              {l.pausedAt ? (
+                <Field label={t('listing.pausedSince')} value={formatWhen(l.pausedAt)} />
+              ) : null}
               {l.publication ? (
                 <Field
                   label={t('listing.publication')}
-                  value={<StatusBadge {...(() => { const p = publicationStatusLabel(l.publication.status); return { tone: p.tone, label: t(p.key) }; })()} />}
+                  value={
+                    <StatusBadge
+                      {...(() => {
+                        const p = publicationStatusLabel(l.publication.status);
+                        return { tone: p.tone, label: t(p.key) };
+                      })()}
+                    />
+                  }
                 />
               ) : null}
             </FieldGrid>
@@ -59,7 +87,10 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                 <Field label={t('listing.field.propertyType')} value={l.public.propertyType} />
                 <Field label={t('listing.field.community')} value={l.public.community} />
                 <Field label={t('listing.field.emirate')} value={l.public.emirate} />
-                <Field label={t('listing.field.buildingOrProject')} value={l.public.buildingOrProject} />
+                <Field
+                  label={t('listing.field.buildingOrProject')}
+                  value={l.public.buildingOrProject}
+                />
                 <Field label={t('listing.field.bedrooms')} value={l.public.bedrooms} />
                 <Field label={t('listing.field.bathrooms')} value={l.public.bathrooms} />
               </FieldGrid>
@@ -70,7 +101,10 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             <DataSection title={t('listing.privateSection')} visibility="private">
               <FieldGrid>
                 <Field label={t('listing.field.unitIdentifier')} value={l.private.unitIdentifier} />
-                <Field label={t('listing.field.occupancyStatus')} value={l.private.occupancyStatus} />
+                <Field
+                  label={t('listing.field.occupancyStatus')}
+                  value={l.private.occupancyStatus}
+                />
               </FieldGrid>
             </DataSection>
           ) : null}

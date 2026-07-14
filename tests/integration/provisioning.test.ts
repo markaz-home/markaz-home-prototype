@@ -22,7 +22,9 @@ beforeAll(async () => {
   if (!url || !serviceKey) return;
   admin = createClient(url, serviceKey, { auth: { persistSession: false } });
   try {
-    const rows = await sql<{ n: number }[]>`select count(*)::int as n from public.profiles where email = ${DEMO_EMAILS.admin}`;
+    const rows = await sql<
+      { n: number }[]
+    >`select count(*)::int as n from public.profiles where email = ${DEMO_EMAILS.admin}`;
     available = Number(rows[0]?.n ?? 0) > 0;
   } catch {
     available = false;
@@ -54,7 +56,9 @@ describe('account provisioning', () => {
     });
     expect(error).toBeTruthy();
     // And exactly one profile remains for that email.
-    const rows = await sql<{ n: number }[]>`select count(*)::int as n from public.profiles where email = ${DEMO_EMAILS.customerA}`;
+    const rows = await sql<
+      { n: number }[]
+    >`select count(*)::int as n from public.profiles where email = ${DEMO_EMAILS.customerA}`;
     expect(Number(rows[0]?.n)).toBe(1);
   });
 

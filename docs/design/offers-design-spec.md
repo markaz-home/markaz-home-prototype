@@ -6,7 +6,7 @@
 **Applications:** MARKAZ Home customer web  
 **Primary languages:** English and Arabic  
 **Accessibility target:** WCAG 2.2 AA  
-**Last updated:** June 2026  
+**Last updated:** June 2026
 
 ---
 
@@ -226,17 +226,17 @@ Negotiation history is a structured event log.
 
 Use the following internal states:
 
-| State | Meaning | Next action |
-|---|---|---|
-| `DRAFT` | Buyer has not submitted | Buyer |
-| `AWAITING_SELLER` | Current proposal was submitted by buyer | Seller |
-| `AWAITING_BUYER` | Current proposal was submitted by seller | Buyer |
-| `ACCEPTED` | Current proposal was accepted | None |
-| `REJECTED` | Seller or buyer rejected the current negotiation | None |
-| `WITHDRAWN` | Buyer withdrew the thread | None |
-| `EXPIRED` | Current proposal expired server-side | None |
-| `CLOSED_OTHER_ACCEPTED` | Another thread for the listing was accepted | None |
-| `CLOSED_LISTING_UNAVAILABLE` | Listing paused, unpublished, or materially invalidated | None |
+| State                        | Meaning                                                | Next action |
+| ---------------------------- | ------------------------------------------------------ | ----------- |
+| `DRAFT`                      | Buyer has not submitted                                | Buyer       |
+| `AWAITING_SELLER`            | Current proposal was submitted by buyer                | Seller      |
+| `AWAITING_BUYER`             | Current proposal was submitted by seller               | Buyer       |
+| `ACCEPTED`                   | Current proposal was accepted                          | None        |
+| `REJECTED`                   | Seller or buyer rejected the current negotiation       | None        |
+| `WITHDRAWN`                  | Buyer withdrew the thread                              | None        |
+| `EXPIRED`                    | Current proposal expired server-side                   | None        |
+| `CLOSED_OTHER_ACCEPTED`      | Another thread for the listing was accepted            | None        |
+| `CLOSED_LISTING_UNAVAILABLE` | Listing paused, unpublished, or materially invalidated | None        |
 
 `VIEWED` must be metadata/event information, not a thread state.
 
@@ -244,29 +244,29 @@ Use the following internal states:
 
 ## 5.2 Proposal states
 
-| State | Meaning |
-|---|---|
-| `CURRENT` | Proposal currently awaits action |
-| `SUPERSEDED` | Replaced by a newer counter |
-| `ACCEPTED` | Selected proposal |
-| `REJECTED` | Proposal ended by rejection |
-| `EXPIRED` | Proposal expired |
-| `WITHDRAWN` | Thread withdrawn while this was current |
-| `CLOSED` | Closed because listing became unavailable or another offer won |
+| State        | Meaning                                                        |
+| ------------ | -------------------------------------------------------------- |
+| `CURRENT`    | Proposal currently awaits action                               |
+| `SUPERSEDED` | Replaced by a newer counter                                    |
+| `ACCEPTED`   | Selected proposal                                              |
+| `REJECTED`   | Proposal ended by rejection                                    |
+| `EXPIRED`    | Proposal expired                                               |
+| `WITHDRAWN`  | Thread withdrawn while this was current                        |
+| `CLOSED`     | Closed because listing became unavailable or another offer won |
 
 ## 5.3 User-facing status language
 
-| Internal state | Buyer copy | Seller copy |
-|---|---|---|
-| `DRAFT` | Draft offer | Not visible |
-| `AWAITING_SELLER` | Waiting for seller | Response needed |
-| `AWAITING_BUYER` | Your response is needed | Waiting for buyer |
-| `ACCEPTED` | Offer accepted | Offer accepted |
-| `REJECTED` | Offer declined | Offer declined |
-| `WITHDRAWN` | Offer withdrawn | Buyer withdrew |
-| `EXPIRED` | Offer expired | Offer expired |
-| `CLOSED_OTHER_ACCEPTED` | Property is under offer | Another offer was selected |
-| `CLOSED_LISTING_UNAVAILABLE` | Property is no longer available | Listing unavailable |
+| Internal state               | Buyer copy                      | Seller copy                |
+| ---------------------------- | ------------------------------- | -------------------------- |
+| `DRAFT`                      | Draft offer                     | Not visible                |
+| `AWAITING_SELLER`            | Waiting for seller              | Response needed            |
+| `AWAITING_BUYER`             | Your response is needed         | Waiting for buyer          |
+| `ACCEPTED`                   | Offer accepted                  | Offer accepted             |
+| `REJECTED`                   | Offer declined                  | Offer declined             |
+| `WITHDRAWN`                  | Offer withdrawn                 | Buyer withdrew             |
+| `EXPIRED`                    | Offer expired                   | Offer expired              |
+| `CLOSED_OTHER_ACCEPTED`      | Property is under offer         | Another offer was selected |
+| `CLOSED_LISTING_UNAVAILABLE` | Property is no longer available | Listing unavailable        |
 
 ## 5.4 Next-action logic
 
@@ -500,16 +500,16 @@ LIVE + AVAILABLE property
 
 ## 10.1 Buyer entry-point treatment
 
-| Entry | Behaviour |
-|---|---|
-| Property page | Make an Offer or View Your Offer |
-| Saved Properties | Card action opens property; offer CTA remains on detail |
-| Buyer Offers | Resume next action |
-| Deep link | Authenticate, authorise, load thread |
-| Seller counter notification | Opens thread with next-action panel focused |
-| Listing paused | Closed/unavailable panel |
-| Other offer accepted | Property Under Offer; thread closed |
-| Return after sign-out | Safe return to same authorised thread |
+| Entry                       | Behaviour                                               |
+| --------------------------- | ------------------------------------------------------- |
+| Property page               | Make an Offer or View Your Offer                        |
+| Saved Properties            | Card action opens property; offer CTA remains on detail |
+| Buyer Offers                | Resume next action                                      |
+| Deep link                   | Authenticate, authorise, load thread                    |
+| Seller counter notification | Opens thread with next-action panel focused             |
+| Listing paused              | Closed/unavailable panel                                |
+| Other offer accepted        | Property Under Offer; thread closed                     |
+| Return after sign-out       | Safe return to same authorised thread                   |
 
 ---
 
@@ -534,16 +534,16 @@ Offer submitted
 
 ## 11.1 Seller entry-point treatment
 
-| Entry | Behaviour |
-|---|---|
-| My Listings | Show `View offers` and action-needed count |
-| Live listing management | Offers summary panel |
-| Offers tab | Cross-listing inbox |
-| Listing-specific route | Comparison view for one listing |
-| Notification | Deep link to relevant thread |
-| Below-threshold manual review | Visible in All / Below threshold filter |
-| Return after sign-out | Safe authenticated return |
-| Buyer counter | Thread opens with response needed |
+| Entry                         | Behaviour                                  |
+| ----------------------------- | ------------------------------------------ |
+| My Listings                   | Show `View offers` and action-needed count |
+| Live listing management       | Offers summary panel                       |
+| Offers tab                    | Cross-listing inbox                        |
+| Listing-specific route        | Comparison view for one listing            |
+| Notification                  | Deep link to relevant thread               |
+| Below-threshold manual review | Visible in All / Below threshold filter    |
+| Return after sign-out         | Safe authenticated return                  |
+| Buyer counter                 | Thread opens with response needed          |
 
 ---
 
@@ -553,19 +553,24 @@ Offer submitted
 
 Dialog or bottom sheet:
 
-**Title:**  
+**Title:**
+
 > Sign in to make an offer
 
-**Body:**  
+**Body:**
+
 > Create or sign in to your MARKAZ account, then return to this property to continue.
 
-**Primary:**  
+**Primary:**
+
 > Sign in
 
-**Secondary:**  
+**Secondary:**
+
 > Create account
 
-**Tertiary:**  
+**Tertiary:**
+
 > Not now
 
 ## 12.2 Intent preservation
@@ -595,12 +600,12 @@ Prevent open redirects by allowlisting only customer-web relative routes.
 
 ## 12.3 Listing changes during authentication
 
-| New condition | Copy |
-|---|---|
-| Listing paused/unavailable | `This property is no longer available for offers.` |
-| User is owner | `This is your listing. Manage offers from My Listings.` |
-| Another offer accepted | `This property is now under offer and is not accepting new offers.` |
-| Existing active thread found | Redirect to `View your offer` |
+| New condition                | Copy                                                                |
+| ---------------------------- | ------------------------------------------------------------------- |
+| Listing paused/unavailable   | `This property is no longer available for offers.`                  |
+| User is owner                | `This is your listing. Manage offers from My Listings.`             |
+| Another offer accepted       | `This property is now under offer and is not accepting new offers.` |
+| Existing active thread found | Redirect to `View your offer`                                       |
 
 ---
 
@@ -647,19 +652,24 @@ Two-column layout:
 
 ## 13.3 Copy
 
-**Title:**  
+**Title:**
+
 > Make an offer
 
-**Description:**  
+**Description:**
+
 > Enter the amount you would like the seller to consider.
 
-**Amount label:**  
+**Amount label:**
+
 > Your offer
 
-**Placeholder:**  
+**Placeholder:**
+
 > 2,250,000
 
-**Asking price:**  
+**Asking price:**
+
 > Asking price: AED {amount}
 
 **Difference labels:**
@@ -668,16 +678,20 @@ Two-column layout:
 - `AED {amount} above asking`
 - `Matches the asking price`
 
-**Expiry label:**  
+**Expiry label:**
+
 > Offer validity
 
-**Expiry helper:**  
+**Expiry helper:**
+
 > The seller must respond before this proposal expires.
 
-**Primary:**  
+**Primary:**
+
 > Review offer
 
-**Secondary:**  
+**Secondary:**
+
 > Cancel
 
 ## 13.4 AED input behaviour
@@ -754,13 +768,16 @@ On opening, review, and submit:
 
 If an active thread exists:
 
-**Title:**  
+**Title:**
+
 > You already have an active offer
 
-**Body:**  
+**Body:**
+
 > Continue the existing negotiation to review its latest status or propose a new amount.
 
-**Primary:**  
+**Primary:**
+
 > View your offer
 
 No second thread is created.
@@ -785,19 +802,24 @@ Sections:
 
 ## 15.2 Copy
 
-**Title:**  
+**Title:**
+
 > Review your offer
 
-**Description:**  
+**Description:**
+
 > Check the amount and validity before sending it to the seller.
 
-**Disclosure — required:**  
+**Disclosure — required:**
+
 > This offer is an expression of interest for this prototype. It does not create a legally binding property agreement.
 
-**Primary:**  
+**Primary:**
+
 > Submit offer
 
-**Secondary:**  
+**Secondary:**
+
 > Edit offer
 
 ## 15.3 Submission
@@ -812,10 +834,12 @@ Sections:
 
 ## 15.4 Offer submitted
 
-**Title:**  
+**Title:**
+
 > Your offer has been sent
 
-**Body:**  
+**Body:**
+
 > The seller can review, accept, reject, or propose a different amount.
 
 Status:
@@ -1222,22 +1246,28 @@ Context:
 
 ## 21.2 Copy
 
-**Seller title:**  
+**Seller title:**
+
 > Make a counteroffer
 
-**Buyer title:**  
+**Buyer title:**
+
 > Propose a different amount
 
-**Description:**  
+**Description:**
+
 > Enter a new amount for the other party to consider.
 
-**Primary:**  
+**Primary:**
+
 > Review counteroffer
 
-**Review primary:**  
+**Review primary:**
+
 > Submit counteroffer
 
-**Disclosure:**  
+**Disclosure:**
+
 > This counteroffer remains part of a non-binding prototype negotiation.
 
 ## 21.3 Rules
@@ -1263,10 +1293,12 @@ Blocking.
 
 ## 22.1 Accept confirmation
 
-**Title:**  
+**Title:**
+
 > Accept this offer?
 
-**Body:**  
+**Body:**
+
 > This will select this buyer’s offer and close other active negotiations for the property.
 
 Summary:
@@ -1278,16 +1310,20 @@ Summary:
 - active competing thread count;
 - listing becomes Under offer.
 
-**Week 5 note:**  
+**Week 5 note:**
+
 > Transaction setup will continue in the next stage.
 
-**Disclosure:**  
+**Disclosure:**
+
 > This prototype acceptance does not create a legally binding property agreement.
 
-**Primary:**  
+**Primary:**
+
 > Accept offer
 
-**Secondary:**  
+**Secondary:**
+
 > Cancel
 
 ## 22.2 Buyer accepts seller counter
@@ -1308,7 +1344,8 @@ Primary:
 
 ## 22.3 Success
 
-**Title:**  
+**Title:**
+
 > Offer accepted
 
 Seller body:
@@ -1339,10 +1376,12 @@ No confetti or payment CTA.
 
 Dialog:
 
-**Title:**  
+**Title:**
+
 > Reject this offer?
 
-**Body:**  
+**Body:**
+
 > This negotiation will close. The buyer will see that the offer was declined.
 
 Optional seller-private reason:
@@ -1355,20 +1394,24 @@ Optional seller-private reason:
 
 Do not show free-form input.
 
-**Primary:**  
+**Primary:**
+
 > Reject offer
 
-**Secondary:**  
+**Secondary:**
+
 > Keep offer open
 
 Use a restrained destructive button.
 
 ## 23.2 Buyer rejects counter
 
-**Title:**  
+**Title:**
+
 > Reject this counteroffer?
 
-**Body:**  
+**Body:**
+
 > This negotiation will close and the seller will no longer be able to accept your previous proposal.
 
 Primary:
@@ -1399,16 +1442,20 @@ Withdrawal closes the thread immediately. Seller cannot respond afterward.
 
 ## 24.2 Dialog copy
 
-**Title:**  
+**Title:**
+
 > Withdraw this offer?
 
-**Body:**  
+**Body:**
+
 > The seller will no longer be able to accept or respond to this offer.
 
-**Primary:**  
+**Primary:**
+
 > Withdraw offer
 
-**Secondary:**  
+**Secondary:**
+
 > Keep offer open
 
 ## 24.3 Success
@@ -1659,16 +1706,16 @@ Do not build preferences or a full notification centre.
 
 ## 30.2 Notification types
 
-| Recipient | Trigger | Copy |
-|---|---|---|
-| Seller | Initial offer at/above threshold | `New offer received for {property}.` |
-| Buyer | Seller counter | `The seller proposed a different amount.` |
-| Buyer | Accepted | `Your offer was accepted.` |
-| Buyer | Rejected | `Your offer was declined.` |
-| Seller | Buyer counter | `Buyer 01 proposed a different amount.` |
-| Seller | Buyer withdrawal | `Buyer 01 withdrew their offer.` |
-| Both | Listing unavailable | `This offer closed because the listing is no longer available.` |
-| Non-selected buyer | Other offer accepted | `The property is now under offer.` |
+| Recipient          | Trigger                          | Copy                                                            |
+| ------------------ | -------------------------------- | --------------------------------------------------------------- |
+| Seller             | Initial offer at/above threshold | `New offer received for {property}.`                            |
+| Buyer              | Seller counter                   | `The seller proposed a different amount.`                       |
+| Buyer              | Accepted                         | `Your offer was accepted.`                                      |
+| Buyer              | Rejected                         | `Your offer was declined.`                                      |
+| Seller             | Buyer counter                    | `Buyer 01 proposed a different amount.`                         |
+| Seller             | Buyer withdrawal                 | `Buyer 01 withdrew their offer.`                                |
+| Both               | Listing unavailable              | `This offer closed because the listing is no longer available.` |
+| Non-selected buyer | Other offer accepted             | `The property is now under offer.`                              |
 
 ## 30.3 Notification menu
 
@@ -1688,28 +1735,28 @@ Do not include full offer amount in the header menu. Amount appears after enteri
 
 # 31. Loading, Empty, Error, and Conflict States
 
-| State | UX |
-|---|---|
-| Creating offer form | Property-summary skeleton + field skeleton |
-| Submitting | Button loading; fields read-only |
-| Loading thread | Header, current-proposal, timeline skeletons |
-| Loading seller inbox | 6 structured row skeletons |
-| Empty buyer offers | Browse Properties CTA |
-| Empty seller offers | Explain offers will appear when buyers submit |
-| Counter submitting | Counter panel disabled; `Submitting counteroffer…` |
-| Accepting | Confirmation button `Accepting offer…` |
-| Rejecting | `Rejecting offer…` |
-| Withdrawing | `Withdrawing offer…` |
-| Expired | Closed panel with exact expiry |
-| Listing unavailable | Unified safe closed panel |
-| Superseded proposal | Show in history; no action |
-| Another offer accepted | Closed neutral panel |
-| Stale action | Refresh state and explain action changed |
-| Two-tab conflict | Latest server state replaces stale tab |
-| Network unavailable | Preserve form amount in memory; Retry |
-| Realtime disconnected | Non-blocking stale banner |
-| Generic error | Safe retry panel |
-| Session expired | Existing sign-in flow with safe return |
+| State                  | UX                                                 |
+| ---------------------- | -------------------------------------------------- |
+| Creating offer form    | Property-summary skeleton + field skeleton         |
+| Submitting             | Button loading; fields read-only                   |
+| Loading thread         | Header, current-proposal, timeline skeletons       |
+| Loading seller inbox   | 6 structured row skeletons                         |
+| Empty buyer offers     | Browse Properties CTA                              |
+| Empty seller offers    | Explain offers will appear when buyers submit      |
+| Counter submitting     | Counter panel disabled; `Submitting counteroffer…` |
+| Accepting              | Confirmation button `Accepting offer…`             |
+| Rejecting              | `Rejecting offer…`                                 |
+| Withdrawing            | `Withdrawing offer…`                               |
+| Expired                | Closed panel with exact expiry                     |
+| Listing unavailable    | Unified safe closed panel                          |
+| Superseded proposal    | Show in history; no action                         |
+| Another offer accepted | Closed neutral panel                               |
+| Stale action           | Refresh state and explain action changed           |
+| Two-tab conflict       | Latest server state replaces stale tab             |
+| Network unavailable    | Preserve form amount in memory; Retry              |
+| Realtime disconnected  | Non-blocking stale banner                          |
+| Generic error          | Safe retry panel                                   |
+| Session expired        | Existing sign-in flow with safe return             |
 
 ## 31.1 Safe not-available copy
 
@@ -1743,36 +1790,36 @@ Primary:
 
 Each component must use existing MARKAZ colour, spacing, typography, radius, focus, and i18n tokens.
 
-| Component | Purpose and anatomy | Variants / states | Behaviour, accessibility, responsive and RTL |
-|---|---|---|---|
-| Make Offer CTA | Primary property action; label + optional amount icon | Eligible, loading, active-thread, under-offer, owner | 44 px min; anonymous opens auth dialog; mobile sticky; logical icon placement |
-| Offer Amount Input | AED prefix, numeric input, helper, error | Empty, valid, warning, invalid, disabled | LTR amount in RTL; numeric keyboard; described-by comparison and errors |
-| AED Comparison Block | Asking, proposed, absolute and % difference | Below, equal, above | Neutral styling; values announced as complete phrases |
-| Offer Warning | Non-blocking unusual amount warning | Low, high | `role=status`, not error; no threshold disclosure |
-| Offer Review Summary | Property, amount, expiry, disclosure | Buyer offer, seller counter, buyer counter | Read-only definition list; edit action; stacks mobile |
-| Non-Binding Disclosure | Information icon + approved text | Offer, counter, acceptance | Always text, not tooltip; pale blue treatment |
-| Offer Status Badge | Short current status | Waiting, action, accepted, closed, expired | Text + icon; no colour-only meaning; limited use |
-| Offer Card | Property context + current status + action | Buyer, seller, closed, unavailable | Whole card not one giant link; explicit action link; mobile stack |
-| Buyer Offers List | Tabs/filters + cards | Empty, loading, partial error | Announce result count; keyboard filter controls |
-| Seller Offers Inbox | Structured comparison rows | Desktop rows, mobile cards | Column headers; mobile semantic cards; no horizontal-scroll dependency |
-| Listing Offer Summary | Listing-level stats and links | Live, paused, under offer | Stats use plain text; hides private info outside seller routes |
-| Offer Comparison Row | Buyer-safe label, amount, difference, threshold, action | Above/below threshold, waiting, closed | Not a ranking; accessible table/list semantics |
-| Offer Detail Header | Breadcrumb, property, title, state | Buyer, seller | One `h1`; status and next action beneath |
-| Buyer-Safe Identity | Buyer number + verified label | Standard | No real identity/ID derivation; stable per listing |
-| Negotiation Timeline | Ordered list of immutable events | Active, closed | Structured list; latest change announced; no chat styling |
-| Timeline Event | Marker, actor, action, amount, time | Buyer, seller, system | Complete textual event; datetime element |
-| Counteroffer Form | Context, amount, expiry, comparison | Buyer, seller, review | Focus first field; mobile sheet; close restores focus |
-| Accept Confirmation Dialog | Consequence summary + disclosure | Seller accepts buyer; buyer accepts counter | Focus trap; primary consequential but blue, not green celebration |
-| Reject Confirmation Dialog | Explanation + private reason | Seller, buyer | Focus trap; restrained destructive treatment |
-| Withdraw Confirmation Dialog | Consequence + actions | Buyer | Focus trap; no undo promise |
-| Expiry Selector | Four radio/select options | 48h, 3d, 7d, none | Native/select semantics; exact resulting date shown |
-| Threshold Indicator | Seller-only classification | At/above, below | Never sent/rendered for buyer projection |
-| Next Action Panel | Current proposal + dominant actions | Buyer action, seller action, waiting, closed | Sticky desktop; mobile bottom bar; status announced |
-| Offer Notification Badge | Unread/action count | 0, 1–99, 99+ | Accessible name includes count; not threshold count leak to buyer |
-| Realtime Status Indicator | Degraded connection banner | Reconnecting, stale, recovered | Hidden when healthy; polite announcement |
-| Closed Offer Panel | Reason and allowed next step | Rejected, withdrawn, expired, unavailable, other accepted | Calm neutral surface; no active controls |
-| Accepted Offer Success Panel | Accepted amount + Week 5 handoff | Buyer, seller | No confetti; focus success heading |
-| Mobile Offer Action Bar | Primary action controls | Buyer, seller, waiting | Safe-area inset; 48 px actions; logical order in RTL |
+| Component                    | Purpose and anatomy                                     | Variants / states                                         | Behaviour, accessibility, responsive and RTL                                  |
+| ---------------------------- | ------------------------------------------------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Make Offer CTA               | Primary property action; label + optional amount icon   | Eligible, loading, active-thread, under-offer, owner      | 44 px min; anonymous opens auth dialog; mobile sticky; logical icon placement |
+| Offer Amount Input           | AED prefix, numeric input, helper, error                | Empty, valid, warning, invalid, disabled                  | LTR amount in RTL; numeric keyboard; described-by comparison and errors       |
+| AED Comparison Block         | Asking, proposed, absolute and % difference             | Below, equal, above                                       | Neutral styling; values announced as complete phrases                         |
+| Offer Warning                | Non-blocking unusual amount warning                     | Low, high                                                 | `role=status`, not error; no threshold disclosure                             |
+| Offer Review Summary         | Property, amount, expiry, disclosure                    | Buyer offer, seller counter, buyer counter                | Read-only definition list; edit action; stacks mobile                         |
+| Non-Binding Disclosure       | Information icon + approved text                        | Offer, counter, acceptance                                | Always text, not tooltip; pale blue treatment                                 |
+| Offer Status Badge           | Short current status                                    | Waiting, action, accepted, closed, expired                | Text + icon; no colour-only meaning; limited use                              |
+| Offer Card                   | Property context + current status + action              | Buyer, seller, closed, unavailable                        | Whole card not one giant link; explicit action link; mobile stack             |
+| Buyer Offers List            | Tabs/filters + cards                                    | Empty, loading, partial error                             | Announce result count; keyboard filter controls                               |
+| Seller Offers Inbox          | Structured comparison rows                              | Desktop rows, mobile cards                                | Column headers; mobile semantic cards; no horizontal-scroll dependency        |
+| Listing Offer Summary        | Listing-level stats and links                           | Live, paused, under offer                                 | Stats use plain text; hides private info outside seller routes                |
+| Offer Comparison Row         | Buyer-safe label, amount, difference, threshold, action | Above/below threshold, waiting, closed                    | Not a ranking; accessible table/list semantics                                |
+| Offer Detail Header          | Breadcrumb, property, title, state                      | Buyer, seller                                             | One `h1`; status and next action beneath                                      |
+| Buyer-Safe Identity          | Buyer number + verified label                           | Standard                                                  | No real identity/ID derivation; stable per listing                            |
+| Negotiation Timeline         | Ordered list of immutable events                        | Active, closed                                            | Structured list; latest change announced; no chat styling                     |
+| Timeline Event               | Marker, actor, action, amount, time                     | Buyer, seller, system                                     | Complete textual event; datetime element                                      |
+| Counteroffer Form            | Context, amount, expiry, comparison                     | Buyer, seller, review                                     | Focus first field; mobile sheet; close restores focus                         |
+| Accept Confirmation Dialog   | Consequence summary + disclosure                        | Seller accepts buyer; buyer accepts counter               | Focus trap; primary consequential but blue, not green celebration             |
+| Reject Confirmation Dialog   | Explanation + private reason                            | Seller, buyer                                             | Focus trap; restrained destructive treatment                                  |
+| Withdraw Confirmation Dialog | Consequence + actions                                   | Buyer                                                     | Focus trap; no undo promise                                                   |
+| Expiry Selector              | Four radio/select options                               | 48h, 3d, 7d, none                                         | Native/select semantics; exact resulting date shown                           |
+| Threshold Indicator          | Seller-only classification                              | At/above, below                                           | Never sent/rendered for buyer projection                                      |
+| Next Action Panel            | Current proposal + dominant actions                     | Buyer action, seller action, waiting, closed              | Sticky desktop; mobile bottom bar; status announced                           |
+| Offer Notification Badge     | Unread/action count                                     | 0, 1–99, 99+                                              | Accessible name includes count; not threshold count leak to buyer             |
+| Realtime Status Indicator    | Degraded connection banner                              | Reconnecting, stale, recovered                            | Hidden when healthy; polite announcement                                      |
+| Closed Offer Panel           | Reason and allowed next step                            | Rejected, withdrawn, expired, unavailable, other accepted | Calm neutral surface; no active controls                                      |
+| Accepted Offer Success Panel | Accepted amount + Week 5 handoff                        | Buyer, seller                                             | No confetti; focus success heading                                            |
+| Mobile Offer Action Bar      | Primary action controls                                 | Buyer, seller, waiting                                    | Safe-area inset; 48 px actions; logical order in RTL                          |
 
 ## 32.1 Reuse
 
@@ -1797,32 +1844,32 @@ Reuse existing:
 
 # 33. Validation Matrix
 
-| Screen | Field/action | Rule | Trigger | English copy | Placement | Clears when | Blocking? | Arabic review |
-|---|---|---|---|---|---|---|---|---|
-| Offer form | Amount empty | Required | Blur/submit | `Enter your offer amount.` | Under field | Valid amount | Yes | Language |
-| Offer form | Zero | > 0 | Blur/submit | `Offer amount must be greater than zero.` | Under field | > 0 | Yes | Language |
-| Offer form | Negative | Positive only | Input/submit | `Enter a positive offer amount.` | Under field | Positive | Yes | Language |
-| Offer form | Invalid number | Whole AED number | Input/submit | `Enter a valid amount in AED.` | Under field | Valid | Yes | Language |
-| Offer form | Amount too large | ≤ 999,999,999 | Submit | `Offer amount must be AED 999,999,999 or less.` | Under field | Within max | Yes | Language |
-| Offer form | Decimals | Whole dirhams | Input/submit | `Enter the amount in whole dirhams.` | Under field | Integer | Yes | Language |
-| Offer form | Low warning | >20% below asking | Valid input | `This offer is significantly below the asking price. You can still submit it, but the seller may be less likely to respond.` | Below comparison | Amount changes | No | Language |
-| Offer form | High warning | >20% above asking | Valid input | `This offer is significantly above the asking price. Review the amount before continuing.` | Below comparison | Amount changes | No | Language |
-| Eligibility | Own listing | Buyer must not own | Open/submit | `This is your listing. Manage offers from My Listings.` | Page panel | Different listing | Yes | Language |
-| Eligibility | Non-LIVE/paused | Must be LIVE/available | Open/submit | `This property is no longer available for offers.` | Page panel | Listing available | Yes | Language |
-| Eligibility | Under offer | No accepted offer | Open/submit | `This property is under offer and is not accepting new offers.` | Page panel | Not reversible in Week 4 | Yes | Language |
-| Offer form | Existing active thread | One active thread | Open/submit | `You already have an active offer for this property.` | Page alert | Open thread | Yes | Language |
-| Submit | Duplicate request | Idempotent | Double request | No error; route to existing submitted thread | N/A | N/A | No | N/A |
-| Counter | Amount invalid | Same rules | Blur/submit | `Enter a valid counteroffer amount in AED.` | Under field | Valid | Yes | Language |
-| Counter | Same as current | Must differ | Submit | `This matches the current proposal. Accept it instead, or enter a different amount.` | Under field | Different | Yes | Language |
-| Thread action | Proposal expired | Before action | Server response | `This proposal has expired and can no longer be acted on.` | Form alert | Refresh/new thread | Yes | Language |
-| Thread action | Already acted on | Current version required | Server response | `This offer has changed. We have refreshed the latest status.` | Page alert | Refresh | Yes | Language |
-| Accept | Stale proposal | Current proposal required | Confirm | `A newer proposal is available. Review it before accepting.` | Dialog/page alert | Review current | Yes | Language |
-| Accept | Second accepted offer | Only one per listing | Server conflict | `Another offer has already been accepted for this property.` | Dialog/page alert | Refresh | Yes | Security + language |
-| Withdraw | Already accepted | Active only | Confirm | `This offer has already been accepted and cannot be withdrawn.` | Dialog alert | N/A | Yes | Language |
-| Negotiation | Listing paused | Listing available | Event/action | `The listing was paused, so this negotiation is now closed.` | Closed panel | New listing cycle | Yes | Language |
-| Negotiation | Material change | Original facts invalidated | Event/action | `The property details changed, so this negotiation is now closed.` | Closed panel | New offer | Yes | Language |
-| Realtime | Conflict | Version mismatch | Mutation | `Another action was completed first. Review the latest status.` | Page alert | Refresh | Yes | Language |
-| Session | Expired | Active auth required | Any mutation | `Your session has expired. Sign in again to continue.` | Session notice | Sign in | Yes | Security + language |
+| Screen        | Field/action           | Rule                       | Trigger         | English copy                                                                                                                 | Placement         | Clears when              | Blocking? | Arabic review       |
+| ------------- | ---------------------- | -------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------ | --------- | ------------------- |
+| Offer form    | Amount empty           | Required                   | Blur/submit     | `Enter your offer amount.`                                                                                                   | Under field       | Valid amount             | Yes       | Language            |
+| Offer form    | Zero                   | > 0                        | Blur/submit     | `Offer amount must be greater than zero.`                                                                                    | Under field       | > 0                      | Yes       | Language            |
+| Offer form    | Negative               | Positive only              | Input/submit    | `Enter a positive offer amount.`                                                                                             | Under field       | Positive                 | Yes       | Language            |
+| Offer form    | Invalid number         | Whole AED number           | Input/submit    | `Enter a valid amount in AED.`                                                                                               | Under field       | Valid                    | Yes       | Language            |
+| Offer form    | Amount too large       | ≤ 999,999,999              | Submit          | `Offer amount must be AED 999,999,999 or less.`                                                                              | Under field       | Within max               | Yes       | Language            |
+| Offer form    | Decimals               | Whole dirhams              | Input/submit    | `Enter the amount in whole dirhams.`                                                                                         | Under field       | Integer                  | Yes       | Language            |
+| Offer form    | Low warning            | >20% below asking          | Valid input     | `This offer is significantly below the asking price. You can still submit it, but the seller may be less likely to respond.` | Below comparison  | Amount changes           | No        | Language            |
+| Offer form    | High warning           | >20% above asking          | Valid input     | `This offer is significantly above the asking price. Review the amount before continuing.`                                   | Below comparison  | Amount changes           | No        | Language            |
+| Eligibility   | Own listing            | Buyer must not own         | Open/submit     | `This is your listing. Manage offers from My Listings.`                                                                      | Page panel        | Different listing        | Yes       | Language            |
+| Eligibility   | Non-LIVE/paused        | Must be LIVE/available     | Open/submit     | `This property is no longer available for offers.`                                                                           | Page panel        | Listing available        | Yes       | Language            |
+| Eligibility   | Under offer            | No accepted offer          | Open/submit     | `This property is under offer and is not accepting new offers.`                                                              | Page panel        | Not reversible in Week 4 | Yes       | Language            |
+| Offer form    | Existing active thread | One active thread          | Open/submit     | `You already have an active offer for this property.`                                                                        | Page alert        | Open thread              | Yes       | Language            |
+| Submit        | Duplicate request      | Idempotent                 | Double request  | No error; route to existing submitted thread                                                                                 | N/A               | N/A                      | No        | N/A                 |
+| Counter       | Amount invalid         | Same rules                 | Blur/submit     | `Enter a valid counteroffer amount in AED.`                                                                                  | Under field       | Valid                    | Yes       | Language            |
+| Counter       | Same as current        | Must differ                | Submit          | `This matches the current proposal. Accept it instead, or enter a different amount.`                                         | Under field       | Different                | Yes       | Language            |
+| Thread action | Proposal expired       | Before action              | Server response | `This proposal has expired and can no longer be acted on.`                                                                   | Form alert        | Refresh/new thread       | Yes       | Language            |
+| Thread action | Already acted on       | Current version required   | Server response | `This offer has changed. We have refreshed the latest status.`                                                               | Page alert        | Refresh                  | Yes       | Language            |
+| Accept        | Stale proposal         | Current proposal required  | Confirm         | `A newer proposal is available. Review it before accepting.`                                                                 | Dialog/page alert | Review current           | Yes       | Language            |
+| Accept        | Second accepted offer  | Only one per listing       | Server conflict | `Another offer has already been accepted for this property.`                                                                 | Dialog/page alert | Refresh                  | Yes       | Security + language |
+| Withdraw      | Already accepted       | Active only                | Confirm         | `This offer has already been accepted and cannot be withdrawn.`                                                              | Dialog alert      | N/A                      | Yes       | Language            |
+| Negotiation   | Listing paused         | Listing available          | Event/action    | `The listing was paused, so this negotiation is now closed.`                                                                 | Closed panel      | New listing cycle        | Yes       | Language            |
+| Negotiation   | Material change        | Original facts invalidated | Event/action    | `The property details changed, so this negotiation is now closed.`                                                           | Closed panel      | New offer                | Yes       | Language            |
+| Realtime      | Conflict               | Version mismatch           | Mutation        | `Another action was completed first. Review the latest status.`                                                              | Page alert        | Refresh                  | Yes       | Language            |
+| Session       | Expired                | Active auth required       | Any mutation    | `Your session has expired. Sign in again to continue.`                                                                       | Session notice    | Sign in                  | Yes       | Security + language |
 
 ---
 
@@ -2128,144 +2175,144 @@ Never audit tokens, contact information, raw request bodies, free-form text, or 
 
 ## 38.1 Property and offer creation
 
-| Key | English |
-|---|---|
-| `offer.cta.make` | Make an offer |
-| `offer.cta.view` | View your offer |
-| `offer.cta.underOffer` | Under offer |
-| `offer.form.title` | Make an offer |
-| `offer.form.description` | Enter the amount you would like the seller to consider. |
-| `offer.form.amount` | Your offer |
-| `offer.form.asking` | Asking price: AED {amount} |
-| `offer.form.expiry` | Offer validity |
-| `offer.form.expiryHelp` | The seller must respond before this proposal expires. |
-| `offer.form.review` | Review offer |
-| `offer.form.cancel` | Cancel |
-| `offer.warning.low` | This offer is significantly below the asking price. You can still submit it, but the seller may be less likely to respond. |
-| `offer.warning.high` | This offer is significantly above the asking price. Review the amount before continuing. |
+| Key                      | English                                                                                                                    |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `offer.cta.make`         | Make an offer                                                                                                              |
+| `offer.cta.view`         | View your offer                                                                                                            |
+| `offer.cta.underOffer`   | Under offer                                                                                                                |
+| `offer.form.title`       | Make an offer                                                                                                              |
+| `offer.form.description` | Enter the amount you would like the seller to consider.                                                                    |
+| `offer.form.amount`      | Your offer                                                                                                                 |
+| `offer.form.asking`      | Asking price: AED {amount}                                                                                                 |
+| `offer.form.expiry`      | Offer validity                                                                                                             |
+| `offer.form.expiryHelp`  | The seller must respond before this proposal expires.                                                                      |
+| `offer.form.review`      | Review offer                                                                                                               |
+| `offer.form.cancel`      | Cancel                                                                                                                     |
+| `offer.warning.low`      | This offer is significantly below the asking price. You can still submit it, but the seller may be less likely to respond. |
+| `offer.warning.high`     | This offer is significantly above the asking price. Review the amount before continuing.                                   |
 
 ## 38.2 Review and submission
 
-| Key | English |
-|---|---|
-| `offer.review.title` | Review your offer |
-| `offer.review.description` | Check the amount and validity before sending it to the seller. |
+| Key                           | English                                                                                                              |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `offer.review.title`          | Review your offer                                                                                                    |
+| `offer.review.description`    | Check the amount and validity before sending it to the seller.                                                       |
 | `offer.disclosure.nonBinding` | This offer is an expression of interest for this prototype. It does not create a legally binding property agreement. |
-| `offer.review.edit` | Edit offer |
-| `offer.review.submit` | Submit offer |
-| `offer.review.submitting` | Submitting offer… |
-| `offer.submitted.title` | Your offer has been sent |
-| `offer.submitted.body` | The seller can review, accept, reject, or propose a different amount. |
-| `offer.status.waitingSeller` | Waiting for seller |
-| `offer.action.viewDetails` | View offer details |
-| `offer.action.myOffers` | View My Offers |
+| `offer.review.edit`           | Edit offer                                                                                                           |
+| `offer.review.submit`         | Submit offer                                                                                                         |
+| `offer.review.submitting`     | Submitting offer…                                                                                                    |
+| `offer.submitted.title`       | Your offer has been sent                                                                                             |
+| `offer.submitted.body`        | The seller can review, accept, reject, or propose a different amount.                                                |
+| `offer.status.waitingSeller`  | Waiting for seller                                                                                                   |
+| `offer.action.viewDetails`    | View offer details                                                                                                   |
+| `offer.action.myOffers`       | View My Offers                                                                                                       |
 
 ## 38.3 Offers hub
 
-| Key | English |
-|---|---|
-| `offers.title` | Offers |
-| `offers.tab.made` | Made by me |
-| `offers.tab.received` | Received on my listings |
-| `offers.filter.all` | All |
-| `offers.filter.action` | Needs your action |
-| `offers.filter.waiting` | Waiting |
-| `offers.filter.accepted` | Accepted |
-| `offers.filter.closed` | Closed |
-| `offers.buyer.emptyTitle` | You have not made any offers yet |
-| `offers.buyer.emptyBody` | Browse properties and make an offer when you find the right home. |
-| `offers.seller.title` | Offers received |
-| `offers.seller.description` | Review and respond to offers across your live listings. |
-| `offers.seller.emptyTitle` | No offers received yet |
-| `offers.seller.emptyBody` | Offers from interested customers will appear here. |
-| `offers.action.browse` | Browse properties |
+| Key                         | English                                                           |
+| --------------------------- | ----------------------------------------------------------------- |
+| `offers.title`              | Offers                                                            |
+| `offers.tab.made`           | Made by me                                                        |
+| `offers.tab.received`       | Received on my listings                                           |
+| `offers.filter.all`         | All                                                               |
+| `offers.filter.action`      | Needs your action                                                 |
+| `offers.filter.waiting`     | Waiting                                                           |
+| `offers.filter.accepted`    | Accepted                                                          |
+| `offers.filter.closed`      | Closed                                                            |
+| `offers.buyer.emptyTitle`   | You have not made any offers yet                                  |
+| `offers.buyer.emptyBody`    | Browse properties and make an offer when you find the right home. |
+| `offers.seller.title`       | Offers received                                                   |
+| `offers.seller.description` | Review and respond to offers across your live listings.           |
+| `offers.seller.emptyTitle`  | No offers received yet                                            |
+| `offers.seller.emptyBody`   | Offers from interested customers will appear here.                |
+| `offers.action.browse`      | Browse properties                                                 |
 
 ## 38.4 Status and next action
 
-| Key | English |
-|---|---|
-| `offer.status.responseNeeded` | Your response is needed |
-| `offer.status.waitingBuyer` | Waiting for buyer |
-| `offer.status.accepted` | Offer accepted |
-| `offer.status.rejected` | Offer declined |
-| `offer.status.withdrawn` | Offer withdrawn |
-| `offer.status.expired` | Offer expired |
-| `offer.status.unavailable` | Listing unavailable |
-| `offer.status.otherAccepted` | Property is under offer |
-| `offer.context.otherOffers` | The seller may be reviewing other offers. |
-| `offer.threshold.above` | At or above notification threshold |
-| `offer.threshold.below` | Below notification threshold |
-| `offer.threshold.help` | The threshold controls immediate notifications only. It does not prevent or hide lower offers. |
+| Key                           | English                                                                                        |
+| ----------------------------- | ---------------------------------------------------------------------------------------------- |
+| `offer.status.responseNeeded` | Your response is needed                                                                        |
+| `offer.status.waitingBuyer`   | Waiting for buyer                                                                              |
+| `offer.status.accepted`       | Offer accepted                                                                                 |
+| `offer.status.rejected`       | Offer declined                                                                                 |
+| `offer.status.withdrawn`      | Offer withdrawn                                                                                |
+| `offer.status.expired`        | Offer expired                                                                                  |
+| `offer.status.unavailable`    | Listing unavailable                                                                            |
+| `offer.status.otherAccepted`  | Property is under offer                                                                        |
+| `offer.context.otherOffers`   | The seller may be reviewing other offers.                                                      |
+| `offer.threshold.above`       | At or above notification threshold                                                             |
+| `offer.threshold.below`       | Below notification threshold                                                                   |
+| `offer.threshold.help`        | The threshold controls immediate notifications only. It does not prevent or hide lower offers. |
 
 ## 38.5 Counter
 
-| Key | English |
-|---|---|
-| `counter.seller.title` | Make a counteroffer |
-| `counter.buyer.title` | Propose a different amount |
-| `counter.description` | Enter a new amount for the other party to consider. |
-| `counter.review` | Review counteroffer |
-| `counter.submit` | Submit counteroffer |
-| `counter.submitting` | Submitting counteroffer… |
-| `counter.disclosure` | This counteroffer remains part of a non-binding prototype negotiation. |
-| `counter.equalError` | This matches the current proposal. Accept it instead, or enter a different amount. |
-| `counter.received` | The seller proposed a different amount. |
-| `counter.buyerSubmitted` | Your counteroffer has been sent to the seller. |
+| Key                      | English                                                                            |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| `counter.seller.title`   | Make a counteroffer                                                                |
+| `counter.buyer.title`    | Propose a different amount                                                         |
+| `counter.description`    | Enter a new amount for the other party to consider.                                |
+| `counter.review`         | Review counteroffer                                                                |
+| `counter.submit`         | Submit counteroffer                                                                |
+| `counter.submitting`     | Submitting counteroffer…                                                           |
+| `counter.disclosure`     | This counteroffer remains part of a non-binding prototype negotiation.             |
+| `counter.equalError`     | This matches the current proposal. Accept it instead, or enter a different amount. |
+| `counter.received`       | The seller proposed a different amount.                                            |
+| `counter.buyerSubmitted` | Your counteroffer has been sent to the seller.                                     |
 
 ## 38.6 Accept, reject, withdraw
 
-| Key | English |
-|---|---|
-| `accept.title` | Accept this offer? |
-| `accept.body` | This will select this buyer’s offer and close other active negotiations for the property. |
-| `accept.week5` | Transaction setup will continue in the next stage. |
-| `accept.disclosure` | This prototype acceptance does not create a legally binding property agreement. |
-| `accept.action` | Accept offer |
-| `accept.counterTitle` | Accept this counteroffer? |
-| `accept.counterAction` | Accept counteroffer |
-| `accept.successTitle` | Offer accepted |
+| Key                    | English                                                                                      |
+| ---------------------- | -------------------------------------------------------------------------------------------- |
+| `accept.title`         | Accept this offer?                                                                           |
+| `accept.body`          | This will select this buyer’s offer and close other active negotiations for the property.    |
+| `accept.week5`         | Transaction setup will continue in the next stage.                                           |
+| `accept.disclosure`    | This prototype acceptance does not create a legally binding property agreement.              |
+| `accept.action`        | Accept offer                                                                                 |
+| `accept.counterTitle`  | Accept this counteroffer?                                                                    |
+| `accept.counterAction` | Accept counteroffer                                                                          |
+| `accept.successTitle`  | Offer accepted                                                                               |
 | `accept.sellerSuccess` | This buyer’s offer has been selected. The transaction setup will continue in the next stage. |
-| `accept.buyerSuccess` | The seller’s proposal has been accepted. Transaction setup will continue in the next stage. |
-| `reject.title` | Reject this offer? |
-| `reject.body` | This negotiation will close. The buyer will see that the offer was declined. |
-| `reject.action` | Reject offer |
-| `reject.keep` | Keep offer open |
-| `reject.counterTitle` | Reject this counteroffer? |
-| `reject.counterAction` | Reject counteroffer |
-| `withdraw.title` | Withdraw this offer? |
-| `withdraw.body` | The seller will no longer be able to accept or respond to this offer. |
-| `withdraw.action` | Withdraw offer |
-| `withdraw.keep` | Keep offer open |
+| `accept.buyerSuccess`  | The seller’s proposal has been accepted. Transaction setup will continue in the next stage.  |
+| `reject.title`         | Reject this offer?                                                                           |
+| `reject.body`          | This negotiation will close. The buyer will see that the offer was declined.                 |
+| `reject.action`        | Reject offer                                                                                 |
+| `reject.keep`          | Keep offer open                                                                              |
+| `reject.counterTitle`  | Reject this counteroffer?                                                                    |
+| `reject.counterAction` | Reject counteroffer                                                                          |
+| `withdraw.title`       | Withdraw this offer?                                                                         |
+| `withdraw.body`        | The seller will no longer be able to accept or respond to this offer.                        |
+| `withdraw.action`      | Withdraw offer                                                                               |
+| `withdraw.keep`        | Keep offer open                                                                              |
 
 ## 38.7 Closed and error states
 
-| Key | English |
-|---|---|
-| `closed.expiredTitle` | This offer has expired |
-| `closed.expiredBody` | The proposal is no longer available to accept or counter. |
-| `closed.otherAcceptedTitle` | Property is under offer |
-| `closed.otherAcceptedBody` | The seller selected another offer, so this negotiation is now closed. |
-| `closed.pausedBody` | The listing was paused, so this negotiation is now closed. |
-| `closed.changedBody` | The property details changed, so this negotiation is now closed. |
-| `error.notAvailableTitle` | This offer is not available |
-| `error.notAvailableBody` | It may no longer exist, or you may not have permission to view it. |
-| `error.staleTitle` | This offer has changed |
-| `error.staleBody` | Another action was completed before yours. We have refreshed the latest status. |
-| `error.generic` | We could not complete this action. Review the latest offer status and try again. |
-| `error.session` | Your session has expired. Sign in again to continue. |
-| `realtime.reconnecting` | Reconnecting to live updates… |
-| `realtime.stale` | Updates may be delayed. Refresh to check the latest offer status. |
-| `realtime.recovered` | Offer status is up to date. |
+| Key                         | English                                                                          |
+| --------------------------- | -------------------------------------------------------------------------------- |
+| `closed.expiredTitle`       | This offer has expired                                                           |
+| `closed.expiredBody`        | The proposal is no longer available to accept or counter.                        |
+| `closed.otherAcceptedTitle` | Property is under offer                                                          |
+| `closed.otherAcceptedBody`  | The seller selected another offer, so this negotiation is now closed.            |
+| `closed.pausedBody`         | The listing was paused, so this negotiation is now closed.                       |
+| `closed.changedBody`        | The property details changed, so this negotiation is now closed.                 |
+| `error.notAvailableTitle`   | This offer is not available                                                      |
+| `error.notAvailableBody`    | It may no longer exist, or you may not have permission to view it.               |
+| `error.staleTitle`          | This offer has changed                                                           |
+| `error.staleBody`           | Another action was completed before yours. We have refreshed the latest status.  |
+| `error.generic`             | We could not complete this action. Review the latest offer status and try again. |
+| `error.session`             | Your session has expired. Sign in again to continue.                             |
+| `realtime.reconnecting`     | Reconnecting to live updates…                                                    |
+| `realtime.stale`            | Updates may be delayed. Refresh to check the latest offer status.                |
+| `realtime.recovered`        | Offer status is up to date.                                                      |
 
 ## 38.8 Authentication interception
 
-| Key | English |
-|---|---|
-| `offer.auth.title` | Sign in to make an offer |
-| `offer.auth.body` | Create or sign in to your MARKAZ account, then return to this property to continue. |
-| `offer.auth.signIn` | Sign in |
-| `offer.auth.create` | Create account |
-| `offer.auth.cancel` | Not now |
+| Key                 | English                                                                             |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| `offer.auth.title`  | Sign in to make an offer                                                            |
+| `offer.auth.body`   | Create or sign in to your MARKAZ account, then return to this property to continue. |
+| `offer.auth.signIn` | Sign in                                                                             |
+| `offer.auth.create` | Create account                                                                      |
+| `offer.auth.cancel` | Not now                                                                             |
 
 ---
 
@@ -2273,39 +2320,39 @@ Never audit tokens, contact information, raw request bodies, free-form text, or 
 
 **Status:** All Arabic below is draft. Professional Arabic review is required. Non-binding, acceptance, property, and financial terminology also require legal/business review.
 
-| English | Draft Arabic | Review |
-|---|---|---|
-| Make an offer | تقديم عرض | Language + property |
-| View your offer | عرض تفاصيل عرضك | Language |
-| Under offer | قيد التفاوض على عرض | Product + language |
-| Your offer | عرضك | Language |
-| Asking price | السعر المطلوب | Property |
-| Offer validity | مدة صلاحية العرض | Legal + language |
-| Review offer | مراجعة العرض | Language |
-| Submit offer | إرسال العرض | Language |
-| Your offer has been sent | تم إرسال عرضك | Language |
-| Waiting for seller | بانتظار رد البائع | Language |
-| Offers | العروض | Language |
-| Made by me | العروض التي قدّمتها | Language |
-| Received on my listings | العروض الواردة على عقاراتي | Property + language |
-| Needs your action | يتطلب إجراءً منك | Language |
-| Offer accepted | تم قبول العرض | Legal + language |
-| Offer declined | تم رفض العرض | Language |
-| Offer withdrawn | تم سحب العرض | Language |
-| Offer expired | انتهت صلاحية العرض | Legal + language |
-| Make a counteroffer | تقديم عرض مقابل | Legal + property |
-| Propose a different amount | اقتراح مبلغ مختلف | Language |
-| Accept offer | قبول العرض | Legal |
-| Reject offer | رفض العرض | Legal |
-| Withdraw offer | سحب العرض | Legal |
-| At or above notification threshold | عند حد الإشعار أو أعلى منه | Product + language |
-| Below notification threshold | أقل من حد الإشعار | Product + language |
-| Buyer 01 | المشتري 01 | Product + language |
-| Verified customer | عميل تم التحقق منه تجريبيًا | Business + language |
-| Property is under offer | العقار قيد التفاوض على عرض | Product + language |
-| Sign in to make an offer | سجّل الدخول لتقديم عرض | Language |
-| This offer is not available | هذا العرض غير متاح | Security + language |
-| Reconnecting to live updates… | جارٍ إعادة الاتصال بالتحديثات المباشرة… | Language |
+| English                            | Draft Arabic                            | Review              |
+| ---------------------------------- | --------------------------------------- | ------------------- |
+| Make an offer                      | تقديم عرض                               | Language + property |
+| View your offer                    | عرض تفاصيل عرضك                         | Language            |
+| Under offer                        | قيد التفاوض على عرض                     | Product + language  |
+| Your offer                         | عرضك                                    | Language            |
+| Asking price                       | السعر المطلوب                           | Property            |
+| Offer validity                     | مدة صلاحية العرض                        | Legal + language    |
+| Review offer                       | مراجعة العرض                            | Language            |
+| Submit offer                       | إرسال العرض                             | Language            |
+| Your offer has been sent           | تم إرسال عرضك                           | Language            |
+| Waiting for seller                 | بانتظار رد البائع                       | Language            |
+| Offers                             | العروض                                  | Language            |
+| Made by me                         | العروض التي قدّمتها                     | Language            |
+| Received on my listings            | العروض الواردة على عقاراتي              | Property + language |
+| Needs your action                  | يتطلب إجراءً منك                        | Language            |
+| Offer accepted                     | تم قبول العرض                           | Legal + language    |
+| Offer declined                     | تم رفض العرض                            | Language            |
+| Offer withdrawn                    | تم سحب العرض                            | Language            |
+| Offer expired                      | انتهت صلاحية العرض                      | Legal + language    |
+| Make a counteroffer                | تقديم عرض مقابل                         | Legal + property    |
+| Propose a different amount         | اقتراح مبلغ مختلف                       | Language            |
+| Accept offer                       | قبول العرض                              | Legal               |
+| Reject offer                       | رفض العرض                               | Legal               |
+| Withdraw offer                     | سحب العرض                               | Legal               |
+| At or above notification threshold | عند حد الإشعار أو أعلى منه              | Product + language  |
+| Below notification threshold       | أقل من حد الإشعار                       | Product + language  |
+| Buyer 01                           | المشتري 01                              | Product + language  |
+| Verified customer                  | عميل تم التحقق منه تجريبيًا             | Business + language |
+| Property is under offer            | العقار قيد التفاوض على عرض              | Product + language  |
+| Sign in to make an offer           | سجّل الدخول لتقديم عرض                  | Language            |
+| This offer is not available        | هذا العرض غير متاح                      | Security + language |
+| Reconnecting to live updates…      | جارٍ إعادة الاتصال بالتحديثات المباشرة… | Language            |
 
 Draft non-binding wording:
 
@@ -2319,43 +2366,43 @@ Requires legal and professional Arabic review.
 
 ## 40.1 Screen handoff table
 
-| Route / state | Screen | Perspective | Listing / offer state | Primary action | Secondary actions | Loading / error / conflict | Transition | Key implementation notes |
-|---|---|---|---|---|---|---|---|---|
-| Public property | Property with Make an Offer | Buyer/anon | LIVE + AVAILABLE | Make an offer | Save, Share | Eligibility refresh | Open auth/form | Reuse Week 3 detail; owner/under-offer variants |
-| Property dialog | Anonymous interception | Anonymous | LIVE + AVAILABLE | Sign in | Create account, Not now | Listing recheck after auth | Safe return | Do not preserve amount |
-| `/properties/.../offer` | Offer amount | Buyer | No active thread | Review offer | Cancel | Validation, unavailable | Local review state | AED whole dirhams; expiry default 7d |
-| Same | Warning state | Buyer | Unusual valid amount | Review offer | Edit | Non-blocking warning | Review | Never expose threshold |
-| Same | Review Offer | Buyer | Draft | Submit offer | Edit | Submit conflict/session | `AWAITING_SELLER` | Idempotent create |
-| `/offers/[id]` | Offer submitted | Buyer | AWAITING_SELLER | View details | Property, My Offers | Thread load | Same thread | Success focus |
-| `/offers?view=made` | Buyer Offers empty | Buyer | None | Browse properties | Switch tab | Load/error | Marketplace | Empty state |
-| Same | Buyer Offers populated | Buyer | Mixed | Open next action | Filters | Partial load | Thread | Result announcement |
-| `/offers/[id]` | Waiting for seller | Buyer | AWAITING_SELLER | Withdraw | Property | Realtime/stale | WITHDRAWN | No counter while own proposal current |
-| Same | Seller counter received | Buyer | AWAITING_BUYER | Accept counter | Counter, Reject, Withdraw | Expiry/conflict | ACCEPTED/AWAITING_SELLER/REJECTED/WITHDRAWN | Sticky action panel |
-| Same | Buyer counter form | Buyer | AWAITING_BUYER | Review counter | Cancel | Validation | Review | Immutable proposal |
-| Same | Buyer accepts counter | Buyer | AWAITING_BUYER | Accept counteroffer | Cancel | Concurrent accept | ACCEPTED | Listing UNDER_OFFER |
-| Same | Buyer rejects counter | Buyer | AWAITING_BUYER | Reject counteroffer | Continue negotiating | Stale | REJECTED | Closed |
-| Same | Buyer withdrawal | Buyer | Active | Withdraw offer | Keep open | Stale/accepted | WITHDRAWN | Closed |
-| Same | Accepted | Buyer | ACCEPTED | Return to Offers | View property | N/A | Week 5 future | No transaction UI |
-| Same | Rejected/expired/unavailable | Buyer | Closed | Return to Offers | New offer if eligible | N/A | Closed | Reason-specific safe panel |
-| `/offers?view=received` | Seller Offers empty | Seller | No threads | Return to listings | Switch tab | Load/error | My Listings | Clear explanation |
-| Same | Seller Offers inbox | Seller | Mixed | Review offer | Filters/sort | Partial load | Thread | Threshold seller-only |
-| `/sell/listings/[id]/offers` | Listing-specific offers | Seller | LIVE | Review offer | Manage/View public | Listing state conflict | Thread | Private comparison |
-| `/offers/[id]` | Seller detail | Seller | AWAITING_SELLER | Accept | Counter, Reject | Stale/expired | Selected action | Buyer-safe identity |
-| Dialog | Accept confirmation | Seller | Current proposal | Accept offer | Cancel | Double accept | ACCEPTED | Atomic close competing |
-| Thread | Accept success | Seller | ACCEPTED | Manage listing | Return Offers | N/A | Under Offer | Week 5 handoff only |
-| Panel | Counter form | Seller | AWAITING_SELLER | Review counter | Cancel | Validation | Review | Expiry reset |
-| Thread | Counter submitted | Seller | AWAITING_BUYER | Return Offers | View thread | N/A | AWAITING_BUYER | Notification to buyer |
-| Dialog | Reject confirmation | Seller | AWAITING_SELLER | Reject | Keep open | Stale | REJECTED | Reason private |
-| Thread | Reject success | Seller | REJECTED | Return Offers | N/A | N/A | Closed | No undo |
-| Listing view | Multiple active offers | Seller | LIVE + AVAILABLE | Review thread | Sort/filter | One may change live | Per thread | No ranking |
-| Thread | Another offer accepted | Both | CLOSED_OTHER_ACCEPTED | Return Offers | View property | N/A | Closed | No selected details |
-| Thread | Listing paused | Both | CLOSED_LISTING_UNAVAILABLE | Return Offers | Seller Manage | N/A | Closed | Old thread never resumes |
-| Thread | Negotiation timeline | Both | Any | Context action | N/A | Skeleton/partial | N/A | Ordered immutable events |
-| Banner | Realtime reconnecting | Both | Any | Refresh when stale | N/A | Connection | N/A | Server refetch |
-| Thread | Stale conflict | Both | Changed | Review latest | N/A | Version mismatch | Refetch | Never replay action |
-| Auth | Session expired | Both | Any active | Sign in | Cancel | N/A | Safe return | Require reconfirmation |
-| Mobile | Offer action bar | Both | Actionable | Perspective action | More | Loading/conflict | Per action | Safe-area and RTL |
-| RTL | Arabic offer detail | Both | Any | Same logic | Same | Same | Same | Amounts LTR; layout mirrored |
+| Route / state                | Screen                       | Perspective | Listing / offer state      | Primary action      | Secondary actions         | Loading / error / conflict | Transition                                  | Key implementation notes                        |
+| ---------------------------- | ---------------------------- | ----------- | -------------------------- | ------------------- | ------------------------- | -------------------------- | ------------------------------------------- | ----------------------------------------------- |
+| Public property              | Property with Make an Offer  | Buyer/anon  | LIVE + AVAILABLE           | Make an offer       | Save, Share               | Eligibility refresh        | Open auth/form                              | Reuse Week 3 detail; owner/under-offer variants |
+| Property dialog              | Anonymous interception       | Anonymous   | LIVE + AVAILABLE           | Sign in             | Create account, Not now   | Listing recheck after auth | Safe return                                 | Do not preserve amount                          |
+| `/properties/.../offer`      | Offer amount                 | Buyer       | No active thread           | Review offer        | Cancel                    | Validation, unavailable    | Local review state                          | AED whole dirhams; expiry default 7d            |
+| Same                         | Warning state                | Buyer       | Unusual valid amount       | Review offer        | Edit                      | Non-blocking warning       | Review                                      | Never expose threshold                          |
+| Same                         | Review Offer                 | Buyer       | Draft                      | Submit offer        | Edit                      | Submit conflict/session    | `AWAITING_SELLER`                           | Idempotent create                               |
+| `/offers/[id]`               | Offer submitted              | Buyer       | AWAITING_SELLER            | View details        | Property, My Offers       | Thread load                | Same thread                                 | Success focus                                   |
+| `/offers?view=made`          | Buyer Offers empty           | Buyer       | None                       | Browse properties   | Switch tab                | Load/error                 | Marketplace                                 | Empty state                                     |
+| Same                         | Buyer Offers populated       | Buyer       | Mixed                      | Open next action    | Filters                   | Partial load               | Thread                                      | Result announcement                             |
+| `/offers/[id]`               | Waiting for seller           | Buyer       | AWAITING_SELLER            | Withdraw            | Property                  | Realtime/stale             | WITHDRAWN                                   | No counter while own proposal current           |
+| Same                         | Seller counter received      | Buyer       | AWAITING_BUYER             | Accept counter      | Counter, Reject, Withdraw | Expiry/conflict            | ACCEPTED/AWAITING_SELLER/REJECTED/WITHDRAWN | Sticky action panel                             |
+| Same                         | Buyer counter form           | Buyer       | AWAITING_BUYER             | Review counter      | Cancel                    | Validation                 | Review                                      | Immutable proposal                              |
+| Same                         | Buyer accepts counter        | Buyer       | AWAITING_BUYER             | Accept counteroffer | Cancel                    | Concurrent accept          | ACCEPTED                                    | Listing UNDER_OFFER                             |
+| Same                         | Buyer rejects counter        | Buyer       | AWAITING_BUYER             | Reject counteroffer | Continue negotiating      | Stale                      | REJECTED                                    | Closed                                          |
+| Same                         | Buyer withdrawal             | Buyer       | Active                     | Withdraw offer      | Keep open                 | Stale/accepted             | WITHDRAWN                                   | Closed                                          |
+| Same                         | Accepted                     | Buyer       | ACCEPTED                   | Return to Offers    | View property             | N/A                        | Week 5 future                               | No transaction UI                               |
+| Same                         | Rejected/expired/unavailable | Buyer       | Closed                     | Return to Offers    | New offer if eligible     | N/A                        | Closed                                      | Reason-specific safe panel                      |
+| `/offers?view=received`      | Seller Offers empty          | Seller      | No threads                 | Return to listings  | Switch tab                | Load/error                 | My Listings                                 | Clear explanation                               |
+| Same                         | Seller Offers inbox          | Seller      | Mixed                      | Review offer        | Filters/sort              | Partial load               | Thread                                      | Threshold seller-only                           |
+| `/sell/listings/[id]/offers` | Listing-specific offers      | Seller      | LIVE                       | Review offer        | Manage/View public        | Listing state conflict     | Thread                                      | Private comparison                              |
+| `/offers/[id]`               | Seller detail                | Seller      | AWAITING_SELLER            | Accept              | Counter, Reject           | Stale/expired              | Selected action                             | Buyer-safe identity                             |
+| Dialog                       | Accept confirmation          | Seller      | Current proposal           | Accept offer        | Cancel                    | Double accept              | ACCEPTED                                    | Atomic close competing                          |
+| Thread                       | Accept success               | Seller      | ACCEPTED                   | Manage listing      | Return Offers             | N/A                        | Under Offer                                 | Week 5 handoff only                             |
+| Panel                        | Counter form                 | Seller      | AWAITING_SELLER            | Review counter      | Cancel                    | Validation                 | Review                                      | Expiry reset                                    |
+| Thread                       | Counter submitted            | Seller      | AWAITING_BUYER             | Return Offers       | View thread               | N/A                        | AWAITING_BUYER                              | Notification to buyer                           |
+| Dialog                       | Reject confirmation          | Seller      | AWAITING_SELLER            | Reject              | Keep open                 | Stale                      | REJECTED                                    | Reason private                                  |
+| Thread                       | Reject success               | Seller      | REJECTED                   | Return Offers       | N/A                       | N/A                        | Closed                                      | No undo                                         |
+| Listing view                 | Multiple active offers       | Seller      | LIVE + AVAILABLE           | Review thread       | Sort/filter               | One may change live        | Per thread                                  | No ranking                                      |
+| Thread                       | Another offer accepted       | Both        | CLOSED_OTHER_ACCEPTED      | Return Offers       | View property             | N/A                        | Closed                                      | No selected details                             |
+| Thread                       | Listing paused               | Both        | CLOSED_LISTING_UNAVAILABLE | Return Offers       | Seller Manage             | N/A                        | Closed                                      | Old thread never resumes                        |
+| Thread                       | Negotiation timeline         | Both        | Any                        | Context action      | N/A                       | Skeleton/partial           | N/A                                         | Ordered immutable events                        |
+| Banner                       | Realtime reconnecting        | Both        | Any                        | Refresh when stale  | N/A                       | Connection                 | N/A                                         | Server refetch                                  |
+| Thread                       | Stale conflict               | Both        | Changed                    | Review latest       | N/A                       | Version mismatch           | Refetch                                     | Never replay action                             |
+| Auth                         | Session expired              | Both        | Any active                 | Sign in             | Cancel                    | N/A                        | Safe return                                 | Require reconfirmation                          |
+| Mobile                       | Offer action bar             | Both        | Actionable                 | Perspective action  | More                      | Loading/conflict           | Per action                                  | Safe-area and RTL                               |
+| RTL                          | Arabic offer detail          | Both        | Any                        | Same logic          | Same                      | Same                       | Same                                        | Amounts LTR; layout mirrored                    |
 
 ## 40.2 Requirement labels
 
@@ -2377,52 +2424,52 @@ Use:
 
 ## Priority P0 — approve before implementation
 
-| Mockup | View | Perspective | Listing / offer state | Key interaction | Why approval is required | Engineering must not invent |
-|---|---|---|---|---|---|---|
-| 1. Property detail with Make an Offer | Desktop | Buyer | LIVE + AVAILABLE | Entry CTA | Integrates Week 4 into approved Week 3 page | CTA hierarchy, sticky placement, owner/under-offer variants |
-| 2. Buyer offer form | Desktop | Buyer | Draft | AED entry + expiry | Defines financial hierarchy and warning treatment | Widths, comparison presentation, warning style |
-| 3. Review Offer | Desktop | Buyer | Draft review | Submit | Consequence and disclosure hierarchy | Summary layout, copy placement, action order |
-| 4. Buyer Offers dashboard | Desktop | Buyer | Mixed | Filter/action | Establishes unified Offers architecture | Card anatomy, filter hierarchy, status treatment |
-| 5. Seller Offers inbox | Desktop | Seller | Multiple active | Compare and open | Most information-dense new screen | Row columns, buyer-safe identity, threshold visibility |
-| 6. Listing-specific comparison | Desktop | Seller | LIVE, multiple threads | Compare | Defines private multiple-offer experience | Summary metrics, no ranking, responsive columns |
-| 7. Seller offer detail | Desktop | Seller | AWAITING_SELLER | Accept/counter/reject | Core negotiation decision screen | 8/4 layout, action hierarchy, timeline placement |
-| 8. Negotiation timeline | Desktop | Shared | Multi-counter | Understand history | Prevents chat-like interpretation | Actor styling, event spacing, chronology |
-| 9. Counteroffer form | Desktop | Both variants | Active | Enter/review counter | Must work for buyer and seller | Comparison content, panel behaviour, expiry |
-| 10. Accept confirmation | Desktop modal | Seller | Multiple active | Accept one | Highest-consequence action | Competing-thread warning, disclosure, button treatment |
-| 11. Offer accepted | Desktop | Buyer and seller variants | ACCEPTED | Week 5 handoff | Defines end of milestone | No transaction UI, under-offer treatment |
+| Mockup                                | View          | Perspective               | Listing / offer state  | Key interaction       | Why approval is required                          | Engineering must not invent                                 |
+| ------------------------------------- | ------------- | ------------------------- | ---------------------- | --------------------- | ------------------------------------------------- | ----------------------------------------------------------- |
+| 1. Property detail with Make an Offer | Desktop       | Buyer                     | LIVE + AVAILABLE       | Entry CTA             | Integrates Week 4 into approved Week 3 page       | CTA hierarchy, sticky placement, owner/under-offer variants |
+| 2. Buyer offer form                   | Desktop       | Buyer                     | Draft                  | AED entry + expiry    | Defines financial hierarchy and warning treatment | Widths, comparison presentation, warning style              |
+| 3. Review Offer                       | Desktop       | Buyer                     | Draft review           | Submit                | Consequence and disclosure hierarchy              | Summary layout, copy placement, action order                |
+| 4. Buyer Offers dashboard             | Desktop       | Buyer                     | Mixed                  | Filter/action         | Establishes unified Offers architecture           | Card anatomy, filter hierarchy, status treatment            |
+| 5. Seller Offers inbox                | Desktop       | Seller                    | Multiple active        | Compare and open      | Most information-dense new screen                 | Row columns, buyer-safe identity, threshold visibility      |
+| 6. Listing-specific comparison        | Desktop       | Seller                    | LIVE, multiple threads | Compare               | Defines private multiple-offer experience         | Summary metrics, no ranking, responsive columns             |
+| 7. Seller offer detail                | Desktop       | Seller                    | AWAITING_SELLER        | Accept/counter/reject | Core negotiation decision screen                  | 8/4 layout, action hierarchy, timeline placement            |
+| 8. Negotiation timeline               | Desktop       | Shared                    | Multi-counter          | Understand history    | Prevents chat-like interpretation                 | Actor styling, event spacing, chronology                    |
+| 9. Counteroffer form                  | Desktop       | Both variants             | Active                 | Enter/review counter  | Must work for buyer and seller                    | Comparison content, panel behaviour, expiry                 |
+| 10. Accept confirmation               | Desktop modal | Seller                    | Multiple active        | Accept one            | Highest-consequence action                        | Competing-thread warning, disclosure, button treatment      |
+| 11. Offer accepted                    | Desktop       | Buyer and seller variants | ACCEPTED               | Week 5 handoff        | Defines end of milestone                          | No transaction UI, under-offer treatment                    |
 
 ## Priority P1 — approve during implementation
 
-| Mockup | View | Perspective | State | Key interaction | Why | Must not invent |
-|---|---|---|---|---|---|---|
-| 12. Offer submitted | Desktop | Buyer | AWAITING_SELLER | Success/withdraw | Sets waiting-state tone | Success density and actions |
-| 13. Below-threshold offer | Desktop | Seller | AWAITING_SELLER | Manual review | Protects threshold privacy and avoids negative styling | Indicator language and prominence |
-| 14. Multiple-offer seller view | Desktop | Seller | Multiple | Filter/sort | Validates comparison without auction cues | No leaderboard/ranking |
-| 15. Mobile buyer offer flow | Mobile | Buyer | Draft → review | Amount and sticky action | Ensures keyboard and safe-area behaviour | Form stacking, sticky CTA, review transition |
-| 16. Mobile seller offer detail | Mobile | Seller | AWAITING_SELLER | Accept/counter/more | Consequential actions on small screen | Action order, bottom sheet, timeline |
-| 17. Arabic RTL Buyer Offers | Desktop/mobile | Buyer | Mixed | Filters/open | Validates bidirectional amounts and status | Mirroring, amount isolation, text wrapping |
-| 18. Arabic RTL Seller Offers | Desktop | Seller | Multiple | Compare | Most complex RTL information layout | Column order, threshold text, identity labels |
+| Mockup                         | View           | Perspective | State           | Key interaction          | Why                                                    | Must not invent                               |
+| ------------------------------ | -------------- | ----------- | --------------- | ------------------------ | ------------------------------------------------------ | --------------------------------------------- |
+| 12. Offer submitted            | Desktop        | Buyer       | AWAITING_SELLER | Success/withdraw         | Sets waiting-state tone                                | Success density and actions                   |
+| 13. Below-threshold offer      | Desktop        | Seller      | AWAITING_SELLER | Manual review            | Protects threshold privacy and avoids negative styling | Indicator language and prominence             |
+| 14. Multiple-offer seller view | Desktop        | Seller      | Multiple        | Filter/sort              | Validates comparison without auction cues              | No leaderboard/ranking                        |
+| 15. Mobile buyer offer flow    | Mobile         | Buyer       | Draft → review  | Amount and sticky action | Ensures keyboard and safe-area behaviour               | Form stacking, sticky CTA, review transition  |
+| 16. Mobile seller offer detail | Mobile         | Seller      | AWAITING_SELLER | Accept/counter/more      | Consequential actions on small screen                  | Action order, bottom sheet, timeline          |
+| 17. Arabic RTL Buyer Offers    | Desktop/mobile | Buyer       | Mixed           | Filters/open             | Validates bidirectional amounts and status             | Mirroring, amount isolation, text wrapping    |
+| 18. Arabic RTL Seller Offers   | Desktop        | Seller      | Multiple        | Compare                  | Most complex RTL information layout                    | Column order, threshold text, identity labels |
 
 ---
 
 # 42. Open Product Decisions
 
-| Decision | Recommendation in this spec | Required owner |
-|---|---|---|
-| Offer expiry | Include; default 7 days; 48h/3d/7d/none | Product |
-| Offer notes | Exclude Week 4 | Product |
-| Buyer-safe identity | Stable per-listing `Buyer 01` label + Verified customer | Product/privacy |
-| Viewed event | Include only if consistently persisted; otherwise omit | Engineering/product |
-| Accepted listing visibility | Remains public as Under offer | Product |
-| Rejection reason | Predefined, seller-private | Product/legal |
-| New offer after rejection/withdrawal | Allowed as new thread if listing available | Product |
-| Paused listing threads | Close permanently; never auto-resume | Product |
-| Material edit threads | Close permanently | Product |
-| Under-offer Saved Properties | Remain visible with Under offer | Product |
-| Full notification centre | Deferred; header menu + badges only | Product |
-| Arabic copy | Draft only | Professional Arabic + legal |
-| “Verified customer” wording | Demo verification meaning must be reviewed | Legal/business |
-| Production Realtime channel policy | Participant-only private channels | Engineering/security |
+| Decision                             | Recommendation in this spec                             | Required owner              |
+| ------------------------------------ | ------------------------------------------------------- | --------------------------- |
+| Offer expiry                         | Include; default 7 days; 48h/3d/7d/none                 | Product                     |
+| Offer notes                          | Exclude Week 4                                          | Product                     |
+| Buyer-safe identity                  | Stable per-listing `Buyer 01` label + Verified customer | Product/privacy             |
+| Viewed event                         | Include only if consistently persisted; otherwise omit  | Engineering/product         |
+| Accepted listing visibility          | Remains public as Under offer                           | Product                     |
+| Rejection reason                     | Predefined, seller-private                              | Product/legal               |
+| New offer after rejection/withdrawal | Allowed as new thread if listing available              | Product                     |
+| Paused listing threads               | Close permanently; never auto-resume                    | Product                     |
+| Material edit threads                | Close permanently                                       | Product                     |
+| Under-offer Saved Properties         | Remain visible with Under offer                         | Product                     |
+| Full notification centre             | Deferred; header menu + badges only                     | Product                     |
+| Arabic copy                          | Draft only                                              | Professional Arabic + legal |
+| “Verified customer” wording          | Demo verification meaning must be reviewed              | Legal/business              |
+| Production Realtime channel policy   | Participant-only private channels                       | Engineering/security        |
 
 ---
 

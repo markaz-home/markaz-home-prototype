@@ -225,16 +225,16 @@ Static gate (this closure):
 
 Integration (live local Supabase stack), **8 files / 49 tests passing**:
 
-| Suite | Tests | Covers |
-|---|---|---|
-| `rls.test.ts` | 9 | RLS identity propagation + policy matrix |
-| `storage.test.ts` | 3 | public read / private signed-URL boundary |
-| `listing-privacy.test.ts` | 5 | draft public-projection privacy |
-| `provisioning.test.ts` | 3 | demo provisioning |
-| `listing-journey.test.ts` | 6 | wizard → READY |
-| `publication-marketplace.test.ts` | 4 | publish→LIVE→anon marketplace, privacy, pause/resume, owner-cannot-save |
-| **`publication-security.test.ts`** | **14** | Storage write/update/delete denied for customers; reads allowed; service copy/cleanup; `public_path` customer-write denied + elevated-write allowed; saved-property self/non-LIVE/cross-user denied + cross-owner-LIVE allowed + own-remove |
-| **`publication-compensation.test.ts`** | **5** | Scenarios A–E: partial photo failure cleanup; DB-failure-after-copy cleanup + retry→LIVE; retry produces no duplicate objects; repeated success no-op; repeated cleanup safe |
+| Suite                                  | Tests  | Covers                                                                                                                                                                                                                                      |
+| -------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rls.test.ts`                          | 9      | RLS identity propagation + policy matrix                                                                                                                                                                                                    |
+| `storage.test.ts`                      | 3      | public read / private signed-URL boundary                                                                                                                                                                                                   |
+| `listing-privacy.test.ts`              | 5      | draft public-projection privacy                                                                                                                                                                                                             |
+| `provisioning.test.ts`                 | 3      | demo provisioning                                                                                                                                                                                                                           |
+| `listing-journey.test.ts`              | 6      | wizard → READY                                                                                                                                                                                                                              |
+| `publication-marketplace.test.ts`      | 4      | publish→LIVE→anon marketplace, privacy, pause/resume, owner-cannot-save                                                                                                                                                                     |
+| **`publication-security.test.ts`**     | **14** | Storage write/update/delete denied for customers; reads allowed; service copy/cleanup; `public_path` customer-write denied + elevated-write allowed; saved-property self/non-LIVE/cross-user denied + cross-owner-LIVE allowed + own-remove |
+| **`publication-compensation.test.ts`** | **5**  | Scenarios A–E: partial photo failure cleanup; DB-failure-after-copy cleanup + retry→LIVE; retry produces no duplicate objects; repeated success no-op; repeated cleanup safe                                                                |
 
 ## 18. Full E2E results
 
@@ -248,10 +248,10 @@ Playwright (`@axe-core/playwright`), run against the built web app:
 - `e2e/seller-publication.spec.ts` — publish → review → `LIVE` → public page;
   returned-for-changes + retry → `LIVE`; public-photo processing-failure state +
   actionable retry; publication-checklist axe; pause → gone from marketplace → resume
-  (serial); live-management axe. *(Last observed run before the local Docker daemon
+  (serial); live-management axe. _(Last observed run before the local Docker daemon
   wedged: 5 passing; the resume step then failed because the seeded Marina LIVE listing
   lacked the readiness records `resume` re-validates — fixed in `setup-demo.ts`; a
-  clean-stack re-run is the closing confirmation, see §22.)*
+  clean-stack re-run is the closing confirmation, see §22.)_
 
 Existing Week 1 / 1.5 / 2 e2e (`auth-password`, `foundation`, `listing-journey`,
 `listing-quality`) are unchanged.
@@ -291,7 +291,7 @@ render, and the detail opens from a card tap.
 - **Simulation timing** is resolve-on-poll (no durable job queue — out of scope): a
   `PENDING` request resolves when its status is next read.
 - The public bucket serves objects by **public URL** (no signing) — correct for
-  *published* photos only; drafts/documents never enter it.
+  _published_ photos only; drafts/documents never enter it.
 - **Closing validation note:** during this closure the local Docker daemon wedged on
   the Supabase API gateway (Kong became uncancellable after repeated stack resets),
   which blocks `db:setup` and browser sign-in until Docker Desktop is restarted. All
@@ -300,7 +300,7 @@ render, and the detail opens from a card tap.
   stack; the seller-publication e2e was last green at 5 tests with the resume fix
   applied afterward. The single closing step is one clean-stack run:
   `pnpm supabase:reset && pnpm db:setup && pnpm lint && pnpm typecheck && pnpm test &&
-  pnpm test:e2e && pnpm build`.
+pnpm test:e2e && pnpm build`.
 
 ## 23. Acceptance checklist
 

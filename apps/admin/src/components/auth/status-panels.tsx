@@ -14,9 +14,12 @@ export function SuccessPanel({
 }) {
   return (
     <div className="space-y-5">
-      <CheckCircle2 className="h-9 w-9 text-success" aria-hidden />
+      <CheckCircle2 className="text-success h-9 w-9" aria-hidden />
       <div className="space-y-2">
-        <h1 tabIndex={-1} className="font-display text-3xl font-medium tracking-tight text-brand-900">
+        <h1
+          tabIndex={-1}
+          className="font-display text-brand-900 text-3xl font-medium tracking-tight"
+        >
           {title}
         </h1>
         {description ? <p className="text-muted-foreground">{description}</p> : null}
@@ -43,14 +46,17 @@ export function ErrorPanel({
   const Icon = variant === 'denied' ? ShieldAlert : AlertTriangle;
   return (
     <div className="space-y-5">
-      <Icon className="h-9 w-9 text-destructive" aria-hidden />
+      <Icon className="text-destructive h-9 w-9" aria-hidden />
       <div className="space-y-2">
-        <h1 tabIndex={-1} className="font-display text-3xl font-medium tracking-tight text-brand-900">
+        <h1
+          tabIndex={-1}
+          className="font-display text-brand-900 text-3xl font-medium tracking-tight"
+        >
           {title}
         </h1>
         {description ? <p className="text-muted-foreground">{description}</p> : null}
         {reference ? (
-          <p className="text-xs text-muted-foreground" dir="ltr">
+          <p className="text-muted-foreground text-xs" dir="ltr">
             Reference: {reference}
           </p>
         ) : null}

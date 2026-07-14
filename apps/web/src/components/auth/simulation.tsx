@@ -6,8 +6,8 @@ import { cn } from '@markaz/ui';
 export function DemoDisclosure() {
   const t = useTranslations('identity');
   return (
-    <div className="flex items-start gap-2.5 rounded-lg bg-brand-100 p-3 text-sm text-foreground">
-      <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
+    <div className="bg-brand-100 text-foreground flex items-start gap-2.5 rounded-lg p-3 text-sm">
+      <Info className="text-primary mt-0.5 h-4 w-4 shrink-0" aria-hidden />
       <p>
         <span className="font-medium">{t('disclosureTitle')}</span> {t('disclosureBody')}
       </p>

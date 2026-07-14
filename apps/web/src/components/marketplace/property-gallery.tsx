@@ -37,7 +37,7 @@ export function PropertyGallery({ photos, headline }: { photos: string[]; headli
 
   if (total === 0) {
     return (
-      <div className="flex aspect-[16/9] w-full items-center justify-center rounded-lg bg-muted text-sm text-muted-foreground">
+      <div className="bg-muted text-muted-foreground flex aspect-[16/9] w-full items-center justify-center rounded-lg text-sm">
         {t('photographsUnavailable')}
       </div>
     );
@@ -54,9 +54,14 @@ export function PropertyGallery({ photos, headline }: { photos: string[]; headli
         <button
           type="button"
           onClick={() => openAt(0)}
-          className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted sm:col-span-2 sm:row-span-2 sm:aspect-auto sm:h-full"
+          className="bg-muted relative aspect-[4/3] overflow-hidden rounded-lg sm:col-span-2 sm:row-span-2 sm:aspect-auto sm:h-full"
         >
-          <PhotoImg src={photos[0]!} alt={`${headline} — 1`} failed={failed.has(0)} onError={() => markFailed(0)} />
+          <PhotoImg
+            src={photos[0]!}
+            alt={`${headline} — 1`}
+            failed={failed.has(0)}
+            onError={() => markFailed(0)}
+          />
         </button>
         {thumbs.map((src, i) => {
           const realIndex = i + 1;
@@ -66,9 +71,14 @@ export function PropertyGallery({ photos, headline }: { photos: string[]; headli
               key={realIndex}
               type="button"
               onClick={() => openAt(realIndex)}
-              className="relative hidden aspect-[4/3] overflow-hidden rounded-lg bg-muted sm:block sm:aspect-auto sm:h-full"
+              className="bg-muted relative hidden aspect-[4/3] overflow-hidden rounded-lg sm:block sm:aspect-auto sm:h-full"
             >
-              <PhotoImg src={src} alt={`${headline} — ${realIndex + 1}`} failed={failed.has(realIndex)} onError={() => markFailed(realIndex)} />
+              <PhotoImg
+                src={src}
+                alt={`${headline} — ${realIndex + 1}`}
+                failed={failed.has(realIndex)}
+                onError={() => markFailed(realIndex)}
+              />
               {isLast && (
                 <span className="absolute inset-0 flex items-center justify-center bg-black/55 text-lg font-semibold text-white">
                   +{extra + 1}
@@ -80,7 +90,11 @@ export function PropertyGallery({ photos, headline }: { photos: string[]; headli
       </div>
 
       <div className="mt-2">
-        <button type="button" onClick={() => openAt(0)} className="text-sm font-medium text-primary underline-offset-2 hover:underline">
+        <button
+          type="button"
+          onClick={() => openAt(0)}
+          className="text-primary text-sm font-medium underline-offset-2 hover:underline"
+        >
           {t('viewAllPhotos', { count: total })}
         </button>
       </div>
@@ -88,18 +102,34 @@ export function PropertyGallery({ photos, headline }: { photos: string[]; headli
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-4xl border-0 bg-neutral-950 p-0 text-white">
           <div className="relative flex aspect-[3/2] items-center justify-center">
-            <PhotoImg src={photos[index]!} alt={`${headline} — ${index + 1}`} failed={failed.has(index)} onError={() => markFailed(index)} contain />
+            <PhotoImg
+              src={photos[index]!}
+              alt={`${headline} — ${index + 1}`}
+              failed={failed.has(index)}
+              onError={() => markFailed(index)}
+              contain
+            />
             {failed.has(index) && (
-              <p className="absolute bottom-2 text-xs text-white/70">{t('imageFailed', { n: index + 1 })}</p>
+              <p className="absolute bottom-2 text-xs text-white/70">
+                {t('imageFailed', { n: index + 1 })}
+              </p>
             )}
             {total > 1 && (
               <>
-                <button type="button" aria-label={t('photoCount', { current: index, total })} onClick={() => go(index - 1)}
-                  className="absolute start-2 rounded-full bg-black/50 p-2 hover:bg-black/70">
+                <button
+                  type="button"
+                  aria-label={t('photoCount', { current: index, total })}
+                  onClick={() => go(index - 1)}
+                  className="absolute start-2 rounded-full bg-black/50 p-2 hover:bg-black/70"
+                >
                   <ChevronLeft className="h-6 w-6 rtl:rotate-180" />
                 </button>
-                <button type="button" aria-label={t('photoCount', { current: index + 2, total })} onClick={() => go(index + 1)}
-                  className="absolute end-2 rounded-full bg-black/50 p-2 hover:bg-black/70">
+                <button
+                  type="button"
+                  aria-label={t('photoCount', { current: index + 2, total })}
+                  onClick={() => go(index + 1)}
+                  className="absolute end-2 rounded-full bg-black/50 p-2 hover:bg-black/70"
+                >
                   <ChevronRight className="h-6 w-6 rtl:rotate-180" />
                 </button>
               </>
@@ -114,12 +144,34 @@ export function PropertyGallery({ photos, headline }: { photos: string[]; headli
   );
 }
 
-function PhotoImg({ src, alt, failed, onError, contain }: { src: string; alt: string; failed: boolean; onError: () => void; contain?: boolean }) {
+function PhotoImg({
+  src,
+  alt,
+  failed,
+  onError,
+  contain,
+}: {
+  src: string;
+  alt: string;
+  failed: boolean;
+  onError: () => void;
+  contain?: boolean;
+}) {
   const t = useTranslations('property');
   if (failed) {
-    return <span className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">{t('imageUnavailable')}</span>;
+    return (
+      <span className="text-muted-foreground flex h-full w-full items-center justify-center text-xs">
+        {t('imageUnavailable')}
+      </span>
+    );
   }
   return (
-    <img src={src} alt={alt} onError={onError} loading="lazy" className={cn('h-full w-full', contain ? 'object-contain' : 'object-cover')} />
+    <img
+      src={src}
+      alt={alt}
+      onError={onError}
+      loading="lazy"
+      className={cn('h-full w-full', contain ? 'object-contain' : 'object-cover')}
+    />
   );
 }

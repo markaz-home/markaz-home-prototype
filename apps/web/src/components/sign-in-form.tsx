@@ -31,14 +31,23 @@ export function SignInForm() {
     handleSubmit,
     getValues,
     formState: { errors, isSubmitting },
-  } = useForm<SignInInput>({ resolver: zodResolver(signInSchema), defaultValues: { email: '', password: '' } });
+  } = useForm<SignInInput>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: { email: '', password: '' },
+  });
 
-  const fe = (code?: string) => (code ? tv(FIELD_ERROR_KEYS[code] ?? 'unexpectedError') : undefined);
-  const errorList = (['email', 'password'] as const).filter((k) => errors[k]).map((k) => ({ id: k, message: fe(errors[k]?.message) ?? '' }));
+  const fe = (code?: string) =>
+    code ? tv(FIELD_ERROR_KEYS[code] ?? 'unexpectedError') : undefined;
+  const errorList = (['email', 'password'] as const)
+    .filter((k) => errors[k])
+    .map((k) => ({ id: k, message: fe(errors[k]?.message) ?? '' }));
 
   async function onSubmit(data: SignInInput) {
     setFormError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email: data.email, password: data.password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
     if (error) {
       const key = mapAuthError(error);
       if (key === 'email_not_confirmed') {
@@ -65,26 +74,53 @@ export function SignInForm() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
           <FormField id="email" label={tf('email')} error={fe(errors.email?.message)} required>
-            <Input id="email" type="email" inputMode="email" autoComplete="email" dir="ltr" placeholder={tf('emailPlaceholder')} aria-invalid={!!errors.email} {...register('email')} />
+            <Input
+              id="email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              dir="ltr"
+              placeholder={tf('emailPlaceholder')}
+              aria-invalid={!!errors.email}
+              {...register('email')}
+            />
           </FormField>
-          <FormField id="password" label={tf('password')} error={fe(errors.password?.message)} required>
-            <PasswordField id="password" autoComplete="current-password" dir="ltr" placeholder={t('passwordPlaceholder')} aria-invalid={!!errors.password} {...register('password')} />
+          <FormField
+            id="password"
+            label={tf('password')}
+            error={fe(errors.password?.message)}
+            required
+          >
+            <PasswordField
+              id="password"
+              autoComplete="current-password"
+              dir="ltr"
+              placeholder={t('passwordPlaceholder')}
+              aria-invalid={!!errors.password}
+              {...register('password')}
+            />
           </FormField>
           <div className="flex justify-end">
-            <Link href="/forgot-password" className="text-sm font-medium text-primary underline-offset-4 hover:underline">
+            <Link
+              href="/forgot-password"
+              className="text-primary text-sm font-medium underline-offset-4 hover:underline"
+            >
               {t('forgot')}
             </Link>
           </div>
           <Button type="submit" className="w-full" loading={isSubmitting}>
             {isSubmitting ? t('submitting') : t('submit')}
           </Button>
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-center text-sm">
             {t('new')}{' '}
-            <Link href="/sign-up" className="font-medium text-primary underline-offset-4 hover:underline">
+            <Link
+              href="/sign-up"
+              className="text-primary font-medium underline-offset-4 hover:underline"
+            >
               {ta('createAccount')}
             </Link>
           </p>
-          <p className="text-center text-xs text-muted-foreground">{t('security')}</p>
+          <p className="text-muted-foreground text-center text-xs">{t('security')}</p>
         </form>
       </div>
     </AuthShell>

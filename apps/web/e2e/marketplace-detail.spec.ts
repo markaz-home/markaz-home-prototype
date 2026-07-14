@@ -14,7 +14,10 @@ const IC_HIDDEN = 'mkz-demodtn01'; // Downtown, owned by Customer A, no Investme
 async function signIn(page: Page) {
   await page.goto('/en/sign-in');
   await page.getByLabel(/email/i).fill(DEMO_EMAIL);
-  await page.getByLabel(/password/i).first().fill(DEMO_PASSWORD);
+  await page
+    .getByLabel(/password/i)
+    .first()
+    .fill(DEMO_PASSWORD);
   await page.getByRole('button', { name: /^sign in$/i }).click();
   await page.waitForURL(/\/en\/(dashboard|properties)/, { timeout: 15000 });
 }
@@ -24,7 +27,9 @@ async function openDetail(page: Page, publicId: string, locale = 'en') {
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 15000 });
 }
 
-test('detail page shows facts, gallery, and a visible Investment Case with disclosure', async ({ page }) => {
+test('detail page shows facts, gallery, and a visible Investment Case with disclosure', async ({
+  page,
+}) => {
   await openDetail(page, IC_VISIBLE);
   await expect(page.getByRole('heading', { name: /Investment Case/i })).toBeVisible();
   await expect(page.getByText(/Estimated ROI/i)).toBeVisible();
@@ -49,7 +54,9 @@ test('gallery opens and is keyboard-navigable (arrows + escape)', async ({ page 
   await expect(dialog).toBeHidden();
 });
 
-test('owner viewing their own public listing sees Your listing + Manage, not Save', async ({ page }) => {
+test('owner viewing their own public listing sees Your listing + Manage, not Save', async ({
+  page,
+}) => {
   await signIn(page);
   await openDetail(page, IC_HIDDEN); // Customer A owns this listing
   await expect(page.getByText(/Your listing/i)).toBeVisible();

@@ -14,14 +14,14 @@ const LEGAL = { terms: '#terms', privacy: '#privacy' };
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   const t = useTranslations('auth');
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className="bg-background flex min-h-dvh flex-col">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
+        className="focus:bg-primary focus:text-primary-foreground sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded focus:px-3 focus:py-2"
       >
         Skip to content
       </a>
-      <header className="border-b bg-card">
+      <header className="bg-card border-b">
         <div className="container flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center" aria-label="MARKAZ Home">
             <BrandLogo />
@@ -30,7 +30,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <LanguageSwitcher />
             <Link
               href="/"
-              className="hidden text-sm text-muted-foreground hover:text-foreground sm:inline"
+              className="text-muted-foreground hover:text-foreground hidden text-sm sm:inline"
             >
               {t('returnHome')}
             </Link>
@@ -43,11 +43,16 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </main>
 
       <footer className="border-t">
-        <div className="container flex flex-wrap items-center gap-x-5 gap-y-2 py-6 text-xs text-muted-foreground">
+        <div className="text-muted-foreground container flex flex-wrap items-center gap-x-5 gap-y-2 py-6 text-xs">
           <a href={LEGAL.terms} target="_blank" rel="noreferrer" className="hover:text-foreground">
             Terms of Use
           </a>
-          <a href={LEGAL.privacy} target="_blank" rel="noreferrer" className="hover:text-foreground">
+          <a
+            href={LEGAL.privacy}
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-foreground"
+          >
             Privacy Policy
           </a>
           <span className="ms-auto">© MARKAZ Home</span>

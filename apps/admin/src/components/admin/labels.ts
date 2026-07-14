@@ -10,40 +10,66 @@ type Mapped = { tone: StatusTone; key: string };
 
 export function listingStateLabel(state: string): Mapped {
   const tone: Record<string, StatusTone> = {
-    DRAFT: 'neutral', READY_TO_PUBLISH: 'info', LIVE: 'complete', PAUSED: 'paused',
-    UNDER_OFFER: 'info', SOLD_DEMO: 'complete', ARCHIVED: 'neutral', REJECTED: 'attention',
+    DRAFT: 'neutral',
+    READY_TO_PUBLISH: 'info',
+    LIVE: 'complete',
+    PAUSED: 'paused',
+    UNDER_OFFER: 'info',
+    SOLD_DEMO: 'complete',
+    ARCHIVED: 'neutral',
+    REJECTED: 'attention',
   };
   return { tone: tone[state] ?? 'neutral', key: `listings.state.${state}` };
 }
 
 export function publicationStatusLabel(status: string): Mapped {
   const tone: Record<string, StatusTone> = {
-    PENDING: 'attention', APPROVED_DEMO: 'complete', REJECTED_DEMO: 'info', NOT_SUBMITTED: 'neutral',
+    PENDING: 'attention',
+    APPROVED_DEMO: 'complete',
+    REJECTED_DEMO: 'info',
+    NOT_SUBMITTED: 'neutral',
   };
   return { tone: tone[status] ?? 'neutral', key: `publication.status.${status}` };
 }
 
 export function verificationStatusLabel(status: string): Mapped {
   const tone: Record<string, StatusTone> = {
-    PENDING: 'attention', PROCESSING: 'info', VERIFIED_DEMO: 'complete', FAILED_DEMO: 'failed',
+    PENDING: 'attention',
+    PROCESSING: 'info',
+    VERIFIED_DEMO: 'complete',
+    FAILED_DEMO: 'failed',
   };
   return { tone: tone[status] ?? 'neutral', key: `verifications.status.${status}` };
 }
 
 export function offerStatusLabel(status: string): Mapped {
   const tone: Record<string, StatusTone> = {
-    DRAFT: 'neutral', AWAITING_SELLER: 'info', AWAITING_BUYER: 'info', ACCEPTED: 'complete',
-    REJECTED: 'neutral', WITHDRAWN: 'neutral', EXPIRED: 'neutral',
-    CLOSED_OTHER_ACCEPTED: 'neutral', CLOSED_LISTING_UNAVAILABLE: 'neutral',
+    DRAFT: 'neutral',
+    AWAITING_SELLER: 'info',
+    AWAITING_BUYER: 'info',
+    ACCEPTED: 'complete',
+    REJECTED: 'neutral',
+    WITHDRAWN: 'neutral',
+    EXPIRED: 'neutral',
+    CLOSED_OTHER_ACCEPTED: 'neutral',
+    CLOSED_LISTING_UNAVAILABLE: 'neutral',
   };
   return { tone: tone[status] ?? 'neutral', key: `adminOffers.status.${status}` };
 }
 
 export function transactionStatusLabel(status: string): Mapped {
   const tone: Record<string, StatusTone> = {
-    INITIATED: 'info', CONFIRMATION: 'info', DEPOSIT: 'info', DOCUMENTS: 'info',
-    DUE_DILIGENCE: 'info', TRANSFER: 'info', COMPLETION: 'info',
-    COMPLETED_DEMO: 'complete', CANCELLATION_PENDING: 'attention', CANCELLED: 'neutral', FAILED: 'failed',
+    INITIATED: 'info',
+    CONFIRMATION: 'info',
+    DEPOSIT: 'info',
+    DOCUMENTS: 'info',
+    DUE_DILIGENCE: 'info',
+    TRANSFER: 'info',
+    COMPLETION: 'info',
+    COMPLETED_DEMO: 'complete',
+    CANCELLATION_PENDING: 'attention',
+    CANCELLED: 'neutral',
+    FAILED: 'failed',
   };
   return { tone: tone[status] ?? 'neutral', key: `adminTransactions.status.${status}` };
 }

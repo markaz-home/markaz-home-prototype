@@ -70,7 +70,10 @@ d('offer negotiation (live DB)', () => {
 
   it('blocks a second active thread for the same buyer+listing (idempotency backstop)', async () => {
     // buyer1 already has an active thread from the previous test.
-    await expectError(() => createOffer(buyer1, listing, 950_000), /duplicate key|unique|uniq_active_thread/i);
+    await expectError(
+      () => createOffer(buyer1, listing, 950_000),
+      /duplicate key|unique|uniq_active_thread/i,
+    );
   });
 
   it('rejects a buyer offering on their own listing', async () => {
@@ -86,8 +89,9 @@ d('offer negotiation (live DB)', () => {
     );
     expect((notifs[0] as { n: number }).n).toBe(0);
     // ...yet the below-threshold thread is fully persisted and visible to the seller.
-    const visible = await asUser(seller, (tx) =>
-      tx`select count(*)::int as n from public.offer_threads where listing_id = ${listing}`,
+    const visible = await asUser(
+      seller,
+      (tx) => tx`select count(*)::int as n from public.offer_threads where listing_id = ${listing}`,
     );
     expect((visible[0] as { n: number }).n).toBeGreaterThanOrEqual(1);
   });
@@ -109,16 +113,20 @@ d('offer negotiation (live DB)', () => {
     let t = await threadRow(threadId);
 
     // Seller counters at 600k.
-    await asUser(seller, (tx) =>
-      tx`select public.submit_counter(${threadId}::uuid, 600000, null, ${t.version as number})`,
+    await asUser(
+      seller,
+      (tx) =>
+        tx`select public.submit_counter(${threadId}::uuid, 600000, null, ${t.version as number})`,
     );
     t = await threadRow(threadId);
     expect(t.status).toBe('AWAITING_BUYER');
     expect(t.next_actor).toBe('BUYER');
 
     // Buyer counters at 550k.
-    await asUser(buyer3, (tx) =>
-      tx`select public.submit_counter(${threadId}::uuid, 550000, null, ${t.version as number})`,
+    await asUser(
+      buyer3,
+      (tx) =>
+        tx`select public.submit_counter(${threadId}::uuid, 550000, null, ${t.version as number})`,
     );
 
     const proposals = await asService(
@@ -127,7 +135,9 @@ d('offer negotiation (live DB)', () => {
            from public.offer_proposals where thread_id = ${threadId} order by created_at`,
     );
     // Three distinct rows; the earlier two are frozen at their original amounts.
-    expect(proposals.map((p) => (p as { amount: number }).amount)).toEqual([500_000, 600_000, 550_000]);
+    expect(proposals.map((p) => (p as { amount: number }).amount)).toEqual([
+      500_000, 600_000, 550_000,
+    ]);
     expect((proposals[0] as { status: string }).status).toBe('SUPERSEDED');
     expect((proposals[1] as { status: string }).status).toBe('SUPERSEDED');
     expect((proposals[2] as { status: string }).status).toBe('CURRENT');
@@ -138,7 +148,12 @@ d('offer negotiation (live DB)', () => {
     const threadId = await createOffer(buyer1, l, 700_000);
     const t = await threadRow(threadId);
     await expectError(
-      () => asUser(seller, (tx) => tx`select public.submit_counter(${threadId}::uuid, 700000, null, ${t.version as number})`),
+      () =>
+        asUser(
+          seller,
+          (tx) =>
+            tx`select public.submit_counter(${threadId}::uuid, 700000, null, ${t.version as number})`,
+        ),
       /EQUAL_AMOUNT/,
     );
   });
@@ -148,7 +163,11 @@ d('offer negotiation (live DB)', () => {
     const threadId = await createOffer(buyer1, l, 700_000);
     // Wrong expected version → STALE.
     await expectError(
-      () => asUser(seller, (tx) => tx`select public.submit_counter(${threadId}::uuid, 800000, null, 999)`),
+      () =>
+        asUser(
+          seller,
+          (tx) => tx`select public.submit_counter(${threadId}::uuid, 800000, null, 999)`,
+        ),
       /STALE/,
     );
   });
@@ -160,8 +179,10 @@ d('offer negotiation (live DB)', () => {
 
     // Seller accepts buyer2's proposal on thread B.
     const b = await threadRow(tB);
-    await asUser(seller, (tx) =>
-      tx`select public.accept_offer(${tB}::uuid, ${b.current_proposal_id as string}::uuid, ${b.version as number})`,
+    await asUser(
+      seller,
+      (tx) =>
+        tx`select public.accept_offer(${tB}::uuid, ${b.current_proposal_id as string}::uuid, ${b.version as number})`,
     );
 
     const after = await threadRow(tB);
@@ -182,16 +203,20 @@ d('offer negotiation (live DB)', () => {
     const tA = await createOffer(buyer1, l, 800_000);
     const tB = await createOffer(buyer2, l, 810_000);
     const a = await threadRow(tA);
-    await asUser(seller, (tx) =>
-      tx`select public.accept_offer(${tA}::uuid, ${a.current_proposal_id as string}::uuid, ${a.version as number})`,
+    await asUser(
+      seller,
+      (tx) =>
+        tx`select public.accept_offer(${tA}::uuid, ${a.current_proposal_id as string}::uuid, ${a.version as number})`,
     );
     // Second thread was auto-closed; trying to accept it now fails (not actionable).
     const b = await threadRow(tB);
     expect(b.status).toBe('CLOSED_OTHER_ACCEPTED');
     await expectError(
       () =>
-        asUser(seller, (tx) =>
-          tx`select public.accept_offer(${tB}::uuid, ${b.current_proposal_id as string}::uuid, ${b.version as number})`,
+        asUser(
+          seller,
+          (tx) =>
+            tx`select public.accept_offer(${tB}::uuid, ${b.current_proposal_id as string}::uuid, ${b.version as number})`,
         ),
       /NOT_ACTIONABLE|STALE/,
     );

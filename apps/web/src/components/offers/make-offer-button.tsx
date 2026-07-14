@@ -53,14 +53,14 @@ export function MakeOfferButton({
             setAuthOpen(true);
           }}
         >
-          <Tag className="h-4 w-4 me-2" aria-hidden /> {t('cta.make')}
+          <Tag className="me-2 h-4 w-4" aria-hidden /> {t('cta.make')}
         </Button>
         <Dialog open={authOpen} onOpenChange={setAuthOpen}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>{t('auth.title')}</DialogTitle>
             </DialogHeader>
-            <p className="text-sm text-muted-foreground">{t('auth.body')}</p>
+            <p className="text-muted-foreground text-sm">{t('auth.body')}</p>
             <DialogFooter className="flex-col gap-2 sm:flex-col">
               <Button asChild className="w-full">
                 <Link href="/sign-in">{t('auth.signIn')}</Link>
@@ -100,7 +100,7 @@ export function MakeOfferButton({
   return (
     <Button asChild>
       <Link href={offerPath}>
-        <Tag className="h-4 w-4 me-2" aria-hidden /> {t('cta.make')}
+        <Tag className="me-2 h-4 w-4" aria-hidden /> {t('cta.make')}
       </Link>
     </Button>
   );

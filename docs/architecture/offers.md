@@ -34,17 +34,17 @@ Customers have **read-only** RLS on the offer tables. Every mutation goes throug
 `SECURITY DEFINER` SQL function (owned by a BYPASSRLS role; mirrors the Week-1
 `enforce_offer_not_on_own_listing`/`is_admin` pattern):
 
-| Function | Effect |
-|---|---|
-| `create_offer(listing, amount, expires)` | New thread + initial buyer proposal (`AWAITING_SELLER`) |
-| `submit_counter(thread, amount, expires, version)` | Supersede current, new proposal, flip `next_actor` |
-| `accept_offer(thread, proposal, version)` | Atomic accept + close other threads (see acceptance) |
-| `reject_offer(thread, version, reason)` | Terminal; seller reason is private |
-| `withdraw_offer(thread, version)` | Buyer-only; terminal |
-| `close_listing_offers(listing, reason)` | Pause/material-edit closes active threads |
-| `expire_due_offers()` | Lazy expiry on read (no durable job dependency) |
-| `mark_offer_viewed(thread)` | Optional seller-viewed event |
-| `offer_listing_summary(listing)` | Public-safe property summary for a participant/owner |
+| Function                                           | Effect                                                  |
+| -------------------------------------------------- | ------------------------------------------------------- |
+| `create_offer(listing, amount, expires)`           | New thread + initial buyer proposal (`AWAITING_SELLER`) |
+| `submit_counter(thread, amount, expires, version)` | Supersede current, new proposal, flip `next_actor`      |
+| `accept_offer(thread, proposal, version)`          | Atomic accept + close other threads (see acceptance)    |
+| `reject_offer(thread, version, reason)`            | Terminal; seller reason is private                      |
+| `withdraw_offer(thread, version)`                  | Buyer-only; terminal                                    |
+| `close_listing_offers(listing, reason)`            | Pause/material-edit closes active threads               |
+| `expire_due_offers()`                              | Lazy expiry on read (no durable job dependency)         |
+| `mark_offer_viewed(thread)`                        | Optional seller-viewed event                            |
+| `offer_listing_summary(listing)`                   | Public-safe property summary for a participant/owner    |
 
 These resolve the actor from `auth.uid()` (never client-supplied) and derive
 `created_by_side` from thread membership.

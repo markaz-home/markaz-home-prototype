@@ -8,18 +8,29 @@ import { NotesPanel } from '@/components/admin/notes-panel';
 import { RetryVerificationAction } from '@/components/admin/entity-actions';
 import { verificationStatusLabel, formatWhen } from '@/components/admin/labels';
 
-export default async function VerificationDetailPage({ params }: { params: Promise<{ locale: string; verificationId: string }> }) {
+export default async function VerificationDetailPage({
+  params,
+}: {
+  params: Promise<{ locale: string; verificationId: string }>;
+}) {
   const { locale, verificationId } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('admin');
 
-  let v: Awaited<ReturnType<Awaited<ReturnType<typeof getServerApi>>['admin']['verifications']['get']>> | null = null;
+  let v: Awaited<
+    ReturnType<Awaited<ReturnType<typeof getServerApi>>['admin']['verifications']['get']>
+  > | null = null;
   try {
     v = await (await getServerApi()).admin.verifications.get({ id: verificationId });
   } catch {
     v = null;
   }
-  if (!v) return <PageShell maxWidth={560}><EmptyState title={t('verifications.unavailable')} /></PageShell>;
+  if (!v)
+    return (
+      <PageShell maxWidth={560}>
+        <EmptyState title={t('verifications.unavailable')} />
+      </PageShell>
+    );
 
   const status = verificationStatusLabel(v.status);
   const canRetry = v.status === 'FAILED_DEMO' && !v.superseded;
@@ -35,10 +46,25 @@ export default async function VerificationDetailPage({ params }: { params: Promi
         <div className="space-y-6 lg:col-span-2">
           <DataSection title={t('verifications.title')}>
             <FieldGrid>
-              <Field label={t('verifications.col.status')} value={<StatusBadge tone={status.tone} label={t.has(status.key) ? t(status.key) : v.status} />} />
+              <Field
+                label={t('verifications.col.status')}
+                value={
+                  <StatusBadge
+                    tone={status.tone}
+                    label={t.has(status.key) ? t(status.key) : v.status}
+                  />
+                }
+              />
               <Field label={t('verifications.col.created')} value={formatWhen(v.createdAt)} />
-              {v.superseded ? <Field label={t('verifications.col.status')} value={t('verifications.superseded')} /> : null}
-              {v.failureReason ? <Field label={t('verifications.failureReason')} value={v.failureReason} /> : null}
+              {v.superseded ? (
+                <Field
+                  label={t('verifications.col.status')}
+                  value={t('verifications.superseded')}
+                />
+              ) : null}
+              {v.failureReason ? (
+                <Field label={t('verifications.failureReason')} value={v.failureReason} />
+              ) : null}
             </FieldGrid>
           </DataSection>
         </div>

@@ -15,7 +15,12 @@ describe('AED + locale formatting', () => {
     expect(formatNumber(1000, 'zz')).toBe('1,000');
   });
   it('formats a date deterministically', () => {
-    const s = formatDate('2026-03-01T00:00:00.000Z', 'en', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC' });
+    const s = formatDate('2026-03-01T00:00:00.000Z', 'en', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      timeZone: 'UTC',
+    });
     expect(s).toContain('2026');
   });
 });

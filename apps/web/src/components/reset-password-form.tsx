@@ -38,8 +38,11 @@ export function ResetPasswordForm() {
   const fe = (c?: string) => (c ? tv(FIELD_ERROR_KEYS[c] ?? 'unexpectedError') : undefined);
   // Surface the max-length (128) error under the field (design spec §2194); the
   // checklist already covers min-length + policy. Never a silent truncation.
-  const passwordFieldError = errors.password?.message === 'password_too_long' ? fe('password_too_long') : undefined;
-  const errorList = (['password', 'confirmPassword'] as const).filter((k) => errors[k]).map((k) => ({ id: k, message: fe(errors[k]?.message) ?? '' }));
+  const passwordFieldError =
+    errors.password?.message === 'password_too_long' ? fe('password_too_long') : undefined;
+  const errorList = (['password', 'confirmPassword'] as const)
+    .filter((k) => errors[k])
+    .map((k) => ({ id: k, message: fe(errors[k]?.message) ?? '' }));
 
   async function onSubmit(data: ResetPasswordInput) {
     setError(null);
@@ -60,13 +63,34 @@ export function ResetPasswordForm() {
         <AuthHeading title={t('title')} description={t('description')} />
         <ErrorSummary errors={errorList} />
         {error ? <Alert variant="destructive">{error}</Alert> : null}
-        <form onSubmit={handleSubmit(onSubmit, () => setSubmitted(true))} className="space-y-5" noValidate>
+        <form
+          onSubmit={handleSubmit(onSubmit, () => setSubmitted(true))}
+          className="space-y-5"
+          noValidate
+        >
           <FormField id="password" label={t('newPassword')} error={passwordFieldError} required>
-            <PasswordField id="password" autoComplete="new-password" dir="ltr" aria-invalid={!!errors.password} {...register('password')} />
+            <PasswordField
+              id="password"
+              autoComplete="new-password"
+              dir="ltr"
+              aria-invalid={!!errors.password}
+              {...register('password')}
+            />
           </FormField>
           <PasswordChecklist password={password} submitted={submitted} />
-          <FormField id="confirmPassword" label={t('confirm')} error={fe(errors.confirmPassword?.message)} required>
-            <PasswordField id="confirmPassword" autoComplete="new-password" dir="ltr" aria-invalid={!!errors.confirmPassword} {...register('confirmPassword')} />
+          <FormField
+            id="confirmPassword"
+            label={t('confirm')}
+            error={fe(errors.confirmPassword?.message)}
+            required
+          >
+            <PasswordField
+              id="confirmPassword"
+              autoComplete="new-password"
+              dir="ltr"
+              aria-invalid={!!errors.confirmPassword}
+              {...register('confirmPassword')}
+            />
           </FormField>
           <Button type="submit" className="w-full" loading={isSubmitting}>
             {isSubmitting ? t('submitting') : t('submit')}

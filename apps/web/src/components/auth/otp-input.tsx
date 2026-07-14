@@ -46,11 +46,11 @@ export function OtpInput({
           <div
             key={i}
             className={cn(
-              'flex h-14 w-12 items-center justify-center rounded-md border bg-background text-xl font-semibold tabular-nums transition-colors',
+              'bg-background flex h-14 w-12 items-center justify-center rounded-md border text-xl font-semibold tabular-nums transition-colors',
               invalid
                 ? 'border-destructive'
                 : i === focusIdx && !disabled
-                  ? 'border-ring ring-2 ring-ring'
+                  ? 'border-ring ring-ring ring-2'
                   : 'border-input',
             )}
           >

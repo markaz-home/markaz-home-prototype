@@ -63,21 +63,31 @@ d('single accepted offer under concurrency (live DB)', () => {
       return (t as { id: string }).id;
     });
 
-    const a = await asService((tx: Sql) => tx`select current_proposal_id, version from public.offer_threads where id = ${tA}`);
-    const b = await asService((tx: Sql) => tx`select current_proposal_id, version from public.offer_threads where id = ${tB}`);
+    const a = await asService(
+      (tx: Sql) =>
+        tx`select current_proposal_id, version from public.offer_threads where id = ${tA}`,
+    );
+    const b = await asService(
+      (tx: Sql) =>
+        tx`select current_proposal_id, version from public.offer_threads where id = ${tB}`,
+    );
     const aRow = a[0] as { current_proposal_id: string; version: number };
     const bRow = b[0] as { current_proposal_id: string; version: number };
 
     // Fire both accepts concurrently (separate connections via separate transactions).
     const [rA, rB] = await Promise.all([
       settle(
-        asUser(seller, (tx) =>
-          tx`select public.accept_offer(${tA}::uuid, ${aRow.current_proposal_id}::uuid, ${aRow.version})`,
+        asUser(
+          seller,
+          (tx) =>
+            tx`select public.accept_offer(${tA}::uuid, ${aRow.current_proposal_id}::uuid, ${aRow.version})`,
         ),
       ),
       settle(
-        asUser(seller, (tx) =>
-          tx`select public.accept_offer(${tB}::uuid, ${bRow.current_proposal_id}::uuid, ${bRow.version})`,
+        asUser(
+          seller,
+          (tx) =>
+            tx`select public.accept_offer(${tB}::uuid, ${bRow.current_proposal_id}::uuid, ${bRow.version})`,
         ),
       ),
     ]);
@@ -92,7 +102,9 @@ d('single accepted offer under concurrency (live DB)', () => {
       (tx: Sql) => tx`select status, count(*)::int as n from public.offer_threads
                       where listing_id = ${listing} group by status order by status`,
     );
-    const byStatus = Object.fromEntries(rows.map((r) => [(r as { status: string }).status, (r as { n: number }).n]));
+    const byStatus = Object.fromEntries(
+      rows.map((r) => [(r as { status: string }).status, (r as { n: number }).n]),
+    );
     expect(byStatus.ACCEPTED).toBe(1);
     expect(byStatus.CLOSED_OTHER_ACCEPTED ?? 0).toBe(1);
     expect(byStatus.AWAITING_SELLER ?? 0).toBe(0);
@@ -104,12 +116,27 @@ d('single accepted offer under concurrency (live DB)', () => {
       const [row] = await tx`select * from public.create_offer(${listing}::uuid, 750000, null)`;
       return (row as { id: string }).id;
     });
-    const meta = await asService((tx: Sql) => tx`select current_proposal_id, version from public.offer_threads where id = ${t}`);
+    const meta = await asService(
+      (tx: Sql) =>
+        tx`select current_proposal_id, version from public.offer_threads where id = ${t}`,
+    );
     const m = meta[0] as { current_proposal_id: string; version: number };
 
     const [r1, r2] = await Promise.all([
-      settle(asUser(seller, (tx) => tx`select public.accept_offer(${t}::uuid, ${m.current_proposal_id}::uuid, ${m.version})`)),
-      settle(asUser(seller, (tx) => tx`select public.accept_offer(${t}::uuid, ${m.current_proposal_id}::uuid, ${m.version})`)),
+      settle(
+        asUser(
+          seller,
+          (tx) =>
+            tx`select public.accept_offer(${t}::uuid, ${m.current_proposal_id}::uuid, ${m.version})`,
+        ),
+      ),
+      settle(
+        asUser(
+          seller,
+          (tx) =>
+            tx`select public.accept_offer(${t}::uuid, ${m.current_proposal_id}::uuid, ${m.version})`,
+        ),
+      ),
     ]);
 
     expect([r1, r2].filter((r) => r.ok).length).toBe(1);
@@ -117,7 +144,8 @@ d('single accepted offer under concurrency (live DB)', () => {
     for (const l of losers) expect(l.err ?? '').toMatch(LOSER);
 
     const accepted = await asService(
-      (tx: Sql) => tx`select count(*)::int as n from public.offer_threads where listing_id = ${listing} and status = 'ACCEPTED'`,
+      (tx: Sql) =>
+        tx`select count(*)::int as n from public.offer_threads where listing_id = ${listing} and status = 'ACCEPTED'`,
     );
     expect((accepted[0] as { n: number }).n).toBe(1);
   });

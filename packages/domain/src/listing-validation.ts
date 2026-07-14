@@ -63,21 +63,46 @@ export const SUPPORTED_EMIRATE = 'DUBAI' as const;
 // Building/project is conditionally required for Apartment/Penthouse.
 export const propertyDetailsSchema = z
   .object({
-    propertyType: z.enum(PROPERTY_TYPES, { errorMap: () => ({ message: 'property_type_required' }) }),
+    propertyType: z.enum(PROPERTY_TYPES, {
+      errorMap: () => ({ message: 'property_type_required' }),
+    }),
     emirate: z.literal(SUPPORTED_EMIRATE, { errorMap: () => ({ message: 'emirate_unsupported' }) }),
     community: z.string().trim().min(2, 'community_required').max(100, 'community_too_long'),
     buildingOrProject: z.string().trim().max(120, 'building_too_long').optional().or(z.literal('')),
-    unitIdentifier: z.string().trim().min(1, 'unit_identifier_required').max(50, 'unit_identifier_too_long'),
-    bedrooms: z.number().int('bedrooms_required').min(0, 'bedrooms_required').max(BEDROOMS_MAX, 'bedrooms_invalid'),
-    bathrooms: z.number().int('bathrooms_required').min(1, 'bathrooms_required').max(BATHROOMS_MAX, 'bathrooms_invalid'),
+    unitIdentifier: z
+      .string()
+      .trim()
+      .min(1, 'unit_identifier_required')
+      .max(50, 'unit_identifier_too_long'),
+    bedrooms: z
+      .number()
+      .int('bedrooms_required')
+      .min(0, 'bedrooms_required')
+      .max(BEDROOMS_MAX, 'bedrooms_invalid'),
+    bathrooms: z
+      .number()
+      .int('bathrooms_required')
+      .min(1, 'bathrooms_required')
+      .max(BATHROOMS_MAX, 'bathrooms_invalid'),
     sizeSqft: z
       .number({ invalid_type_error: 'size_invalid' })
       .min(SIZE_MIN_SQFT, 'size_invalid')
       .max(SIZE_MAX_SQFT, 'size_invalid'),
-    furnishingStatus: z.enum(FURNISHING_STATUSES, { errorMap: () => ({ message: 'furnishing_required' }) }),
-    occupancyStatus: z.enum(OCCUPANCY_STATUSES, { errorMap: () => ({ message: 'occupancy_required' }) }),
-    completionStatus: z.enum(COMPLETION_STATUSES, { errorMap: () => ({ message: 'completion_required' }) }),
-    parkingSpaces: z.number().int().min(0, 'parking_invalid').max(PARKING_MAX, 'parking_invalid').optional(),
+    furnishingStatus: z.enum(FURNISHING_STATUSES, {
+      errorMap: () => ({ message: 'furnishing_required' }),
+    }),
+    occupancyStatus: z.enum(OCCUPANCY_STATUSES, {
+      errorMap: () => ({ message: 'occupancy_required' }),
+    }),
+    completionStatus: z.enum(COMPLETION_STATUSES, {
+      errorMap: () => ({ message: 'completion_required' }),
+    }),
+    parkingSpaces: z
+      .number()
+      .int()
+      .min(0, 'parking_invalid')
+      .max(PARKING_MAX, 'parking_invalid')
+      .optional(),
     description: z
       .string()
       .trim()
@@ -140,10 +165,10 @@ export const investmentCaseSchema = z
       }, 'purchase_date_too_early'),
     visible: z.boolean().default(false),
   })
-  .refine(
-    (d) => Date.parse(`${d.purchaseDate}T00:00:00Z`) <= Date.now(),
-    { path: ['purchaseDate'], message: 'purchase_date_future' },
-  );
+  .refine((d) => Date.parse(`${d.purchaseDate}T00:00:00Z`) <= Date.now(), {
+    path: ['purchaseDate'],
+    message: 'purchase_date_future',
+  });
 export type InvestmentCaseInput = z.infer<typeof investmentCaseSchema>;
 
 /** Studio is stored as 0 bedrooms; this helps display. */

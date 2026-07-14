@@ -11,11 +11,11 @@ and the documentation set.
 
 ## The two applications
 
-| App | Purpose | Port (local) | Origin env |
-| --- | --- | --- | --- |
-| `apps/web` | Customer / public app — buy and sell journeys | 3000 | `NEXT_PUBLIC_WEB_URL` |
-| `apps/admin` | Separate admin app — `ADMIN` account_type required | 3001 | `NEXT_PUBLIC_ADMIN_URL` |
-| `apps/worker` | Durable background jobs — **placeholder only in Week 1** | — | — |
+| App           | Purpose                                                  | Port (local) | Origin env              |
+| ------------- | -------------------------------------------------------- | ------------ | ----------------------- |
+| `apps/web`    | Customer / public app — buy and sell journeys            | 3000         | `NEXT_PUBLIC_WEB_URL`   |
+| `apps/admin`  | Separate admin app — `ADMIN` account_type required       | 3001         | `NEXT_PUBLIC_ADMIN_URL` |
+| `apps/worker` | Durable background jobs — **placeholder only in Week 1** | —            | —                       |
 
 The customer app exposes **no admin routes or navigation** (ADR 0008). There are
 exactly two account types, `CUSTOMER` and `ADMIN`; buyer/seller are journeys, not
@@ -23,17 +23,17 @@ roles (ADR 0002).
 
 ## Shared packages
 
-| Package | Role |
-| --- | --- |
-| `@markaz/config` | Shared eslint / tsconfig / tailwind presets |
-| `@markaz/ui` | shadcn/Radix-style neutral design system + tokens, RTL-safe |
-| `@markaz/i18n` | next-intl (en + ar), RTL, AED currency formatting |
-| `@markaz/domain` | Types, state machines, zod schemas, `resolvePostAuthDestination` |
-| `@markaz/db` | Drizzle schema + postgres-js client + `withUserContext` RLS helper |
-| `@markaz/auth` | Supabase SSR clients + RBAC |
-| `@markaz/api` | tRPC routers + procedure tiers (`protected`/`customer`/`admin`) |
-| `@markaz/realtime` | Supabase Realtime subscription hook |
-| `@markaz/observability` | pino structured logging |
+| Package                 | Role                                                               |
+| ----------------------- | ------------------------------------------------------------------ |
+| `@markaz/config`        | Shared eslint / tsconfig / tailwind presets                        |
+| `@markaz/ui`            | shadcn/Radix-style neutral design system + tokens, RTL-safe        |
+| `@markaz/i18n`          | next-intl (en + ar), RTL, AED currency formatting                  |
+| `@markaz/domain`        | Types, state machines, zod schemas, `resolvePostAuthDestination`   |
+| `@markaz/db`            | Drizzle schema + postgres-js client + `withUserContext` RLS helper |
+| `@markaz/auth`          | Supabase SSR clients + RBAC                                        |
+| `@markaz/api`           | tRPC routers + procedure tiers (`protected`/`customer`/`admin`)    |
+| `@markaz/realtime`      | Supabase Realtime subscription hook                                |
+| `@markaz/observability` | pino structured logging                                            |
 
 ## Stack
 

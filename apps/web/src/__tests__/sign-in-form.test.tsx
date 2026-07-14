@@ -60,7 +60,9 @@ describe('SignInForm', () => {
     await user.type(screen.getByLabelText(/Email address/i), 'new@markaz.demo');
     await user.type(screen.getByLabelText(/^Password/), 'Aa1!aaaa');
     await user.click(screen.getByRole('button', { name: 'Sign in' }));
-    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringContaining('/verify-email')));
+    await waitFor(() =>
+      expect(push).toHaveBeenCalledWith(expect.stringContaining('/verify-email')),
+    );
   });
 
   it('signs in successfully and routes to the dashboard', async () => {

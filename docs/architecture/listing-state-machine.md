@@ -26,7 +26,7 @@ completion requirements, **not** enum values.
   - edit details/settings after Form A → `OWNERSHIP_VERIFIED` (Form A + permit
     superseded).
 - **Failures do not transition** the listing. A failed simulated ownership check
-  or permit sets the *record* status `FAILED_DEMO`; the listing stays put and is
+  or permit sets the _record_ status `FAILED_DEMO`; the listing stays put and is
   recoverable (retry / replace). The customer never reaches `REJECTED`
   (reserved for a future Admin decision).
 

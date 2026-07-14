@@ -322,19 +322,19 @@ No second transaction may be created through repeated retry.
 
 ## 8.1 Internal states
 
-| State | Entry | Exit | User label | Reversible |
-|---|---|---|---|---|
-| `INITIATED` | Transaction created | First participant confirmation | Transaction created | No |
-| `CONFIRMATION` | Workspace active | Both confirm + purchase route selected | Confirming transaction | Yes until complete |
-| `DEPOSIT` | Confirmation complete | Buyer confirms demo deposit | Confirming demo deposit | No after completion |
-| `DOCUMENTS` | Deposit complete | Required documents + shared review complete | Completing documents | Task-level only |
-| `DUE_DILIGENCE` | Documents complete | Simulated checks complete | Demo checks in progress | Retryable |
-| `TRANSFER` | Demo checks complete | Both ready + appointment simulated | Preparing transfer | Readiness can change before appointment |
-| `COMPLETION` | Appointment simulated | Both completion confirmations | Confirming completion | No after complete |
-| `COMPLETED_DEMO` | Final server validation | Terminal | Completed in demo | No |
-| `CANCELLATION_PENDING` | Mutual cancellation required | Confirmed / declined / future review | Cancellation requested | Yes until resolved |
-| `CANCELLED` | Cancellation completed | Terminal | Transaction cancelled | No |
-| `FAILED` | Terminal workflow/system failure | Future Admin intervention | Transaction needs review | No customer progression |
+| State                  | Entry                            | Exit                                        | User label               | Reversible                              |
+| ---------------------- | -------------------------------- | ------------------------------------------- | ------------------------ | --------------------------------------- |
+| `INITIATED`            | Transaction created              | First participant confirmation              | Transaction created      | No                                      |
+| `CONFIRMATION`         | Workspace active                 | Both confirm + purchase route selected      | Confirming transaction   | Yes until complete                      |
+| `DEPOSIT`              | Confirmation complete            | Buyer confirms demo deposit                 | Confirming demo deposit  | No after completion                     |
+| `DOCUMENTS`            | Deposit complete                 | Required documents + shared review complete | Completing documents     | Task-level only                         |
+| `DUE_DILIGENCE`        | Documents complete               | Simulated checks complete                   | Demo checks in progress  | Retryable                               |
+| `TRANSFER`             | Demo checks complete             | Both ready + appointment simulated          | Preparing transfer       | Readiness can change before appointment |
+| `COMPLETION`           | Appointment simulated            | Both completion confirmations               | Confirming completion    | No after complete                       |
+| `COMPLETED_DEMO`       | Final server validation          | Terminal                                    | Completed in demo        | No                                      |
+| `CANCELLATION_PENDING` | Mutual cancellation required     | Confirmed / declined / future review        | Cancellation requested   | Yes until resolved                      |
+| `CANCELLED`            | Cancellation completed           | Terminal                                    | Transaction cancelled    | No                                      |
+| `FAILED`               | Terminal workflow/system failure | Future Admin intervention                   | Transaction needs review | No customer progression                 |
 
 ## 8.2 User-facing status
 
@@ -466,15 +466,15 @@ The server derives next actor from incomplete required tasks in the current stag
 
 ## 10.3 Perspective copy
 
-| Next actor | Current participant | Copy |
-|---|---|---|
-| Buyer | Buyer | Your action is required |
-| Buyer | Seller | Waiting for buyer |
-| Seller | Seller | Your action is required |
-| Seller | Buyer | Waiting for seller |
-| Both | Either | Action required from both participants |
-| System | Either | Waiting for demo processing |
-| None | Either | No action required |
+| Next actor | Current participant | Copy                                   |
+| ---------- | ------------------- | -------------------------------------- |
+| Buyer      | Buyer               | Your action is required                |
+| Buyer      | Seller              | Waiting for buyer                      |
+| Seller     | Seller              | Your action is required                |
+| Seller     | Buyer               | Waiting for seller                     |
+| Both       | Either              | Action required from both participants |
+| System     | Either              | Waiting for demo processing            |
+| None       | Either              | No action required                     |
 
 ---
 
@@ -749,7 +749,6 @@ CTA:
 Render available cards and show:
 
 > Some transactions could not be loaded. Try again to refresh the list.
-
 
 ---
 
@@ -1713,7 +1712,6 @@ Actions:
 
 The listing remains `PAUSED` or Under offer according to the last safe committed state; never silently return it to marketplace.
 
-
 ---
 
 # 33. Transaction Timeline
@@ -1791,22 +1789,22 @@ Use the canonical Week 4 in-app `notifications` system. Do not create a parallel
 
 ## 34.2 Notification types
 
-| Recipient | Trigger | Copy |
-|---|---|---|
-| Both | Transaction created | `Your transaction workspace is ready.` |
-| Buyer | Buyer task required | `Your action is required for {property}.` |
-| Seller | Seller task required | `Your action is required for {property}.` |
-| Seller | Deposit confirmed | `The buyer confirmed the demo deposit.` |
-| Participant | Document required | `Complete your document checklist for {property}.` |
-| Participant | Other checklist complete | `The other participant completed their document checklist.` |
-| Both | Demo checks complete | `Due diligence was completed in demo.` |
-| Buyer | Seller ready | `The seller confirmed transfer readiness.` |
-| Seller | Buyer ready | `The buyer confirmed transfer readiness.` |
-| Both | Appointment simulated | `A transfer appointment was simulated.` |
-| Other participant | Cancellation requested | `A transaction cancellation was requested.` |
-| Both | Cancelled | `The transaction was cancelled.` |
-| Both | Completed | `The transaction was completed in demo.` |
-| Both | Failed | `The transaction needs review.` |
+| Recipient         | Trigger                  | Copy                                                        |
+| ----------------- | ------------------------ | ----------------------------------------------------------- |
+| Both              | Transaction created      | `Your transaction workspace is ready.`                      |
+| Buyer             | Buyer task required      | `Your action is required for {property}.`                   |
+| Seller            | Seller task required     | `Your action is required for {property}.`                   |
+| Seller            | Deposit confirmed        | `The buyer confirmed the demo deposit.`                     |
+| Participant       | Document required        | `Complete your document checklist for {property}.`          |
+| Participant       | Other checklist complete | `The other participant completed their document checklist.` |
+| Both              | Demo checks complete     | `Due diligence was completed in demo.`                      |
+| Buyer             | Seller ready             | `The seller confirmed transfer readiness.`                  |
+| Seller            | Buyer ready              | `The buyer confirmed transfer readiness.`                   |
+| Both              | Appointment simulated    | `A transfer appointment was simulated.`                     |
+| Other participant | Cancellation requested   | `A transaction cancellation was requested.`                 |
+| Both              | Cancelled                | `The transaction was cancelled.`                            |
+| Both              | Completed                | `The transaction was completed in demo.`                    |
+| Both              | Failed                   | `The transaction needs review.`                             |
 
 ## 34.3 Header bell
 
@@ -1993,42 +1991,42 @@ Never show raw SQL, storage errors, stack traces, signed URLs, object paths, or 
 
 All components use shared MARKAZ colour, typography, spacing, radius, focus, and localisation tokens.
 
-| Component | Purpose and anatomy | Variants and states | Interaction, accessibility, responsive and RTL |
-|---|---|---|---|
-| Transaction Handoff Panel | Accepted offer, property, amount, perspective, next stage | Buyer, seller, loading, error | Focus heading after acceptance; stacks mobile; amounts LTR |
-| Transaction Card | Property, amount, perspective, stage, progress, next action | Active, waiting, completed, cancelled, failed | Explicit CTA; card not one giant link; mobile single column |
-| Perspective Badge | `You are buying/selling` | Buyer, seller | Text plus icon; never account role; logical placement |
-| Transaction Header | Reference, property, amount, status, last updated | Active, terminal | One h1; compact mobile variant; mixed names bidi-isolated |
-| Simulation Disclosure | Persistent legal/simulation boundary | Full, compact | Pale-blue information panel; text always visible |
-| Stage Progress Tracker | Six grouped stages | Complete, current, future, blocked, failed, cancelled | Ordered list; aria-current; horizontal desktop, compact mobile |
-| Stage Preview Panel | Explains future stage and prerequisites | Future, blocked | Non-actionable; link to blocker when allowed |
-| Current Milestone Card | Stage title, status, actor, tasks, action | Buyer, seller, both, system | Main workspace focus; sticky action separated |
-| Next Action Panel | Dominant current action and waiting explanation | Action, waiting, blocked, terminal | Sticky desktop; mobile bottom bar; no ambiguous Pending |
-| Participant Status Rows | Buyer and seller task/readiness states | Action, waiting, complete | Stack mobile; no contact details; text state |
-| Task List | Required and optional tasks | Pending, action, progress, complete, blocked, failed, skipped | Semantic list; filter not required; actor announced |
-| Task Row | Icon, title, actor, helper, status, action | All milestone states | 44 px target; status text; logical icon order |
-| Accepted Offer Summary | Property and accepted proposal facts | Compact, expanded | Immutable; links to accepted offer history |
-| Purchase Route Selector | Cash/Financing radio group | Default, selected, disabled | Fieldset/legend; LTR financial terms isolated as needed |
-| Financing Status Panel | Simple demo financing state | Not started, progress, confirmed, unable | No bank branding; explicit simulation text |
-| Demo Deposit Card | Accepted amount, 10%, demo amount, disclosure | Action, processing, complete | Definition list; no payment UI; amount announced fully |
-| Document Checklist | Participant-specific required files | Buyer, seller, financing | Uploader sees files; other participant sees status only |
-| Document Upload Control | Drop/select, requirements, privacy | Empty, uploading, uploaded, failed, replacing | Keyboard file input; no drag-only dependency; mobile picker |
-| File Metadata Card | Type, safe name, size, date, status, actions | Private, processing, accepted-demo, replace | Filename LTR; remove/replace confirmation; uploader only |
-| Document Privacy Badge | Visibility category | Private to you, shared status, shared summary | Full accessible label; no tooltip-only privacy |
-| Shared Summary Panel | Simulated Form F summary and dual review | Waiting, one confirmed, complete | Structured data; no signature styling; both perspectives |
-| Demo Check Panel | Prerequisites and simulated outcome | Blocked, progress, complete, failed | Status live region; retry; no official clearance language |
-| Preferred Date Field | Seller’s transfer-date preference | Empty, valid, invalid, read-only | Native date/input fallback; server-date validation; RTL label |
-| Readiness Control | Participant readiness confirmation | Not ready, ready, locked | Consequence dialog on change; status announced |
-| Appointment Summary | Simulated date and participant readiness | Processing, created | Clear no-booking disclosure; shared record |
-| Completion Checklist | Completed stage summary and dual confirmation | Buyer/seller waiting, ready, complete | No confetti; confirmation dialog; terminal read-only |
-| Cancellation Trigger | Low-emphasis transaction action | Available, unavailable | Not primary; explanatory label; keyboard accessible |
-| Cancellation Dialog | Reason, consequences, mutual/unilateral rule | Request, respond, processing | Focus trap, structured reasons, no free-form accusation |
-| Cancellation Status Panel | Requesting/responding/final status | Pending, declined, cancelled | Stops progression; clear listing outcome |
-| Transaction Timeline | Chronological structured events | Active, terminal | Ordered list; no chat; polite inserted-event announcement |
-| Realtime Status Banner | Degraded live-update status | Reconnecting, stale, recovered | Hidden when healthy; manual refresh in stale state |
-| Mobile Transaction Action Bar | Current participant action | Confirm, upload, retry, respond | Safe-area padding; 48 px controls; logical RTL order |
-| Unavailable Transaction Panel | Unified safe missing/forbidden state | Standard | No enumeration; heading focused |
-| Transaction Error Panel | Retryable or terminal failure | Retry, future review | Safe reference optional; no raw details |
+| Component                     | Purpose and anatomy                                         | Variants and states                                           | Interaction, accessibility, responsive and RTL                 |
+| ----------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------- |
+| Transaction Handoff Panel     | Accepted offer, property, amount, perspective, next stage   | Buyer, seller, loading, error                                 | Focus heading after acceptance; stacks mobile; amounts LTR     |
+| Transaction Card              | Property, amount, perspective, stage, progress, next action | Active, waiting, completed, cancelled, failed                 | Explicit CTA; card not one giant link; mobile single column    |
+| Perspective Badge             | `You are buying/selling`                                    | Buyer, seller                                                 | Text plus icon; never account role; logical placement          |
+| Transaction Header            | Reference, property, amount, status, last updated           | Active, terminal                                              | One h1; compact mobile variant; mixed names bidi-isolated      |
+| Simulation Disclosure         | Persistent legal/simulation boundary                        | Full, compact                                                 | Pale-blue information panel; text always visible               |
+| Stage Progress Tracker        | Six grouped stages                                          | Complete, current, future, blocked, failed, cancelled         | Ordered list; aria-current; horizontal desktop, compact mobile |
+| Stage Preview Panel           | Explains future stage and prerequisites                     | Future, blocked                                               | Non-actionable; link to blocker when allowed                   |
+| Current Milestone Card        | Stage title, status, actor, tasks, action                   | Buyer, seller, both, system                                   | Main workspace focus; sticky action separated                  |
+| Next Action Panel             | Dominant current action and waiting explanation             | Action, waiting, blocked, terminal                            | Sticky desktop; mobile bottom bar; no ambiguous Pending        |
+| Participant Status Rows       | Buyer and seller task/readiness states                      | Action, waiting, complete                                     | Stack mobile; no contact details; text state                   |
+| Task List                     | Required and optional tasks                                 | Pending, action, progress, complete, blocked, failed, skipped | Semantic list; filter not required; actor announced            |
+| Task Row                      | Icon, title, actor, helper, status, action                  | All milestone states                                          | 44 px target; status text; logical icon order                  |
+| Accepted Offer Summary        | Property and accepted proposal facts                        | Compact, expanded                                             | Immutable; links to accepted offer history                     |
+| Purchase Route Selector       | Cash/Financing radio group                                  | Default, selected, disabled                                   | Fieldset/legend; LTR financial terms isolated as needed        |
+| Financing Status Panel        | Simple demo financing state                                 | Not started, progress, confirmed, unable                      | No bank branding; explicit simulation text                     |
+| Demo Deposit Card             | Accepted amount, 10%, demo amount, disclosure               | Action, processing, complete                                  | Definition list; no payment UI; amount announced fully         |
+| Document Checklist            | Participant-specific required files                         | Buyer, seller, financing                                      | Uploader sees files; other participant sees status only        |
+| Document Upload Control       | Drop/select, requirements, privacy                          | Empty, uploading, uploaded, failed, replacing                 | Keyboard file input; no drag-only dependency; mobile picker    |
+| File Metadata Card            | Type, safe name, size, date, status, actions                | Private, processing, accepted-demo, replace                   | Filename LTR; remove/replace confirmation; uploader only       |
+| Document Privacy Badge        | Visibility category                                         | Private to you, shared status, shared summary                 | Full accessible label; no tooltip-only privacy                 |
+| Shared Summary Panel          | Simulated Form F summary and dual review                    | Waiting, one confirmed, complete                              | Structured data; no signature styling; both perspectives       |
+| Demo Check Panel              | Prerequisites and simulated outcome                         | Blocked, progress, complete, failed                           | Status live region; retry; no official clearance language      |
+| Preferred Date Field          | Seller’s transfer-date preference                           | Empty, valid, invalid, read-only                              | Native date/input fallback; server-date validation; RTL label  |
+| Readiness Control             | Participant readiness confirmation                          | Not ready, ready, locked                                      | Consequence dialog on change; status announced                 |
+| Appointment Summary           | Simulated date and participant readiness                    | Processing, created                                           | Clear no-booking disclosure; shared record                     |
+| Completion Checklist          | Completed stage summary and dual confirmation               | Buyer/seller waiting, ready, complete                         | No confetti; confirmation dialog; terminal read-only           |
+| Cancellation Trigger          | Low-emphasis transaction action                             | Available, unavailable                                        | Not primary; explanatory label; keyboard accessible            |
+| Cancellation Dialog           | Reason, consequences, mutual/unilateral rule                | Request, respond, processing                                  | Focus trap, structured reasons, no free-form accusation        |
+| Cancellation Status Panel     | Requesting/responding/final status                          | Pending, declined, cancelled                                  | Stops progression; clear listing outcome                       |
+| Transaction Timeline          | Chronological structured events                             | Active, terminal                                              | Ordered list; no chat; polite inserted-event announcement      |
+| Realtime Status Banner        | Degraded live-update status                                 | Reconnecting, stale, recovered                                | Hidden when healthy; manual refresh in stale state             |
+| Mobile Transaction Action Bar | Current participant action                                  | Confirm, upload, retry, respond                               | Safe-area padding; 48 px controls; logical RTL order           |
+| Unavailable Transaction Panel | Unified safe missing/forbidden state                        | Standard                                                      | No enumeration; heading focused                                |
+| Transaction Error Panel       | Retryable or terminal failure                               | Retry, future review                                          | Safe reference optional; no raw details                        |
 
 ## 37.1 Reuse from prior milestones
 
@@ -2048,42 +2046,42 @@ All components use shared MARKAZ colour, typography, spacing, radius, focus, and
 
 # 38. Validation Matrix
 
-| Screen | Field/action | Rule | Trigger | English error or warning | Placement | Clears when | Blocking? | Arabic review |
-|---|---|---|---|---|---|---|---|---|
-| Transaction entry | Access | Buyer or seller participant only | Route load | `This transaction is not available.` | Page panel | Authorised route | Yes | Security + language |
-| Creation | Accepted offer | Thread/proposal must remain accepted | Ensure/create | `The accepted offer is no longer available for transaction setup.` | Page panel | Valid accepted offer | Yes | Security + language |
-| Creation | Duplicate | One transaction per accepted thread/proposal | Repeated request | No error; return existing transaction | N/A | N/A | No | N/A |
-| Any action | Participant turn | Current participant must own task | Action | `This action is not available for your transaction perspective.` | Form alert | Correct task | Yes | Security + language |
-| Details | Confirmation missing | Required checkbox | Submit | `Confirm the transaction details to continue.` | Under checkbox | Checked | Yes | Legal + language |
-| Purchase route | Missing | Cash or Financing required | Submit | `Select a purchase route.` | Under group | Selected | Yes | Language |
-| Financing | Invalid status | Approved demo status only | Submit | `Select a valid financing status.` | Panel | Valid state | Yes | Language |
-| Deposit | Not available | Confirmation stage complete | Open/action | `Complete the transaction confirmation stage first.` | Panel | Prerequisite complete | Yes | Language |
-| Deposit | Checkbox missing | Simulation acknowledgement required | Submit | `Confirm that no real payment will be processed.` | Under checkbox | Checked | Yes | Legal + language |
-| Deposit | Already complete | Idempotent | Repeat | No error; show completed state | N/A | N/A | No | N/A |
-| Document | Unsupported type | PDF/JPG/PNG only | Select/upload | `Upload a PDF, JPG, or PNG file.` | Upload control | Supported file | Yes | Language |
-| Document | Too large | ≤10 MB | Select/upload | `File size must be 10 MB or less.` | Upload control | Smaller file | Yes | Language |
-| Document | Upload failed | Storage/register operation succeeds | Upload | `We could not upload this file. Try again.` | File card | Retry succeeds | Yes for required | Language |
-| Document | Replace failed | Existing file remains active | Replace | `The replacement could not be uploaded. Your current file is unchanged.` | File card | Retry/cancel | No if existing valid | Language |
-| Documents | Required missing | Required files by route | Continue | `Complete the required document checklist to continue.` | Stage alert | All present | Yes | Language |
-| Shared review | Confirmation missing | Both reviews required | Progress | `Review and confirm the simulated transaction summary.` | Task row | Confirmed | Yes | Legal + language |
-| Demo checks | Prerequisites | Deposit/docs/route complete | Start | `Complete the highlighted transaction tasks before starting demo checks.` | Check panel | Requirements complete | Yes | Language |
-| Demo checks | Failure | Simulation resolves safely | Result | `We could not complete the demo checks. Try again.` | Check panel | Retry succeeds | Yes | Language |
-| Transfer | Date missing | Required seller date | Submit | `Choose a preferred transfer date.` | Under date | Date selected | Yes | Language |
-| Transfer | Date too soon | ≥3 days | Submit | `Choose a date at least 3 days from today.` | Under date | Valid date | Yes | Language |
-| Transfer | Date too late | ≤30 days | Submit | `Choose a date within the next 30 days.` | Under date | Valid date | Yes | Language |
-| Transfer | Buyer readiness | Required | Appointment action | `The buyer must confirm readiness first.` | Status panel | Buyer ready | Yes | Language |
-| Transfer | Seller readiness | Required | Appointment action | `The seller must confirm readiness first.` | Status panel | Seller ready | Yes | Language |
-| Appointment | Duplicate | One active simulated appointment | Repeat | No error; show existing appointment | N/A | N/A | No | N/A |
-| Completion | Too early | All required stages complete | Open/submit | `Complete all required transaction stages before confirming completion.` | Completion panel | Requirements complete | Yes | Legal + language |
-| Completion | Buyer confirmation missing | Both required | Finalise | `Waiting for the buyer to confirm completion in demo.` | Status row | Buyer confirms | Yes | Language |
-| Completion | Seller confirmation missing | Both required | Finalise | `Waiting for the seller to confirm completion in demo.` | Status row | Seller confirms | Yes | Language |
-| Cancellation | Reason missing | Structured reason required | Submit | `Select a cancellation reason.` | Under group | Selected | Yes | Legal + language |
-| Cancellation | Already pending | One active request | Request | `A cancellation request is already in progress.` | Panel | Resolve request | Yes | Language |
-| Cancellation | Terminal state | Not after completion/cancelled | Request | `Cancellation is not available for this transaction.` | Panel | N/A | Yes | Legal + language |
-| Cancellation | Response stale | Current request/version required | Confirm/decline | `The cancellation request has changed. Review the latest status.` | Alert | Refresh | Yes | Security + language |
-| Any action | Version conflict | Expected version matches | Mutation | `This transaction has changed. Review the latest status.` | Page alert | Refetch | Yes | Language |
-| Upload | Session expired | Active session required | Upload/register | `Your session has expired. Sign in again before uploading.` | Session alert | Sign in | Yes | Security + language |
-| Realtime | Stale | Connection unavailable | Connection | `Updates may be delayed. Refresh to check the latest transaction status.` | Banner | Reconnected/refreshed | No | Language |
+| Screen            | Field/action                | Rule                                         | Trigger            | English error or warning                                                  | Placement        | Clears when           | Blocking?            | Arabic review       |
+| ----------------- | --------------------------- | -------------------------------------------- | ------------------ | ------------------------------------------------------------------------- | ---------------- | --------------------- | -------------------- | ------------------- |
+| Transaction entry | Access                      | Buyer or seller participant only             | Route load         | `This transaction is not available.`                                      | Page panel       | Authorised route      | Yes                  | Security + language |
+| Creation          | Accepted offer              | Thread/proposal must remain accepted         | Ensure/create      | `The accepted offer is no longer available for transaction setup.`        | Page panel       | Valid accepted offer  | Yes                  | Security + language |
+| Creation          | Duplicate                   | One transaction per accepted thread/proposal | Repeated request   | No error; return existing transaction                                     | N/A              | N/A                   | No                   | N/A                 |
+| Any action        | Participant turn            | Current participant must own task            | Action             | `This action is not available for your transaction perspective.`          | Form alert       | Correct task          | Yes                  | Security + language |
+| Details           | Confirmation missing        | Required checkbox                            | Submit             | `Confirm the transaction details to continue.`                            | Under checkbox   | Checked               | Yes                  | Legal + language    |
+| Purchase route    | Missing                     | Cash or Financing required                   | Submit             | `Select a purchase route.`                                                | Under group      | Selected              | Yes                  | Language            |
+| Financing         | Invalid status              | Approved demo status only                    | Submit             | `Select a valid financing status.`                                        | Panel            | Valid state           | Yes                  | Language            |
+| Deposit           | Not available               | Confirmation stage complete                  | Open/action        | `Complete the transaction confirmation stage first.`                      | Panel            | Prerequisite complete | Yes                  | Language            |
+| Deposit           | Checkbox missing            | Simulation acknowledgement required          | Submit             | `Confirm that no real payment will be processed.`                         | Under checkbox   | Checked               | Yes                  | Legal + language    |
+| Deposit           | Already complete            | Idempotent                                   | Repeat             | No error; show completed state                                            | N/A              | N/A                   | No                   | N/A                 |
+| Document          | Unsupported type            | PDF/JPG/PNG only                             | Select/upload      | `Upload a PDF, JPG, or PNG file.`                                         | Upload control   | Supported file        | Yes                  | Language            |
+| Document          | Too large                   | ≤10 MB                                       | Select/upload      | `File size must be 10 MB or less.`                                        | Upload control   | Smaller file          | Yes                  | Language            |
+| Document          | Upload failed               | Storage/register operation succeeds          | Upload             | `We could not upload this file. Try again.`                               | File card        | Retry succeeds        | Yes for required     | Language            |
+| Document          | Replace failed              | Existing file remains active                 | Replace            | `The replacement could not be uploaded. Your current file is unchanged.`  | File card        | Retry/cancel          | No if existing valid | Language            |
+| Documents         | Required missing            | Required files by route                      | Continue           | `Complete the required document checklist to continue.`                   | Stage alert      | All present           | Yes                  | Language            |
+| Shared review     | Confirmation missing        | Both reviews required                        | Progress           | `Review and confirm the simulated transaction summary.`                   | Task row         | Confirmed             | Yes                  | Legal + language    |
+| Demo checks       | Prerequisites               | Deposit/docs/route complete                  | Start              | `Complete the highlighted transaction tasks before starting demo checks.` | Check panel      | Requirements complete | Yes                  | Language            |
+| Demo checks       | Failure                     | Simulation resolves safely                   | Result             | `We could not complete the demo checks. Try again.`                       | Check panel      | Retry succeeds        | Yes                  | Language            |
+| Transfer          | Date missing                | Required seller date                         | Submit             | `Choose a preferred transfer date.`                                       | Under date       | Date selected         | Yes                  | Language            |
+| Transfer          | Date too soon               | ≥3 days                                      | Submit             | `Choose a date at least 3 days from today.`                               | Under date       | Valid date            | Yes                  | Language            |
+| Transfer          | Date too late               | ≤30 days                                     | Submit             | `Choose a date within the next 30 days.`                                  | Under date       | Valid date            | Yes                  | Language            |
+| Transfer          | Buyer readiness             | Required                                     | Appointment action | `The buyer must confirm readiness first.`                                 | Status panel     | Buyer ready           | Yes                  | Language            |
+| Transfer          | Seller readiness            | Required                                     | Appointment action | `The seller must confirm readiness first.`                                | Status panel     | Seller ready          | Yes                  | Language            |
+| Appointment       | Duplicate                   | One active simulated appointment             | Repeat             | No error; show existing appointment                                       | N/A              | N/A                   | No                   | N/A                 |
+| Completion        | Too early                   | All required stages complete                 | Open/submit        | `Complete all required transaction stages before confirming completion.`  | Completion panel | Requirements complete | Yes                  | Legal + language    |
+| Completion        | Buyer confirmation missing  | Both required                                | Finalise           | `Waiting for the buyer to confirm completion in demo.`                    | Status row       | Buyer confirms        | Yes                  | Language            |
+| Completion        | Seller confirmation missing | Both required                                | Finalise           | `Waiting for the seller to confirm completion in demo.`                   | Status row       | Seller confirms       | Yes                  | Language            |
+| Cancellation      | Reason missing              | Structured reason required                   | Submit             | `Select a cancellation reason.`                                           | Under group      | Selected              | Yes                  | Legal + language    |
+| Cancellation      | Already pending             | One active request                           | Request            | `A cancellation request is already in progress.`                          | Panel            | Resolve request       | Yes                  | Language            |
+| Cancellation      | Terminal state              | Not after completion/cancelled               | Request            | `Cancellation is not available for this transaction.`                     | Panel            | N/A                   | Yes                  | Legal + language    |
+| Cancellation      | Response stale              | Current request/version required             | Confirm/decline    | `The cancellation request has changed. Review the latest status.`         | Alert            | Refresh               | Yes                  | Security + language |
+| Any action        | Version conflict            | Expected version matches                     | Mutation           | `This transaction has changed. Review the latest status.`                 | Page alert       | Refetch               | Yes                  | Language            |
+| Upload            | Session expired             | Active session required                      | Upload/register    | `Your session has expired. Sign in again before uploading.`               | Session alert    | Sign in               | Yes                  | Security + language |
+| Realtime          | Stale                       | Connection unavailable                       | Connection         | `Updates may be delayed. Refresh to check the latest transaction status.` | Banner           | Reconnected/refreshed | No                   | Language            |
 
 ---
 
@@ -2406,164 +2404,164 @@ Never audit file content, raw filenames where avoidable, signed URLs, identity n
 
 ## 43.1 Handoff and navigation
 
-| Key | English |
-|---|---|
-| `transaction.continue` | Continue to Transaction |
-| `transaction.readyTitle` | Your transaction is ready |
-| `transaction.readyBuyerBody` | The accepted offer has moved into the transaction stage. You and the seller can now complete the required demo steps. |
-| `transaction.readySellerBody` | The accepted offer has moved into the transaction stage. You and the buyer can now complete the required demo steps. |
-| `transaction.preparing` | Preparing your transaction… |
-| `transactions.title` | My Transactions |
-| `transactions.description` | Track property purchases and sales from accepted offer to demo completion. |
-| `transaction.perspective.buying` | You are buying |
-| `transaction.perspective.selling` | You are selling |
+| Key                               | English                                                                                                               |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `transaction.continue`            | Continue to Transaction                                                                                               |
+| `transaction.readyTitle`          | Your transaction is ready                                                                                             |
+| `transaction.readyBuyerBody`      | The accepted offer has moved into the transaction stage. You and the seller can now complete the required demo steps. |
+| `transaction.readySellerBody`     | The accepted offer has moved into the transaction stage. You and the buyer can now complete the required demo steps.  |
+| `transaction.preparing`           | Preparing your transaction…                                                                                           |
+| `transactions.title`              | My Transactions                                                                                                       |
+| `transactions.description`        | Track property purchases and sales from accepted offer to demo completion.                                            |
+| `transaction.perspective.buying`  | You are buying                                                                                                        |
+| `transaction.perspective.selling` | You are selling                                                                                                       |
 
 ## 43.2 Status and action ownership
 
-| Key | English |
-|---|---|
-| `transaction.action.yours` | Your action is required |
-| `transaction.waitingBuyer` | Waiting for buyer |
-| `transaction.waitingSeller` | Waiting for seller |
-| `transaction.waitingBoth` | Action required from both participants |
-| `transaction.waitingSystem` | Waiting for demo processing |
-| `transaction.noAction` | No action required |
-| `transaction.inProgress` | In progress |
-| `transaction.blocked` | Blocked |
-| `transaction.completedDemo` | Completed in demo |
+| Key                         | English                                |
+| --------------------------- | -------------------------------------- |
+| `transaction.action.yours`  | Your action is required                |
+| `transaction.waitingBuyer`  | Waiting for buyer                      |
+| `transaction.waitingSeller` | Waiting for seller                     |
+| `transaction.waitingBoth`   | Action required from both participants |
+| `transaction.waitingSystem` | Waiting for demo processing            |
+| `transaction.noAction`      | No action required                     |
+| `transaction.inProgress`    | In progress                            |
+| `transaction.blocked`       | Blocked                                |
+| `transaction.completedDemo` | Completed in demo                      |
 
 ## 43.3 Stages
 
-| Key | English |
-|---|---|
-| `stage.confirm` | Confirm transaction |
-| `stage.deposit` | Deposit |
-| `stage.documents` | Documents |
-| `stage.checks` | Demo checks |
-| `stage.transfer` | Transfer |
-| `stage.completion` | Completion |
-| `stage.progress` | Stage {current} of {total} · {stage} |
+| Key                | English                              |
+| ------------------ | ------------------------------------ |
+| `stage.confirm`    | Confirm transaction                  |
+| `stage.deposit`    | Deposit                              |
+| `stage.documents`  | Documents                            |
+| `stage.checks`     | Demo checks                          |
+| `stage.transfer`   | Transfer                             |
+| `stage.completion` | Completion                           |
+| `stage.progress`   | Stage {current} of {total} · {stage} |
 
 ## 43.4 Confirmation and purchase route
 
-| Key | English |
-|---|---|
-| `confirmation.title` | Confirm transaction details |
-| `confirmation.body` | Review the property and accepted amount before the transaction progresses. |
-| `confirmation.checkbox` | I confirm that the property and accepted amount shown are correct for this demo transaction. |
-| `confirmation.action` | Confirm transaction details |
-| `confirmation.done` | Your details are confirmed |
-| `confirmation.issue` | Something looks incorrect |
-| `route.title` | How do you plan to purchase this property? |
-| `route.help` | This selection is used only to shape the prototype transaction checklist. |
-| `route.cash` | Cash purchase |
-| `route.financing` | Financing |
-| `route.financingDisclosure` | No mortgage application, bank approval, or credit assessment is performed. |
-| `financing.notStarted` | Not started |
-| `financing.inProgress` | In progress |
-| `financing.confirmed` | Confirmed in demo |
-| `financing.unable` | Unable to proceed |
+| Key                         | English                                                                                      |
+| --------------------------- | -------------------------------------------------------------------------------------------- |
+| `confirmation.title`        | Confirm transaction details                                                                  |
+| `confirmation.body`         | Review the property and accepted amount before the transaction progresses.                   |
+| `confirmation.checkbox`     | I confirm that the property and accepted amount shown are correct for this demo transaction. |
+| `confirmation.action`       | Confirm transaction details                                                                  |
+| `confirmation.done`         | Your details are confirmed                                                                   |
+| `confirmation.issue`        | Something looks incorrect                                                                    |
+| `route.title`               | How do you plan to purchase this property?                                                   |
+| `route.help`                | This selection is used only to shape the prototype transaction checklist.                    |
+| `route.cash`                | Cash purchase                                                                                |
+| `route.financing`           | Financing                                                                                    |
+| `route.financingDisclosure` | No mortgage application, bank approval, or credit assessment is performed.                   |
+| `financing.notStarted`      | Not started                                                                                  |
+| `financing.inProgress`      | In progress                                                                                  |
+| `financing.confirmed`       | Confirmed in demo                                                                            |
+| `financing.unable`          | Unable to proceed                                                                            |
 
 ## 43.5 Deposit
 
-| Key | English |
-|---|---|
-| `deposit.title` | Confirm deposit in demo |
-| `deposit.body` | Review the demo amount and confirm the step. No real payment will be processed and no funds will be held. |
-| `deposit.amount` | Demo deposit amount |
-| `deposit.checkbox` | I understand that this is a simulated deposit confirmation and no money will be transferred. |
-| `deposit.action` | Confirm demo deposit |
-| `deposit.processing` | Confirming demo deposit… |
-| `deposit.successTitle` | Deposit confirmed in demo |
-| `deposit.successBody` | No real payment has been processed. |
+| Key                    | English                                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------------------------------------- |
+| `deposit.title`        | Confirm deposit in demo                                                                                   |
+| `deposit.body`         | Review the demo amount and confirm the step. No real payment will be processed and no funds will be held. |
+| `deposit.amount`       | Demo deposit amount                                                                                       |
+| `deposit.checkbox`     | I understand that this is a simulated deposit confirmation and no money will be transferred.              |
+| `deposit.action`       | Confirm demo deposit                                                                                      |
+| `deposit.processing`   | Confirming demo deposit…                                                                                  |
+| `deposit.successTitle` | Deposit confirmed in demo                                                                                 |
+| `deposit.successBody`  | No real payment has been processed.                                                                       |
 
 ## 43.6 Documents
 
-| Key | English |
-|---|---|
-| `documents.title` | Transaction documents |
-| `documents.privateTitle` | Use fictional sample files only |
-| `documents.privateBody` | Do not upload a real Emirates ID, passport, bank statement, mortgage approval, Title Deed, Oqood, or other sensitive document. |
-| `documents.upload` | Upload document |
-| `documents.replace` | Replace document |
-| `documents.remove` | Remove document |
-| `documents.uploading` | Uploading… |
-| `documents.processing` | Processing in demo |
-| `documents.accepted` | Accepted in demo |
-| `documents.privateBadge` | Private to you |
-| `documents.otherStatus` | The other participant can see only whether this checklist is complete. |
-| `documents.missing` | Complete the required document checklist to continue. |
+| Key                      | English                                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `documents.title`        | Transaction documents                                                                                                          |
+| `documents.privateTitle` | Use fictional sample files only                                                                                                |
+| `documents.privateBody`  | Do not upload a real Emirates ID, passport, bank statement, mortgage approval, Title Deed, Oqood, or other sensitive document. |
+| `documents.upload`       | Upload document                                                                                                                |
+| `documents.replace`      | Replace document                                                                                                               |
+| `documents.remove`       | Remove document                                                                                                                |
+| `documents.uploading`    | Uploading…                                                                                                                     |
+| `documents.processing`   | Processing in demo                                                                                                             |
+| `documents.accepted`     | Accepted in demo                                                                                                               |
+| `documents.privateBadge` | Private to you                                                                                                                 |
+| `documents.otherStatus`  | The other participant can see only whether this checklist is complete.                                                         |
+| `documents.missing`      | Complete the required document checklist to continue.                                                                          |
 
 ## 43.7 Shared summary and checks
 
-| Key | English |
-|---|---|
-| `summary.title` | Simulated transaction summary |
-| `summary.disclosureTitle` | Document review simulated |
-| `summary.disclosureBody` | This is not an official Form F or legally binding agreement. |
-| `summary.confirm` | Confirm I reviewed the demo summary |
-| `checks.title` | Due-diligence checks simulated |
-| `checks.disclosure` | These prototype checks are not legal, financial, structural, title, or regulatory advice. |
-| `checks.start` | Start demo checks |
-| `checks.running` | Running demo checks… |
-| `checks.successTitle` | Due diligence completed in demo |
-| `checks.successBody` | The prototype prerequisites are complete. No legal or regulatory clearance has been performed. |
-| `checks.blockedTitle` | Demo checks are blocked |
-| `checks.retry` | Retry demo checks |
+| Key                       | English                                                                                        |
+| ------------------------- | ---------------------------------------------------------------------------------------------- |
+| `summary.title`           | Simulated transaction summary                                                                  |
+| `summary.disclosureTitle` | Document review simulated                                                                      |
+| `summary.disclosureBody`  | This is not an official Form F or legally binding agreement.                                   |
+| `summary.confirm`         | Confirm I reviewed the demo summary                                                            |
+| `checks.title`            | Due-diligence checks simulated                                                                 |
+| `checks.disclosure`       | These prototype checks are not legal, financial, structural, title, or regulatory advice.      |
+| `checks.start`            | Start demo checks                                                                              |
+| `checks.running`          | Running demo checks…                                                                           |
+| `checks.successTitle`     | Due diligence completed in demo                                                                |
+| `checks.successBody`      | The prototype prerequisites are complete. No legal or regulatory clearance has been performed. |
+| `checks.blockedTitle`     | Demo checks are blocked                                                                        |
+| `checks.retry`            | Retry demo checks                                                                              |
 
 ## 43.8 Transfer
 
-| Key | English |
-|---|---|
-| `transfer.title` | Prepare for transfer |
-| `transfer.date` | Preferred transfer date |
-| `transfer.dateHelp` | Choose a preferred date for this prototype. No official appointment will be booked. |
-| `transfer.buyerReady` | I confirm the buyer tasks are ready for the simulated transfer stage. |
-| `transfer.sellerReady` | I confirm the seller tasks are ready for the simulated transfer stage. |
-| `transfer.dateWorks` | This date works for me |
-| `transfer.notReady` | I am not ready yet |
-| `transfer.bothReady` | Both participants are ready |
-| `transfer.createAppointment` | Create simulated appointment |
-| `transfer.appointmentTitle` | Transfer appointment simulated |
-| `transfer.appointmentBody` | No official appointment has been booked. |
+| Key                          | English                                                                             |
+| ---------------------------- | ----------------------------------------------------------------------------------- |
+| `transfer.title`             | Prepare for transfer                                                                |
+| `transfer.date`              | Preferred transfer date                                                             |
+| `transfer.dateHelp`          | Choose a preferred date for this prototype. No official appointment will be booked. |
+| `transfer.buyerReady`        | I confirm the buyer tasks are ready for the simulated transfer stage.               |
+| `transfer.sellerReady`       | I confirm the seller tasks are ready for the simulated transfer stage.              |
+| `transfer.dateWorks`         | This date works for me                                                              |
+| `transfer.notReady`          | I am not ready yet                                                                  |
+| `transfer.bothReady`         | Both participants are ready                                                         |
+| `transfer.createAppointment` | Create simulated appointment                                                        |
+| `transfer.appointmentTitle`  | Transfer appointment simulated                                                      |
+| `transfer.appointmentBody`   | No official appointment has been booked.                                            |
 
 ## 43.9 Completion
 
-| Key | English |
-|---|---|
-| `completion.title` | Complete transaction in demo |
-| `completion.buyerCheckbox` | I confirm completion of this transaction in the demo. |
-| `completion.sellerCheckbox` | I confirm completion of this transaction in the demo. |
-| `completion.action` | Confirm completion in demo |
-| `completion.waitingBuyer` | Waiting for the buyer to confirm completion in demo. |
-| `completion.waitingSeller` | Waiting for the seller to confirm completion in demo. |
-| `completion.successTitle` | Transaction completed in demo |
-| `completion.successBody` | This prototype has not processed a real payment or official property transfer. |
-| `listing.soldDemo` | Sold in demo |
+| Key                         | English                                                                        |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| `completion.title`          | Complete transaction in demo                                                   |
+| `completion.buyerCheckbox`  | I confirm completion of this transaction in the demo.                          |
+| `completion.sellerCheckbox` | I confirm completion of this transaction in the demo.                          |
+| `completion.action`         | Confirm completion in demo                                                     |
+| `completion.waitingBuyer`   | Waiting for the buyer to confirm completion in demo.                           |
+| `completion.waitingSeller`  | Waiting for the seller to confirm completion in demo.                          |
+| `completion.successTitle`   | Transaction completed in demo                                                  |
+| `completion.successBody`    | This prototype has not processed a real payment or official property transfer. |
+| `listing.soldDemo`          | Sold in demo                                                                   |
 
 ## 43.10 Cancellation and errors
 
-| Key | English |
-|---|---|
-| `cancellation.request` | Request cancellation |
-| `cancellation.title` | Request transaction cancellation? |
-| `cancellation.body` | The transaction will stop progressing while the cancellation is confirmed or reviewed. |
-| `cancellation.pending` | Cancellation requested |
-| `cancellation.confirm` | Confirm cancellation |
-| `cancellation.keep` | Keep transaction active |
-| `cancellation.cancelledTitle` | Transaction cancelled |
-| `cancellation.cancelledBody` | The transaction has stopped. The listing is paused and will not return to the marketplace automatically. |
-| `transaction.failedTitle` | This transaction needs review |
-| `transaction.failedBody` | Progress is paused because the transaction could not be updated safely. |
-| `error.stepTitle` | We could not complete this step |
-| `error.stepBody` | Your transaction information has been preserved. Try again or return later. |
-| `error.unavailableTitle` | This transaction is not available |
-| `error.unavailableBody` | It may no longer exist, or you may not have permission to view it. |
-| `error.conflictTitle` | This transaction has changed |
-| `error.conflictBody` | Another action was completed before yours. We have refreshed the latest status. |
-| `realtime.reconnecting` | Reconnecting to transaction updates… |
-| `realtime.stale` | Updates may be delayed. Refresh to check the latest transaction status. |
-| `session.expired` | Your session has expired. Sign in again to continue. |
+| Key                           | English                                                                                                  |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `cancellation.request`        | Request cancellation                                                                                     |
+| `cancellation.title`          | Request transaction cancellation?                                                                        |
+| `cancellation.body`           | The transaction will stop progressing while the cancellation is confirmed or reviewed.                   |
+| `cancellation.pending`        | Cancellation requested                                                                                   |
+| `cancellation.confirm`        | Confirm cancellation                                                                                     |
+| `cancellation.keep`           | Keep transaction active                                                                                  |
+| `cancellation.cancelledTitle` | Transaction cancelled                                                                                    |
+| `cancellation.cancelledBody`  | The transaction has stopped. The listing is paused and will not return to the marketplace automatically. |
+| `transaction.failedTitle`     | This transaction needs review                                                                            |
+| `transaction.failedBody`      | Progress is paused because the transaction could not be updated safely.                                  |
+| `error.stepTitle`             | We could not complete this step                                                                          |
+| `error.stepBody`              | Your transaction information has been preserved. Try again or return later.                              |
+| `error.unavailableTitle`      | This transaction is not available                                                                        |
+| `error.unavailableBody`       | It may no longer exist, or you may not have permission to view it.                                       |
+| `error.conflictTitle`         | This transaction has changed                                                                             |
+| `error.conflictBody`          | Another action was completed before yours. We have refreshed the latest status.                          |
+| `realtime.reconnecting`       | Reconnecting to transaction updates…                                                                     |
+| `realtime.stale`              | Updates may be delayed. Refresh to check the latest transaction status.                                  |
+| `session.expired`             | Your session has expired. Sign in again to continue.                                                     |
 
 ---
 
@@ -2571,43 +2569,43 @@ Never audit file content, raw filenames where avoidable, signed URLs, identity n
 
 **Status:** Draft only. Professional Arabic review is required for all copy. Legal, financial, cancellation, Form F, deposit, due-diligence, and transfer terminology also requires legal/business review.
 
-| English | Draft Arabic | Review |
-|---|---|---|
-| Continue to Transaction | المتابعة إلى المعاملة | Language + property |
-| Your transaction is ready | معاملتك جاهزة | Language |
-| My Transactions | معاملاتي | Language |
-| You are buying | أنت المشتري في هذه المعاملة | Language |
-| You are selling | أنت البائع في هذه المعاملة | Language |
-| Your action is required | يتطلب الأمر إجراءً منك | Language |
-| Waiting for buyer | بانتظار المشتري | Language |
-| Waiting for seller | بانتظار البائع | Language |
-| Confirm transaction | تأكيد المعاملة | Legal + language |
-| Deposit | الدفعة المقدّمة | Legal + financial |
-| Documents | المستندات | Legal + language |
-| Demo checks | الفحوصات التجريبية | Legal + language |
-| Transfer | نقل الملكية التجريبي | Legal + property |
-| Completion | الإكمال التجريبي | Legal + language |
-| Confirm transaction details | تأكيد تفاصيل المعاملة | Legal + language |
-| Cash purchase | شراء نقدي | Financial |
-| Financing | تمويل | Financial |
-| Confirm deposit in demo | تأكيد الدفعة المقدّمة في العرض التجريبي | Legal + financial |
-| Deposit confirmed in demo | تم تأكيد الدفعة المقدّمة تجريبيًا | Legal + financial |
-| Use fictional sample files only | استخدم ملفات تجريبية غير حقيقية فقط | Privacy + language |
-| Private to you | خاص بك | Privacy |
-| Simulated transaction summary | ملخص المعاملة التجريبي | Legal + language |
-| Document review simulated | مراجعة المستندات محاكاة تجريبية | Legal + language |
-| Due-diligence checks simulated | فحوصات العناية الواجبة محاكاة تجريبية | Legal + professional language |
-| Prepare for transfer | الاستعداد للنقل التجريبي | Legal + property |
-| Buyer ready | المشتري جاهز | Language |
-| Seller ready | البائع جاهز | Language |
-| Transfer appointment simulated | تمت محاكاة موعد النقل | Legal + language |
-| Transaction completed in demo | اكتملت المعاملة تجريبيًا | Legal + language |
-| Sold in demo | تم البيع تجريبيًا | Legal + property |
-| Request cancellation | طلب إلغاء المعاملة | Legal + language |
-| Cancellation requested | تم طلب الإلغاء | Legal + language |
-| Transaction cancelled | تم إلغاء المعاملة | Legal + language |
-| This transaction needs review | تحتاج هذه المعاملة إلى مراجعة | Language |
-| This transaction is not available | هذه المعاملة غير متاحة | Security + language |
+| English                           | Draft Arabic                            | Review                        |
+| --------------------------------- | --------------------------------------- | ----------------------------- |
+| Continue to Transaction           | المتابعة إلى المعاملة                   | Language + property           |
+| Your transaction is ready         | معاملتك جاهزة                           | Language                      |
+| My Transactions                   | معاملاتي                                | Language                      |
+| You are buying                    | أنت المشتري في هذه المعاملة             | Language                      |
+| You are selling                   | أنت البائع في هذه المعاملة              | Language                      |
+| Your action is required           | يتطلب الأمر إجراءً منك                  | Language                      |
+| Waiting for buyer                 | بانتظار المشتري                         | Language                      |
+| Waiting for seller                | بانتظار البائع                          | Language                      |
+| Confirm transaction               | تأكيد المعاملة                          | Legal + language              |
+| Deposit                           | الدفعة المقدّمة                         | Legal + financial             |
+| Documents                         | المستندات                               | Legal + language              |
+| Demo checks                       | الفحوصات التجريبية                      | Legal + language              |
+| Transfer                          | نقل الملكية التجريبي                    | Legal + property              |
+| Completion                        | الإكمال التجريبي                        | Legal + language              |
+| Confirm transaction details       | تأكيد تفاصيل المعاملة                   | Legal + language              |
+| Cash purchase                     | شراء نقدي                               | Financial                     |
+| Financing                         | تمويل                                   | Financial                     |
+| Confirm deposit in demo           | تأكيد الدفعة المقدّمة في العرض التجريبي | Legal + financial             |
+| Deposit confirmed in demo         | تم تأكيد الدفعة المقدّمة تجريبيًا       | Legal + financial             |
+| Use fictional sample files only   | استخدم ملفات تجريبية غير حقيقية فقط     | Privacy + language            |
+| Private to you                    | خاص بك                                  | Privacy                       |
+| Simulated transaction summary     | ملخص المعاملة التجريبي                  | Legal + language              |
+| Document review simulated         | مراجعة المستندات محاكاة تجريبية         | Legal + language              |
+| Due-diligence checks simulated    | فحوصات العناية الواجبة محاكاة تجريبية   | Legal + professional language |
+| Prepare for transfer              | الاستعداد للنقل التجريبي                | Legal + property              |
+| Buyer ready                       | المشتري جاهز                            | Language                      |
+| Seller ready                      | البائع جاهز                             | Language                      |
+| Transfer appointment simulated    | تمت محاكاة موعد النقل                   | Legal + language              |
+| Transaction completed in demo     | اكتملت المعاملة تجريبيًا                | Legal + language              |
+| Sold in demo                      | تم البيع تجريبيًا                       | Legal + property              |
+| Request cancellation              | طلب إلغاء المعاملة                      | Legal + language              |
+| Cancellation requested            | تم طلب الإلغاء                          | Legal + language              |
+| Transaction cancelled             | تم إلغاء المعاملة                       | Legal + language              |
+| This transaction needs review     | تحتاج هذه المعاملة إلى مراجعة           | Language                      |
+| This transaction is not available | هذه المعاملة غير متاحة                  | Security + language           |
 
 ## 44.1 Draft simulation disclosure
 
@@ -2634,64 +2632,64 @@ Requires UAE property/legal and Arabic review.
 
 ## 45.1 Screen handoff table
 
-| # | Route/state | Screen | Perspective | Transaction / milestone state | Primary action | Secondary actions | Loading/error/conflict | Transition and events | Privacy and implementation notes |
-|---:|---|---|---|---|---|---|---|---|---|
-| 1 | Accepted offer | Offer accepted handoff | Buyer/Seller | Accepted, no/ensured transaction | Continue to Transaction | Offers, property | Creation loading/failure | Ensure transaction; `TRANSACTION_CREATED` | No contact details; perspective copy |
-| 2 | Handoff loading | Transaction creation loading | Both | Creating | Retry | Offers | Slow/error | Idempotent ensure | No duplicate transaction |
-| 3 | Handoff success | Transaction created | Both | INITIATED | Open workspace | Offers | N/A | Notification to both | Safe reference only |
-| 4 | `/transactions` | Empty | Customer | None | Browse properties | Offers | Load/error | None | Unified buyer/seller page |
-| 5 | `/transactions` | Populated | Customer | Mixed | Continue/View | Filters/sort | Partial failure | None | Cards use participant projection |
-| 6 | Card state | Buyer action required | Buyer | Active | Continue | View summary | N/A | None | Badge from task state |
-| 7 | Card state | Seller action required | Seller | Active | Continue | View summary | N/A | None | No separate seller dashboard |
-| 8 | Card state | Waiting | Both | Active | View progress | None | Realtime stale | None | Explain who is acting |
-| 9 | `/transactions/[id]` | Workspace overview | Both | Any active | Current action | Anchors, cancellation | Skeleton/unavailable | Refetch | Server participant guard |
-| 10 | Workspace | Progress tracker | Both | Any | Open current | Preview stages | Load/stale | None | Ordered semantics |
-| 11 | Workspace | Current milestone | Both | Current stage | Perspective action | None | Task error | Per task | One dominant action |
-| 12 | Workspace | Buyer task list | Both | Mixed | Buyer actions | None | Partial load | Task transitions | Seller sees safe status only |
-| 13 | Workspace | Seller task list | Both | Mixed | Seller actions | None | Partial load | Task transitions | Buyer sees safe status only |
-| 14 | Workspace | Timeline | Both | Any | None | None | Partial load | Realtime refetch | Safe event projection |
-| 15 | Confirmation | Buyer confirms details | Buyer | CONFIRMATION | Confirm details | Report issue | Conflict/session | Confirmation event | Immutable amount/property |
-| 16 | Confirmation | Seller confirms details | Seller | CONFIRMATION | Confirm details | Report issue | Conflict/session | Confirmation event | Same shared facts |
-| 17 | Confirmation | One confirmed | Both | CONFIRMATION | Other participant acts | View progress | Realtime | Notification | No re-edit by confirmer |
-| 18 | Confirmation | Both confirmed | Both | CONFIRMATION | Continue/route task | None | State conflict | Stage gate | Purchase route also required |
-| 19 | Purchase route | Cash | Buyer | CONFIRMATION | Select/confirm | Change | Validation | Route event | No proof-of-funds upload |
-| 20 | Purchase route | Financing | Buyer | CONFIRMATION | Select/confirm | Change | Validation | Route event | No bank integration |
-| 21 | Financing | In progress | Buyer | CONFIRMATION/DOCUMENTS | Update status | Cancellation | Error | Financing event | Blocks demo checks until confirmed |
-| 22 | Deposit | Simulation overview | Buyer | DEPOSIT, action | Confirm demo deposit | Back | Validation/conflict | Deposit event | Display-only 10% |
-| 23 | Deposit | Confirmation dialog | Buyer | DEPOSIT | Confirm | Cancel | Session/stale | Idempotent confirm | No payment UI |
-| 24 | Deposit | Confirmed | Both | DEPOSIT complete | Continue | View timeline | N/A | Notify seller | Explicit no-payment copy |
-| 25 | Documents | Buyer checklist | Buyer | DOCUMENTS | Upload required file | Replace/remove | Upload errors | File events | Private to buyer |
-| 26 | Documents | Seller checklist | Seller | DOCUMENTS | Upload required file | Replace/remove | Upload errors | File events | Private to seller |
-| 27 | Upload dialog | Upload document | Uploader | DOCUMENTS | Select/upload | Cancel | Type/size/session | Register document | Fictional warning before picker |
-| 28 | File state | Upload processing | Uploader | DOCUMENTS | None | Cancel if safe | Failure | Status event | No raw storage status |
-| 29 | File state | Upload failure | Uploader | DOCUMENTS | Retry | Remove | Error | None | Existing file retained on replace failure |
-| 30 | File state | Replace document | Uploader | DOCUMENTS | Replace | Keep current | Failure | Replace event | One active file/type |
-| 31 | Documents | Private notice | Both | DOCUMENTS | None | Learn more | N/A | None | Other participant sees status only |
-| 32 | Documents | Shared status | Other participant | DOCUMENTS | None | Timeline | Realtime | Checklist event | No filename/preview |
-| 33 | Shared summary | Simulated MOU/Form F review | Both | DOCUMENTS | Confirm review | Back | Conflict | Review event | Not a legal document |
-| 34 | Checks | Due diligence in progress | Both | DUE_DILIGENCE | None | Return later | Processing error | Simulation start | System actor |
-| 35 | Checks | Completed in demo | Both | DUE_DILIGENCE complete | Continue | Timeline | N/A | Simulation complete | No clearance claim |
-| 36 | Checks | Blocked | Both | DUE_DILIGENCE blocked | Complete missing task | Return later | N/A | None | Links to blockers |
-| 37 | Transfer | Preparation | Seller/Buyer | TRANSFER | Perspective action | Cancellation | Validation | Date/readiness events | Date preference only |
-| 38 | Transfer | Buyer ready | Buyer | TRANSFER | Confirm readiness | Not ready | Conflict | Readiness event | Change until appointment |
-| 39 | Transfer | Seller ready | Seller | TRANSFER | Confirm readiness | Not ready | Conflict | Readiness event | Same |
-| 40 | Transfer | Both ready | Both | TRANSFER | Create simulated appointment | None | Duplicate/conflict | Appointment event | Idempotent |
-| 41 | Transfer | Appointment simulated | Both | TRANSFER complete | Continue | Timeline | Failure | Notify both | No official booking |
-| 42 | Completion | Confirmation overview | Both | COMPLETION | Confirm completion | Cancellation | Incomplete/conflict | Completion confirmation | Disclosure visible |
-| 43 | Completion | Completed in demo | Both | COMPLETED_DEMO | Transactions | History/property | N/A | Listing `SOLD_DEMO` | Read-only; no real-sale claim |
-| 44 | Cancellation | Request | Buyer/Seller | Non-terminal | Request cancellation | Keep active | Validation | Cancellation event | Structured reason only |
-| 45 | Cancellation | Pending | Both | CANCELLATION_PENDING | Other confirms/declines | History | Conflict | Notification | All progress disabled |
-| 46 | Cancellation | Confirmed | Other participant | CANCELLATION_PENDING | Confirm cancellation | Keep active | Stale | Resolve request | Consequence summary |
-| 47 | Cancellation | Cancelled | Both | CANCELLED | Transactions / Review listing | History | N/A | Listing PAUSED | No auto-republish |
-| 48 | Failure | Transaction failed | Both | FAILED | Transactions | History | N/A | Failure event | Future Operations review only |
-| 49 | Error | Recoverable step error | Both | Task FAILED | Retry | Return later | Generic safe error | Retry | Preserve data |
-| 50 | Error | Unauthorised/unavailable | Unknown | N/A | Transactions | Dashboard | N/A | Access-denied audit | Unified safe copy |
-| 51 | Responsive | Mobile workspace | Both | Active | Sticky current action | Menu | Same states | Same | 390×844 minimum target |
-| 52 | Responsive | Mobile upload | Uploader | DOCUMENTS | Choose file | Cancel | Upload errors | Same | Safe-area and native picker |
-| 53 | Responsive | Mobile deposit | Buyer | DEPOSIT | Confirm | Back | Same | Same | No banking imitation |
-| 54 | Localisation | Arabic workspace | Both | Active | Same | Same | Same | Same | Mirrored; amounts/references LTR |
-| 55 | Localisation | Arabic checklist | Uploader | DOCUMENTS | Same | Same | Same | Same | Filenames LTR |
-| 56 | Localisation | Arabic completion | Both | COMPLETED_DEMO | Transactions | History | Same | Same | Legal copy unapproved |
+|   # | Route/state          | Screen                       | Perspective       | Transaction / milestone state    | Primary action                | Secondary actions     | Loading/error/conflict   | Transition and events                     | Privacy and implementation notes          |
+| --: | -------------------- | ---------------------------- | ----------------- | -------------------------------- | ----------------------------- | --------------------- | ------------------------ | ----------------------------------------- | ----------------------------------------- |
+|   1 | Accepted offer       | Offer accepted handoff       | Buyer/Seller      | Accepted, no/ensured transaction | Continue to Transaction       | Offers, property      | Creation loading/failure | Ensure transaction; `TRANSACTION_CREATED` | No contact details; perspective copy      |
+|   2 | Handoff loading      | Transaction creation loading | Both              | Creating                         | Retry                         | Offers                | Slow/error               | Idempotent ensure                         | No duplicate transaction                  |
+|   3 | Handoff success      | Transaction created          | Both              | INITIATED                        | Open workspace                | Offers                | N/A                      | Notification to both                      | Safe reference only                       |
+|   4 | `/transactions`      | Empty                        | Customer          | None                             | Browse properties             | Offers                | Load/error               | None                                      | Unified buyer/seller page                 |
+|   5 | `/transactions`      | Populated                    | Customer          | Mixed                            | Continue/View                 | Filters/sort          | Partial failure          | None                                      | Cards use participant projection          |
+|   6 | Card state           | Buyer action required        | Buyer             | Active                           | Continue                      | View summary          | N/A                      | None                                      | Badge from task state                     |
+|   7 | Card state           | Seller action required       | Seller            | Active                           | Continue                      | View summary          | N/A                      | None                                      | No separate seller dashboard              |
+|   8 | Card state           | Waiting                      | Both              | Active                           | View progress                 | None                  | Realtime stale           | None                                      | Explain who is acting                     |
+|   9 | `/transactions/[id]` | Workspace overview           | Both              | Any active                       | Current action                | Anchors, cancellation | Skeleton/unavailable     | Refetch                                   | Server participant guard                  |
+|  10 | Workspace            | Progress tracker             | Both              | Any                              | Open current                  | Preview stages        | Load/stale               | None                                      | Ordered semantics                         |
+|  11 | Workspace            | Current milestone            | Both              | Current stage                    | Perspective action            | None                  | Task error               | Per task                                  | One dominant action                       |
+|  12 | Workspace            | Buyer task list              | Both              | Mixed                            | Buyer actions                 | None                  | Partial load             | Task transitions                          | Seller sees safe status only              |
+|  13 | Workspace            | Seller task list             | Both              | Mixed                            | Seller actions                | None                  | Partial load             | Task transitions                          | Buyer sees safe status only               |
+|  14 | Workspace            | Timeline                     | Both              | Any                              | None                          | None                  | Partial load             | Realtime refetch                          | Safe event projection                     |
+|  15 | Confirmation         | Buyer confirms details       | Buyer             | CONFIRMATION                     | Confirm details               | Report issue          | Conflict/session         | Confirmation event                        | Immutable amount/property                 |
+|  16 | Confirmation         | Seller confirms details      | Seller            | CONFIRMATION                     | Confirm details               | Report issue          | Conflict/session         | Confirmation event                        | Same shared facts                         |
+|  17 | Confirmation         | One confirmed                | Both              | CONFIRMATION                     | Other participant acts        | View progress         | Realtime                 | Notification                              | No re-edit by confirmer                   |
+|  18 | Confirmation         | Both confirmed               | Both              | CONFIRMATION                     | Continue/route task           | None                  | State conflict           | Stage gate                                | Purchase route also required              |
+|  19 | Purchase route       | Cash                         | Buyer             | CONFIRMATION                     | Select/confirm                | Change                | Validation               | Route event                               | No proof-of-funds upload                  |
+|  20 | Purchase route       | Financing                    | Buyer             | CONFIRMATION                     | Select/confirm                | Change                | Validation               | Route event                               | No bank integration                       |
+|  21 | Financing            | In progress                  | Buyer             | CONFIRMATION/DOCUMENTS           | Update status                 | Cancellation          | Error                    | Financing event                           | Blocks demo checks until confirmed        |
+|  22 | Deposit              | Simulation overview          | Buyer             | DEPOSIT, action                  | Confirm demo deposit          | Back                  | Validation/conflict      | Deposit event                             | Display-only 10%                          |
+|  23 | Deposit              | Confirmation dialog          | Buyer             | DEPOSIT                          | Confirm                       | Cancel                | Session/stale            | Idempotent confirm                        | No payment UI                             |
+|  24 | Deposit              | Confirmed                    | Both              | DEPOSIT complete                 | Continue                      | View timeline         | N/A                      | Notify seller                             | Explicit no-payment copy                  |
+|  25 | Documents            | Buyer checklist              | Buyer             | DOCUMENTS                        | Upload required file          | Replace/remove        | Upload errors            | File events                               | Private to buyer                          |
+|  26 | Documents            | Seller checklist             | Seller            | DOCUMENTS                        | Upload required file          | Replace/remove        | Upload errors            | File events                               | Private to seller                         |
+|  27 | Upload dialog        | Upload document              | Uploader          | DOCUMENTS                        | Select/upload                 | Cancel                | Type/size/session        | Register document                         | Fictional warning before picker           |
+|  28 | File state           | Upload processing            | Uploader          | DOCUMENTS                        | None                          | Cancel if safe        | Failure                  | Status event                              | No raw storage status                     |
+|  29 | File state           | Upload failure               | Uploader          | DOCUMENTS                        | Retry                         | Remove                | Error                    | None                                      | Existing file retained on replace failure |
+|  30 | File state           | Replace document             | Uploader          | DOCUMENTS                        | Replace                       | Keep current          | Failure                  | Replace event                             | One active file/type                      |
+|  31 | Documents            | Private notice               | Both              | DOCUMENTS                        | None                          | Learn more            | N/A                      | None                                      | Other participant sees status only        |
+|  32 | Documents            | Shared status                | Other participant | DOCUMENTS                        | None                          | Timeline              | Realtime                 | Checklist event                           | No filename/preview                       |
+|  33 | Shared summary       | Simulated MOU/Form F review  | Both              | DOCUMENTS                        | Confirm review                | Back                  | Conflict                 | Review event                              | Not a legal document                      |
+|  34 | Checks               | Due diligence in progress    | Both              | DUE_DILIGENCE                    | None                          | Return later          | Processing error         | Simulation start                          | System actor                              |
+|  35 | Checks               | Completed in demo            | Both              | DUE_DILIGENCE complete           | Continue                      | Timeline              | N/A                      | Simulation complete                       | No clearance claim                        |
+|  36 | Checks               | Blocked                      | Both              | DUE_DILIGENCE blocked            | Complete missing task         | Return later          | N/A                      | None                                      | Links to blockers                         |
+|  37 | Transfer             | Preparation                  | Seller/Buyer      | TRANSFER                         | Perspective action            | Cancellation          | Validation               | Date/readiness events                     | Date preference only                      |
+|  38 | Transfer             | Buyer ready                  | Buyer             | TRANSFER                         | Confirm readiness             | Not ready             | Conflict                 | Readiness event                           | Change until appointment                  |
+|  39 | Transfer             | Seller ready                 | Seller            | TRANSFER                         | Confirm readiness             | Not ready             | Conflict                 | Readiness event                           | Same                                      |
+|  40 | Transfer             | Both ready                   | Both              | TRANSFER                         | Create simulated appointment  | None                  | Duplicate/conflict       | Appointment event                         | Idempotent                                |
+|  41 | Transfer             | Appointment simulated        | Both              | TRANSFER complete                | Continue                      | Timeline              | Failure                  | Notify both                               | No official booking                       |
+|  42 | Completion           | Confirmation overview        | Both              | COMPLETION                       | Confirm completion            | Cancellation          | Incomplete/conflict      | Completion confirmation                   | Disclosure visible                        |
+|  43 | Completion           | Completed in demo            | Both              | COMPLETED_DEMO                   | Transactions                  | History/property      | N/A                      | Listing `SOLD_DEMO`                       | Read-only; no real-sale claim             |
+|  44 | Cancellation         | Request                      | Buyer/Seller      | Non-terminal                     | Request cancellation          | Keep active           | Validation               | Cancellation event                        | Structured reason only                    |
+|  45 | Cancellation         | Pending                      | Both              | CANCELLATION_PENDING             | Other confirms/declines       | History               | Conflict                 | Notification                              | All progress disabled                     |
+|  46 | Cancellation         | Confirmed                    | Other participant | CANCELLATION_PENDING             | Confirm cancellation          | Keep active           | Stale                    | Resolve request                           | Consequence summary                       |
+|  47 | Cancellation         | Cancelled                    | Both              | CANCELLED                        | Transactions / Review listing | History               | N/A                      | Listing PAUSED                            | No auto-republish                         |
+|  48 | Failure              | Transaction failed           | Both              | FAILED                           | Transactions                  | History               | N/A                      | Failure event                             | Future Operations review only             |
+|  49 | Error                | Recoverable step error       | Both              | Task FAILED                      | Retry                         | Return later          | Generic safe error       | Retry                                     | Preserve data                             |
+|  50 | Error                | Unauthorised/unavailable     | Unknown           | N/A                              | Transactions                  | Dashboard             | N/A                      | Access-denied audit                       | Unified safe copy                         |
+|  51 | Responsive           | Mobile workspace             | Both              | Active                           | Sticky current action         | Menu                  | Same states              | Same                                      | 390×844 minimum target                    |
+|  52 | Responsive           | Mobile upload                | Uploader          | DOCUMENTS                        | Choose file                   | Cancel                | Upload errors            | Same                                      | Safe-area and native picker               |
+|  53 | Responsive           | Mobile deposit               | Buyer             | DEPOSIT                          | Confirm                       | Back                  | Same                     | Same                                      | No banking imitation                      |
+|  54 | Localisation         | Arabic workspace             | Both              | Active                           | Same                          | Same                  | Same                     | Same                                      | Mirrored; amounts/references LTR          |
+|  55 | Localisation         | Arabic checklist             | Uploader          | DOCUMENTS                        | Same                          | Same                  | Same                     | Same                                      | Filenames LTR                             |
+|  56 | Localisation         | Arabic completion            | Both              | COMPLETED_DEMO                   | Transactions                  | History               | Same                     | Same                                      | Legal copy unapproved                     |
 
 ## 45.2 Requirement labels
 
@@ -2714,64 +2712,64 @@ Use these labels in Claude Code tasks:
 
 ## Priority P0 — approve before engineering begins
 
-| # | Mockup | View | Perspective | Transaction / milestone | Key interaction | Why approval is required | Engineering must not invent |
-|---:|---|---|---|---|---|---|---|
-| 1 | Offer accepted handoff | Desktop | Buyer and seller variants | INITIATED | Continue | Connects Week 4 and Week 5 | Copy hierarchy, property summary, disclosure |
-| 2 | My Transactions | Desktop | Mixed | Multiple | Filter and continue | Establishes unified buying/selling architecture | Card anatomy, badges, filters |
-| 3 | Transaction workspace | Desktop | Buyer | CONFIRMATION | Current action | Core product shell | 8/4 layout, progress, next-action placement |
-| 4 | Transaction workspace | Mobile | Buyer | Active | Sticky action | Validates hierarchy at 390 px | Section order, sticky safe area |
-| 5 | Progress tracker | Desktop/mobile | Shared | Mixed | Open stage/preview | Central navigation model | Stage states, labels, responsive collapse |
-| 6 | Buyer action required | Desktop | Buyer | CONFIRMATION/DEPOSIT | Confirm | Defines actor ownership | Status language and action hierarchy |
-| 7 | Seller action required | Desktop | Seller | CONFIRMATION/TRANSFER | Confirm | Validates shared shell variant | Perspective differences |
-| 8 | Transaction-details confirmation | Desktop | Buyer | CONFIRMATION | Confirm + report issue | Locks immutable accepted facts | Data grouping and issue treatment |
-| 9 | Deposit simulation | Desktop/mobile | Buyer | DEPOSIT | Confirm demo deposit | High simulation/legal risk | No-payment treatment, amount hierarchy |
-| 10 | Buyer document checklist | Desktop | Buyer | DOCUMENTS | Upload/replace/remove | Establishes private-document design | Visibility, file states, warnings |
-| 11 | Seller document checklist | Desktop | Seller | DOCUMENTS | Upload/status | Ensures coordinated privacy | Other-participant status treatment |
-| 12 | Simulated Form F review | Desktop | Both variants | DOCUMENTS | Dual confirmation | Prevents official-contract imitation | Shared summary, disclosure, no signature UI |
-| 13 | Due-diligence state | Desktop | Shared | DUE_DILIGENCE | Processing/block/retry | Defines believable simulation | Check states and failure treatment |
-| 14 | Transfer preparation | Desktop | Seller/buyer variants | TRANSFER | Date + readiness | Most complex shared stage | Date model, dual readiness, appointment |
-| 15 | Completion confirmation | Desktop | Both | COMPLETION | Confirm | Consequential terminal action | Summary, dual confirmation, disclosure |
-| 16 | Transaction completed in demo | Desktop | Both | COMPLETED_DEMO | Read-only summary | Defines final product tone | `SOLD_DEMO` wording and actions |
-| 17 | Cancellation confirmation | Desktop/mobile | Buyer or seller | Active | Request/confirm | High-consequence branch | Mutual/unilateral explanation, listing outcome |
-| 18 | Transaction cancelled | Desktop | Seller/buyer | CANCELLED | Exit/review listing | Defines post-cancellation policy | Paused listing and historical offer treatment |
+|   # | Mockup                           | View           | Perspective               | Transaction / milestone | Key interaction        | Why approval is required                        | Engineering must not invent                    |
+| --: | -------------------------------- | -------------- | ------------------------- | ----------------------- | ---------------------- | ----------------------------------------------- | ---------------------------------------------- |
+|   1 | Offer accepted handoff           | Desktop        | Buyer and seller variants | INITIATED               | Continue               | Connects Week 4 and Week 5                      | Copy hierarchy, property summary, disclosure   |
+|   2 | My Transactions                  | Desktop        | Mixed                     | Multiple                | Filter and continue    | Establishes unified buying/selling architecture | Card anatomy, badges, filters                  |
+|   3 | Transaction workspace            | Desktop        | Buyer                     | CONFIRMATION            | Current action         | Core product shell                              | 8/4 layout, progress, next-action placement    |
+|   4 | Transaction workspace            | Mobile         | Buyer                     | Active                  | Sticky action          | Validates hierarchy at 390 px                   | Section order, sticky safe area                |
+|   5 | Progress tracker                 | Desktop/mobile | Shared                    | Mixed                   | Open stage/preview     | Central navigation model                        | Stage states, labels, responsive collapse      |
+|   6 | Buyer action required            | Desktop        | Buyer                     | CONFIRMATION/DEPOSIT    | Confirm                | Defines actor ownership                         | Status language and action hierarchy           |
+|   7 | Seller action required           | Desktop        | Seller                    | CONFIRMATION/TRANSFER   | Confirm                | Validates shared shell variant                  | Perspective differences                        |
+|   8 | Transaction-details confirmation | Desktop        | Buyer                     | CONFIRMATION            | Confirm + report issue | Locks immutable accepted facts                  | Data grouping and issue treatment              |
+|   9 | Deposit simulation               | Desktop/mobile | Buyer                     | DEPOSIT                 | Confirm demo deposit   | High simulation/legal risk                      | No-payment treatment, amount hierarchy         |
+|  10 | Buyer document checklist         | Desktop        | Buyer                     | DOCUMENTS               | Upload/replace/remove  | Establishes private-document design             | Visibility, file states, warnings              |
+|  11 | Seller document checklist        | Desktop        | Seller                    | DOCUMENTS               | Upload/status          | Ensures coordinated privacy                     | Other-participant status treatment             |
+|  12 | Simulated Form F review          | Desktop        | Both variants             | DOCUMENTS               | Dual confirmation      | Prevents official-contract imitation            | Shared summary, disclosure, no signature UI    |
+|  13 | Due-diligence state              | Desktop        | Shared                    | DUE_DILIGENCE           | Processing/block/retry | Defines believable simulation                   | Check states and failure treatment             |
+|  14 | Transfer preparation             | Desktop        | Seller/buyer variants     | TRANSFER                | Date + readiness       | Most complex shared stage                       | Date model, dual readiness, appointment        |
+|  15 | Completion confirmation          | Desktop        | Both                      | COMPLETION              | Confirm                | Consequential terminal action                   | Summary, dual confirmation, disclosure         |
+|  16 | Transaction completed in demo    | Desktop        | Both                      | COMPLETED_DEMO          | Read-only summary      | Defines final product tone                      | `SOLD_DEMO` wording and actions                |
+|  17 | Cancellation confirmation        | Desktop/mobile | Buyer or seller           | Active                  | Request/confirm        | High-consequence branch                         | Mutual/unilateral explanation, listing outcome |
+|  18 | Transaction cancelled            | Desktop        | Seller/buyer              | CANCELLED               | Exit/review listing    | Defines post-cancellation policy                | Paused listing and historical offer treatment  |
 
 ## Priority P1 — approve during implementation
 
-| # | Mockup | View | Perspective | State | Key interaction | Why | Must not invent |
-|---:|---|---|---|---|---|---|---|
-| 19 | My Transactions | Mobile | Mixed | Multiple | Filter/card | Mobile navigation and card density | Card content/order |
-| 20 | Deposit confirmed | Desktop | Seller | DEPOSIT complete | Waiting/continue | Other-participant view | Amount and no-payment copy |
-| 21 | Upload states | Desktop/mobile | Uploader | DOCUMENTS | Progress/error/replace | Upload recovery consistency | File card states |
-| 22 | Cancellation pending | Desktop | Other participant | CANCELLATION_PENDING | Confirm/decline | Stops progression safely | Disabled actions and copy |
-| 23 | Arabic RTL workspace | Desktop | Buyer | Active | Current action | Most complex RTL shell | Mirroring and amount isolation |
-| 24 | Arabic RTL document checklist | Mobile | Seller | DOCUMENTS | Upload | Validates file/bidi handling | Filename direction and controls |
+|   # | Mockup                        | View           | Perspective       | State                | Key interaction        | Why                                | Must not invent                 |
+| --: | ----------------------------- | -------------- | ----------------- | -------------------- | ---------------------- | ---------------------------------- | ------------------------------- |
+|  19 | My Transactions               | Mobile         | Mixed             | Multiple             | Filter/card            | Mobile navigation and card density | Card content/order              |
+|  20 | Deposit confirmed             | Desktop        | Seller            | DEPOSIT complete     | Waiting/continue       | Other-participant view             | Amount and no-payment copy      |
+|  21 | Upload states                 | Desktop/mobile | Uploader          | DOCUMENTS            | Progress/error/replace | Upload recovery consistency        | File card states                |
+|  22 | Cancellation pending          | Desktop        | Other participant | CANCELLATION_PENDING | Confirm/decline        | Stops progression safely           | Disabled actions and copy       |
+|  23 | Arabic RTL workspace          | Desktop        | Buyer             | Active               | Current action         | Most complex RTL shell             | Mirroring and amount isolation  |
+|  24 | Arabic RTL document checklist | Mobile         | Seller            | DOCUMENTS            | Upload                 | Validates file/bidi handling       | Filename direction and controls |
 
 ---
 
 # 47. Open Product Decisions
 
-| Decision | Recommendation in this specification | Owner/review |
-|---|---|---|
-| Transaction creation | Automatic plus idempotent ensure fallback | Engineering/product |
-| Overall stage model | Six grouped stages with task records | Product/engineering |
-| Demo deposit | Fixed 10%, server-calculated, display-only | Product/legal |
-| Purchase route | Cash or Financing; simple status only | Product |
-| Required identity sample | Fictional sample required for each participant | Product/privacy |
-| Proof of funds | Not required in Week 5 | Product |
-| Shared documents | Structured transaction summary only | Legal/privacy |
-| Form F terminology | Use simulated summary; no generated official file | Legal/product |
-| Due diligence | Prototype prerequisite simulation | Legal/product |
-| Preferred transfer date | Seller selects 3–30 days; buyer confirms readiness | Product |
-| Completion listing state | `SOLD_DEMO` | Architecture/product |
-| Direct sold page | Archival safe `Sold in demo`, excluded from search | Marketplace/product |
-| Cancellation before confirmations | Unilateral | Product/legal |
-| Cancellation after confirmations | Mutual | Product/legal |
-| Cancellation listing state | `PAUSED`, never auto-LIVE | Product |
-| Accepted thread after cancellation | Historical accepted; cancelled transaction no longer blocks availability | Architecture |
-| Document retention after cancellation | Retain privately for prototype history; deletion policy later | Privacy/legal |
-| Arabic wording | Draft only | Professional Arabic + legal |
-| Future Operations review | Customer-facing status only; controls in Week 6 | Product |
-| Shared demo seed | Not required; use isolated fixtures/factories | Engineering/QA |
+| Decision                              | Recommendation in this specification                                     | Owner/review                |
+| ------------------------------------- | ------------------------------------------------------------------------ | --------------------------- |
+| Transaction creation                  | Automatic plus idempotent ensure fallback                                | Engineering/product         |
+| Overall stage model                   | Six grouped stages with task records                                     | Product/engineering         |
+| Demo deposit                          | Fixed 10%, server-calculated, display-only                               | Product/legal               |
+| Purchase route                        | Cash or Financing; simple status only                                    | Product                     |
+| Required identity sample              | Fictional sample required for each participant                           | Product/privacy             |
+| Proof of funds                        | Not required in Week 5                                                   | Product                     |
+| Shared documents                      | Structured transaction summary only                                      | Legal/privacy               |
+| Form F terminology                    | Use simulated summary; no generated official file                        | Legal/product               |
+| Due diligence                         | Prototype prerequisite simulation                                        | Legal/product               |
+| Preferred transfer date               | Seller selects 3–30 days; buyer confirms readiness                       | Product                     |
+| Completion listing state              | `SOLD_DEMO`                                                              | Architecture/product        |
+| Direct sold page                      | Archival safe `Sold in demo`, excluded from search                       | Marketplace/product         |
+| Cancellation before confirmations     | Unilateral                                                               | Product/legal               |
+| Cancellation after confirmations      | Mutual                                                                   | Product/legal               |
+| Cancellation listing state            | `PAUSED`, never auto-LIVE                                                | Product                     |
+| Accepted thread after cancellation    | Historical accepted; cancelled transaction no longer blocks availability | Architecture                |
+| Document retention after cancellation | Retain privately for prototype history; deletion policy later            | Privacy/legal               |
+| Arabic wording                        | Draft only                                                               | Professional Arabic + legal |
+| Future Operations review              | Customer-facing status only; controls in Week 6                          | Product                     |
+| Shared demo seed                      | Not required; use isolated fixtures/factories                            | Engineering/QA              |
 
 ---
 

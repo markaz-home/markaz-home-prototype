@@ -57,13 +57,22 @@ async function main() {
     for (const acc of ACCOUNTS) {
       const meta = { full_name: acc.fullName, terms_accepted: true, privacy_accepted: true };
       let id: string;
-      const created = await admin.auth.admin.createUser({ email: acc.email, password: PASSWORD, email_confirm: true, user_metadata: meta });
+      const created = await admin.auth.admin.createUser({
+        email: acc.email,
+        password: PASSWORD,
+        email_confirm: true,
+        user_metadata: meta,
+      });
       if (created.data?.user) {
         id = created.data.user.id;
       } else {
         const existing = await findId(acc.email);
         if (!existing) throw created.error ?? new Error(`Could not provision ${acc.email}`);
-        await admin.auth.admin.updateUserById(existing, { password: PASSWORD, email_confirm: true, user_metadata: meta });
+        await admin.auth.admin.updateUserById(existing, {
+          password: PASSWORD,
+          email_confirm: true,
+          user_metadata: meta,
+        });
         id = existing;
       }
       await sql`
@@ -83,4 +92,7 @@ async function main() {
   console.log('✓ Demo customers ready. Sign in (do NOT sign up) with the credentials above.');
 }
 
-main().catch((e) => { console.error('Failed:', e); process.exit(1); });
+main().catch((e) => {
+  console.error('Failed:', e);
+  process.exit(1);
+});

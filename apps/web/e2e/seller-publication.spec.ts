@@ -18,12 +18,17 @@ const L = {
 async function signIn(page: Page) {
   await page.goto('/en/sign-in');
   await page.getByLabel(/email/i).fill(DEMO_EMAIL);
-  await page.getByLabel(/password/i).first().fill(DEMO_PASSWORD);
+  await page
+    .getByLabel(/password/i)
+    .first()
+    .fill(DEMO_PASSWORD);
   await page.getByRole('button', { name: /^sign in$/i }).click();
   await page.waitForURL(/\/en\/(dashboard|properties)/, { timeout: 15000 });
 }
 
-test('publish a READY listing through review to LIVE and open its public page', async ({ page }) => {
+test('publish a READY listing through review to LIVE and open its public page', async ({
+  page,
+}) => {
   await signIn(page);
   await page.goto(`/en/sell/listings/${L.ready}/publish`);
   await expect(page.getByRole('heading', { name: /Publication checklist/i })).toBeVisible();
@@ -33,7 +38,9 @@ test('publish a READY listing through review to LIVE and open its public page', 
   await page.getByRole('button', { name: /Submit for publication/i }).click();
 
   await page.waitForURL(new RegExp(`/sell/listings/${L.ready}/publication`));
-  await expect(page.getByRole('heading', { name: /Your listing is live/i })).toBeVisible({ timeout: 20000 });
+  await expect(page.getByRole('heading', { name: /Your listing is live/i })).toBeVisible({
+    timeout: 20000,
+  });
   await page.getByRole('link', { name: /View live listing/i }).click();
   await page.waitForURL(/\/en\/properties\/mkz-/);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
@@ -42,13 +49,19 @@ test('publish a READY listing through review to LIVE and open its public page', 
 test('returned-for-changes shows a safe reason and retry republishes to LIVE', async ({ page }) => {
   await signIn(page);
   await page.goto(`/en/sell/listings/${L.returned}/publication`);
-  await expect(page.getByRole('heading', { name: /Review your listing before resubmitting/i })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: /Review your listing before resubmitting/i }),
+  ).toBeVisible();
   await expect(page.getByText(/Changes required/i)).toBeVisible();
   await page.getByRole('button', { name: /Try publication again/i }).click();
-  await expect(page.getByRole('heading', { name: /Your listing is live/i })).toBeVisible({ timeout: 20000 });
+  await expect(page.getByRole('heading', { name: /Your listing is live/i })).toBeVisible({
+    timeout: 20000,
+  });
 });
 
-test('a public-photo processing failure is actionable and keeps the listing private', async ({ page }) => {
+test('a public-photo processing failure is actionable and keeps the listing private', async ({
+  page,
+}) => {
   await signIn(page);
   await page.goto(`/en/sell/listings/${L.photoFail}/publication`);
   await expect(page.getByText(/could not prepare all property photographs/i)).toBeVisible();
@@ -81,7 +94,9 @@ test.describe('pause and resume a live listing', () => {
 
   test('paused listing is gone from the marketplace, then resume restores it', async ({ page }) => {
     await page.goto('/en/properties');
-    await expect(page.locator('a[href*="/properties/mkz-"]').first()).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('a[href*="/properties/mkz-"]').first()).toBeVisible({
+      timeout: 15000,
+    });
     await expect(page.locator('a[href*="/properties/mkz-demomar01"]')).toHaveCount(0);
 
     await signIn(page);

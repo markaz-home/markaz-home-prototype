@@ -16,7 +16,10 @@ async function signIn(page: Page, email: string) {
   await expect(page).toHaveURL(/\/en\/dashboard/);
 }
 
-const PNG_1x1 = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
+const PNG_1x1 = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+  'base64',
+);
 
 test.describe('listing journey', () => {
   test('My Listings shows seeded drafts for Customer A', async ({ page }) => {
@@ -49,14 +52,20 @@ test.describe('listing journey', () => {
     await expect(page).toHaveURL(/\/ownership/);
 
     // Ownership document (fictional sample)
-    await page.locator('input[type=file]').setInputFiles({ name: 'fictional-title-deed.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 fictional sample') });
+    await page.locator('input[type=file]').setInputFiles({
+      name: 'fictional-title-deed.pdf',
+      mimeType: 'application/pdf',
+      buffer: Buffer.from('%PDF-1.4 fictional sample'),
+    });
     await expect(page.getByText('Uploaded privately')).toBeVisible({ timeout: 15000 });
     await page.getByRole('button', { name: 'Save and continue' }).click();
     await expect(page).toHaveURL(/\/verification/);
 
     // Simulated ownership verification → verified
     await page.getByRole('button', { name: 'Start simulated check' }).click();
-    await page.getByRole('button', { name: 'Continue to listing settings' }).click({ timeout: 20000 });
+    await page
+      .getByRole('button', { name: 'Continue to listing settings' })
+      .click({ timeout: 20000 });
     await expect(page).toHaveURL(/\/settings/);
 
     // Settings
@@ -75,7 +84,9 @@ test.describe('listing journey', () => {
     await expect(page).toHaveURL(/\/photos/, { timeout: 20000 });
 
     // Photos
-    await page.locator('input[type=file]').setInputFiles({ name: 'cover.png', mimeType: 'image/png', buffer: PNG_1x1 });
+    await page
+      .locator('input[type=file]')
+      .setInputFiles({ name: 'cover.png', mimeType: 'image/png', buffer: PNG_1x1 });
     await expect(page.getByText('· Cover photograph')).toBeVisible({ timeout: 15000 });
     await page.getByRole('button', { name: 'Save and continue' }).click();
     await expect(page).toHaveURL(/\/trakheesi/);
@@ -93,7 +104,9 @@ test.describe('listing journey', () => {
     await expect(page.getByRole('heading', { name: 'Your listing is ready' })).toBeVisible();
   });
 
-  test('a customer cannot access another customer\'s draft (safe not-available)', async ({ page }) => {
+  test("a customer cannot access another customer's draft (safe not-available)", async ({
+    page,
+  }) => {
     // Customer A (whose password is never mutated by other specs) tries to open
     // Customer B's seeded draft → safe not-available (RLS + server ownership).
     await signIn(page, 'customer-a@markaz.demo');

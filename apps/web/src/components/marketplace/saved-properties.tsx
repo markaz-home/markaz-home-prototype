@@ -29,18 +29,30 @@ export function SavedProperties() {
   return (
     <div>
       <h1 className="font-display text-3xl font-semibold">{t('title')}</h1>
-      <p className="mt-2 text-muted-foreground">{t('description')}</p>
+      <p className="text-muted-foreground mt-2">{t('description')}</p>
 
       <div className="mt-6">
         {list.isLoading ? (
-          <Grid>{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="aspect-[4/3] w-full rounded-lg" />)}</Grid>
+          <Grid>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="aspect-[4/3] w-full rounded-lg" />
+            ))}
+          </Grid>
         ) : list.isError ? (
-          <ErrorState title={t('partialError')} retryLabel={ts('error')} onRetry={() => list.refetch()} />
+          <ErrorState
+            title={t('partialError')}
+            retryLabel={ts('error')}
+            onRetry={() => list.refetch()}
+          />
         ) : !list.data || list.data.length === 0 ? (
           <EmptyState
             title={t('emptyTitle')}
             description={t('emptyBody')}
-            action={<Button asChild><Link href="/properties">{t('browse')}</Link></Button>}
+            action={
+              <Button asChild>
+                <Link href="/properties">{t('browse')}</Link>
+              </Button>
+            }
           />
         ) : (
           <Grid>
@@ -51,11 +63,18 @@ export function SavedProperties() {
                 <Card key={item.savedId} className="flex flex-col justify-between">
                   <CardContent className="space-y-2 pt-6">
                     <p className="font-medium">{t('unavailableTitle')}</p>
-                    <p className="text-sm text-muted-foreground">{t('unavailableBody')}</p>
-                    <p className="text-xs text-muted-foreground">{t('savedOn', { date: new Date(item.savedAt).toLocaleDateString() })}</p>
+                    <p className="text-muted-foreground text-sm">{t('unavailableBody')}</p>
+                    <p className="text-muted-foreground text-xs">
+                      {t('savedOn', { date: new Date(item.savedAt).toLocaleDateString() })}
+                    </p>
                   </CardContent>
                   <div className="p-4 pt-0">
-                    <Button variant="outline" size="sm" onClick={() => removeSaved(item.savedId)} disabled={remove.isPending}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeSaved(item.savedId)}
+                      disabled={remove.isPending}
+                    >
                       {ts('remove')}
                     </Button>
                   </div>
@@ -66,7 +85,9 @@ export function SavedProperties() {
         )}
       </div>
 
-      <span role="status" aria-live="polite" className="sr-only">{announce}</span>
+      <span role="status" aria-live="polite" className="sr-only">
+        {announce}
+      </span>
     </div>
   );
 }

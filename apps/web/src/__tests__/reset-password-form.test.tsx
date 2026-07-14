@@ -56,9 +56,13 @@ describe('ResetPasswordForm (recovery session — no code field)', () => {
     const tooLong = `Aa1!${'a'.repeat(125)}`; // 129 chars
     expect(tooLong.length).toBe(129);
     fireEvent.change(screen.getByLabelText(/^New password/), { target: { value: tooLong } });
-    fireEvent.change(screen.getByLabelText(/^Confirm new password/), { target: { value: tooLong } });
+    fireEvent.change(screen.getByLabelText(/^Confirm new password/), {
+      target: { value: tooLong },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Update password' }));
-    expect(await screen.findByText('Password must be 128 characters or fewer.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Password must be 128 characters or fewer.'),
+    ).toBeInTheDocument();
     expect(updateUser).not.toHaveBeenCalled();
   });
 

@@ -44,7 +44,9 @@ describe('ForgotPasswordForm (official recovery link)', () => {
     renderWithIntl(<ForgotPasswordForm />);
     await user.type(screen.getByLabelText(/Email address/i), 'nobody@markaz.demo');
     await user.click(screen.getByRole('button', { name: /Send recovery email/i }));
-    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringContaining('/forgot-password/check-email')));
+    await waitFor(() =>
+      expect(push).toHaveBeenCalledWith(expect.stringContaining('/forgot-password/check-email')),
+    );
   });
 
   it('renders Arabic', () => {

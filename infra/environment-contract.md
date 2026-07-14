@@ -6,25 +6,25 @@ a provisioning script — AWS is not provisioned here (see `README.md`).
 
 ## Required services
 
-| Service | Local (Week 1) | Production (platform-owned) |
-| --- | --- | --- |
-| PostgreSQL | Supabase CLI Docker (`:54322`) | RDS for PostgreSQL, Multi-AZ |
-| Auth (OTP) | Supabase Auth (GoTrue) in Docker | Self-hosted Supabase Auth |
-| Email delivery | Inbucket (`:54324`) | SES |
-| Realtime | Supabase Realtime in Docker | Self-hosted Realtime, **direct** to DB |
-| Storage | Supabase Storage in Docker | Self-hosted Storage |
-| Connection pooler | n/a locally | RDS Proxy (app paths only) |
+| Service           | Local (Week 1)                   | Production (platform-owned)            |
+| ----------------- | -------------------------------- | -------------------------------------- |
+| PostgreSQL        | Supabase CLI Docker (`:54322`)   | RDS for PostgreSQL, Multi-AZ           |
+| Auth (OTP)        | Supabase Auth (GoTrue) in Docker | Self-hosted Supabase Auth              |
+| Email delivery    | Inbucket (`:54324`)              | SES                                    |
+| Realtime          | Supabase Realtime in Docker      | Self-hosted Realtime, **direct** to DB |
+| Storage           | Supabase Storage in Docker       | Self-hosted Storage                    |
+| Connection pooler | n/a locally                      | RDS Proxy (app paths only)             |
 
 ## Port assumptions (local)
 
-| Service | Port |
-| --- | --- |
-| Customer app (`apps/web`) | 3000 |
-| Admin app (`apps/admin`) | 3001 |
-| Supabase API (Kong) | 54321 |
-| Postgres | 54322 |
-| Supabase Studio | 54323 |
-| Inbucket | 54324 |
+| Service                   | Port  |
+| ------------------------- | ----- |
+| Customer app (`apps/web`) | 3000  |
+| Admin app (`apps/admin`)  | 3001  |
+| Supabase API (Kong)       | 54321 |
+| Postgres                  | 54322 |
+| Supabase Studio           | 54323 |
+| Inbucket                  | 54324 |
 
 ## Networking assumptions (production)
 
@@ -38,10 +38,10 @@ a provisioning script — AWS is not provisioned here (see `README.md`).
 
 Two connection paths, distinguished by env var:
 
-| Path | Env var | Pooled vs direct | Used by |
-| --- | --- | --- | --- |
-| App / API queries | `DATABASE_URL` | **Pooled** (RDS Proxy in prod, where compatible) | tRPC resolvers, `withUserContext` / `withAnonContext` |
-| Direct ops | `DIRECT_DATABASE_URL` | **Direct** (never the pooler) | Migrations, seed, admin maintenance, **Realtime/logical replication** |
+| Path              | Env var               | Pooled vs direct                                 | Used by                                                               |
+| ----------------- | --------------------- | ------------------------------------------------ | --------------------------------------------------------------------- |
+| App / API queries | `DATABASE_URL`        | **Pooled** (RDS Proxy in prod, where compatible) | tRPC resolvers, `withUserContext` / `withAnonContext`                 |
+| Direct ops        | `DIRECT_DATABASE_URL` | **Direct** (never the pooler)                    | Migrations, seed, admin maintenance, **Realtime/logical replication** |
 
 - **Realtime must use the direct path** — RDS Proxy does not support logical
   replication (ADR 0005).

@@ -27,7 +27,9 @@ beforeEach(() => {
 describe('AdminResetPassword (recovery session — no code field)', () => {
   it('renders the admin reset form with NO recovery code field', () => {
     renderWithIntl(<AdminResetPassword />);
-    expect(screen.getByRole('heading', { name: 'Choose a new Admin password' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Choose a new Admin password' }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/^New password/)).toBeInTheDocument();
     expect(screen.queryByLabelText(/Verification code/i)).toBeNull();
   });
@@ -46,6 +48,8 @@ describe('AdminResetPassword (recovery session — no code field)', () => {
 
   it('renders Arabic admin reset copy', () => {
     renderWithIntl(<AdminResetPassword />, 'ar');
-    expect(screen.getByRole('heading', { name: 'اختر كلمة مرور جديدة للمشرف' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'اختر كلمة مرور جديدة للمشرف' }),
+    ).toBeInTheDocument();
   });
 });

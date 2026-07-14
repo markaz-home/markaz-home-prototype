@@ -5,7 +5,7 @@
 
 ## Context
 
-The Week 3 marketplace must let **anonymous** visitors *and* signed-in customers
+The Week 3 marketplace must let **anonymous** visitors _and_ signed-in customers
 read public listing data — cards, the detail page, filter facets — while exposing
 **none** of the private data those listings carry. The base tables
 (`properties`, `property_photos`, `investment_cases`) mix public and **private**
@@ -24,7 +24,7 @@ copy, ADR-0012).
    and selects **only** allow-listed public columns for `state = 'LIVE'`. It exposes
    neither the unit identifier, occupancy, owner id, ownership docs, nor any private
    storage path; photo arrays carry **only** `public_path` values. `security_barrier
-   = true` prevents predicate push-down from leaking rows. The view runs with its
+= true` prevents predicate push-down from leaking rows. The view runs with its
    owner's privileges, so it is the **single** place the marketplace touches the base
    tables — resolvers never read raw `properties` / `property_photos` /
    `investment_cases` for marketplace data. `grant select` is to `anon` +
@@ -40,7 +40,7 @@ copy, ADR-0012).
    the public response **only** through `toPublicCard` / `toPublicDetail`
    (`packages/api/src/public-projection.ts`) — **allow-list mapping**, building a
    fresh object field-by-field, **never** returning a DB row with private fields
-   deleted. The view bounds what is *queryable*; the mappers bound what is *returned*
+   deleted. The view bounds what is _queryable_; the mappers bound what is _returned_
    (the §37 allowlist). Either layer alone would be safe; together a new private
    column cannot leak by accident.
 
@@ -86,4 +86,4 @@ copy, ADR-0012).
 - Privacy is covered by the publication→marketplace integration test (asserts no
   unit id, owner id, or draft path in any public response) and the projection's own
   allow-list mapper shape.
-</content>
+  </content>

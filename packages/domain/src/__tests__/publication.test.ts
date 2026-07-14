@@ -42,8 +42,12 @@ describe('publication eligibility + checklist', () => {
   it('blocks when the price is missing or photos lack a cover', () => {
     expect(isPublicationEligible(ready, null)).toBe(false);
     expect(publicationChecklist(ready, 0).price).toBe('INCOMPLETE');
-    expect(publicationChecklist({ ...ready, photos: { count: 3, hasCover: false } }, 2_100_000).cover).toBe('INCOMPLETE');
-    expect(isPublicationEligible({ ...ready, permit: { status: 'PENDING', fresh: true } }, 2_100_000)).toBe(false);
+    expect(
+      publicationChecklist({ ...ready, photos: { count: 3, hasCover: false } }, 2_100_000).cover,
+    ).toBe('INCOMPLETE');
+    expect(
+      isPublicationEligible({ ...ready, permit: { status: 'PENDING', fresh: true } }, 2_100_000),
+    ).toBe(false);
   });
 });
 
@@ -54,7 +58,16 @@ describe('live-edit classification (§17.4)', () => {
     }
   });
   it('treats price/location/facts/document/photo-files as material (default material)', () => {
-    for (const f of ['askingPrice', 'community', 'propertyType', 'bedrooms', 'document', 'photoFiles', 'furnishing', 'anythingElse']) {
+    for (const f of [
+      'askingPrice',
+      'community',
+      'propertyType',
+      'bedrooms',
+      'document',
+      'photoFiles',
+      'furnishing',
+      'anythingElse',
+    ]) {
       expect(classifyLiveEdit(f)).toBe('MATERIAL');
     }
   });
@@ -75,12 +88,23 @@ describe('pause / resume', () => {
 
 describe('public slug + id', () => {
   it('builds a public, unit-free slug from public fields', () => {
-    expect(buildListingSlug({ bedrooms: 2, propertyType: 'APARTMENT', community: 'Dubai Marina' })).toBe('2-bedroom-apartment-dubai-marina');
-    expect(buildListingSlug({ bedrooms: 0, propertyType: 'APARTMENT', community: 'Business Bay' })).toBe('studio-apartment-business-bay');
+    expect(
+      buildListingSlug({ bedrooms: 2, propertyType: 'APARTMENT', community: 'Dubai Marina' }),
+    ).toBe('2-bedroom-apartment-dubai-marina');
+    expect(
+      buildListingSlug({ bedrooms: 0, propertyType: 'APARTMENT', community: 'Business Bay' }),
+    ).toBe('studio-apartment-business-bay');
     expect(bedroomLabel(3)).toBe('3-bedroom');
     // Structural privacy: the signature accepts only public fields — there is no
     // unitIdentifier parameter, so a unit number can never reach the slug.
-    expect(buildListingSlug({ bedrooms: 2, propertyType: 'TOWNHOUSE', community: 'Arabian Ranches', buildingOrProject: 'Palmera 2' })).toBe('2-bedroom-townhouse-arabian-ranches');
+    expect(
+      buildListingSlug({
+        bedrooms: 2,
+        propertyType: 'TOWNHOUSE',
+        community: 'Arabian Ranches',
+        buildingOrProject: 'Palmera 2',
+      }),
+    ).toBe('2-bedroom-townhouse-arabian-ranches');
   });
   it('formats an opaque public id (non-uuid)', () => {
     const id = formatPublicId('A1B2C3D4E5');
@@ -91,14 +115,32 @@ describe('public slug + id', () => {
 
 describe('marketplace query schema', () => {
   it('coerces + defaults sort/page', () => {
-    const q = marketplaceQuerySchema.parse({ type: 'APARTMENT', minPrice: '1000000', maxPrice: '3000000', beds: '2', sort: 'PRICE_ASC', page: '2' });
-    expect(q).toMatchObject({ type: 'APARTMENT', minPrice: 1_000_000, maxPrice: 3_000_000, beds: '2', sort: 'PRICE_ASC', page: 2 });
+    const q = marketplaceQuerySchema.parse({
+      type: 'APARTMENT',
+      minPrice: '1000000',
+      maxPrice: '3000000',
+      beds: '2',
+      sort: 'PRICE_ASC',
+      page: '2',
+    });
+    expect(q).toMatchObject({
+      type: 'APARTMENT',
+      minPrice: 1_000_000,
+      maxPrice: 3_000_000,
+      beds: '2',
+      sort: 'PRICE_ASC',
+      page: 2,
+    });
     expect(marketplaceQuerySchema.parse({}).sort).toBe(DEFAULT_SORT);
     expect(marketplaceQuerySchema.parse({}).page).toBe(1);
   });
   it('rejects inverted ranges', () => {
-    expect(marketplaceQuerySchema.safeParse({ minPrice: '3000000', maxPrice: '1000000' }).success).toBe(false);
-    expect(marketplaceQuerySchema.safeParse({ minSize: '2000', maxSize: '500' }).success).toBe(false);
+    expect(
+      marketplaceQuerySchema.safeParse({ minPrice: '3000000', maxPrice: '1000000' }).success,
+    ).toBe(false);
+    expect(marketplaceQuerySchema.safeParse({ minSize: '2000', maxSize: '500' }).success).toBe(
+      false,
+    );
   });
   it('drops individually-invalid fields but keeps valid ones (lenient parse)', () => {
     const q = parseMarketplaceQuery({ type: 'NOT_A_TYPE', beds: '2', sort: 'bogus', page: 'x' });

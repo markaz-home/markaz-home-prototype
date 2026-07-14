@@ -15,13 +15,13 @@ seeded** — open the web app and sign up. To create an admin (optional, env-dri
 
 ## Commands
 
-| Command | What it does | When to use |
-| --- | --- | --- |
-| `pnpm supabase:reset` | Drops the DB, re-applies **all migrations in order**, then runs the **(minimal) seed** | The default first step. Clean, deterministic schema (stale schema, after pulling migrations, before a demo). |
-| `pnpm db:setup` | **Optional** env-driven admin bootstrap (Admin API), **idempotent**; no-op without `BOOTSTRAP_ADMIN_EMAIL` | Only when you want to create/refresh the single admin account. |
-| `pnpm db:migrate` | Applies pending migrations | Apply new migrations without wiping existing data. |
-| `pnpm db:seed` | Runs `supabase/seed.sql` | Rarely needed directly; the minimal seed runs as part of `supabase:reset`. |
-| `pnpm db:generate` | `drizzle-kit generate` → `packages/db/drizzle` | **Review only.** Produces SQL to read; do **not** apply it directly. |
+| Command               | What it does                                                                                               | When to use                                                                                                  |
+| --------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `pnpm supabase:reset` | Drops the DB, re-applies **all migrations in order**, then runs the **(minimal) seed**                     | The default first step. Clean, deterministic schema (stale schema, after pulling migrations, before a demo). |
+| `pnpm db:setup`       | **Optional** env-driven admin bootstrap (Admin API), **idempotent**; no-op without `BOOTSTRAP_ADMIN_EMAIL` | Only when you want to create/refresh the single admin account.                                               |
+| `pnpm db:migrate`     | Applies pending migrations                                                                                 | Apply new migrations without wiping existing data.                                                           |
+| `pnpm db:seed`        | Runs `supabase/seed.sql`                                                                                   | Rarely needed directly; the minimal seed runs as part of `supabase:reset`.                                   |
+| `pnpm db:generate`    | `drizzle-kit generate` → `packages/db/drizzle`                                                             | **Review only.** Produces SQL to read; do **not** apply it directly.                                         |
 
 ## Authoring a schema change into the canonical history
 

@@ -2,15 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import {
-  Alert,
-  Button,
-  Card,
-  CardContent,
-  EmptyState,
-  Label,
-  Skeleton,
-} from '@markaz/ui';
+import { Alert, Button, Card, CardContent, EmptyState, Label, Skeleton } from '@markaz/ui';
 import {
   normalizeAmountInput,
   validateOfferAmount,
@@ -46,7 +38,9 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const amount = useMemo(() => normalizeAmountInput(raw), [raw]);
-  const asking = eligibility.data?.eligible ? eligibility.data.property?.askingPriceAed ?? null : null;
+  const asking = eligibility.data?.eligible
+    ? (eligibility.data.property?.askingPriceAed ?? null)
+    : null;
   const amountError = touched ? validateOfferAmount(amount) : null;
   const comparison = amount != null && asking ? offerComparison(amount, asking) : null;
   const warning = amount != null && asking ? offerWarning(amount, asking) : null;
@@ -72,7 +66,11 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
         <IneligiblePanel
           title={t('eligibility.activeThread')}
           body={t('eligibility.activeThreadBody')}
-          action={<Button asChild><Link href={`/offers/${eligibility.data.threadId}`}>{t('cta.view')}</Link></Button>}
+          action={
+            <Button asChild>
+              <Link href={`/offers/${eligibility.data.threadId}`}>{t('cta.view')}</Link>
+            </Button>
+          }
         />
       );
     }
@@ -86,7 +84,11 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
       <IneligiblePanel
         title={t('error.notAvailableTitle')}
         body={map[reason] ?? t('eligibility.unavailable')}
-        action={<Button asChild variant="outline"><Link href={`/properties/${publicId}/${slug}`}>{t('closed.viewProperty')}</Link></Button>}
+        action={
+          <Button asChild variant="outline">
+            <Link href={`/properties/${publicId}/${slug}`}>{t('closed.viewProperty')}</Link>
+          </Button>
+        }
       />
     );
   }
@@ -106,16 +108,22 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
 
   return (
     <div className="container max-w-[1180px] py-8">
-      <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
-        <Link href={`/properties/${publicId}/${slug}`} className="hover:text-foreground">{property?.headline ?? '—'}</Link>
+      <nav aria-label="Breadcrumb" className="text-muted-foreground mb-4 text-sm">
+        <Link href={`/properties/${publicId}/${slug}`} className="hover:text-foreground">
+          {property?.headline ?? '—'}
+        </Link>
         <span> · {step === 'review' ? t('review.title') : t('form.title')}</span>
       </nav>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
         <div className="max-w-[720px] space-y-6">
           <header>
-            <h1 className="text-2xl font-semibold">{step === 'review' ? t('review.title') : t('form.title')}</h1>
-            <p className="mt-1 text-muted-foreground">{step === 'review' ? t('review.description') : t('form.description')}</p>
+            <h1 className="text-2xl font-semibold">
+              {step === 'review' ? t('review.title') : t('form.title')}
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              {step === 'review' ? t('review.description') : t('form.description')}
+            </p>
           </header>
 
           {submitError ? <Alert variant="destructive">{submitError}</Alert> : null}
@@ -132,8 +140,10 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
             >
               <div className="space-y-2">
                 <Label htmlFor="offer-amount">{t('form.amount')}</Label>
-                <div className="flex items-center gap-2 rounded-md border px-3 focus-within:ring-2 focus-within:ring-ring">
-                  <span className="select-none font-medium text-muted-foreground" aria-hidden>AED</span>
+                <div className="focus-within:ring-ring flex items-center gap-2 rounded-md border px-3 focus-within:ring-2">
+                  <span className="text-muted-foreground select-none font-medium" aria-hidden>
+                    AED
+                  </span>
                   <input
                     id="offer-amount"
                     inputMode="numeric"
@@ -148,13 +158,21 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
                     className="h-12 flex-1 bg-transparent text-lg tabular-nums outline-none"
                   />
                 </div>
-                <p id="offer-asking" className="text-sm text-muted-foreground">
+                <p id="offer-asking" className="text-muted-foreground text-sm">
                   {t('form.asking', { amount: formatAed(asking, locale).replace('AED ', '') })}
                 </p>
-                <div id="offer-comparison"><AmountComparison comparison={comparison} /></div>
+                <div id="offer-comparison">
+                  <AmountComparison comparison={comparison} />
+                </div>
                 {amountError ? (
-                  <p id="offer-amount-error" role="alert" className="text-sm text-destructive">
-                    {amountError === 'REQUIRED' ? tv('required') : amountError === 'POSITIVE' ? tv('zero') : amountError === 'INTEGER' ? tv('decimals') : tv('max')}
+                  <p id="offer-amount-error" role="alert" className="text-destructive text-sm">
+                    {amountError === 'REQUIRED'
+                      ? tv('required')
+                      : amountError === 'POSITIVE'
+                        ? tv('zero')
+                        : amountError === 'INTEGER'
+                          ? tv('decimals')
+                          : tv('max')}
                   </p>
                 ) : null}
               </div>
@@ -171,15 +189,21 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
                   id="offer-expiry"
                   value={expiry}
                   onChange={(e) => setExpiry(e.target.value as ExpiryOption)}
-                  className="h-11 w-full rounded-md border bg-background px-3"
+                  className="bg-background h-11 w-full rounded-md border px-3"
                 >
                   {EXPIRY_OPTIONS.map((o) => (
-                    <option key={o} value={o}>{t(`expiry.${o === '48h' ? 'h48' : o === '3d' ? 'd3' : o === '7d' ? 'd7' : 'none'}` as 'expiry.d7')}</option>
+                    <option key={o} value={o}>
+                      {t(
+                        `expiry.${o === '48h' ? 'h48' : o === '3d' ? 'd3' : o === '7d' ? 'd7' : 'none'}` as 'expiry.d7',
+                      )}
+                    </option>
                   ))}
                 </select>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {t('form.expiryHelp')}
-                  {expiresPreview ? <> · {t('form.validUntil', { date: expiresPreview.toLocaleString(locale) })}</> : null}
+                  {expiresPreview ? (
+                    <> · {t('form.validUntil', { date: expiresPreview.toLocaleString(locale) })}</>
+                  ) : null}
                 </p>
               </fieldset>
 
@@ -199,10 +223,21 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
                   <Row label={t('askingPrice')} value={formatAed(asking, locale)} />
                   <Row label={t('form.amount')} value={formatAed(amount, locale)} bold />
                   <Row
-                    label={comparison?.direction === 'BELOW' ? t('form.belowAsking', { amount: formatAed(comparison.absDiff, locale) }) : comparison?.direction === 'ABOVE' ? t('form.aboveAsking', { amount: formatAed(comparison.absDiff, locale) }) : t('form.matches')}
+                    label={
+                      comparison?.direction === 'BELOW'
+                        ? t('form.belowAsking', { amount: formatAed(comparison.absDiff, locale) })
+                        : comparison?.direction === 'ABOVE'
+                          ? t('form.aboveAsking', { amount: formatAed(comparison.absDiff, locale) })
+                          : t('form.matches')
+                    }
                     value=""
                   />
-                  <Row label={t('form.expiry')} value={expiresPreview ? expiresPreview.toLocaleString(locale) : t('form.noExpiry')} />
+                  <Row
+                    label={t('form.expiry')}
+                    value={
+                      expiresPreview ? expiresPreview.toLocaleString(locale) : t('form.noExpiry')
+                    }
+                  />
                 </CardContent>
               </Card>
               <NonBindingDisclosure />
@@ -210,7 +245,11 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
                 <Button onClick={onSubmit} loading={submit.isPending}>
                   {submit.isPending ? t('review.submitting') : t('review.submit')}
                 </Button>
-                <Button variant="outline" onClick={() => setStep('form')} disabled={submit.isPending}>
+                <Button
+                  variant="outline"
+                  onClick={() => setStep('form')}
+                  disabled={submit.isPending}
+                >
                   {t('review.edit')}
                 </Button>
               </div>
@@ -223,11 +262,19 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
           <Card>
             <CardContent className="space-y-3 pt-6">
               {property?.coverUrl ? (
-                <img src={property.coverUrl} alt="" className="aspect-[4/3] w-full rounded-md object-cover" />
+                <img
+                  src={property.coverUrl}
+                  alt=""
+                  className="aspect-[4/3] w-full rounded-md object-cover"
+                />
               ) : null}
               <p className="text-lg font-semibold">{formatAed(asking, locale)}</p>
-              <p className="font-medium" dir="auto">{property?.headline}</p>
-              <p className="text-sm text-muted-foreground">{[property?.community, property?.emirate].filter(Boolean).join(' · ')}</p>
+              <p className="font-medium" dir="auto">
+                {property?.headline}
+              </p>
+              <p className="text-muted-foreground text-sm">
+                {[property?.community, property?.emirate].filter(Boolean).join(' · ')}
+              </p>
             </CardContent>
           </Card>
         </aside>
@@ -236,7 +283,15 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
   );
 }
 
-function IneligiblePanel({ title, body, action }: { title: string; body: string; action: React.ReactNode }) {
+function IneligiblePanel({
+  title,
+  body,
+  action,
+}: {
+  title: string;
+  body: string;
+  action: React.ReactNode;
+}) {
   return (
     <div className="container max-w-[680px] py-12">
       <EmptyState title={title} description={body} action={action} />
@@ -247,8 +302,10 @@ function IneligiblePanel({ title, body, action }: { title: string; body: string;
 function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
     <div className="flex items-baseline justify-between gap-4 border-b pb-2 last:border-0">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className={bold ? 'text-lg font-semibold' : 'font-medium'} dir="ltr">{value}</span>
+      <span className="text-muted-foreground text-sm">{label}</span>
+      <span className={bold ? 'text-lg font-semibold' : 'font-medium'} dir="ltr">
+        {value}
+      </span>
     </div>
   );
 }

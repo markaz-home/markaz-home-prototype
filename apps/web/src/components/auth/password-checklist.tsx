@@ -28,7 +28,13 @@ export function PasswordChecklist({
   const req = checkPasswordRequirements(password);
   const strength = passwordStrength(password); // 0..3
   const strengthLabel =
-    strength === 0 ? '' : strength === 1 ? t('incomplete') : strength === 2 ? t('meets') : t('strong');
+    strength === 0
+      ? ''
+      : strength === 1
+        ? t('incomplete')
+        : strength === 2
+          ? t('meets')
+          : t('strong');
 
   return (
     <div className="space-y-2" aria-live="polite">
@@ -51,10 +57,10 @@ export function PasswordChecklist({
           ))}
         </div>
         {strengthLabel ? (
-          <span className="text-xs text-muted-foreground">{strengthLabel}</span>
+          <span className="text-muted-foreground text-xs">{strengthLabel}</span>
         ) : null}
       </div>
-      <p className="text-xs font-medium text-muted-foreground">{t('requirementsTitle')}</p>
+      <p className="text-muted-foreground text-xs font-medium">{t('requirementsTitle')}</p>
       <ul className="grid grid-cols-1 gap-1 text-xs sm:grid-cols-2">
         {RULES.map((rule) => {
           const ok = req[RULE_FIELD[rule]];

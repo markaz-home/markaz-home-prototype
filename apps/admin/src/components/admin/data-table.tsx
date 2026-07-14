@@ -42,7 +42,7 @@ export function DataTable<T>({
       <table className="hidden w-full border-collapse text-sm md:table">
         <caption className="sr-only">{caption}</caption>
         <thead>
-          <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
+          <tr className="text-muted-foreground border-b text-left text-xs uppercase tracking-wide">
             {columns.map((c) => (
               <th
                 key={c.id}
@@ -63,7 +63,7 @@ export function DataTable<T>({
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={rowKey(row)} className="group border-b transition-colors hover:bg-muted/40">
+            <tr key={rowKey(row)} className="hover:bg-muted/40 group border-b transition-colors">
               {columns.map((c, i) => (
                 <td
                   key={c.id}
@@ -74,7 +74,10 @@ export function DataTable<T>({
                   )}
                 >
                   {i === 0 ? (
-                    <Link href={rowHref(row)} className="font-medium text-foreground hover:underline">
+                    <Link
+                      href={rowHref(row)}
+                      className="text-foreground font-medium hover:underline"
+                    >
                       {c.cell(row)}
                     </Link>
                   ) : (
@@ -83,7 +86,11 @@ export function DataTable<T>({
                 </td>
               ))}
               <td className="px-3 py-3 text-right">
-                <Link href={rowHref(row)} className="inline-flex text-muted-foreground group-hover:text-foreground" aria-label={caption}>
+                <Link
+                  href={rowHref(row)}
+                  className="text-muted-foreground group-hover:text-foreground inline-flex"
+                  aria-label={caption}
+                >
                   <ChevronRight className="h-4 w-4 rtl:rotate-180" aria-hidden />
                 </Link>
               </td>
@@ -98,20 +105,23 @@ export function DataTable<T>({
           <li key={rowKey(row)}>
             <Link
               href={rowHref(row)}
-              className="flex items-start justify-between gap-3 rounded-lg border bg-card p-4 hover:bg-muted/40"
+              className="bg-card hover:bg-muted/40 flex items-start justify-between gap-3 rounded-lg border p-4"
             >
               <div className="min-w-0 space-y-2">
                 <div className="font-medium">{primary.cell(row)}</div>
-                <dl className="space-y-1 text-sm text-muted-foreground">
+                <dl className="text-muted-foreground space-y-1 text-sm">
                   {mobileFacts.map((c) => (
                     <div key={c.id} className="flex gap-2">
                       <dt className="shrink-0">{c.header}:</dt>
-                      <dd className="min-w-0 text-foreground">{c.cell(row)}</dd>
+                      <dd className="text-foreground min-w-0">{c.cell(row)}</dd>
                     </div>
                   ))}
                 </dl>
               </div>
-              <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-muted-foreground rtl:rotate-180" aria-hidden />
+              <ChevronRight
+                className="text-muted-foreground mt-1 h-4 w-4 shrink-0 rtl:rotate-180"
+                aria-hidden
+              />
             </Link>
           </li>
         ))}

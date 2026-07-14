@@ -1,13 +1,16 @@
 # ADR-0029 — Admin realtime as a refetch signal (Week 6)
 
 ## Status
+
 Accepted (Week 6).
 
 ## Context
+
 Review queues benefit from freshness, but realtime payloads must never become an
 authoritative or a data-leak surface.
 
 ## Decision
+
 `listing_publication_requests` was added to the realtime publication (migration `…0812`);
 `transactions` is already published. The `useAdminQueueChannel` hook subscribes to both and, on any
 change, calls back so the dashboard **refetches authoritative metrics** (a server-component refresh).
@@ -18,6 +21,7 @@ connection is unhealthy (hidden while healthy, per §37). Events are coalesced s
 single refetch.
 
 ## Consequences
+
 Live operational queues **without** a second trust boundary — the payload is never read, only used
 as a signal. Consistent with `offer-realtime` / `transactions` realtime. See
 `docs/architecture/realtime.md`.

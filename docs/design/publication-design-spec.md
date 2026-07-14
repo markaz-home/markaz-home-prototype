@@ -156,11 +156,11 @@ This specification does not reopen completed authentication or listing-setup dec
 
 ## 4.1 Main listing states
 
-| Listing state | Public visibility | Owner meaning |
-|---|---:|---|
-| `READY_TO_PUBLISH` | No | Setup is complete; publication has not completed |
-| `LIVE` | Yes | Listing is available in marketplace and public detail routes |
-| `PAUSED` | No | Owner has temporarily removed listing from public marketplace |
+| Listing state      | Public visibility | Owner meaning                                                 |
+| ------------------ | ----------------: | ------------------------------------------------------------- |
+| `READY_TO_PUBLISH` |                No | Setup is complete; publication has not completed              |
+| `LIVE`             |               Yes | Listing is available in marketplace and public detail routes  |
+| `PAUSED`           |                No | Owner has temporarily removed listing from public marketplace |
 
 `REJECTED` is not required for the Week 3 customer flow. The existing recoverable listing remains `READY_TO_PUBLISH` when simulated review returns changes. `SOLD_DEMO` is out of scope.
 
@@ -173,12 +173,12 @@ APPROVED_DEMO
 REJECTED_DEMO
 ```
 
-| Request state | Customer label | Listing state | Public visibility |
-|---|---|---|---:|
-| `NOT_SUBMITTED` | Ready to publish | `READY_TO_PUBLISH` | No |
-| `PENDING` | Publication review in progress | `READY_TO_PUBLISH` | No |
-| `APPROVED_DEMO` | Publication review complete | transitions to `LIVE` | Yes only after public-photo success |
-| `REJECTED_DEMO` | Changes required | `READY_TO_PUBLISH` | No |
+| Request state   | Customer label                 | Listing state         |                   Public visibility |
+| --------------- | ------------------------------ | --------------------- | ----------------------------------: |
+| `NOT_SUBMITTED` | Ready to publish               | `READY_TO_PUBLISH`    |                                  No |
+| `PENDING`       | Publication review in progress | `READY_TO_PUBLISH`    |                                  No |
+| `APPROVED_DEMO` | Publication review complete    | transitions to `LIVE` | Yes only after public-photo success |
+| `REJECTED_DEMO` | Changes required               | `READY_TO_PUBLISH`    |                                  No |
 
 ## 4.3 Derived processing states
 
@@ -614,12 +614,15 @@ Below:
 **Status:** `Ready to publish`
 
 **Title:**
+
 > Your listing setup is complete
 
 **Description:**
+
 > Review the public preview, then submit the listing for simulated publication review.
 
 **Privacy note:**
+
 > Ownership documents, unit identifiers, and private verification information will not appear publicly.
 
 **Primary action:** `Publish listing`
@@ -660,13 +663,13 @@ Explain the conditions required to publish and confirm the server has a safe pub
 
 ## 13.3 Item states
 
-| State | Treatment |
-|---|---|
-| Complete | Check icon, `Complete` |
-| Optional skipped | Neutral icon, `Not included` |
-| In progress | Spinner, `Checking` |
-| Missing | Attention icon, `Action required`, Edit link |
-| Failed | Error icon, concise reason, recovery action |
+| State            | Treatment                                    |
+| ---------------- | -------------------------------------------- |
+| Complete         | Check icon, `Complete`                       |
+| Optional skipped | Neutral icon, `Not included`                 |
+| In progress      | Spinner, `Checking`                          |
+| Missing          | Attention icon, `Action required`, Edit link |
+| Failed           | Error icon, concise reason, recovery action  |
 
 ## 13.4 Public/private summary
 
@@ -693,15 +696,19 @@ On mobile, stack the two groups with `Public` and `Private` headings.
 ## 13.5 Copy
 
 **Title:**
+
 > Publication checklist
 
 **Description:**
+
 > We will check that your public listing is complete and that private information is excluded.
 
 **Complete state:**
+
 > Your listing is ready for publication confirmation.
 
 **Incomplete state:**
+
 > Complete the items marked “Action required” before publishing.
 
 **Primary action when complete:** `Continue to confirmation`
@@ -728,12 +735,15 @@ A final compact confirmation dialog may appear after the checkbox only if engine
 > This prototype does not perform a real regulatory or legal publication review.
 
 **Title:**
+
 > Publish your listing
 
 **Description:**
+
 > Your property will become visible in the MARKAZ marketplace after the simulated review is complete.
 
 **Privacy statement:**
+
 > Your ownership documents and private verification information will remain private.
 
 **Visibility bullets:**
@@ -744,6 +754,7 @@ A final compact confirmation dialog may appear after the checkbox only if engine
 - You can pause the listing later.
 
 **Required checkbox:**
+
 > I have reviewed the public listing and confirm that the property information and photographs are ready to publish.
 
 **Primary button:** `Submit for publication`
@@ -767,9 +778,11 @@ A final compact confirmation dialog may appear after the checkbox only if engine
 ## 15.1 Pending
 
 **Title:**
+
 > Publication review in progress
 
 **Description:**
+
 > We are preparing the public listing and its photographs. You can leave this page and return later.
 
 **Status:** `Pending · Demo`
@@ -807,9 +820,11 @@ Safe failure copy:
 A request may briefly render an approved state while the listing transition resolves.
 
 **Title:**
+
 > Publication review complete
 
 **Description:**
+
 > The demo review is complete. We are making your listing available in the marketplace.
 
 **Status:** `Approved · Demo`
@@ -821,9 +836,11 @@ Then navigate to the Live Success screen after authoritative `LIVE` state is con
 Customer label: `Changes required`, not `Rejected`.
 
 **Title:**
+
 > Review your listing before resubmitting
 
 **Description:**
+
 > The simulated publication review could not be completed with the current listing information.
 
 Reason examples:
@@ -845,9 +862,11 @@ Reason examples:
 Use for temporary non-review failures.
 
 **Title:**
+
 > We could not complete publication
 
 **Description:**
+
 > Your listing is still private and your saved information is unchanged. Try again shortly.
 
 **Primary:** `Try again`
@@ -869,12 +888,15 @@ Use for temporary non-review failures.
 ## 16.1 Copy
 
 **Title — required:**
+
 > Your listing is live
 
 **Description — required:**
+
 > Your property is now visible in the MARKAZ marketplace.
 
 **Supporting copy:**
+
 > You can open the public page, copy the listing link, or manage availability from My Listings.
 
 **Primary:** `View live listing`
@@ -1005,9 +1027,11 @@ This avoids introducing versioned moderation before Week 6.
 Use a confirmation dialog on desktop and bottom sheet on mobile.
 
 **Title:**
+
 > Pause this listing?
 
 **Body — required direction:**
+
 > The property will no longer appear in marketplace search or public property pages. You can resume it later.
 
 **Supporting bullets:**
@@ -1027,9 +1051,11 @@ Use amber or neutral treatment, not red destructive styling, because the action 
 **Status:** `Paused`
 
 **Title:**
+
 > This listing is paused
 
 **Description:**
+
 > It is hidden from marketplace results and public property pages. You can resume it when you are ready.
 
 **Primary:** `Resume listing`
@@ -1051,9 +1077,11 @@ PAUSED → confirmation → LIVE
 Resume confirmation:
 
 **Title:**
+
 > Resume this listing?
 
 **Body:**
+
 > The property will become visible again in marketplace search and through its public link.
 
 **Primary:** `Resume listing`
@@ -1071,7 +1099,6 @@ Pause failure:
 Resume failure:
 
 > We could not resume the listing. It remains paused. Try again.
-
 
 ---
 
@@ -1132,6 +1159,7 @@ Grid:
 ## 19.4 Page copy
 
 **Title:**
+
 > Properties in the UAE
 
 For a Dubai-only seed or launch scope, use:
@@ -1141,9 +1169,11 @@ For a Dubai-only seed or launch scope, use:
 The application should derive this from active geography support, not hard-code an inaccurate national claim.
 
 **Description:**
+
 > Browse clear property information, compare key details, and save homes that interest you.
 
 **Prototype disclosure:**
+
 > **Prototype marketplace**  
 > Property verification and publication review are simulated in this demo.
 
@@ -1202,9 +1232,11 @@ Search must not query or suggest:
 ## 20.2 Search control
 
 **Label:**
+
 > Search properties
 
 **Placeholder:**
+
 > Search by community, area, building, or property type
 
 Desktop:
@@ -1262,12 +1294,15 @@ Error copy:
 ## 20.5 Search states
 
 **Loading suggestions:**
+
 > Searching locations…
 
 **No suggestions:**
+
 > No matching locations. Press Enter to search all properties.
 
 **Search service failure:**
+
 > Search suggestions are unavailable. You can still submit your search.
 
 This failure is non-blocking if the main search endpoint remains available.
@@ -1632,9 +1667,11 @@ The action rail becomes sticky only after the main gallery and only when viewpor
 ## 24.5 Public headline and location
 
 **Headline pattern:**
+
 > {bedroom label} {property type} in {building or community}
 
 **Location:**
+
 > {community} · {emirate}
 
 Use sentence case. Preserve official building and community names.
@@ -1687,22 +1724,24 @@ Use definition-list rows with public values only.
 
 Example:
 
-| Label | Value |
-|---|---|
-| Property type | Apartment |
-| Community | Dubai Marina |
-| Building | Marina Gate 2 |
-| Size | 1,328 sq ft |
-| Furnishing | Furnished |
-| Completion | Ready |
-| Parking | 1 space |
+| Label         | Value         |
+| ------------- | ------------- |
+| Property type | Apartment     |
+| Community     | Dubai Marina  |
+| Building      | Marina Gate 2 |
+| Size          | 1,328 sq ft   |
+| Furnishing    | Furnished     |
+| Completion    | Ready         |
+| Parking       | 1 space       |
 
 ## 24.10 Listing source treatment
 
 **Label:**
+
 > Direct listing
 
 **Copy:**
+
 > Published directly through MARKAZ. Ownership verification and publication review are simulated in this prototype.
 
 Do not show owner name or contact details.
@@ -1831,9 +1870,11 @@ This protects seller financial history and avoids exposing inputs from which sen
 ## 26.3 Panel layout
 
 **Heading:**
+
 > Investment Case
 
 **Introduction:**
+
 > Seller-provided information and estimated calculations to help explain the property’s investment context.
 
 Desktop:
@@ -1890,16 +1931,16 @@ Place directly beneath the metrics in 13–14 px readable text. Do not hide it i
 
 ## 27.2 States
 
-| State | Label | Behaviour |
-|---|---|---|
-| Unsaved | `Save property` | Starts save or auth interception |
-| Saving | `Saving…` | Disable repeat activation |
-| Saved | `Saved` | Button state selected |
-| Removing | `Removing…` | Disable repeat activation |
-| Removed | `Save property` | Polite announcement `Removed from saved properties.` |
-| Error | `Save property` | Restore previous state and show error |
-| Unavailable | Hidden/disabled | Explain listing unavailable |
-| Owner | `Your listing` | Manage action replaces Save |
+| State       | Label           | Behaviour                                            |
+| ----------- | --------------- | ---------------------------------------------------- |
+| Unsaved     | `Save property` | Starts save or auth interception                     |
+| Saving      | `Saving…`       | Disable repeat activation                            |
+| Saved       | `Saved`         | Button state selected                                |
+| Removing    | `Removing…`     | Disable repeat activation                            |
+| Removed     | `Save property` | Polite announcement `Removed from saved properties.` |
+| Error       | `Save property` | Restore previous state and show error                |
+| Unavailable | Hidden/disabled | Explain listing unavailable                          |
+| Owner       | `Your listing`  | Manage action replaces Save                          |
 
 ## 27.3 Optimistic behaviour
 
@@ -1936,9 +1977,11 @@ Saving may update the owner’s aggregate count. The saving customer does not se
 Use an authentication-interception dialog on desktop and bottom sheet on mobile.
 
 **Title:**
+
 > Sign in to save this property
 
 **Description:**
+
 > Save properties to your MARKAZ account and return to them later.
 
 **Primary:** `Sign in`
@@ -1996,9 +2039,11 @@ Requires an onboarded `CUSTOMER` session.
 ## 29.2 Page copy
 
 **Title:**
+
 > Saved properties
 
 **Description:**
+
 > Keep track of properties you may want to revisit.
 
 ## 29.3 Empty state
@@ -2031,12 +2076,15 @@ A save relationship may remain when the listing is paused, unpublished, or other
 Do not show stale public property information. Render a restrained placeholder card:
 
 **Title:**
+
 > This property is no longer available
 
 **Description:**
+
 > It may have been paused or removed from the marketplace.
 
 **Action:**
+
 > Remove from saved
 
 Optional metadata:
@@ -2119,6 +2167,7 @@ Use a page skeleton matching final structure:
 Do not show a full-page spinner.
 
 Announcement:
+
 > Loading properties…
 
 ## 31.2 Filter or sort refresh
@@ -2139,9 +2188,11 @@ Announcement:
 ## 31.4 Empty results
 
 **Title:**
+
 > No properties match these filters
 
 **Description:**
+
 > Try changing your search, price range, or property details.
 
 **Primary:** `Clear all filters`
@@ -2155,9 +2206,11 @@ If only text search is active:
 ## 31.5 Marketplace unavailable
 
 **Title:**
+
 > Properties are temporarily unavailable
 
 **Description:**
+
 > We could not load the marketplace. Try again shortly.
 
 **Primary:** `Try again`
@@ -2177,9 +2230,11 @@ If only text search is active:
 Use the same public state for unknown, non-live, paused, and removed listings.
 
 **Title:**
+
 > This property is no longer available
 
 **Description:**
+
 > It may have been paused or removed from the MARKAZ marketplace.
 
 **Primary:** `Browse properties`
@@ -2207,6 +2262,7 @@ Restore the prior saved state.
 Use the marketplace card skeleton without search/filter controls.
 
 Announcement:
+
 > Loading saved properties…
 
 ## 31.11 Publication pending
@@ -2251,15 +2307,16 @@ Do not reveal whether the listing exists.
 ## 31.16 Generic unexpected error
 
 **Title:**
+
 > Something went wrong
 
 **Description:**
+
 > We could not complete this request. Your saved information has not been changed.
 
 **Primary:** `Try again`
 
 Optional safe support reference may be shown. Never display raw SQL, storage provider, stack trace, signed URL, object path, or private ID.
-
 
 ---
 
@@ -2604,35 +2661,35 @@ The following components extend the approved MARKAZ design system and reuse exis
 
 # 33. Validation Matrix
 
-| Screen | Field/control | Rule | Trigger | English message | Placement | Clears when | Blocking? | Arabic review |
-|---|---|---|---|---|---|---|---:|---|
-| Browse | Search | Maximum 100 characters | Submit/blur | `Search must be 100 characters or fewer.` | Under search | Length valid | Yes for search submit | Language |
-| Browse | Search | No unsupported control/markup characters | Submit | `Remove unsupported symbols and try again.` | Under search | Input valid | Yes | Language/security |
-| Filters | Minimum price | Positive whole AED or empty | Apply | `Enter a valid minimum price.` | Under field | Valid/empty | Yes | Language |
-| Filters | Maximum price | Positive whole AED or empty | Apply | `Enter a valid maximum price.` | Under field | Valid/empty | Yes | Language |
-| Filters | Price range | Minimum ≤ maximum | Apply | `Minimum price must not be higher than maximum price.` | Range group | Range valid | Yes | Language |
-| Filters | Minimum size | Positive whole sq ft or empty | Apply | `Enter a valid minimum size.` | Under field | Valid/empty | Yes | Language |
-| Filters | Maximum size | Positive whole sq ft or empty | Apply | `Enter a valid maximum size.` | Under field | Valid/empty | Yes | Language |
-| Filters | Size range | Minimum ≤ maximum | Apply | `Minimum size must not be higher than maximum size.` | Range group | Range valid | Yes | Language |
-| Browse | Results | Query valid but no matches | Response | `No properties match these filters.` | Results region | Filters/query change | Non-blocking state | Language |
-| Browse | Filter request | Request fails | Response | `We could not update the results. Try again.` | Alert above results | Successful retry | Non-blocking; old results remain | Language |
-| Browse | Sort request | Request fails | Response | `We could not change the sort order. Try again.` | Near sort + alert | Successful retry | Non-blocking | Language |
-| Pagination | Next page | Request fails | Response | `We could not load the next page. Try again.` | Pagination alert | Retry success | Non-blocking | Language |
-| Property | Public availability | Listing not `LIVE`/missing | Load | `This property is no longer available.` | Unavailable page | Listing live again/new navigation | Blocking | Language/security |
-| Save | Save request | Server failure | Response | `We could not save this property. Try again.` | Toast/live message and near control | Successful action | Non-blocking | Language |
-| Save | Listing changed state | Not live during request | Response | `This property is no longer available.` | Alert | Navigate away/live again | Blocking save | Language/security |
-| Saved | Remove unavailable item | Request failure | Response | `We could not remove this property from saved items. Try again.` | Card alert | Retry success | Non-blocking | Language |
-| Publication | Checklist | One or more required checks incomplete | Load/submit | `Complete the items marked “Action required” before publishing.` | Checklist summary | All complete | Yes | Language |
-| Publication | Confirmation | Checkbox not accepted | Submit | `Confirm that the public listing is ready to publish.` | Under checkbox | Checked | Yes | Language/legal review |
-| Publication | Submission | Request fails | Response | `We could not submit the listing for publication. It is still private.` | Form-level alert | Retry success | Yes for transition | Language |
-| Publication | Public photos | One or more public images fail | Processing result | `We could not prepare all property photographs for publication. Your listing is still private.` | Status panel | Retry/photo edit success | Yes | Language |
-| Publication | Public projection | Private-field/check failure | Processing result | `A required publication check is no longer complete. Review the listing and try again.` | Status panel | Listing valid | Yes | Language/security |
-| Publication | Listing changed | Version changed after submit | Processing result | `The listing changed after it was submitted. Review the latest information and submit again.` | Status panel | New submission | Yes | Language |
-| Pause | Pause request | Request fails | Response | `We could not pause the listing. It remains live. Try again.` | Dialog/panel alert | Retry success | Non-blocking; remains live | Language |
-| Resume | Resume request | Request fails | Response | `We could not resume the listing. It remains paused. Try again.` | Panel alert | Retry success | Non-blocking; remains paused | Language |
-| Resume | Readiness invalid | Material edit/check invalid | Action | `This listing needs publication review before it can become live again.` | Management panel | Resubmission approved | Blocks direct resume | Language |
-| Gallery | Image | Single image fails | Load | `Image {number} could not be loaded.` | Image placeholder / announced on focus | Reload success | Non-blocking | Language |
-| Gallery | All images | No public images load | Load | `Property photographs are temporarily unavailable.` | Gallery region | Reload success | Non-blocking page | Language |
+| Screen      | Field/control           | Rule                                     | Trigger           | English message                                                                                 | Placement                              | Clears when                       |                        Blocking? | Arabic review         |
+| ----------- | ----------------------- | ---------------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------- | --------------------------------- | -------------------------------: | --------------------- |
+| Browse      | Search                  | Maximum 100 characters                   | Submit/blur       | `Search must be 100 characters or fewer.`                                                       | Under search                           | Length valid                      |            Yes for search submit | Language              |
+| Browse      | Search                  | No unsupported control/markup characters | Submit            | `Remove unsupported symbols and try again.`                                                     | Under search                           | Input valid                       |                              Yes | Language/security     |
+| Filters     | Minimum price           | Positive whole AED or empty              | Apply             | `Enter a valid minimum price.`                                                                  | Under field                            | Valid/empty                       |                              Yes | Language              |
+| Filters     | Maximum price           | Positive whole AED or empty              | Apply             | `Enter a valid maximum price.`                                                                  | Under field                            | Valid/empty                       |                              Yes | Language              |
+| Filters     | Price range             | Minimum ≤ maximum                        | Apply             | `Minimum price must not be higher than maximum price.`                                          | Range group                            | Range valid                       |                              Yes | Language              |
+| Filters     | Minimum size            | Positive whole sq ft or empty            | Apply             | `Enter a valid minimum size.`                                                                   | Under field                            | Valid/empty                       |                              Yes | Language              |
+| Filters     | Maximum size            | Positive whole sq ft or empty            | Apply             | `Enter a valid maximum size.`                                                                   | Under field                            | Valid/empty                       |                              Yes | Language              |
+| Filters     | Size range              | Minimum ≤ maximum                        | Apply             | `Minimum size must not be higher than maximum size.`                                            | Range group                            | Range valid                       |                              Yes | Language              |
+| Browse      | Results                 | Query valid but no matches               | Response          | `No properties match these filters.`                                                            | Results region                         | Filters/query change              |               Non-blocking state | Language              |
+| Browse      | Filter request          | Request fails                            | Response          | `We could not update the results. Try again.`                                                   | Alert above results                    | Successful retry                  | Non-blocking; old results remain | Language              |
+| Browse      | Sort request            | Request fails                            | Response          | `We could not change the sort order. Try again.`                                                | Near sort + alert                      | Successful retry                  |                     Non-blocking | Language              |
+| Pagination  | Next page               | Request fails                            | Response          | `We could not load the next page. Try again.`                                                   | Pagination alert                       | Retry success                     |                     Non-blocking | Language              |
+| Property    | Public availability     | Listing not `LIVE`/missing               | Load              | `This property is no longer available.`                                                         | Unavailable page                       | Listing live again/new navigation |                         Blocking | Language/security     |
+| Save        | Save request            | Server failure                           | Response          | `We could not save this property. Try again.`                                                   | Toast/live message and near control    | Successful action                 |                     Non-blocking | Language              |
+| Save        | Listing changed state   | Not live during request                  | Response          | `This property is no longer available.`                                                         | Alert                                  | Navigate away/live again          |                    Blocking save | Language/security     |
+| Saved       | Remove unavailable item | Request failure                          | Response          | `We could not remove this property from saved items. Try again.`                                | Card alert                             | Retry success                     |                     Non-blocking | Language              |
+| Publication | Checklist               | One or more required checks incomplete   | Load/submit       | `Complete the items marked “Action required” before publishing.`                                | Checklist summary                      | All complete                      |                              Yes | Language              |
+| Publication | Confirmation            | Checkbox not accepted                    | Submit            | `Confirm that the public listing is ready to publish.`                                          | Under checkbox                         | Checked                           |                              Yes | Language/legal review |
+| Publication | Submission              | Request fails                            | Response          | `We could not submit the listing for publication. It is still private.`                         | Form-level alert                       | Retry success                     |               Yes for transition | Language              |
+| Publication | Public photos           | One or more public images fail           | Processing result | `We could not prepare all property photographs for publication. Your listing is still private.` | Status panel                           | Retry/photo edit success          |                              Yes | Language              |
+| Publication | Public projection       | Private-field/check failure              | Processing result | `A required publication check is no longer complete. Review the listing and try again.`         | Status panel                           | Listing valid                     |                              Yes | Language/security     |
+| Publication | Listing changed         | Version changed after submit             | Processing result | `The listing changed after it was submitted. Review the latest information and submit again.`   | Status panel                           | New submission                    |                              Yes | Language              |
+| Pause       | Pause request           | Request fails                            | Response          | `We could not pause the listing. It remains live. Try again.`                                   | Dialog/panel alert                     | Retry success                     |       Non-blocking; remains live | Language              |
+| Resume      | Resume request          | Request fails                            | Response          | `We could not resume the listing. It remains paused. Try again.`                                | Panel alert                            | Retry success                     |     Non-blocking; remains paused | Language              |
+| Resume      | Readiness invalid       | Material edit/check invalid              | Action            | `This listing needs publication review before it can become live again.`                        | Management panel                       | Resubmission approved             |             Blocks direct resume | Language              |
+| Gallery     | Image                   | Single image fails                       | Load              | `Image {number} could not be loaded.`                                                           | Image placeholder / announced on focus | Reload success                    |                     Non-blocking | Language              |
+| Gallery     | All images              | No public images load                    | Load              | `Property photographs are temporarily unavailable.`                                             | Gallery region                         | Reload success                    |                Non-blocking page | Language              |
 
 Validation principles:
 
@@ -2647,13 +2704,13 @@ Validation principles:
 
 ## 34.1 Global widths
 
-| Surface | Maximum width | Desktop gutters | Tablet gutters | Mobile gutters |
-|---|---:|---:|---:|---:|
-| Marketplace browse | 1360 px | 40 px | 32 px | 20–24 px |
-| Property details | 1360 px | 40 px | 32 px | 0 gallery / 20–24 content |
-| Saved Properties | 1360 px | 40 px | 32 px | 20–24 px |
-| Seller publication | 1200 px | 40 px | 32 px | 20–24 px |
-| Status panel | 680 px | centred | centred | full content width |
+| Surface            | Maximum width | Desktop gutters | Tablet gutters |            Mobile gutters |
+| ------------------ | ------------: | --------------: | -------------: | ------------------------: |
+| Marketplace browse |       1360 px |           40 px |          32 px |                  20–24 px |
+| Property details   |       1360 px |           40 px |          32 px | 0 gallery / 20–24 content |
+| Saved Properties   |       1360 px |           40 px |          32 px |                  20–24 px |
+| Seller publication |       1200 px |           40 px |          32 px |                  20–24 px |
+| Status panel       |        680 px |         centred |        centred |        full content width |
 
 ## 34.2 Desktop marketplace
 
@@ -3024,194 +3081,194 @@ This section is the master English copy reference. Contextual screen sections re
 
 ## 38.1 Marketplace browse
 
-| Key | English |
-|---|---|
-| `marketplace.title.uae` | Properties in the UAE |
-| `marketplace.title.dubai` | Properties in Dubai |
-| `marketplace.description` | Browse clear property information, compare key details, and save homes that interest you. |
-| `marketplace.prototypeTitle` | Prototype marketplace |
-| `marketplace.prototypeBody` | Property verification and publication review are simulated in this demo. |
-| `marketplace.searchLabel` | Search properties |
-| `marketplace.searchPlaceholder` | Search by community, area, building, or property type |
-| `marketplace.searchAction` | Search |
-| `marketplace.clearSearch` | Clear search |
-| `marketplace.results.one` | 1 property |
-| `marketplace.results.many` | {count} properties |
-| `marketplace.results.query` | {count} properties matching “{query}” |
-| `marketplace.updating` | Updating results… |
-| `marketplace.found` | {count} properties found. |
+| Key                             | English                                                                                   |
+| ------------------------------- | ----------------------------------------------------------------------------------------- |
+| `marketplace.title.uae`         | Properties in the UAE                                                                     |
+| `marketplace.title.dubai`       | Properties in Dubai                                                                       |
+| `marketplace.description`       | Browse clear property information, compare key details, and save homes that interest you. |
+| `marketplace.prototypeTitle`    | Prototype marketplace                                                                     |
+| `marketplace.prototypeBody`     | Property verification and publication review are simulated in this demo.                  |
+| `marketplace.searchLabel`       | Search properties                                                                         |
+| `marketplace.searchPlaceholder` | Search by community, area, building, or property type                                     |
+| `marketplace.searchAction`      | Search                                                                                    |
+| `marketplace.clearSearch`       | Clear search                                                                              |
+| `marketplace.results.one`       | 1 property                                                                                |
+| `marketplace.results.many`      | {count} properties                                                                        |
+| `marketplace.results.query`     | {count} properties matching “{query}”                                                     |
+| `marketplace.updating`          | Updating results…                                                                         |
+| `marketplace.found`             | {count} properties found.                                                                 |
 
 ## 38.2 Filters and sort
 
-| Key | English |
-|---|---|
-| `filters.title` | Filters |
-| `filters.propertyType` | Property type |
-| `filters.priceRange` | Price range |
-| `filters.minimumPrice` | Minimum price |
-| `filters.maximumPrice` | Maximum price |
-| `filters.bedrooms` | Bedrooms |
-| `filters.bathrooms` | Bathrooms |
-| `filters.community` | Community or area |
-| `filters.emirate` | Emirate |
-| `filters.size` | Property size |
-| `filters.minimumSize` | Minimum size |
-| `filters.maximumSize` | Maximum size |
-| `filters.furnishing` | Furnishing |
-| `filters.completion` | Completion status |
-| `filters.investment` | Investment Case available |
-| `filters.more` | More filters |
-| `filters.apply` | Apply filters |
-| `filters.showCount` | Show {count} properties |
-| `filters.clearAll` | Clear all |
-| `sort.label` | Sort by |
-| `sort.newest` | Newest |
-| `sort.priceLow` | Price: Low to High |
-| `sort.priceHigh` | Price: High to Low |
-| `sort.sizeLarge` | Size: Largest First |
+| Key                    | English                   |
+| ---------------------- | ------------------------- |
+| `filters.title`        | Filters                   |
+| `filters.propertyType` | Property type             |
+| `filters.priceRange`   | Price range               |
+| `filters.minimumPrice` | Minimum price             |
+| `filters.maximumPrice` | Maximum price             |
+| `filters.bedrooms`     | Bedrooms                  |
+| `filters.bathrooms`    | Bathrooms                 |
+| `filters.community`    | Community or area         |
+| `filters.emirate`      | Emirate                   |
+| `filters.size`         | Property size             |
+| `filters.minimumSize`  | Minimum size              |
+| `filters.maximumSize`  | Maximum size              |
+| `filters.furnishing`   | Furnishing                |
+| `filters.completion`   | Completion status         |
+| `filters.investment`   | Investment Case available |
+| `filters.more`         | More filters              |
+| `filters.apply`        | Apply filters             |
+| `filters.showCount`    | Show {count} properties   |
+| `filters.clearAll`     | Clear all                 |
+| `sort.label`           | Sort by                   |
+| `sort.newest`          | Newest                    |
+| `sort.priceLow`        | Price: Low to High        |
+| `sort.priceHigh`       | Price: High to Low        |
+| `sort.sizeLarge`       | Size: Largest First       |
 
 ## 38.3 Empty and error states
 
-| Key | English |
-|---|---|
-| `empty.resultsTitle` | No properties match these filters |
-| `empty.resultsBody` | Try changing your search, price range, or property details. |
-| `empty.queryBody` | No properties match “{query}”. Try a different area, building, or property type. |
-| `empty.clear` | Clear all filters |
-| `empty.browseAll` | Browse all properties |
-| `error.marketplaceTitle` | Properties are temporarily unavailable |
-| `error.marketplaceBody` | We could not load the marketplace. Try again shortly. |
-| `error.retry` | Try again |
-| `error.propertyTitle` | This property is no longer available |
-| `error.propertyBody` | It may have been paused or removed from the MARKAZ marketplace. |
-| `error.nextPage` | We could not load the next page. Try again. |
-| `error.filter` | We could not update the results. Try again. |
+| Key                      | English                                                                          |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| `empty.resultsTitle`     | No properties match these filters                                                |
+| `empty.resultsBody`      | Try changing your search, price range, or property details.                      |
+| `empty.queryBody`        | No properties match “{query}”. Try a different area, building, or property type. |
+| `empty.clear`            | Clear all filters                                                                |
+| `empty.browseAll`        | Browse all properties                                                            |
+| `error.marketplaceTitle` | Properties are temporarily unavailable                                           |
+| `error.marketplaceBody`  | We could not load the marketplace. Try again shortly.                            |
+| `error.retry`            | Try again                                                                        |
+| `error.propertyTitle`    | This property is no longer available                                             |
+| `error.propertyBody`     | It may have been paused or removed from the MARKAZ marketplace.                  |
+| `error.nextPage`         | We could not load the next page. Try again.                                      |
+| `error.filter`           | We could not update the results. Try again.                                      |
 
 ## 38.4 Property card and details
 
-| Key | English |
-|---|---|
-| `property.investmentAvailable` | Investment Case available |
-| `property.yourListing` | Your listing |
-| `property.imageUnavailable` | Property image unavailable |
-| `property.about` | About this property |
-| `property.amenities` | Features and amenities |
-| `property.details` | Property details |
-| `property.directTitle` | Direct listing |
-| `property.directBody` | Published directly through MARKAZ. Ownership verification and publication review are simulated in this prototype. |
-| `property.viewAllPhotos` | View all {count} photos |
-| `property.photoCount` | {current} of {total} |
-| `property.share` | Share listing |
-| `property.copyLink` | Copy listing link |
-| `property.linkCopied` | Listing link copied. |
-| `property.manage` | Manage listing |
+| Key                            | English                                                                                                           |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `property.investmentAvailable` | Investment Case available                                                                                         |
+| `property.yourListing`         | Your listing                                                                                                      |
+| `property.imageUnavailable`    | Property image unavailable                                                                                        |
+| `property.about`               | About this property                                                                                               |
+| `property.amenities`           | Features and amenities                                                                                            |
+| `property.details`             | Property details                                                                                                  |
+| `property.directTitle`         | Direct listing                                                                                                    |
+| `property.directBody`          | Published directly through MARKAZ. Ownership verification and publication review are simulated in this prototype. |
+| `property.viewAllPhotos`       | View all {count} photos                                                                                           |
+| `property.photoCount`          | {current} of {total}                                                                                              |
+| `property.share`               | Share listing                                                                                                     |
+| `property.copyLink`            | Copy listing link                                                                                                 |
+| `property.linkCopied`          | Listing link copied.                                                                                              |
+| `property.manage`              | Manage listing                                                                                                    |
 
 ## 38.5 Save and authentication interception
 
-| Key | English |
-|---|---|
-| `save.save` | Save property |
-| `save.saving` | Saving… |
-| `save.saved` | Saved |
-| `save.remove` | Remove from saved |
-| `save.removing` | Removing… |
-| `save.success` | Property saved. |
-| `save.removed` | Removed from saved properties. |
-| `save.error` | We could not save this property. Try again. |
-| `save.authTitle` | Sign in to save this property |
-| `save.authBody` | Save properties to your MARKAZ account and return to them later. |
-| `save.signIn` | Sign in |
-| `save.createAccount` | Create account |
-| `save.continueBrowsing` | Continue browsing |
-| `save.unavailableReturn` | This property is no longer available, so it was not saved. |
+| Key                      | English                                                          |
+| ------------------------ | ---------------------------------------------------------------- |
+| `save.save`              | Save property                                                    |
+| `save.saving`            | Saving…                                                          |
+| `save.saved`             | Saved                                                            |
+| `save.remove`            | Remove from saved                                                |
+| `save.removing`          | Removing…                                                        |
+| `save.success`           | Property saved.                                                  |
+| `save.removed`           | Removed from saved properties.                                   |
+| `save.error`             | We could not save this property. Try again.                      |
+| `save.authTitle`         | Sign in to save this property                                    |
+| `save.authBody`          | Save properties to your MARKAZ account and return to them later. |
+| `save.signIn`            | Sign in                                                          |
+| `save.createAccount`     | Create account                                                   |
+| `save.continueBrowsing`  | Continue browsing                                                |
+| `save.unavailableReturn` | This property is no longer available, so it was not saved.       |
 
 ## 38.6 Saved Properties
 
-| Key | English |
-|---|---|
-| `saved.title` | Saved properties |
-| `saved.description` | Keep track of properties you may want to revisit. |
-| `saved.emptyTitle` | No saved properties yet |
-| `saved.emptyBody` | Save properties while browsing to find them here later. |
-| `saved.browse` | Browse properties |
-| `saved.unavailableTitle` | This property is no longer available |
-| `saved.unavailableBody` | It may have been paused or removed from the marketplace. |
-| `saved.partialError` | Some saved properties could not be loaded. Try again. |
-| `saved.removeError` | We could not remove this property from saved items. Try again. |
+| Key                      | English                                                        |
+| ------------------------ | -------------------------------------------------------------- |
+| `saved.title`            | Saved properties                                               |
+| `saved.description`      | Keep track of properties you may want to revisit.              |
+| `saved.emptyTitle`       | No saved properties yet                                        |
+| `saved.emptyBody`        | Save properties while browsing to find them here later.        |
+| `saved.browse`           | Browse properties                                              |
+| `saved.unavailableTitle` | This property is no longer available                           |
+| `saved.unavailableBody`  | It may have been paused or removed from the marketplace.       |
+| `saved.partialError`     | Some saved properties could not be loaded. Try again.          |
+| `saved.removeError`      | We could not remove this property from saved items. Try again. |
 
 ## 38.7 Publication
 
-| Key | English |
-|---|---|
-| `publication.readyStatus` | Ready to publish |
-| `publication.readyTitle` | Your listing setup is complete |
-| `publication.readyBody` | Review the public preview, then submit the listing for simulated publication review. |
-| `publication.privacy` | Ownership documents, unit identifiers, and private verification information will not appear publicly. |
-| `publication.preview` | Preview public listing |
-| `publication.publish` | Publish listing |
-| `publication.checklistTitle` | Publication checklist |
-| `publication.checklistBody` | We will check that your public listing is complete and that private information is excluded. |
-| `publication.checklistComplete` | Your listing is ready for publication confirmation. |
-| `publication.checklistIncomplete` | Complete the items marked “Action required” before publishing. |
-| `publication.confirmTitle` | Publish your listing |
-| `publication.confirmBody` | Your property will become visible in the MARKAZ marketplace after the simulated review is complete. |
-| `publication.confirmPrivacy` | Your ownership documents and private verification information will remain private. |
-| `publication.checkbox` | I have reviewed the public listing and confirm that the property information and photographs are ready to publish. |
-| `publication.checkboxError` | Confirm that the public listing is ready to publish. |
-| `publication.submit` | Submit for publication |
-| `publication.submitting` | Submitting… |
-| `publication.simTitle` | Publication review simulated |
-| `publication.simBody` | This prototype does not perform a real regulatory or legal publication review. |
-| `publication.pendingTitle` | Publication review in progress |
-| `publication.pendingBody` | We are preparing the public listing and its photographs. You can leave this page and return later. |
-| `publication.pendingStatus` | Pending · Demo |
-| `publication.approvedTitle` | Publication review complete |
-| `publication.approvedBody` | The demo review is complete. We are making your listing available in the marketplace. |
-| `publication.approvedStatus` | Approved · Demo |
-| `publication.returnedTitle` | Review your listing before resubmitting |
-| `publication.returnedBody` | The simulated publication review could not be completed with the current listing information. |
-| `publication.reviewListing` | Review listing |
-| `publication.retry` | Try publication again |
-| `publication.processingErrorTitle` | We could not complete publication |
-| `publication.processingErrorBody` | Your listing is still private and your saved information is unchanged. Try again shortly. |
-| `publication.photoFailure` | We could not prepare all property photographs for publication. Your listing is still private. |
-| `publication.liveTitle` | Your listing is live |
-| `publication.liveBody` | Your property is now visible in the MARKAZ marketplace. |
-| `publication.viewLive` | View live listing |
-| `publication.manage` | Manage listing |
+| Key                                | English                                                                                                            |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `publication.readyStatus`          | Ready to publish                                                                                                   |
+| `publication.readyTitle`           | Your listing setup is complete                                                                                     |
+| `publication.readyBody`            | Review the public preview, then submit the listing for simulated publication review.                               |
+| `publication.privacy`              | Ownership documents, unit identifiers, and private verification information will not appear publicly.              |
+| `publication.preview`              | Preview public listing                                                                                             |
+| `publication.publish`              | Publish listing                                                                                                    |
+| `publication.checklistTitle`       | Publication checklist                                                                                              |
+| `publication.checklistBody`        | We will check that your public listing is complete and that private information is excluded.                       |
+| `publication.checklistComplete`    | Your listing is ready for publication confirmation.                                                                |
+| `publication.checklistIncomplete`  | Complete the items marked “Action required” before publishing.                                                     |
+| `publication.confirmTitle`         | Publish your listing                                                                                               |
+| `publication.confirmBody`          | Your property will become visible in the MARKAZ marketplace after the simulated review is complete.                |
+| `publication.confirmPrivacy`       | Your ownership documents and private verification information will remain private.                                 |
+| `publication.checkbox`             | I have reviewed the public listing and confirm that the property information and photographs are ready to publish. |
+| `publication.checkboxError`        | Confirm that the public listing is ready to publish.                                                               |
+| `publication.submit`               | Submit for publication                                                                                             |
+| `publication.submitting`           | Submitting…                                                                                                        |
+| `publication.simTitle`             | Publication review simulated                                                                                       |
+| `publication.simBody`              | This prototype does not perform a real regulatory or legal publication review.                                     |
+| `publication.pendingTitle`         | Publication review in progress                                                                                     |
+| `publication.pendingBody`          | We are preparing the public listing and its photographs. You can leave this page and return later.                 |
+| `publication.pendingStatus`        | Pending · Demo                                                                                                     |
+| `publication.approvedTitle`        | Publication review complete                                                                                        |
+| `publication.approvedBody`         | The demo review is complete. We are making your listing available in the marketplace.                              |
+| `publication.approvedStatus`       | Approved · Demo                                                                                                    |
+| `publication.returnedTitle`        | Review your listing before resubmitting                                                                            |
+| `publication.returnedBody`         | The simulated publication review could not be completed with the current listing information.                      |
+| `publication.reviewListing`        | Review listing                                                                                                     |
+| `publication.retry`                | Try publication again                                                                                              |
+| `publication.processingErrorTitle` | We could not complete publication                                                                                  |
+| `publication.processingErrorBody`  | Your listing is still private and your saved information is unchanged. Try again shortly.                          |
+| `publication.photoFailure`         | We could not prepare all property photographs for publication. Your listing is still private.                      |
+| `publication.liveTitle`            | Your listing is live                                                                                               |
+| `publication.liveBody`             | Your property is now visible in the MARKAZ marketplace.                                                            |
+| `publication.viewLive`             | View live listing                                                                                                  |
+| `publication.manage`               | Manage listing                                                                                                     |
 
 ## 38.8 Pause and resume
 
-| Key | English |
-|---|---|
-| `pause.title` | Pause this listing? |
-| `pause.body` | The property will no longer appear in marketplace search or public property pages. You can resume it later. |
-| `pause.action` | Pause listing |
-| `pause.keepLive` | Keep listing live |
-| `pause.status` | Paused |
-| `pause.pageTitle` | This listing is paused |
-| `pause.pageBody` | It is hidden from marketplace results and public property pages. You can resume it when you are ready. |
-| `resume.title` | Resume this listing? |
-| `resume.body` | The property will become visible again in marketplace search and through its public link. |
-| `resume.action` | Resume listing |
-| `resume.keepPaused` | Keep paused |
-| `pause.error` | We could not pause the listing. It remains live. Try again. |
-| `resume.error` | We could not resume the listing. It remains paused. Try again. |
-| `resume.reviewRequired` | This listing needs publication review before it can become live again. |
+| Key                     | English                                                                                                     |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `pause.title`           | Pause this listing?                                                                                         |
+| `pause.body`            | The property will no longer appear in marketplace search or public property pages. You can resume it later. |
+| `pause.action`          | Pause listing                                                                                               |
+| `pause.keepLive`        | Keep listing live                                                                                           |
+| `pause.status`          | Paused                                                                                                      |
+| `pause.pageTitle`       | This listing is paused                                                                                      |
+| `pause.pageBody`        | It is hidden from marketplace results and public property pages. You can resume it when you are ready.      |
+| `resume.title`          | Resume this listing?                                                                                        |
+| `resume.body`           | The property will become visible again in marketplace search and through its public link.                   |
+| `resume.action`         | Resume listing                                                                                              |
+| `resume.keepPaused`     | Keep paused                                                                                                 |
+| `pause.error`           | We could not pause the listing. It remains live. Try again.                                                 |
+| `resume.error`          | We could not resume the listing. It remains paused. Try again.                                              |
+| `resume.reviewRequired` | This listing needs publication review before it can become live again.                                      |
 
 ## 38.9 Investment Case
 
-| Key | English |
-|---|---|
-| `investment.title` | Investment Case |
-| `investment.intro` | Seller-provided information and estimated calculations to help explain the property’s investment context. |
-| `investment.roi` | Estimated ROI |
-| `investment.annualised` | Estimated annualised return |
-| `investment.priceSqft` | Price per square foot |
-| `investment.areaComparison` | Area comparison |
-| `investment.unavailable` | Not available from the information provided |
-| `investment.areaUnavailable` | Area comparison unavailable |
-| `investment.disclosure` | Investment figures are seller-provided and calculated from the information entered. They are estimates, not financial advice or guaranteed returns. |
+| Key                          | English                                                                                                                                             |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `investment.title`           | Investment Case                                                                                                                                     |
+| `investment.intro`           | Seller-provided information and estimated calculations to help explain the property’s investment context.                                           |
+| `investment.roi`             | Estimated ROI                                                                                                                                       |
+| `investment.annualised`      | Estimated annualised return                                                                                                                         |
+| `investment.priceSqft`       | Price per square foot                                                                                                                               |
+| `investment.areaComparison`  | Area comparison                                                                                                                                     |
+| `investment.unavailable`     | Not available from the information provided                                                                                                         |
+| `investment.areaUnavailable` | Area comparison unavailable                                                                                                                         |
+| `investment.disclosure`      | Investment figures are seller-provided and calculated from the information entered. They are estimates, not financial advice or guaranteed returns. |
 
 ---
 
@@ -3231,76 +3288,76 @@ Do not represent the Arabic as approved until review is complete.
 
 ## 39.2 Draft Arabic copy
 
-| English | Draft Arabic | Review |
-|---|---|---|
-| Properties in the UAE | عقارات في دولة الإمارات | Language/property |
-| Properties in Dubai | عقارات في دبي | Language/property |
-| Browse clear property information, compare key details, and save homes that interest you. | تصفّح معلومات واضحة عن العقارات، وقارن التفاصيل الأساسية، واحفظ العقارات التي تهمك. | Language |
-| Prototype marketplace | سوق تجريبي | Business/language |
-| Property verification and publication review are simulated in this demo. | التحقق من العقار ومراجعة النشر محاكاة ضمن هذا العرض التجريبي. | Business/legal/language |
-| Search properties | البحث عن عقارات | Language |
-| Search by community, area, building, or property type | ابحث حسب المجمع أو المنطقة أو المبنى أو نوع العقار | Property/language |
-| Filters | عوامل التصفية | Language |
-| Property type | نوع العقار | Property |
-| Price range | نطاق السعر | Language |
-| Minimum price | الحد الأدنى للسعر | Language |
-| Maximum price | الحد الأقصى للسعر | Language |
-| Bedrooms | غرف النوم | Property |
-| Bathrooms | الحمّامات | Property |
-| Community or area | المجمع أو المنطقة | Property |
-| Property size | مساحة العقار | Property |
-| Furnishing | حالة التأثيث | Property |
-| Completion status | حالة الإنجاز | Property |
-| Investment Case available | تتوفر دراسة استثمارية | Business/property |
-| Apply filters | تطبيق عوامل التصفية | Language |
-| Show {count} properties | عرض {count} عقارًا | Plural review |
-| Clear all | مسح الكل | Language |
-| Sort by | الترتيب حسب | Language |
-| Newest | الأحدث | Language |
-| Price: Low to High | السعر: من الأقل إلى الأعلى | Language |
-| Price: High to Low | السعر: من الأعلى إلى الأقل | Language |
-| Size: Largest First | المساحة: الأكبر أولًا | Language |
-| No properties match these filters | لا توجد عقارات تطابق عوامل التصفية هذه | Language |
-| Try changing your search, price range, or property details. | جرّب تعديل البحث أو نطاق السعر أو تفاصيل العقار. | Language |
-| Save property | حفظ العقار | Language |
-| Saved | تم الحفظ | Language |
-| Remove from saved | إزالة من المحفوظات | Language |
-| Your listing | إعلانك | Property/language |
-| Investment Case available | تتوفر دراسة استثمارية | Business/property |
-| About this property | نبذة عن العقار | Property |
-| Features and amenities | المزايا والمرافق | Property |
-| Property details | تفاصيل العقار | Property |
-| Direct listing | إعلان مباشر | Business/property |
-| Share listing | مشاركة الإعلان | Language |
-| Manage listing | إدارة الإعلان | Language |
-| Sign in to save this property | سجّل الدخول لحفظ هذا العقار | Language |
-| Save properties to your MARKAZ account and return to them later. | احفظ العقارات في حسابك على MARKAZ للعودة إليها لاحقًا. | Language |
-| Saved properties | العقارات المحفوظة | Language |
-| No saved properties yet | لا توجد عقارات محفوظة بعد | Language |
-| This property is no longer available | هذا العقار لم يعد متاحًا | Language |
-| Ready to publish | جاهز للنشر | Business/property |
-| Your listing setup is complete | اكتمل إعداد إعلانك | Language |
-| Publication checklist | قائمة التحقق قبل النشر | Business/language |
-| Publish your listing | انشر إعلانك | Language |
-| Your property will become visible in the MARKAZ marketplace after the simulated review is complete. | سيظهر عقارك في سوق MARKAZ بعد اكتمال المراجعة التجريبية. | Business/legal/language |
-| Your ownership documents and private verification information will remain private. | ستظل مستندات الملكية ومعلومات التحقق الخاصة سرية. | Legal/privacy/language |
-| I have reviewed the public listing and confirm that the property information and photographs are ready to publish. | لقد راجعت الإعلان العام وأؤكد أن معلومات العقار وصوره جاهزة للنشر. | Legal/product/language |
-| Submit for publication | إرسال للنشر | Language |
-| Publication review simulated | محاكاة مراجعة النشر | Business/legal/language |
-| This prototype does not perform a real regulatory or legal publication review. | لا يُجري هذا النموذج الأولي مراجعة تنظيمية أو قانونية فعلية للنشر. | Legal/language |
-| Publication review in progress | مراجعة النشر قيد التنفيذ | Business/language |
-| Review your listing before resubmitting | راجع إعلانك قبل إعادة الإرسال | Language |
-| Your listing is live | إعلانك منشور الآن | Business/property |
-| Your property is now visible in the MARKAZ marketplace. | أصبح عقارك ظاهرًا الآن في سوق MARKAZ. | Language |
-| Pause this listing? | هل تريد إيقاف هذا الإعلان مؤقتًا؟ | Language |
-| The property will no longer appear in marketplace search or public property pages. You can resume it later. | لن يظهر العقار في نتائج البحث أو صفحات العقارات العامة. يمكنك استئناف الإعلان لاحقًا. | Language |
-| This listing is paused | هذا الإعلان متوقف مؤقتًا | Language |
-| Resume listing | استئناف الإعلان | Language |
-| Investment Case | الدراسة الاستثمارية | Business/property |
-| Estimated ROI | العائد على الاستثمار التقديري | Financial/legal |
-| Estimated annualised return | العائد السنوي التقديري | Financial/legal |
-| Price per square foot | السعر لكل قدم مربعة | Property |
-| Area comparison | مقارنة بالمنطقة | Property |
+| English                                                                                                                                             | Draft Arabic                                                                                                             | Review                    |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------- |
+| Properties in the UAE                                                                                                                               | عقارات في دولة الإمارات                                                                                                  | Language/property         |
+| Properties in Dubai                                                                                                                                 | عقارات في دبي                                                                                                            | Language/property         |
+| Browse clear property information, compare key details, and save homes that interest you.                                                           | تصفّح معلومات واضحة عن العقارات، وقارن التفاصيل الأساسية، واحفظ العقارات التي تهمك.                                      | Language                  |
+| Prototype marketplace                                                                                                                               | سوق تجريبي                                                                                                               | Business/language         |
+| Property verification and publication review are simulated in this demo.                                                                            | التحقق من العقار ومراجعة النشر محاكاة ضمن هذا العرض التجريبي.                                                            | Business/legal/language   |
+| Search properties                                                                                                                                   | البحث عن عقارات                                                                                                          | Language                  |
+| Search by community, area, building, or property type                                                                                               | ابحث حسب المجمع أو المنطقة أو المبنى أو نوع العقار                                                                       | Property/language         |
+| Filters                                                                                                                                             | عوامل التصفية                                                                                                            | Language                  |
+| Property type                                                                                                                                       | نوع العقار                                                                                                               | Property                  |
+| Price range                                                                                                                                         | نطاق السعر                                                                                                               | Language                  |
+| Minimum price                                                                                                                                       | الحد الأدنى للسعر                                                                                                        | Language                  |
+| Maximum price                                                                                                                                       | الحد الأقصى للسعر                                                                                                        | Language                  |
+| Bedrooms                                                                                                                                            | غرف النوم                                                                                                                | Property                  |
+| Bathrooms                                                                                                                                           | الحمّامات                                                                                                                | Property                  |
+| Community or area                                                                                                                                   | المجمع أو المنطقة                                                                                                        | Property                  |
+| Property size                                                                                                                                       | مساحة العقار                                                                                                             | Property                  |
+| Furnishing                                                                                                                                          | حالة التأثيث                                                                                                             | Property                  |
+| Completion status                                                                                                                                   | حالة الإنجاز                                                                                                             | Property                  |
+| Investment Case available                                                                                                                           | تتوفر دراسة استثمارية                                                                                                    | Business/property         |
+| Apply filters                                                                                                                                       | تطبيق عوامل التصفية                                                                                                      | Language                  |
+| Show {count} properties                                                                                                                             | عرض {count} عقارًا                                                                                                       | Plural review             |
+| Clear all                                                                                                                                           | مسح الكل                                                                                                                 | Language                  |
+| Sort by                                                                                                                                             | الترتيب حسب                                                                                                              | Language                  |
+| Newest                                                                                                                                              | الأحدث                                                                                                                   | Language                  |
+| Price: Low to High                                                                                                                                  | السعر: من الأقل إلى الأعلى                                                                                               | Language                  |
+| Price: High to Low                                                                                                                                  | السعر: من الأعلى إلى الأقل                                                                                               | Language                  |
+| Size: Largest First                                                                                                                                 | المساحة: الأكبر أولًا                                                                                                    | Language                  |
+| No properties match these filters                                                                                                                   | لا توجد عقارات تطابق عوامل التصفية هذه                                                                                   | Language                  |
+| Try changing your search, price range, or property details.                                                                                         | جرّب تعديل البحث أو نطاق السعر أو تفاصيل العقار.                                                                         | Language                  |
+| Save property                                                                                                                                       | حفظ العقار                                                                                                               | Language                  |
+| Saved                                                                                                                                               | تم الحفظ                                                                                                                 | Language                  |
+| Remove from saved                                                                                                                                   | إزالة من المحفوظات                                                                                                       | Language                  |
+| Your listing                                                                                                                                        | إعلانك                                                                                                                   | Property/language         |
+| Investment Case available                                                                                                                           | تتوفر دراسة استثمارية                                                                                                    | Business/property         |
+| About this property                                                                                                                                 | نبذة عن العقار                                                                                                           | Property                  |
+| Features and amenities                                                                                                                              | المزايا والمرافق                                                                                                         | Property                  |
+| Property details                                                                                                                                    | تفاصيل العقار                                                                                                            | Property                  |
+| Direct listing                                                                                                                                      | إعلان مباشر                                                                                                              | Business/property         |
+| Share listing                                                                                                                                       | مشاركة الإعلان                                                                                                           | Language                  |
+| Manage listing                                                                                                                                      | إدارة الإعلان                                                                                                            | Language                  |
+| Sign in to save this property                                                                                                                       | سجّل الدخول لحفظ هذا العقار                                                                                              | Language                  |
+| Save properties to your MARKAZ account and return to them later.                                                                                    | احفظ العقارات في حسابك على MARKAZ للعودة إليها لاحقًا.                                                                   | Language                  |
+| Saved properties                                                                                                                                    | العقارات المحفوظة                                                                                                        | Language                  |
+| No saved properties yet                                                                                                                             | لا توجد عقارات محفوظة بعد                                                                                                | Language                  |
+| This property is no longer available                                                                                                                | هذا العقار لم يعد متاحًا                                                                                                 | Language                  |
+| Ready to publish                                                                                                                                    | جاهز للنشر                                                                                                               | Business/property         |
+| Your listing setup is complete                                                                                                                      | اكتمل إعداد إعلانك                                                                                                       | Language                  |
+| Publication checklist                                                                                                                               | قائمة التحقق قبل النشر                                                                                                   | Business/language         |
+| Publish your listing                                                                                                                                | انشر إعلانك                                                                                                              | Language                  |
+| Your property will become visible in the MARKAZ marketplace after the simulated review is complete.                                                 | سيظهر عقارك في سوق MARKAZ بعد اكتمال المراجعة التجريبية.                                                                 | Business/legal/language   |
+| Your ownership documents and private verification information will remain private.                                                                  | ستظل مستندات الملكية ومعلومات التحقق الخاصة سرية.                                                                        | Legal/privacy/language    |
+| I have reviewed the public listing and confirm that the property information and photographs are ready to publish.                                  | لقد راجعت الإعلان العام وأؤكد أن معلومات العقار وصوره جاهزة للنشر.                                                       | Legal/product/language    |
+| Submit for publication                                                                                                                              | إرسال للنشر                                                                                                              | Language                  |
+| Publication review simulated                                                                                                                        | محاكاة مراجعة النشر                                                                                                      | Business/legal/language   |
+| This prototype does not perform a real regulatory or legal publication review.                                                                      | لا يُجري هذا النموذج الأولي مراجعة تنظيمية أو قانونية فعلية للنشر.                                                       | Legal/language            |
+| Publication review in progress                                                                                                                      | مراجعة النشر قيد التنفيذ                                                                                                 | Business/language         |
+| Review your listing before resubmitting                                                                                                             | راجع إعلانك قبل إعادة الإرسال                                                                                            | Language                  |
+| Your listing is live                                                                                                                                | إعلانك منشور الآن                                                                                                        | Business/property         |
+| Your property is now visible in the MARKAZ marketplace.                                                                                             | أصبح عقارك ظاهرًا الآن في سوق MARKAZ.                                                                                    | Language                  |
+| Pause this listing?                                                                                                                                 | هل تريد إيقاف هذا الإعلان مؤقتًا؟                                                                                        | Language                  |
+| The property will no longer appear in marketplace search or public property pages. You can resume it later.                                         | لن يظهر العقار في نتائج البحث أو صفحات العقارات العامة. يمكنك استئناف الإعلان لاحقًا.                                    | Language                  |
+| This listing is paused                                                                                                                              | هذا الإعلان متوقف مؤقتًا                                                                                                 | Language                  |
+| Resume listing                                                                                                                                      | استئناف الإعلان                                                                                                          | Language                  |
+| Investment Case                                                                                                                                     | الدراسة الاستثمارية                                                                                                      | Business/property         |
+| Estimated ROI                                                                                                                                       | العائد على الاستثمار التقديري                                                                                            | Financial/legal           |
+| Estimated annualised return                                                                                                                         | العائد السنوي التقديري                                                                                                   | Financial/legal           |
+| Price per square foot                                                                                                                               | السعر لكل قدم مربعة                                                                                                      | Property                  |
+| Area comparison                                                                                                                                     | مقارنة بالمنطقة                                                                                                          | Property                  |
 | Investment figures are seller-provided and calculated from the information entered. They are estimates, not financial advice or guaranteed returns. | الأرقام الاستثمارية مقدمة من البائع ومحسوبة بناءً على المعلومات المُدخلة. وهي تقديرات وليست نصيحة مالية أو عوائد مضمونة. | Legal/compliance/language |
 
 ---
@@ -3323,53 +3380,53 @@ Use these labels in implementation tasks:
 
 ## 40.2 Seller-publication screens
 
-| Route | Screen | User / listing state | Entry / required data / privacy | Primary / secondary | Components | Loading / empty | Errors | Success / transition | Audit | Responsive / RTL / accessibility | Claude Code notes |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| `/sell/listings/[id]/ready` | Ready management | Owner; `READY_TO_PUBLISH` | Server readiness, public preview summary; private | Publish / Preview, Edit, My Listings | Management summary, status, price, cover | Checking readiness | Not available, readiness invalid | `/publish` | none | Stack mobile; logical mirroring; heading focus | [SECURITY] verify owner and readiness server-side |
-| `/sell/listings/[id]/preview` | Public preview | Owner; ready/pending | Public projection only; owner-private route | Continue to publish / Back | Property Details Shell, preview banner | Projection skeleton | Preview unavailable | `/publish` | none | Same as public detail; no private merge | Reuse exact public mapper and components |
-| `/sell/listings/[id]/publish` | Publication checklist | Owner; ready | Readiness/checklist/public-private map | Continue / Preview, edit links | Checklist, disclosure | Checking items | Missing/failed checks | Confirmation state on route | none | Public/private stack mobile; status semantics | Do not derive readiness only in client |
-| `/sell/listings/[id]/publish` | Confirmation | Owner; ready | Confirmation checkbox | Submit / Back | Confirmation component, sticky actions | Submitting | Checkbox, invalidation, request failure | `/publication` PENDING | `LISTING_PUBLICATION_SUBMITTED` | Checkbox RTL; error association | Idempotent active request; version check |
-| `/sell/listings/[id]/publication` | Pending | Owner; ready + `PENDING` | Request stage, safe photo counts; private | My Listings / Preview, sign out | Status panel, property summary | Poll/refetch | Processing error | Approved/live or returned | stage-specific | Announce changes once; no fake percentage | Persist state; no forced stay on page |
-| same | Approved | Owner; approved | Public readiness and asset completion | View live / Manage | Status panel | Finalising | Live transition failure | `LIVE` + live success | `LISTING_PUBLICATION_APPROVED_DEMO`, `LISTING_PUBLISHED` | Focus success heading | Do not show success before public assets queryable |
-| same | Changes required | Owner; `REJECTED_DEMO`, listing ready | Safe reason category only | Review listing / Retry, My Listings | Failure/retry panel | none | retry failure | New pending request | `LISTING_PUBLICATION_RETURNED_DEMO` | Actions stack mobile | No internal notes/provider text |
-| same | Photo processing failed | Owner; request failed | Failed count only | Try again / Review photographs | Failure panel | retrying | repeat failure | Pending | `LISTING_PUBLIC_PHOTOS_FAILED` | clear live status | Remove/quarantine partial assets |
-| `/sell/listings/[id]/manage` | Live management | Owner; `LIVE` | Public summary + owner aggregate data; private route | View live / Copy, Edit, Pause | Management panel | Loading summary/count | access, action failure | remains live | none | 2-col→stack; owner-only semantics | Saved count aggregate only |
-| same | Paused management | Owner; `PAUSED` | Owner summary; private | Resume or Submit for publication / Edit | Management panel | loading | resume failure | `LIVE` or publish flow | `LISTING_RESUMED` | status announced | Revalidate readiness; material edits require review |
-| dialog/sheet | Pause confirmation | Owner; live | Public-removal consequences | Pause / Keep live | Pause dialog | Pausing | pause failure | `PAUSED` | `LISTING_PAUSED` | focus trap/restore; RTL actions | Reversible neutral action, not delete |
-| dialog/sheet | Resume confirmation | Owner; paused, valid | Public-return consequences | Resume / Keep paused | Confirmation dialog | Resuming | resume failure | `LIVE` | `LISTING_RESUMED` | same | Direct resume only if no invalidating edits |
+| Route                             | Screen                  | User / listing state                  | Entry / required data / privacy                      | Primary / secondary                     | Components                               | Loading / empty       | Errors                                  | Success / transition        | Audit                                                    | Responsive / RTL / accessibility               | Claude Code notes                                   |
+| --------------------------------- | ----------------------- | ------------------------------------- | ---------------------------------------------------- | --------------------------------------- | ---------------------------------------- | --------------------- | --------------------------------------- | --------------------------- | -------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------- |
+| `/sell/listings/[id]/ready`       | Ready management        | Owner; `READY_TO_PUBLISH`             | Server readiness, public preview summary; private    | Publish / Preview, Edit, My Listings    | Management summary, status, price, cover | Checking readiness    | Not available, readiness invalid        | `/publish`                  | none                                                     | Stack mobile; logical mirroring; heading focus | [SECURITY] verify owner and readiness server-side   |
+| `/sell/listings/[id]/preview`     | Public preview          | Owner; ready/pending                  | Public projection only; owner-private route          | Continue to publish / Back              | Property Details Shell, preview banner   | Projection skeleton   | Preview unavailable                     | `/publish`                  | none                                                     | Same as public detail; no private merge        | Reuse exact public mapper and components            |
+| `/sell/listings/[id]/publish`     | Publication checklist   | Owner; ready                          | Readiness/checklist/public-private map               | Continue / Preview, edit links          | Checklist, disclosure                    | Checking items        | Missing/failed checks                   | Confirmation state on route | none                                                     | Public/private stack mobile; status semantics  | Do not derive readiness only in client              |
+| `/sell/listings/[id]/publish`     | Confirmation            | Owner; ready                          | Confirmation checkbox                                | Submit / Back                           | Confirmation component, sticky actions   | Submitting            | Checkbox, invalidation, request failure | `/publication` PENDING      | `LISTING_PUBLICATION_SUBMITTED`                          | Checkbox RTL; error association                | Idempotent active request; version check            |
+| `/sell/listings/[id]/publication` | Pending                 | Owner; ready + `PENDING`              | Request stage, safe photo counts; private            | My Listings / Preview, sign out         | Status panel, property summary           | Poll/refetch          | Processing error                        | Approved/live or returned   | stage-specific                                           | Announce changes once; no fake percentage      | Persist state; no forced stay on page               |
+| same                              | Approved                | Owner; approved                       | Public readiness and asset completion                | View live / Manage                      | Status panel                             | Finalising            | Live transition failure                 | `LIVE` + live success       | `LISTING_PUBLICATION_APPROVED_DEMO`, `LISTING_PUBLISHED` | Focus success heading                          | Do not show success before public assets queryable  |
+| same                              | Changes required        | Owner; `REJECTED_DEMO`, listing ready | Safe reason category only                            | Review listing / Retry, My Listings     | Failure/retry panel                      | none                  | retry failure                           | New pending request         | `LISTING_PUBLICATION_RETURNED_DEMO`                      | Actions stack mobile                           | No internal notes/provider text                     |
+| same                              | Photo processing failed | Owner; request failed                 | Failed count only                                    | Try again / Review photographs          | Failure panel                            | retrying              | repeat failure                          | Pending                     | `LISTING_PUBLIC_PHOTOS_FAILED`                           | clear live status                              | Remove/quarantine partial assets                    |
+| `/sell/listings/[id]/manage`      | Live management         | Owner; `LIVE`                         | Public summary + owner aggregate data; private route | View live / Copy, Edit, Pause           | Management panel                         | Loading summary/count | access, action failure                  | remains live                | none                                                     | 2-col→stack; owner-only semantics              | Saved count aggregate only                          |
+| same                              | Paused management       | Owner; `PAUSED`                       | Owner summary; private                               | Resume or Submit for publication / Edit | Management panel                         | loading               | resume failure                          | `LIVE` or publish flow      | `LISTING_RESUMED`                                        | status announced                               | Revalidate readiness; material edits require review |
+| dialog/sheet                      | Pause confirmation      | Owner; live                           | Public-removal consequences                          | Pause / Keep live                       | Pause dialog                             | Pausing               | pause failure                           | `PAUSED`                    | `LISTING_PAUSED`                                         | focus trap/restore; RTL actions                | Reversible neutral action, not delete               |
+| dialog/sheet                      | Resume confirmation     | Owner; paused, valid                  | Public-return consequences                           | Resume / Keep paused                    | Confirmation dialog                      | Resuming              | resume failure                          | `LIVE`                      | `LISTING_RESUMED`                                        | same                                           | Direct resume only if no invalidating edits         |
 
 ## 40.3 Marketplace screens
 
-| Route | Screen | User / listing state | Entry / required data / privacy | Primary / secondary | Components | Loading / empty | Errors | Success / transition | Audit | Responsive / RTL / accessibility | Claude Code notes |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| `/properties` | Browse | Anonymous/customer; only live | Public facets and projections | Search/open property / filters, sort, save | Shell, search, filters, count, grid, pagination | Full skeleton | marketplace unavailable | detail/query page | none | 3/2/1 cols; RTL toolbar; results live region | Public server query only `LIVE` |
-| `/properties?...` | Filtered results | Any | Validated query params | Open property / remove chips | Same | update state | filter/sort failure retains results | new query URL | none | focus remains trigger | Reset page to 1 on changes |
-| mobile sheet | Mobile filters | Any | Draft filter state, facet count | Show count / Clear | Filter sheet | facet/count loading | count failure | apply and close | none | safe area, trap/restore, RTL | Discard on close without apply |
-| browse region | Empty results | Any | Zero result set | Clear filters / Browse all | Empty state | none | none | query reset | none | focus heading | Not an error status |
-| browse route | Marketplace error | Any | Safe error only | Retry / Home | Error panel | retrying | persistent failure | browse | none | focus heading | No raw errors |
-| `/properties/[publicId]/[slug]` | Property details | Any; live | Public projection only | Save/Share; owner Manage | Details shell, gallery, facts, investment | page skeleton | unavailable, partial images | stays/detail actions | none | gallery mobile; RTL mixed data | Canonical slug redirect; no internal UUID |
-| gallery modal | Full-screen gallery | Any; live projection loaded | Public photos only | Next/previous/close | Gallery modal | image loading | image fail | close returns focus | none | focus trap, swipe, RTL controls | No signed private URL |
-| detail section | Investment visible | Any; live + visible | Public metrics only | none | Investment panel | metric load with page | partial values | static | none | definition list; bidi values | Exclude private inputs |
-| detail section | Investment hidden | Any | No public data | none | none | none | none | section omitted | none | none | Do not reveal hidden existence |
-| card/detail | Save | Customer; other owner’s live listing | public ID + auth | Toggle save | Save button | saving/removing | failure/unavailable | saved/removed | save events | announce state; 44 px | Idempotent server mutation |
-| dialog/sheet | Anonymous Save | Anonymous | public ID + safe return | Sign in / Create, browse | Auth interception | none | intent expiry later | auth flow, return, save | none | modal semantics, RTL | Allowlist route; consume once |
-| `/saved-properties` | Saved empty | Customer | no saves | Browse | Empty state | saved skeleton | page failure | browse | none | focus heading | Protected route |
-| same | Saved populated | Customer | public projections for live saves | Open/remove | Saved grid/cards | skeleton | partial failure | detail/remove | save remove event | same grid | Most-recent-saved order |
-| same | Saved unavailable | Customer | relationship only; no private projection | Remove | Unavailable card | none | remove failure | removed | remove event | no broken link | Never show stale public details |
-| public detail | Owner view | Customer owner; live | public projection + owner boolean only | Manage / Share | Owner badge, Manage control | standard | unavailable | owner manage | none | owner label announced | Hide Save; no private data |
+| Route                           | Screen              | User / listing state                 | Entry / required data / privacy          | Primary / secondary                        | Components                                      | Loading / empty       | Errors                              | Success / transition    | Audit             | Responsive / RTL / accessibility             | Claude Code notes                         |
+| ------------------------------- | ------------------- | ------------------------------------ | ---------------------------------------- | ------------------------------------------ | ----------------------------------------------- | --------------------- | ----------------------------------- | ----------------------- | ----------------- | -------------------------------------------- | ----------------------------------------- |
+| `/properties`                   | Browse              | Anonymous/customer; only live        | Public facets and projections            | Search/open property / filters, sort, save | Shell, search, filters, count, grid, pagination | Full skeleton         | marketplace unavailable             | detail/query page       | none              | 3/2/1 cols; RTL toolbar; results live region | Public server query only `LIVE`           |
+| `/properties?...`               | Filtered results    | Any                                  | Validated query params                   | Open property / remove chips               | Same                                            | update state          | filter/sort failure retains results | new query URL           | none              | focus remains trigger                        | Reset page to 1 on changes                |
+| mobile sheet                    | Mobile filters      | Any                                  | Draft filter state, facet count          | Show count / Clear                         | Filter sheet                                    | facet/count loading   | count failure                       | apply and close         | none              | safe area, trap/restore, RTL                 | Discard on close without apply            |
+| browse region                   | Empty results       | Any                                  | Zero result set                          | Clear filters / Browse all                 | Empty state                                     | none                  | none                                | query reset             | none              | focus heading                                | Not an error status                       |
+| browse route                    | Marketplace error   | Any                                  | Safe error only                          | Retry / Home                               | Error panel                                     | retrying              | persistent failure                  | browse                  | none              | focus heading                                | No raw errors                             |
+| `/properties/[publicId]/[slug]` | Property details    | Any; live                            | Public projection only                   | Save/Share; owner Manage                   | Details shell, gallery, facts, investment       | page skeleton         | unavailable, partial images         | stays/detail actions    | none              | gallery mobile; RTL mixed data               | Canonical slug redirect; no internal UUID |
+| gallery modal                   | Full-screen gallery | Any; live projection loaded          | Public photos only                       | Next/previous/close                        | Gallery modal                                   | image loading         | image fail                          | close returns focus     | none              | focus trap, swipe, RTL controls              | No signed private URL                     |
+| detail section                  | Investment visible  | Any; live + visible                  | Public metrics only                      | none                                       | Investment panel                                | metric load with page | partial values                      | static                  | none              | definition list; bidi values                 | Exclude private inputs                    |
+| detail section                  | Investment hidden   | Any                                  | No public data                           | none                                       | none                                            | none                  | none                                | section omitted         | none              | none                                         | Do not reveal hidden existence            |
+| card/detail                     | Save                | Customer; other owner’s live listing | public ID + auth                         | Toggle save                                | Save button                                     | saving/removing       | failure/unavailable                 | saved/removed           | save events       | announce state; 44 px                        | Idempotent server mutation                |
+| dialog/sheet                    | Anonymous Save      | Anonymous                            | public ID + safe return                  | Sign in / Create, browse                   | Auth interception                               | none                  | intent expiry later                 | auth flow, return, save | none              | modal semantics, RTL                         | Allowlist route; consume once             |
+| `/saved-properties`             | Saved empty         | Customer                             | no saves                                 | Browse                                     | Empty state                                     | saved skeleton        | page failure                        | browse                  | none              | focus heading                                | Protected route                           |
+| same                            | Saved populated     | Customer                             | public projections for live saves        | Open/remove                                | Saved grid/cards                                | skeleton              | partial failure                     | detail/remove           | save remove event | same grid                                    | Most-recent-saved order                   |
+| same                            | Saved unavailable   | Customer                             | relationship only; no private projection | Remove                                     | Unavailable card                                | none                  | remove failure                      | removed                 | remove event      | no broken link                               | Never show stale public details           |
+| public detail                   | Owner view          | Customer owner; live                 | public projection + owner boolean only   | Manage / Share                             | Owner badge, Manage control                     | standard              | unavailable                         | owner manage            | none              | owner label announced                        | Hide Save; no private data                |
 
 ## 40.4 State transitions and publication rules
 
-| Action | Precondition | State/result |
-|---|---|---|
-| Submit publication | owner + ready + confirmation + no active pending | request `PENDING`; listing remains `READY_TO_PUBLISH` |
-| Approve demo review | request pending + projection valid + public photos ready | request `APPROVED_DEMO`; listing `LIVE` atomically |
-| Return demo review | request pending + safe failure | request `REJECTED_DEMO`; listing remains `READY_TO_PUBLISH` |
-| Pause | owner + `LIVE` | listing `PAUSED` |
-| Resume unchanged | owner + `PAUSED` + readiness/public assets valid | listing `LIVE` |
-| Material edit | owner + `LIVE` | require `Pause and edit`; listing rewinds as existing domain dictates |
-| Save | customer + other owner’s `LIVE` listing | saved relationship exists idempotently |
-| Remove save | saving customer | relationship absent idempotently |
+| Action              | Precondition                                             | State/result                                                          |
+| ------------------- | -------------------------------------------------------- | --------------------------------------------------------------------- |
+| Submit publication  | owner + ready + confirmation + no active pending         | request `PENDING`; listing remains `READY_TO_PUBLISH`                 |
+| Approve demo review | request pending + projection valid + public photos ready | request `APPROVED_DEMO`; listing `LIVE` atomically                    |
+| Return demo review  | request pending + safe failure                           | request `REJECTED_DEMO`; listing remains `READY_TO_PUBLISH`           |
+| Pause               | owner + `LIVE`                                           | listing `PAUSED`                                                      |
+| Resume unchanged    | owner + `PAUSED` + readiness/public assets valid         | listing `LIVE`                                                        |
+| Material edit       | owner + `LIVE`                                           | require `Pause and edit`; listing rewinds as existing domain dictates |
+| Save                | customer + other owner’s `LIVE` listing                  | saved relationship exists idempotently                                |
+| Remove save         | saving customer                                          | relationship absent idempotently                                      |
 
 ---
 
@@ -3377,25 +3434,25 @@ Use these labels in implementation tasks:
 
 All P0 mockups must be approved before engineering begins on the associated surface. P1 may proceed only after the shared components they depend on are approved. P2 is useful for polish and localisation validation.
 
-| Priority | Mockup | Viewport / user state / listing state | Key interaction | Why approval is required | Engineering must not invent |
-|---|---|---|---|---|---|
-| P0 | Marketplace browse | Desktop 1440; anonymous; multiple live listings | Search, primary filters, sort, card grid | Establishes public visual language and information density | Search/filter layout, card size, spacing, disclosure, pagination |
-| P0 | Property card states | Desktop component board; anonymous/authenticated/owner | Default, hover, focus, saved, image error, owner | Core reusable marketplace unit | Exact hierarchy, Save placement, owner badge, Investment indicator |
-| P0 | Property details | Desktop 1440; authenticated non-owner; live | Gallery, facts, Save/Share, content rail | Largest buyer-facing screen and Week 4 foundation | Gallery composition, content order, action rail, public disclosure |
-| P0 | Marketplace browse | Mobile 390; anonymous | Search, Filters, Sort, cards | Mobile is materially different from desktop | Mobile hierarchy, card density, action placement, pagination |
-| P0 | Mobile filters | Mobile 390; anonymous | Stage filters, count, apply/clear | High interaction and accessibility risk | Sheet structure, sticky bar, section order, range inputs |
-| P0 | Property details | Mobile 390; authenticated | Swipe gallery, sticky Save/Share | Defines core mobile browsing and future Offer slot | Gallery height, facts layout, sticky bar, section spacing |
-| P0 | Publication checklist | Desktop 1440; owner; ready | Public/private review, continue | Critical privacy and commitment surface | Checklist hierarchy, public/private treatment, edit links |
-| P0 | Publication pending | Desktop 1440; owner; request pending | Leave safely, understand processing | Must feel believable without fake official review | Simulation disclosure, stage treatment, actions, property context |
-| P0 | Listing live success | Desktop 1440; owner; live | View, copy link, manage | Connects private creation to public product | Success tone, cover/identity layout, action hierarchy |
-| P0 | Live-listing management | Desktop 1440; owner; live | View, copy, edit, pause | Defines seller control after publication | Saved count, dates, edit policy, action hierarchy |
-| P1 | Full-screen gallery | Desktop and mobile key frames; any viewer | Next/previous/close | Keyboard, touch, and visual behaviour require alignment | Controls, counter, thumbnail treatment, focus return |
-| P1 | Public Investment Case | Desktop detail section; live + visible | Read metrics/disclosure | High risk of trading-platform or misleading styling | Public metric set, typography, disclosure prominence |
-| P1 | Saved Properties | Desktop 1440; authenticated; live + unavailable saves | Remove saved item | Reuses cards but adds privacy-sensitive unavailable state | Grid order, unavailable card, remove feedback |
-| P1 | Anonymous sign-in interception | Desktop dialog + mobile sheet; anonymous | Sign in/create/close | Must preserve intent without feeling coercive | Copy, action order, modal size, return expectation |
-| P1 | Pause confirmation | Desktop dialog + mobile sheet; owner/live | Pause or cancel | Reversible but consequential action | Tone, retained-data explanation, neutral styling |
-| P2 | Arabic RTL marketplace | Desktop 1440; anonymous | Search/filter/card reading | Validates mixed Arabic/English and number direction | Mirroring, price direction, chips, official names |
-| P2 | Arabic RTL property details | Mobile 390 or desktop 1440; authenticated | Gallery/facts/sticky actions | Validates complex RTL content and action bar | Grid mirroring, bidi values, gallery controls, sticky actions |
+| Priority | Mockup                         | Viewport / user state / listing state                  | Key interaction                                  | Why approval is required                                   | Engineering must not invent                                        |
+| -------- | ------------------------------ | ------------------------------------------------------ | ------------------------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------ |
+| P0       | Marketplace browse             | Desktop 1440; anonymous; multiple live listings        | Search, primary filters, sort, card grid         | Establishes public visual language and information density | Search/filter layout, card size, spacing, disclosure, pagination   |
+| P0       | Property card states           | Desktop component board; anonymous/authenticated/owner | Default, hover, focus, saved, image error, owner | Core reusable marketplace unit                             | Exact hierarchy, Save placement, owner badge, Investment indicator |
+| P0       | Property details               | Desktop 1440; authenticated non-owner; live            | Gallery, facts, Save/Share, content rail         | Largest buyer-facing screen and Week 4 foundation          | Gallery composition, content order, action rail, public disclosure |
+| P0       | Marketplace browse             | Mobile 390; anonymous                                  | Search, Filters, Sort, cards                     | Mobile is materially different from desktop                | Mobile hierarchy, card density, action placement, pagination       |
+| P0       | Mobile filters                 | Mobile 390; anonymous                                  | Stage filters, count, apply/clear                | High interaction and accessibility risk                    | Sheet structure, sticky bar, section order, range inputs           |
+| P0       | Property details               | Mobile 390; authenticated                              | Swipe gallery, sticky Save/Share                 | Defines core mobile browsing and future Offer slot         | Gallery height, facts layout, sticky bar, section spacing          |
+| P0       | Publication checklist          | Desktop 1440; owner; ready                             | Public/private review, continue                  | Critical privacy and commitment surface                    | Checklist hierarchy, public/private treatment, edit links          |
+| P0       | Publication pending            | Desktop 1440; owner; request pending                   | Leave safely, understand processing              | Must feel believable without fake official review          | Simulation disclosure, stage treatment, actions, property context  |
+| P0       | Listing live success           | Desktop 1440; owner; live                              | View, copy link, manage                          | Connects private creation to public product                | Success tone, cover/identity layout, action hierarchy              |
+| P0       | Live-listing management        | Desktop 1440; owner; live                              | View, copy, edit, pause                          | Defines seller control after publication                   | Saved count, dates, edit policy, action hierarchy                  |
+| P1       | Full-screen gallery            | Desktop and mobile key frames; any viewer              | Next/previous/close                              | Keyboard, touch, and visual behaviour require alignment    | Controls, counter, thumbnail treatment, focus return               |
+| P1       | Public Investment Case         | Desktop detail section; live + visible                 | Read metrics/disclosure                          | High risk of trading-platform or misleading styling        | Public metric set, typography, disclosure prominence               |
+| P1       | Saved Properties               | Desktop 1440; authenticated; live + unavailable saves  | Remove saved item                                | Reuses cards but adds privacy-sensitive unavailable state  | Grid order, unavailable card, remove feedback                      |
+| P1       | Anonymous sign-in interception | Desktop dialog + mobile sheet; anonymous               | Sign in/create/close                             | Must preserve intent without feeling coercive              | Copy, action order, modal size, return expectation                 |
+| P1       | Pause confirmation             | Desktop dialog + mobile sheet; owner/live              | Pause or cancel                                  | Reversible but consequential action                        | Tone, retained-data explanation, neutral styling                   |
+| P2       | Arabic RTL marketplace         | Desktop 1440; anonymous                                | Search/filter/card reading                       | Validates mixed Arabic/English and number direction        | Mirroring, price direction, chips, official names                  |
+| P2       | Arabic RTL property details    | Mobile 390 or desktop 1440; authenticated              | Gallery/facts/sticky actions                     | Validates complex RTL content and action bar               | Grid mirroring, bidi values, gallery controls, sticky actions      |
 
 ## 41.1 Mockup approval order
 
@@ -3420,23 +3477,23 @@ Recommended sequence:
 
 The design is implementation-ready with the defaults below. Confirm these items before production rollout; engineering should use the specified default rather than inventing alternatives.
 
-| Decision | Specification default | Owner/review |
-|---|---|---|
-| Geographic heading | Derive `Properties in Dubai` while only Dubai data is supported; use UAE only when coverage exists | Product |
-| Public ID format | Opaque, non-sequential public ID separate from UUID | Architecture/security |
-| Canonical share domain | Current customer-web origin | Platform/product |
-| Public object caching/CDN | Use approved storage delivery architecture; do not expose private paths | Platform/security |
-| Direct public object access while paused | Public page/query hidden; storage policy/caching must prevent unintended continued exposure as architecture permits | Security/platform |
-| Saved count | Show aggregate to owner only | Product/privacy |
-| Live minor-edit list | Description, amenities, order, cover, investment visibility | Product |
-| Asking-price edit | Material; pause and republish | Product |
-| Similar properties | Optional, deterministic, may defer | Product |
-| Arabic copy | Draft only | Professional Arabic reviewer |
-| Investment disclosure Arabic | Draft only | Legal/compliance + Arabic reviewer |
-| Publication confirmation wording | Approved English direction; Arabic/legal review pending | Product/legal |
-| Demo review timing | Persisted pending; no fake countdown; deterministic service outcome | Engineering/demo owner |
-| Public photo failure cleanup | Remove/quarantine partial attempt before retry | Architecture/security |
-| SEO indexing | Routes are SEO-ready; indexing policy may remain off for prototype | Product/SEO |
+| Decision                                 | Specification default                                                                                               | Owner/review                       |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| Geographic heading                       | Derive `Properties in Dubai` while only Dubai data is supported; use UAE only when coverage exists                  | Product                            |
+| Public ID format                         | Opaque, non-sequential public ID separate from UUID                                                                 | Architecture/security              |
+| Canonical share domain                   | Current customer-web origin                                                                                         | Platform/product                   |
+| Public object caching/CDN                | Use approved storage delivery architecture; do not expose private paths                                             | Platform/security                  |
+| Direct public object access while paused | Public page/query hidden; storage policy/caching must prevent unintended continued exposure as architecture permits | Security/platform                  |
+| Saved count                              | Show aggregate to owner only                                                                                        | Product/privacy                    |
+| Live minor-edit list                     | Description, amenities, order, cover, investment visibility                                                         | Product                            |
+| Asking-price edit                        | Material; pause and republish                                                                                       | Product                            |
+| Similar properties                       | Optional, deterministic, may defer                                                                                  | Product                            |
+| Arabic copy                              | Draft only                                                                                                          | Professional Arabic reviewer       |
+| Investment disclosure Arabic             | Draft only                                                                                                          | Legal/compliance + Arabic reviewer |
+| Publication confirmation wording         | Approved English direction; Arabic/legal review pending                                                             | Product/legal                      |
+| Demo review timing                       | Persisted pending; no fake countdown; deterministic service outcome                                                 | Engineering/demo owner             |
+| Public photo failure cleanup             | Remove/quarantine partial attempt before retry                                                                      | Architecture/security              |
+| SEO indexing                             | Routes are SEO-ready; indexing policy may remain off for prototype                                                  | Product/SEO                        |
 
 ---
 

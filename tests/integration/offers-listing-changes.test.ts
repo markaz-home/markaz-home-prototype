@@ -60,7 +60,10 @@ d('pause + material-change behaviour (live DB)', () => {
     const tB = await createOffer(buyer2, listing, 810_000);
 
     // This is exactly what listing.pause runs (listing.ts calls close_listing_offers).
-    await asUser(seller, (tx) => tx`select public.close_listing_offers(${listing}::uuid, 'LISTING_PAUSED')`);
+    await asUser(
+      seller,
+      (tx) => tx`select public.close_listing_offers(${listing}::uuid, 'LISTING_PAUSED')`,
+    );
 
     expect((await threadRow(tA)).status).toBe('CLOSED_LISTING_UNAVAILABLE');
     expect((await threadRow(tB)).status).toBe('CLOSED_LISTING_UNAVAILABLE');
@@ -76,7 +79,12 @@ d('pause + material-change behaviour (live DB)', () => {
     // Closed threads are terminal — a later counter attempt is rejected (no silent reactivation).
     const t = await threadRow(tA);
     await expectError(
-      () => asUser(seller, (tx) => tx`select public.submit_counter(${tA}::uuid, 900000, null, ${t.version as number})`),
+      () =>
+        asUser(
+          seller,
+          (tx) =>
+            tx`select public.submit_counter(${tA}::uuid, 900000, null, ${t.version as number})`,
+        ),
       /NOT_ACTIONABLE/,
     );
   });
@@ -88,11 +96,18 @@ d('pause + material-change behaviour (live DB)', () => {
     expect(t.listing_version).toBe(1);
 
     // Simulate a material listing change after the offer was made.
-    await asService((tx: Sql) => tx`update public.listings set version = version + 1 where id = ${listing}`);
+    await asService(
+      (tx: Sql) => tx`update public.listings set version = version + 1 where id = ${listing}`,
+    );
 
     // The thread's snapshot (v1) no longer matches the listing (v2) → guarded.
     await expectError(
-      () => asUser(seller, (tx) => tx`select public.submit_counter(${threadId}::uuid, 720000, null, ${t.version as number})`),
+      () =>
+        asUser(
+          seller,
+          (tx) =>
+            tx`select public.submit_counter(${threadId}::uuid, 720000, null, ${t.version as number})`,
+        ),
       /LISTING_CHANGED/,
     );
   });
@@ -102,12 +117,16 @@ d('pause + material-change behaviour (live DB)', () => {
     const threadId = await createOffer(buyer1, listing, 700_000);
     const t = await threadRow(threadId);
 
-    await asService((tx: Sql) => tx`update public.listings set version = version + 1 where id = ${listing}`);
+    await asService(
+      (tx: Sql) => tx`update public.listings set version = version + 1 where id = ${listing}`,
+    );
 
     await expectError(
       () =>
-        asUser(seller, (tx) =>
-          tx`select public.accept_offer(${threadId}::uuid, ${t.current_proposal_id as string}::uuid, ${t.version as number})`,
+        asUser(
+          seller,
+          (tx) =>
+            tx`select public.accept_offer(${threadId}::uuid, ${t.current_proposal_id as string}::uuid, ${t.version as number})`,
         ),
       /LISTING_CHANGED/,
     );
@@ -117,7 +136,9 @@ d('pause + material-change behaviour (live DB)', () => {
 
   it('a paused (non-LIVE) listing blocks new offers entirely', async () => {
     const listing = await createLiveListing(seller, { minNotificationPrice: null });
-    await asService((tx: Sql) => tx`update public.listings set state = 'PAUSED' where id = ${listing}`);
+    await asService(
+      (tx: Sql) => tx`update public.listings set state = 'PAUSED' where id = ${listing}`,
+    );
     await expectError(() => createOffer(buyer1, listing, 500_000), /LISTING_UNAVAILABLE/);
   });
 });

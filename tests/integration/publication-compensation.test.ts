@@ -1,10 +1,19 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { sql } from 'drizzle-orm';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { appRouter, createCallerFactory, PublicationReviewService, type Context } from '@markaz/api';
+import {
+  appRouter,
+  createCallerFactory,
+  PublicationReviewService,
+  type Context,
+} from '@markaz/api';
 import { logger } from '@markaz/observability';
 import { withUserContext, getAppDb, closeConnections } from '@markaz/db';
-import { removePublicPhotos, clearPublicPhotoPaths, publicPhotoKey } from '@markaz/db/storage-admin';
+import {
+  removePublicPhotos,
+  clearPublicPhotoPaths,
+  publicPhotoKey,
+} from '@markaz/db/storage-admin';
 import { resolveDemoIds, type DemoIds } from './helpers';
 
 /**
@@ -19,19 +28,42 @@ let service: SupabaseClient | null = null;
 const created: string[] = [];
 const createCaller = createCallerFactory(appRouter);
 const callerFor = (userId: string) =>
-  createCaller({ db: getAppDb(), user: { id: userId, accountType: 'CUSTOMER' }, requestId: 'test', log: logger } as Context);
+  createCaller({
+    db: getAppDb(),
+    user: { id: userId, accountType: 'CUSTOMER' },
+    requestId: 'test',
+    log: logger,
+  } as Context);
 
-const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
+const PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+  'base64',
+);
 const VALID_DETAILS = {
-  propertyType: 'APARTMENT' as const, emirate: 'DUBAI' as const, community: 'Dubai Marina', buildingOrProject: 'Marina Gate 2',
-  unitIdentifier: 'Unit 7001', bedrooms: 2, bathrooms: 2, sizeSqft: 1200, furnishingStatus: 'FURNISHED' as const,
-  occupancyStatus: 'VACANT' as const, completionStatus: 'READY' as const, parkingSpaces: 1, description: 'C'.repeat(120), features: ['BALCONY' as const],
+  propertyType: 'APARTMENT' as const,
+  emirate: 'DUBAI' as const,
+  community: 'Dubai Marina',
+  buildingOrProject: 'Marina Gate 2',
+  unitIdentifier: 'Unit 7001',
+  bedrooms: 2,
+  bathrooms: 2,
+  sizeSqft: 1200,
+  furnishingStatus: 'FURNISHED' as const,
+  occupancyStatus: 'VACANT' as const,
+  completionStatus: 'READY' as const,
+  parkingSpaces: 1,
+  description: 'C'.repeat(120),
+  features: ['BALCONY' as const],
 };
 
 beforeAll(async () => {
   ids = await resolveDemoIds();
   if (!ids) return console.warn('[publication-compensation] Skipped — run `pnpm db:setup`.');
-  service = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
+  service = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } },
+  );
 });
 afterAll(async () => {
   if (ids) {
@@ -47,15 +79,25 @@ async function driveToReady(ownerId: string, photoCount: number): Promise<string
   const { listingId } = await a.listing.create();
   created.push(listingId);
   await a.listing.saveDetails({ listingId, ...VALID_DETAILS });
-  await a.listing.document.register({ listingId, documentType: 'TITLE_DEED', storagePath: `${ownerId}/${listingId}/doc.pdf` });
+  await a.listing.document.register({
+    listingId,
+    documentType: 'TITLE_DEED',
+    storagePath: `${ownerId}/${listingId}/doc.pdf`,
+  });
   await a.listing.verification.start({ listingId });
   await a.listing.verification.status({ listingId });
-  await a.listing.saveSettings({ listingId, askingPriceAed: 1_800_000, minNotificationPriceAed: 1_600_000 });
+  await a.listing.saveSettings({
+    listingId,
+    askingPriceAed: 1_800_000,
+    minNotificationPriceAed: 1_600_000,
+  });
   await a.listing.investment.skip({ listingId });
   await a.listing.formA.complete({ listingId, confirm: true });
   for (let i = 0; i < photoCount; i++) {
     const path = `${ownerId}/${listingId}/photo-${i}.png`;
-    await service!.storage.from('listing-photos-draft').upload(path, PNG, { contentType: 'image/png', upsert: true });
+    await service!.storage
+      .from('listing-photos-draft')
+      .upload(path, PNG, { contentType: 'image/png', upsert: true });
     await a.listing.photos.register({ listingId, storagePath: path, contentType: 'image/png' });
   }
   await a.listing.photos.complete({ listingId });
@@ -76,10 +118,21 @@ const submit = (listingId: string) =>
 
 async function snapshot(listingId: string) {
   const db = getAppDb();
-  const [l] = (await db.execute(sql`select state, public_id from public.listings where id = ${listingId}`)) as unknown as Array<{ state: string; public_id: string | null }>;
-  const photos = (await db.execute(sql`select public_path from public.property_photos where listing_id = ${listingId}`)) as unknown as Array<{ public_path: string | null }>;
-  const [r] = (await db.execute(sql`select status, outcome_category from public.listing_publication_requests where listing_id = ${listingId} and superseded_at is null order by created_at desc limit 1`)) as unknown as Array<{ status: string; outcome_category: string | null }>;
-  return { state: l?.state, publicId: l?.public_id, publicPaths: photos.map((p) => p.public_path), request: r };
+  const [l] = (await db.execute(
+    sql`select state, public_id from public.listings where id = ${listingId}`,
+  )) as unknown as Array<{ state: string; public_id: string | null }>;
+  const photos = (await db.execute(
+    sql`select public_path from public.property_photos where listing_id = ${listingId}`,
+  )) as unknown as Array<{ public_path: string | null }>;
+  const [r] = (await db.execute(
+    sql`select status, outcome_category from public.listing_publication_requests where listing_id = ${listingId} and superseded_at is null order by created_at desc limit 1`,
+  )) as unknown as Array<{ status: string; outcome_category: string | null }>;
+  return {
+    state: l?.state,
+    publicId: l?.public_id,
+    publicPaths: photos.map((p) => p.public_path),
+    request: r,
+  };
 }
 async function publicObjectCount(publicId: string): Promise<number> {
   const { data } = await service!.storage.from('listing-photos').list(publicId, { limit: 1000 });
@@ -142,7 +195,9 @@ describe('publication compensation + idempotency', () => {
     const after = await snapshot(listingId);
     expect(after.state).toBe('LIVE');
     expect(await publicObjectCount(after.publicId!)).toBe(2);
-    const reqCount = (await getAppDb().execute(sql`select count(*)::int as n from public.listing_publication_requests where listing_id = ${listingId} and superseded_at is null`)) as unknown as Array<{ n: number }>;
+    const reqCount = (await getAppDb().execute(
+      sql`select count(*)::int as n from public.listing_publication_requests where listing_id = ${listingId} and superseded_at is null`,
+    )) as unknown as Array<{ n: number }>;
     expect(Number(reqCount[0]?.n)).toBe(1); // one active request
     expect(after.publicId).toBe(before.publicId); // stable identity
   });
@@ -153,7 +208,9 @@ describe('publication compensation + idempotency', () => {
     await submit(listingId);
     await resolve(listingId);
     const s = await snapshot(listingId);
-    const photoRows = (await getAppDb().execute(sql`select id::text from public.property_photos where listing_id = ${listingId}`)) as unknown as Array<{ id: string }>;
+    const photoRows = (await getAppDb().execute(
+      sql`select id::text from public.property_photos where listing_id = ${listingId}`,
+    )) as unknown as Array<{ id: string }>;
     const keys = photoRows.map((p) => publicPhotoKey(s.publicId!, p.id));
     // Cleanup twice — must not throw and must be idempotent.
     await removePublicPhotos(keys);
@@ -163,6 +220,6 @@ describe('publication compensation + idempotency', () => {
     expect(await publicObjectCount(s.publicId!)).toBe(0);
     // An unrelated published listing's objects are untouched.
     const other = await service!.storage.from('listing-photos').list('demo/public', { limit: 10 });
-    expect((other.data?.length ?? 0)).toBeGreaterThan(0);
+    expect(other.data?.length ?? 0).toBeGreaterThan(0);
   });
 });

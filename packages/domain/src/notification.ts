@@ -70,15 +70,28 @@ export const notificationSchema = z.discriminatedUnion('kind', [
   ),
   z.object({ kind: z.literal('ACCOUNT_ACTIONS_RESTRICTED'), payload: z.object({}).passthrough() }),
   z.object({ kind: z.literal('ACCOUNT_ACTIONS_RESTORED'), payload: z.object({}).passthrough() }),
-  z.object({ kind: z.literal('LISTING_PAUSED_BY_ADMIN'), payload: z.object({ listingId: z.string().uuid() }) }),
-  z.object({ kind: z.literal('LISTING_RESUMED_BY_ADMIN'), payload: z.object({ listingId: z.string().uuid() }) }),
-  z.object({ kind: z.literal('TRANSACTION_MARKED_FAILED'), payload: transactionNotificationPayload }),
+  z.object({
+    kind: z.literal('LISTING_PAUSED_BY_ADMIN'),
+    payload: z.object({ listingId: z.string().uuid() }),
+  }),
+  z.object({
+    kind: z.literal('LISTING_RESUMED_BY_ADMIN'),
+    payload: z.object({ listingId: z.string().uuid() }),
+  }),
+  z.object({
+    kind: z.literal('TRANSACTION_MARKED_FAILED'),
+    payload: transactionNotificationPayload,
+  }),
 ]);
 
 export type ValidatedNotification = z.infer<typeof notificationSchema>;
 
 export interface SafeNotificationView {
-  kind: OfferNotificationKind | TransactionNotificationKind | AdminEffectNotificationKind | 'UNKNOWN';
+  kind:
+    | OfferNotificationKind
+    | TransactionNotificationKind
+    | AdminEffectNotificationKind
+    | 'UNKNOWN';
   threadId: string | null;
   transactionId: string | null;
   listingId: string | null;
@@ -91,8 +104,13 @@ export interface SafeNotificationView {
  */
 export function toSafeNotification(kind: string, payload: unknown): SafeNotificationView {
   const parsed = notificationSchema.safeParse({ kind, payload: payload ?? {} });
-  if (!parsed.success) return { kind: 'UNKNOWN', threadId: null, transactionId: null, listingId: null };
-  const p = parsed.data.payload as { threadId?: string; transactionId?: string; listingId?: string };
+  if (!parsed.success)
+    return { kind: 'UNKNOWN', threadId: null, transactionId: null, listingId: null };
+  const p = parsed.data.payload as {
+    threadId?: string;
+    transactionId?: string;
+    listingId?: string;
+  };
   return {
     kind: parsed.data.kind,
     threadId: p.threadId ?? null,

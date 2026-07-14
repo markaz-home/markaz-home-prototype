@@ -44,7 +44,12 @@ export const PURCHASE_ROUTES = ['CASH', 'FINANCING'] as const;
 export type PurchaseRoute = (typeof PURCHASE_ROUTES)[number];
 export const purchaseRouteSchema = z.enum(PURCHASE_ROUTES);
 
-export const FINANCING_STATUSES = ['NOT_STARTED', 'IN_PROGRESS', 'CONFIRMED_DEMO', 'UNABLE_TO_PROCEED'] as const;
+export const FINANCING_STATUSES = [
+  'NOT_STARTED',
+  'IN_PROGRESS',
+  'CONFIRMED_DEMO',
+  'UNABLE_TO_PROCEED',
+] as const;
 export type FinancingStatus = (typeof FINANCING_STATUSES)[number];
 export const financingStatusSchema = z.enum(FINANCING_STATUSES);
 
@@ -79,7 +84,11 @@ export function stageIndex(status: TransactionStatus): number {
   return idx >= 0 ? idx : 0;
 }
 
-export const TERMINAL_STATUSES: readonly TransactionStatus[] = ['COMPLETED_DEMO', 'CANCELLED', 'FAILED'];
+export const TERMINAL_STATUSES: readonly TransactionStatus[] = [
+  'COMPLETED_DEMO',
+  'CANCELLED',
+  'FAILED',
+];
 export function isTerminal(status: TransactionStatus): boolean {
   return TERMINAL_STATUSES.includes(status);
 }
@@ -101,7 +110,13 @@ export const TASK_CATALOGUE: readonly TaskMeta[] = [
   { code: 'BUYER_CONFIRM_DEPOSIT', stage: 'DEPOSIT', actor: 'BUYER', sequence: 20 },
   { code: 'BUYER_DOCUMENTS', stage: 'DOCUMENTS', actor: 'BUYER', sequence: 30 },
   { code: 'SELLER_DOCUMENTS', stage: 'DOCUMENTS', actor: 'SELLER', sequence: 31 },
-  { code: 'BUYER_FINANCING', stage: 'DOCUMENTS', actor: 'BUYER', sequence: 32, conditional: 'FINANCING' },
+  {
+    code: 'BUYER_FINANCING',
+    stage: 'DOCUMENTS',
+    actor: 'BUYER',
+    sequence: 32,
+    conditional: 'FINANCING',
+  },
   { code: 'BUYER_REVIEW_SUMMARY', stage: 'DOCUMENTS', actor: 'BUYER', sequence: 33 },
   { code: 'SELLER_REVIEW_SUMMARY', stage: 'DOCUMENTS', actor: 'SELLER', sequence: 34 },
   { code: 'DUE_DILIGENCE', stage: 'DUE_DILIGENCE', actor: 'SYSTEM', sequence: 40 },
@@ -141,7 +156,11 @@ export interface ProgressInput {
   required: boolean;
 }
 /** Completed required (non-skipped) tasks / all required (non-skipped) tasks. */
-export function computeProgress(tasks: ProgressInput[]): { completed: number; total: number; ratio: number } {
+export function computeProgress(tasks: ProgressInput[]): {
+  completed: number;
+  total: number;
+  ratio: number;
+} {
   const relevant = tasks.filter((t) => t.required && t.status !== 'SKIPPED');
   const total = relevant.length;
   const completed = relevant.filter((t) => t.status === 'COMPLETED_DEMO').length;
@@ -215,7 +234,10 @@ export function transactionStatusKey(status: TransactionStatus): string {
 
 // ---- Cancellation policy ---------------------------------------------------
 /** Unilateral (immediate) cancellation only while pre-deposit and before both confirm (spec §30.2). */
-export function canCancelUnilaterally(status: TransactionStatus, bothDetailsConfirmed: boolean): boolean {
+export function canCancelUnilaterally(
+  status: TransactionStatus,
+  bothDetailsConfirmed: boolean,
+): boolean {
   return (status === 'INITIATED' || status === 'CONFIRMATION') && !bothDetailsConfirmed;
 }
 

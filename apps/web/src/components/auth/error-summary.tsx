@@ -16,10 +16,10 @@ export function ErrorSummary({ errors }: { errors: { id: string; message: string
       ref={ref}
       tabIndex={-1}
       role="alert"
-      className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm"
+      className="border-destructive/40 bg-destructive/10 rounded-md border p-4 text-sm"
     >
       <p className="flex items-center gap-2 font-medium">
-        <AlertCircle className="h-4 w-4 text-destructive" aria-hidden />
+        <AlertCircle className="text-destructive h-4 w-4" aria-hidden />
         {t('errorSummaryTitle')}
       </p>
       <ul className="mt-2 list-inside list-disc space-y-1">

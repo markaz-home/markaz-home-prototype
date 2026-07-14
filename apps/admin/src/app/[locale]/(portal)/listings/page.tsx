@@ -9,7 +9,9 @@ import { SearchBox } from '@/components/admin/search';
 import { listingStateLabel, formatWhen } from '@/components/admin/labels';
 
 const LIMIT = 25;
-type Row = Awaited<ReturnType<Awaited<ReturnType<typeof getServerApi>>['admin']['listings']['list']>>[number];
+type Row = Awaited<
+  ReturnType<Awaited<ReturnType<typeof getServerApi>>['admin']['listings']['list']>
+>[number];
 
 export default async function ListingsPage({
   params,
@@ -37,19 +39,47 @@ export default async function ListingsPage({
 
   const columns: Column<Row>[] = [
     { id: 'title', header: t('listings.col.title'), priority: 'primary', cell: (r) => r.title },
-    { id: 'reference', header: t('listings.col.reference'), priority: 'secondary', cell: (r) => <span dir="ltr" className="font-mono text-xs">{r.publicId ?? '—'}</span> },
-    { id: 'state', header: t('listings.col.state'), priority: 'secondary', cell: (r) => {
-      const s = listingStateLabel(r.state);
-      return <StatusBadge tone={s.tone} label={t(s.key)} />;
-    } },
-    { id: 'location', header: t('listings.col.location'), priority: 'low', cell: (r) => [r.community, r.emirate].filter(Boolean).join(', ') || '—' },
-    { id: 'activity', header: t('listings.col.activity'), priority: 'low', cell: (r) => formatWhen(r.updatedAt) },
+    {
+      id: 'reference',
+      header: t('listings.col.reference'),
+      priority: 'secondary',
+      cell: (r) => (
+        <span dir="ltr" className="font-mono text-xs">
+          {r.publicId ?? '—'}
+        </span>
+      ),
+    },
+    {
+      id: 'state',
+      header: t('listings.col.state'),
+      priority: 'secondary',
+      cell: (r) => {
+        const s = listingStateLabel(r.state);
+        return <StatusBadge tone={s.tone} label={t(s.key)} />;
+      },
+    },
+    {
+      id: 'location',
+      header: t('listings.col.location'),
+      priority: 'low',
+      cell: (r) => [r.community, r.emirate].filter(Boolean).join(', ') || '—',
+    },
+    {
+      id: 'activity',
+      header: t('listings.col.activity'),
+      priority: 'low',
+      cell: (r) => formatWhen(r.updatedAt),
+    },
   ];
 
   return (
     <PageShell maxWidth={1600}>
       <PageHeader title={t('listings.title')} description={t('listings.description')} />
-      {failed ? <Alert variant="warning" className="mb-4">{t('overview.partialError')}</Alert> : null}
+      {failed ? (
+        <Alert variant="warning" className="mb-4">
+          {t('overview.partialError')}
+        </Alert>
+      ) : null}
       <div className="mb-4 flex justify-end">
         <SearchBox placeholder={t('listings.searchPlaceholder')} />
       </div>
@@ -57,7 +87,13 @@ export default async function ListingsPage({
         <EmptyState title={t('listings.empty')} />
       ) : (
         <>
-          <DataTable columns={columns} rows={rows} rowKey={(r) => r.id} rowHref={(r) => `/listings/${r.id}`} caption={t('listings.title')} />
+          <DataTable
+            columns={columns}
+            rows={rows}
+            rowKey={(r) => r.id}
+            rowHref={(r) => `/listings/${r.id}`}
+            caption={t('listings.title')}
+          />
           <div className="mt-4">
             <ListPagination
               pathname="/listings"
@@ -65,7 +101,11 @@ export default async function ListingsPage({
               offset={offset}
               limit={LIMIT}
               count={rows.length}
-              labels={{ prev: t('prev'), next: t('next'), range: t('paginationRange', { from: offset + 1, to: offset + rows.length }) }}
+              labels={{
+                prev: t('prev'),
+                next: t('next'),
+                range: t('paginationRange', { from: offset + 1, to: offset + rows.length }),
+              }}
             />
           </div>
         </>

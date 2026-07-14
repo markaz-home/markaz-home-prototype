@@ -31,7 +31,8 @@ export function PublicationStatus({ listingId }: { listingId: string }) {
   }, [data, status]);
 
   if (status.isLoading) return <Skeleton className="h-80 w-full" />;
-  if (status.isError || !data) return <Alert variant="destructive">{t('processingErrorBody')}</Alert>;
+  if (status.isError || !data)
+    return <Alert variant="destructive">{t('processingErrorBody')}</Alert>;
 
   const publicHref = data.publicId ? `/properties/${data.publicId}/${data.slug ?? ''}` : null;
 
@@ -56,20 +57,30 @@ export function PublicationStatus({ listingId }: { listingId: string }) {
       <Wrapper>
         <Badge variant="success">{t('liveStatus')}</Badge>
         <div className="flex items-start gap-3">
-          <CheckCircle2 className="mt-1 h-6 w-6 text-success" aria-hidden />
+          <CheckCircle2 className="text-success mt-1 h-6 w-6" aria-hidden />
           <div>
             <h1 className="font-display text-3xl font-semibold">{t('liveTitle')}</h1>
-            <p className="mt-2 text-muted-foreground">{t('liveBody')}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{t('liveSupporting')}</p>
+            <p className="text-muted-foreground mt-2">{t('liveBody')}</p>
+            <p className="text-muted-foreground mt-1 text-sm">{t('liveSupporting')}</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Button asChild><Link href={publicHref!}>{t('viewLive')}</Link></Button>
-          <Button variant="outline" onClick={copyLink}>{tp('copyLink')}</Button>
-          <Button asChild variant="outline"><Link href={`/sell/listings/${listingId}/manage`}>{t('manage')}</Link></Button>
-          <Button asChild variant="ghost"><Link href="/sell">{t('returnToListings')}</Link></Button>
+          <Button asChild>
+            <Link href={publicHref!}>{t('viewLive')}</Link>
+          </Button>
+          <Button variant="outline" onClick={copyLink}>
+            {tp('copyLink')}
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={`/sell/listings/${listingId}/manage`}>{t('manage')}</Link>
+          </Button>
+          <Button asChild variant="ghost">
+            <Link href="/sell">{t('returnToListings')}</Link>
+          </Button>
         </div>
-        <Alert><p className="text-sm text-muted-foreground">{t('liveSimNote')}</p></Alert>
+        <Alert>
+          <p className="text-muted-foreground text-sm">{t('liveSimNote')}</p>
+        </Alert>
       </Wrapper>
     );
   }
@@ -84,8 +95,12 @@ export function PublicationStatus({ listingId }: { listingId: string }) {
           <h1 className="font-display text-2xl font-semibold">{t('returnedTitle')}</h1>
           <p className="text-muted-foreground">{t('photoFailure')}</p>
           <div className="flex flex-wrap gap-3">
-            <Button onClick={onRetry} loading={retry.isPending}>{t('retry')}</Button>
-            <Button asChild variant="outline"><Link href={`/sell/listings/${listingId}/photos`}>{t('reviewPhotographs')}</Link></Button>
+            <Button onClick={onRetry} loading={retry.isPending}>
+              {t('retry')}
+            </Button>
+            <Button asChild variant="outline">
+              <Link href={`/sell/listings/${listingId}/photos`}>{t('reviewPhotographs')}</Link>
+            </Button>
           </div>
         </Wrapper>
       );
@@ -96,8 +111,12 @@ export function PublicationStatus({ listingId }: { listingId: string }) {
           <h1 className="font-display text-2xl font-semibold">{t('processingErrorTitle')}</h1>
           <p className="text-muted-foreground">{t('processingErrorBody')}</p>
           <div className="flex flex-wrap gap-3">
-            <Button onClick={onRetry} loading={retry.isPending}>{t('retry')}</Button>
-            <Button asChild variant="ghost"><Link href="/sell">{t('returnToListings')}</Link></Button>
+            <Button onClick={onRetry} loading={retry.isPending}>
+              {t('retry')}
+            </Button>
+            <Button asChild variant="ghost">
+              <Link href="/sell">{t('returnToListings')}</Link>
+            </Button>
           </div>
         </Wrapper>
       );
@@ -108,11 +127,19 @@ export function PublicationStatus({ listingId }: { listingId: string }) {
         <Badge variant="warning">{t('returnedChip')}</Badge>
         <h1 className="font-display text-2xl font-semibold">{t('returnedTitle')}</h1>
         <p className="text-muted-foreground">{t('returnedBody')}</p>
-        <Alert><p className="text-sm">{t(reasonKey)}</p></Alert>
+        <Alert>
+          <p className="text-sm">{t(reasonKey)}</p>
+        </Alert>
         <div className="flex flex-wrap gap-3">
-          <Button asChild><Link href={`/sell/listings/${listingId}`}>{t('reviewListing')}</Link></Button>
-          <Button variant="outline" onClick={onRetry} loading={retry.isPending}>{t('retry')}</Button>
-          <Button asChild variant="ghost"><Link href="/sell">{t('returnToListings')}</Link></Button>
+          <Button asChild>
+            <Link href={`/sell/listings/${listingId}`}>{t('reviewListing')}</Link>
+          </Button>
+          <Button variant="outline" onClick={onRetry} loading={retry.isPending}>
+            {t('retry')}
+          </Button>
+          <Button asChild variant="ghost">
+            <Link href="/sell">{t('returnToListings')}</Link>
+          </Button>
         </div>
       </Wrapper>
     );
@@ -124,22 +151,33 @@ export function PublicationStatus({ listingId }: { listingId: string }) {
     <Wrapper>
       <Badge variant="outline">{approved ? t('approvedStatus') : t('pendingStatus')}</Badge>
       <div className="flex items-start gap-3">
-        <Loader2 className="mt-1 h-6 w-6 animate-spin text-primary motion-reduce:animate-none" aria-hidden />
+        <Loader2
+          className="text-primary mt-1 h-6 w-6 animate-spin motion-reduce:animate-none"
+          aria-hidden
+        />
         <div>
-          <h1 className="font-display text-2xl font-semibold">{approved ? t('approvedTitle') : t('pendingTitle')}</h1>
-          <p className="mt-2 text-muted-foreground">{approved ? t('approvedBody') : t('pendingBody')}</p>
+          <h1 className="font-display text-2xl font-semibold">
+            {approved ? t('approvedTitle') : t('pendingTitle')}
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            {approved ? t('approvedBody') : t('pendingBody')}
+          </p>
         </div>
       </div>
       <Card>
-        <CardContent className="space-y-2 pt-6 text-sm text-muted-foreground">
+        <CardContent className="text-muted-foreground space-y-2 pt-6 text-sm">
           <p>1 · {t('stage1')}</p>
           <p>2 · {t('stage2')}</p>
           <p>3 · {t('stage3')}</p>
         </CardContent>
       </Card>
       <div className="flex flex-wrap gap-3">
-        <Button variant="outline" onClick={() => status.refetch()}>{t('viewStatus')}</Button>
-        <Button asChild variant="ghost"><Link href="/sell">{t('returnToListings')}</Link></Button>
+        <Button variant="outline" onClick={() => status.refetch()}>
+          {t('viewStatus')}
+        </Button>
+        <Button asChild variant="ghost">
+          <Link href="/sell">{t('returnToListings')}</Link>
+        </Button>
       </div>
     </Wrapper>
   );

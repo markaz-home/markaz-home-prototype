@@ -13,11 +13,14 @@ export async function acceptedThread(
     return (t as { id: string }).id;
   });
   const meta = await asService(
-    (tx: Sql) => tx`select current_proposal_id, version from public.offer_threads where id = ${threadId}`,
+    (tx: Sql) =>
+      tx`select current_proposal_id, version from public.offer_threads where id = ${threadId}`,
   );
   const m = meta[0] as { current_proposal_id: string; version: number };
-  await asUser(seller, (tx) =>
-    tx`select public.accept_offer(${threadId}::uuid, ${m.current_proposal_id}::uuid, ${m.version})`,
+  await asUser(
+    seller,
+    (tx) =>
+      tx`select public.accept_offer(${threadId}::uuid, ${m.current_proposal_id}::uuid, ${m.version})`,
   );
   return threadId;
 }
@@ -32,7 +35,10 @@ export async function txRow(id: string): Promise<Record<string, any>> {
 /** Call a transaction function that returns the transactions row; returns the fresh row.
  * The generic is unconstrained so the postgres tagged-template overloads resolve
  * naturally (a declared array return type breaks that resolution). */
-export async function callTx<T>(userId: string, fnCall: (tx: Sql) => Promise<T>): Promise<Record<string, any>> {
+export async function callTx<T>(
+  userId: string,
+  fnCall: (tx: Sql) => Promise<T>,
+): Promise<Record<string, any>> {
   const rows = (await asUser(userId, fnCall)) as unknown as Record<string, any>[];
   return rows[0] as Record<string, any>;
 }

@@ -27,13 +27,17 @@ import {
 } from '../transaction-projection';
 import type { Tx } from '@markaz/db';
 
-const versioned = z.object({ transactionId: z.string().uuid(), expectedVersion: z.number().int().min(0) });
+const versioned = z.object({
+  transactionId: z.string().uuid(),
+  expectedVersion: z.number().int().min(0),
+});
 
 /** Map SECURITY DEFINER exceptions to safe typed tRPC errors. */
 function mapTxError(e: unknown): never {
   const msg = e instanceof Error ? e.message : String(e);
   const code = (m: string) => msg.includes(m);
-  if (code('AUTH_REQUIRED')) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'AUTH_REQUIRED' });
+  if (code('AUTH_REQUIRED'))
+    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'AUTH_REQUIRED' });
   if (code('NOT_FOUND')) throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_FOUND' });
   if (code('STALE') || code('23505')) throw new TRPCError({ code: 'CONFLICT', message: 'STALE' });
   if (code('NOT_YOUR_TASK') || code('insufficient_privilege') || code('permission denied'))
@@ -60,7 +64,11 @@ async function propertyFor(tx: Tx, listingId: string): Promise<TxPropertyJson | 
 }
 
 async function loadTransaction(tx: Tx, transactionId: string): Promise<TxRow | null> {
-  const [row] = await tx.select().from(transactions).where(eq(transactions.id, transactionId)).limit(1);
+  const [row] = await tx
+    .select()
+    .from(transactions)
+    .where(eq(transactions.id, transactionId))
+    .limit(1);
   return (row as unknown as TxRow) ?? null;
 }
 
@@ -70,7 +78,9 @@ export const transactionsRouter = router({
     .input(z.object({ offerThreadId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       try {
-        const r = await ctx.tx.execute(sql`select id from public.ensure_transaction(${input.offerThreadId}::uuid)`);
+        const r = await ctx.tx.execute(
+          sql`select id from public.ensure_transaction(${input.offerThreadId}::uuid)`,
+        );
         const id = (r as unknown as Array<{ id: string }>)[0]?.id;
         if (!id) throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_FOUND' });
         return { transactionId: id };
@@ -85,49 +95,81 @@ export const transactionsRouter = router({
     const rows = (await ctx.tx
       .select()
       .from(transactions)
-      .where(or(eq(transactions.buyerUserId, ctx.user.id), eq(transactions.sellerUserId, ctx.user.id)))
+      .where(
+        or(eq(transactions.buyerUserId, ctx.user.id), eq(transactions.sellerUserId, ctx.user.id)),
+      )
       .orderBy(desc(transactions.updatedAt))) as unknown as TxRow[];
     if (rows.length === 0) return [];
     const ids = rows.map((r) => r.id);
     const tasks = (await ctx.tx
       .select()
       .from(transactionTasks)
-      .where(inArray(transactionTasks.transactionId, ids))) as unknown as (TaskRow & { transactionId: string })[];
+      .where(inArray(transactionTasks.transactionId, ids))) as unknown as (TaskRow & {
+      transactionId: string;
+    })[];
     const out = [];
     for (const row of rows) {
-      const property = await propertyFor(ctx.tx, (row as unknown as { listingId: string }).listingId);
-      out.push(toTransactionListItem(row, ctx.user.id, property, tasks.filter((t) => t.transactionId === row.id)));
+      const property = await propertyFor(
+        ctx.tx,
+        (row as unknown as { listingId: string }).listingId,
+      );
+      out.push(
+        toTransactionListItem(
+          row,
+          ctx.user.id,
+          property,
+          tasks.filter((t) => t.transactionId === row.id),
+        ),
+      );
     }
     return out;
   }),
 
   /** Full perspective-aware workspace detail. Missing == forbidden (safe copy). */
-  get: customerProcedure.input(z.object({ transactionId: z.string().uuid() })).query(async ({ ctx, input }) => {
-    const row = await loadTransaction(ctx.tx, input.transactionId);
-    if (!row) throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_AVAILABLE' });
-    const listingId = (row as unknown as { listingId: string }).listingId;
-    const [tasks, events, docs, property] = await Promise.all([
-      ctx.tx.select().from(transactionTasks).where(eq(transactionTasks.transactionId, row.id)).orderBy(transactionTasks.sequence),
-      ctx.tx.select().from(transactionEvents).where(eq(transactionEvents.transactionId, row.id)).orderBy(transactionEvents.createdAt),
-      ctx.tx.select().from(transactionDocuments).where(eq(transactionDocuments.transactionId, row.id)),
-      propertyFor(ctx.tx, listingId),
-    ]);
-    const allDocs = docs as unknown as { uploadedBy: string }[];
-    return toTransactionDetail({
-      row,
-      userId: ctx.user.id,
-      property,
-      tasks: tasks as unknown as TaskRow[],
-      events: events as never,
-      ownDocuments: allDocs.filter((d) => d.uploadedBy === ctx.user.id) as never,
-      otherDocuments: allDocs.filter((d) => d.uploadedBy !== ctx.user.id) as never,
-    });
-  }),
+  get: customerProcedure
+    .input(z.object({ transactionId: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      const row = await loadTransaction(ctx.tx, input.transactionId);
+      if (!row) throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_AVAILABLE' });
+      const listingId = (row as unknown as { listingId: string }).listingId;
+      const [tasks, events, docs, property] = await Promise.all([
+        ctx.tx
+          .select()
+          .from(transactionTasks)
+          .where(eq(transactionTasks.transactionId, row.id))
+          .orderBy(transactionTasks.sequence),
+        ctx.tx
+          .select()
+          .from(transactionEvents)
+          .where(eq(transactionEvents.transactionId, row.id))
+          .orderBy(transactionEvents.createdAt),
+        ctx.tx
+          .select()
+          .from(transactionDocuments)
+          .where(eq(transactionDocuments.transactionId, row.id)),
+        propertyFor(ctx.tx, listingId),
+      ]);
+      const allDocs = docs as unknown as { uploadedBy: string }[];
+      return toTransactionDetail({
+        row,
+        userId: ctx.user.id,
+        property,
+        tasks: tasks as unknown as TaskRow[],
+        events: events as never,
+        ownDocuments: allDocs.filter((d) => d.uploadedBy === ctx.user.id) as never,
+        otherDocuments: allDocs.filter((d) => d.uploadedBy !== ctx.user.id) as never,
+      });
+    }),
 
   /** Bell/nav badge — transactions needing this user's action (authoritative task state). */
   getActionCounts: customerProcedure.query(async ({ ctx }) => {
     const rows = (await ctx.tx
-      .select({ status: transactions.status, nextActor: transactions.nextActor, buyer: transactions.buyerUserId, seller: transactions.sellerUserId })
+      .select({
+        status: transactions.status,
+        nextActor: transactions.nextActor,
+        buyer: transactions.buyerUserId,
+        seller: transactions.sellerUserId,
+      })
       .from(transactions)
       .where(
         and(
@@ -145,14 +187,18 @@ export const transactionsRouter = router({
   }),
 
   // ---- Mutations (thin wrappers over the SECURITY DEFINER state engine) -----
-  confirmDetails: customerProcedure.input(versioned).mutation(({ ctx, input }) =>
-    runTask(ctx, input, 'CONFIRM_DETAILS'),
-  ),
-  reviewSummary: customerProcedure.input(versioned).mutation(({ ctx, input }) => runTask(ctx, input, 'REVIEW_SUMMARY')),
-  confirmReadiness: customerProcedure.input(versioned).mutation(({ ctx, input }) =>
-    runTask(ctx, input, 'CONFIRM_READINESS'),
-  ),
-  markDocumentsComplete: customerProcedure.input(versioned).mutation(({ ctx, input }) => runTask(ctx, input, 'DOCUMENTS')),
+  confirmDetails: customerProcedure
+    .input(versioned)
+    .mutation(({ ctx, input }) => runTask(ctx, input, 'CONFIRM_DETAILS')),
+  reviewSummary: customerProcedure
+    .input(versioned)
+    .mutation(({ ctx, input }) => runTask(ctx, input, 'REVIEW_SUMMARY')),
+  confirmReadiness: customerProcedure
+    .input(versioned)
+    .mutation(({ ctx, input }) => runTask(ctx, input, 'CONFIRM_READINESS')),
+  markDocumentsComplete: customerProcedure
+    .input(versioned)
+    .mutation(({ ctx, input }) => runTask(ctx, input, 'DOCUMENTS')),
 
   selectRoute: customerProcedure
     .input(versioned.extend({ route: purchaseRouteSchema }))
@@ -180,7 +226,9 @@ export const transactionsRouter = router({
     }),
   confirmDeposit: customerProcedure.input(versioned).mutation(async ({ ctx, input }) => {
     try {
-      await ctx.tx.execute(sql`select public.tx_confirm_deposit(${input.transactionId}::uuid, ${input.expectedVersion})`);
+      await ctx.tx.execute(
+        sql`select public.tx_confirm_deposit(${input.transactionId}::uuid, ${input.expectedVersion})`,
+      );
       return { ok: true as const };
     } catch (e) {
       mapTxError(e);
@@ -188,7 +236,9 @@ export const transactionsRouter = router({
   }),
   runDueDiligence: customerProcedure.input(versioned).mutation(async ({ ctx, input }) => {
     try {
-      await ctx.tx.execute(sql`select public.tx_run_due_diligence(${input.transactionId}::uuid, ${input.expectedVersion})`);
+      await ctx.tx.execute(
+        sql`select public.tx_run_due_diligence(${input.transactionId}::uuid, ${input.expectedVersion})`,
+      );
       return { ok: true as const };
     } catch (e) {
       mapTxError(e);
@@ -208,7 +258,9 @@ export const transactionsRouter = router({
     }),
   createAppointment: customerProcedure.input(versioned).mutation(async ({ ctx, input }) => {
     try {
-      await ctx.tx.execute(sql`select public.tx_create_appointment(${input.transactionId}::uuid, ${input.expectedVersion})`);
+      await ctx.tx.execute(
+        sql`select public.tx_create_appointment(${input.transactionId}::uuid, ${input.expectedVersion})`,
+      );
       return { ok: true as const };
     } catch (e) {
       mapTxError(e);
@@ -216,7 +268,9 @@ export const transactionsRouter = router({
   }),
   confirmCompletion: customerProcedure.input(versioned).mutation(async ({ ctx, input }) => {
     try {
-      await ctx.tx.execute(sql`select public.tx_confirm_completion(${input.transactionId}::uuid, ${input.expectedVersion})`);
+      await ctx.tx.execute(
+        sql`select public.tx_confirm_completion(${input.transactionId}::uuid, ${input.expectedVersion})`,
+      );
       return { ok: true as const };
     } catch (e) {
       mapTxError(e);
@@ -281,11 +335,15 @@ export const transactionsRouter = router({
     .mutation(async ({ ctx, input }) => {
       // Read the path under RLS (uploader-only) before deleting the object.
       const [doc] = (await ctx.tx
-        .select({ path: transactionDocuments.storagePath, uploader: transactionDocuments.uploadedBy })
+        .select({
+          path: transactionDocuments.storagePath,
+          uploader: transactionDocuments.uploadedBy,
+        })
         .from(transactionDocuments)
         .where(eq(transactionDocuments.id, input.documentId))
         .limit(1)) as { path: string; uploader: string }[];
-      if (!doc || doc.uploader !== ctx.user.id) throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_FOUND' });
+      if (!doc || doc.uploader !== ctx.user.id)
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_FOUND' });
       try {
         await ctx.tx.execute(
           sql`select public.tx_remove_document(${input.transactionId}::uuid, ${input.documentId}::uuid)`,
@@ -301,14 +359,19 @@ export const transactionsRouter = router({
     .query(async ({ ctx, input }) => {
       // RLS: a participant can only read their OWN document rows.
       const [doc] = (await ctx.tx
-        .select({ path: transactionDocuments.storagePath, uploader: transactionDocuments.uploadedBy, status: transactionDocuments.status })
+        .select({
+          path: transactionDocuments.storagePath,
+          uploader: transactionDocuments.uploadedBy,
+          status: transactionDocuments.status,
+        })
         .from(transactionDocuments)
         .where(eq(transactionDocuments.id, input.documentId))
         .limit(1)) as { path: string; uploader: string; status: string }[];
       if (!doc || doc.uploader !== ctx.user.id || doc.status === 'REMOVED')
         throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_AVAILABLE' });
       const url = await transactionDocumentSignedUrl(doc.path, 60);
-      if (!url) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'SIGNED_URL_FAILED' });
+      if (!url)
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'SIGNED_URL_FAILED' });
       return { url };
     }),
 });

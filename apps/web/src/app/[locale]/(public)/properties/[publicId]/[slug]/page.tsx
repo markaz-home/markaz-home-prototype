@@ -16,7 +16,10 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const detail = await api.marketplace.getByPublicId({ publicId }).catch(() => null);
   const t = await getTranslations({ locale, namespace: 'error' });
   if (!detail) return { title: t('propertyTitle') };
-  return { title: `${detail.headline} · MARKAZ Home`, description: detail.description ?? undefined };
+  return {
+    title: `${detail.headline} · MARKAZ Home`,
+    description: detail.description ?? undefined,
+  };
 }
 
 export default async function PropertyDetailPage({ params }: PageParams) {
@@ -31,7 +34,7 @@ export default async function PropertyDetailPage({ params }: PageParams) {
     return (
       <div className="container max-w-xl py-20 text-center">
         <h1 className="font-display text-2xl font-semibold">{t('propertyTitle')}</h1>
-        <p className="mt-3 text-muted-foreground">{t('propertyBody')}</p>
+        <p className="text-muted-foreground mt-3">{t('propertyBody')}</p>
         <Button asChild className="mt-6">
           <Link href="/properties">{te('browseAll')}</Link>
         </Button>
@@ -42,7 +45,9 @@ export default async function PropertyDetailPage({ params }: PageParams) {
   const session = await getSession();
   let initialSaved = false;
   if (session) {
-    initialSaved = (await api.marketplace.saved.isSaved({ publicId }).catch(() => ({ saved: false }))).saved;
+    initialSaved = (
+      await api.marketplace.saved.isSaved({ publicId }).catch(() => ({ saved: false }))
+    ).saved;
   }
 
   return <PropertyDetail detail={detail} isAuthenticated={!!session} initialSaved={initialSaved} />;

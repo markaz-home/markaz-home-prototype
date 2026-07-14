@@ -14,7 +14,8 @@ import { AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
 import { trpc } from '@/trpc/react';
 
 const RESEND_SECONDS = 60;
-const mmss = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+const mmss = (s: number) =>
+  `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
 export function VerifyEmailForm() {
   const t = useTranslations('verify');
@@ -99,7 +100,13 @@ export function VerifyEmailForm() {
             <span id="code-label" className="text-sm font-medium">
               {t('codeLabel')}
             </span>
-            <OtpInput value={code} onChange={setCode} ariaLabel={t('codeLabel')} invalid={!!error} disabled={busy} />
+            <OtpInput
+              value={code}
+              onChange={setCode}
+              ariaLabel={t('codeLabel')}
+              invalid={!!error}
+              disabled={busy}
+            />
           </div>
           <Button type="submit" className="w-full" loading={busy}>
             {busy ? t('submitting') : t('submit')}
@@ -119,7 +126,7 @@ export function VerifyEmailForm() {
             {resendIn > 0 ? t('resendIn', { time: mmss(resendIn) }) : t('resend')}
           </button>
         </div>
-        <p className="text-xs text-muted-foreground">{t('help')}</p>
+        <p className="text-muted-foreground text-xs">{t('help')}</p>
       </div>
     </AuthShell>
   );

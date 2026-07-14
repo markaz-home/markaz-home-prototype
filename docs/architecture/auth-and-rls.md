@@ -127,31 +127,31 @@ Companion contexts:
 
 ## tRPC procedure tiers
 
-| Procedure | Requires | Context helper |
-| --- | --- | --- |
-| `protectedProcedure` | any authenticated account | `withUserContext` |
-| `customerProcedure` | `account_type === 'CUSTOMER'` | `withUserContext` |
-| `adminProcedure` | `account_type === 'ADMIN'` | `withUserContext` |
+| Procedure            | Requires                      | Context helper    |
+| -------------------- | ----------------------------- | ----------------- |
+| `protectedProcedure` | any authenticated account     | `withUserContext` |
+| `customerProcedure`  | `account_type === 'CUSTOMER'` | `withUserContext` |
+| `adminProcedure`     | `account_type === 'ADMIN'`    | `withUserContext` |
 
 Every resolver in these tiers runs inside the RLS-scoped transaction and must use
 `ctx.tx`.
 
 ## Policy matrix (per table, summarized)
 
-| Table | Public (anon) | Owner customer | Other customer | Admin |
-| --- | --- | --- | --- | --- |
-| `profiles` | — | read/write own; cannot change `account_type` | — | read (via `is_admin()`) |
-| `listings` | read **LIVE** only | read/write own | read LIVE only | full |
-| `property_photos` | read photos of **LIVE** listings | read/write own | LIVE only | full |
-| `properties` | — | read/write own | — | full |
-| `ownership_documents` | — | read/write own (private) | denied | read |
-| `offer_threads` | — | **read** own (buyer **or** listing-owner seller); no direct write | denied | read |
-| `offer_proposals` | — | **read** if participant of the parent thread; no direct write | denied | read |
-| `offer_events` | — | **read** if participant of the parent thread; no direct write | denied | read |
-| `notifications` | — | read/update-read own (recipient) | denied | read |
-| `transactions` | — | buyer **or** seller | denied | full |
-| `transaction_stage_history` | — | parties to the transaction | denied | full |
-| `audit_events` | — | insert-only | insert-only | read |
+| Table                       | Public (anon)                    | Owner customer                                                    | Other customer | Admin                   |
+| --------------------------- | -------------------------------- | ----------------------------------------------------------------- | -------------- | ----------------------- |
+| `profiles`                  | —                                | read/write own; cannot change `account_type`                      | —              | read (via `is_admin()`) |
+| `listings`                  | read **LIVE** only               | read/write own                                                    | read LIVE only | full                    |
+| `property_photos`           | read photos of **LIVE** listings | read/write own                                                    | LIVE only      | full                    |
+| `properties`                | —                                | read/write own                                                    | —              | full                    |
+| `ownership_documents`       | —                                | read/write own (private)                                          | denied         | read                    |
+| `offer_threads`             | —                                | **read** own (buyer **or** listing-owner seller); no direct write | denied         | read                    |
+| `offer_proposals`           | —                                | **read** if participant of the parent thread; no direct write     | denied         | read                    |
+| `offer_events`              | —                                | **read** if participant of the parent thread; no direct write     | denied         | read                    |
+| `notifications`             | —                                | read/update-read own (recipient)                                  | denied         | read                    |
+| `transactions`              | —                                | buyer **or** seller                                               | denied         | full                    |
+| `transaction_stage_history` | —                                | parties to the transaction                                        | denied         | full                    |
+| `audit_events`              | —                                | insert-only                                                       | insert-only    | read                    |
 
 Key enforced rules baked into the schema/policies:
 

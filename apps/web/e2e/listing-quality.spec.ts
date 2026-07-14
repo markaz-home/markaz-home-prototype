@@ -38,7 +38,14 @@ test.describe('listing accessibility (axe) on major screens', () => {
       await page.goto(url);
       await expect(page.getByRole('heading').first()).toBeVisible({ timeout: 15000 });
       const serious = await axeSerious(page);
-      expect(serious, JSON.stringify(serious.map((v) => ({ id: v.id, nodes: v.nodes.length })), null, 2)).toEqual([]);
+      expect(
+        serious,
+        JSON.stringify(
+          serious.map((v) => ({ id: v.id, nodes: v.nodes.length })),
+          null,
+          2,
+        ),
+      ).toEqual([]);
     });
   }
 });
@@ -48,7 +55,9 @@ test.describe('listing localisation & responsive', () => {
     await signInA(page);
     await page.goto(`/ar/sell/listings/${READY}/settings`);
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
-    await expect(page.getByRole('heading', { name: 'حدّد سعرك وتفضيل العروض' })).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole('heading', { name: 'حدّد سعرك وتفضيل العروض' })).toBeVisible({
+      timeout: 15000,
+    });
     // AED currency fields render with LTR numeric inputs inside the RTL page.
     await expect(page.locator('#asking')).toHaveAttribute('dir', 'ltr');
     await expect(page.getByText('AED').first()).toBeVisible();
@@ -68,7 +77,9 @@ test.describe('listing localisation & responsive', () => {
     await signInA(page);
     await page.goto(`/en/sell/listings/${READY}/photos`);
     // Seeded ready listing has 2 photos; the move/cover controls are real buttons.
-    await expect(page.getByRole('button', { name: 'Move later' }).first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole('button', { name: 'Move later' }).first()).toBeVisible({
+      timeout: 15000,
+    });
     await expect(page.getByRole('button', { name: 'Set as cover' }).first()).toBeVisible();
   });
 });

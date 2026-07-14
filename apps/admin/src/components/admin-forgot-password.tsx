@@ -18,8 +18,13 @@ export function AdminForgotPassword() {
   const router = useRouter();
   const [supabase] = useState(() => createSupabaseBrowserClient());
   const [error, setError] = useState<string | null>(null);
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<ForgotPasswordInput>({
-    resolver: zodResolver(forgotPasswordSchema), defaultValues: { email: '' },
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ForgotPasswordInput>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: { email: '' },
   });
   const fe = (c?: string) => (c ? tv(FIELD_ERROR_KEYS[c] ?? 'unexpectedError') : undefined);
 
@@ -29,7 +34,10 @@ export function AdminForgotPassword() {
     const { error: err } = await supabase.auth.resetPasswordForEmail(data.email, { redirectTo });
     if (err) {
       const key = mapAuthError(err);
-      if (key === 'rate_limited' || key === 'provider_unavailable') { setError(tv(AUTH_ERROR_KEYS[key])); return; }
+      if (key === 'rate_limited' || key === 'provider_unavailable') {
+        setError(tv(AUTH_ERROR_KEYS[key]));
+        return;
+      }
     }
     router.push(`/forgot-password/check-email?email=${encodeURIComponent(data.email)}`);
   }
@@ -41,13 +49,24 @@ export function AdminForgotPassword() {
         {error ? <Alert variant="destructive">{error}</Alert> : null}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
           <FormField id="email" label={tf('email')} error={fe(errors.email?.message)} required>
-            <Input id="email" type="email" inputMode="email" autoComplete="email" dir="ltr" placeholder={tf('emailPlaceholder')} aria-invalid={!!errors.email} {...register('email')} />
+            <Input
+              id="email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              dir="ltr"
+              placeholder={tf('emailPlaceholder')}
+              aria-invalid={!!errors.email}
+              {...register('email')}
+            />
           </FormField>
           <Button type="submit" className="w-full" loading={isSubmitting}>
             {isSubmitting ? tfo('submitting') : tfo('submit')}
           </Button>
           <p className="text-center text-sm">
-            <Link href="/login" className="text-muted-foreground hover:text-foreground">{t('returnSignIn')}</Link>
+            <Link href="/login" className="text-muted-foreground hover:text-foreground">
+              {t('returnSignIn')}
+            </Link>
           </p>
         </form>
       </div>

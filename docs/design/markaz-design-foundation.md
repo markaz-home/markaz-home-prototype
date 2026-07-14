@@ -4,7 +4,7 @@
 **Product:** MARKAZ Home  
 **Primary design context:** Desktop web, with responsive mobile behaviour  
 **Prototype horizon:** Eight-week polished, deployable prototype  
-**Last updated:** June 2026  
+**Last updated:** June 2026
 
 ---
 
@@ -674,19 +674,19 @@ It should communicate trust, clarity, architecture, and calmness without becomin
 
 ### 10.1 Brand palette
 
-| Token | Hex | Primary usage |
-|---|---:|---|
-| Brand 900 — Deep Architectural Blue | `#0F2A44` | Primary text, headers, dark navigation, strong brand moments |
-| Brand 800 — Ocean Ink | `#163A5A` | Hover states, selected navigation, dark surfaces |
-| Brand 700 — Clear Blue | `#1F4E73` | Primary buttons, links, active controls |
-| Brand 500 — Slate Blue | `#486A8A` | Secondary icons, charts, supporting emphasis |
-| Brand 300 — Mist Blue | `#AFC6DA` | Borders, inactive progress, soft data visualisation |
-| Brand 100 — Pale Blue | `#EAF2F7` | Informational panels, selected filters, active background states |
-| Canvas — Cool Off-White | `#F6F8FB` | Main page background |
-| Surface — White | `#FFFFFF` | Cards, forms, modals, content surfaces |
-| Text — Blue Black | `#142332` | Primary body text |
-| Text Secondary — Slate | `#647482` | Supporting copy and metadata |
-| Border — Blue Grey | `#D9E3EA` | Dividers, input borders, card outlines |
+| Token                               |       Hex | Primary usage                                                    |
+| ----------------------------------- | --------: | ---------------------------------------------------------------- |
+| Brand 900 — Deep Architectural Blue | `#0F2A44` | Primary text, headers, dark navigation, strong brand moments     |
+| Brand 800 — Ocean Ink               | `#163A5A` | Hover states, selected navigation, dark surfaces                 |
+| Brand 700 — Clear Blue              | `#1F4E73` | Primary buttons, links, active controls                          |
+| Brand 500 — Slate Blue              | `#486A8A` | Secondary icons, charts, supporting emphasis                     |
+| Brand 300 — Mist Blue               | `#AFC6DA` | Borders, inactive progress, soft data visualisation              |
+| Brand 100 — Pale Blue               | `#EAF2F7` | Informational panels, selected filters, active background states |
+| Canvas — Cool Off-White             | `#F6F8FB` | Main page background                                             |
+| Surface — White                     | `#FFFFFF` | Cards, forms, modals, content surfaces                           |
+| Text — Blue Black                   | `#142332` | Primary body text                                                |
+| Text Secondary — Slate              | `#647482` | Supporting copy and metadata                                     |
+| Border — Blue Grey                  | `#D9E3EA` | Dividers, input borders, card outlines                           |
 
 ### 10.2 Usage proportions
 
@@ -701,13 +701,13 @@ Do not fill entire customer dashboards with dark blue. Blue should create hierar
 
 ### 10.3 Semantic colours
 
-| Meaning | Direction | Example usage |
-|---|---|---|
-| Success / Complete | Green | Demo identity verified, stage completed |
-| Attention / Waiting | Amber | Action required, awaiting response |
-| Failure / Blocked | Red | Verification failed, destructive actions |
-| Active / Informational | Blue | In progress, selected, informational |
-| Not started / Disabled | Grey | Future transaction step, unavailable control |
+| Meaning                | Direction | Example usage                                |
+| ---------------------- | --------- | -------------------------------------------- |
+| Success / Complete     | Green     | Demo identity verified, stage completed      |
+| Attention / Waiting    | Amber     | Action required, awaiting response           |
+| Failure / Blocked      | Red       | Verification failed, destructive actions     |
+| Active / Informational | Blue      | In progress, selected, informational         |
+| Not started / Disabled | Grey      | Future transaction step, unavailable control |
 
 Every semantic status must include a text label or icon. Colour alone is insufficient.
 
@@ -763,17 +763,17 @@ Use for:
 
 ### 11.3 Suggested desktop scale
 
-| Style | Size / line-height | Weight |
-|---|---|---|
-| Hero display | 56–68 / 1.05 | 400–500 |
-| H1 application | 36–44 / 1.15 | 500–600 |
-| H2 | 28–34 / 1.2 | 500–600 |
-| H3 | 22–26 / 1.25 | 600 |
-| Body large | 18 / 1.55 | 400 |
-| Body | 16 / 1.55 | 400 |
-| Body small | 14 / 1.45 | 400–500 |
-| Label | 13–14 / 1.3 | 500–600 |
-| Caption | 12 / 1.4 | 500 |
+| Style          | Size / line-height | Weight  |
+| -------------- | ------------------ | ------- |
+| Hero display   | 56–68 / 1.05       | 400–500 |
+| H1 application | 36–44 / 1.15       | 500–600 |
+| H2             | 28–34 / 1.2        | 500–600 |
+| H3             | 22–26 / 1.25       | 600     |
+| Body large     | 18 / 1.55          | 400     |
+| Body           | 16 / 1.55          | 400     |
+| Body small     | 14 / 1.45          | 400–500 |
+| Label          | 13–14 / 1.3        | 500–600 |
+| Caption        | 12 / 1.4           | 500     |
 
 ### 11.4 Mobile typography
 

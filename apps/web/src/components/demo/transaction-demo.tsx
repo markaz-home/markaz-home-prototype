@@ -117,18 +117,45 @@ function Tracker({ step }: { step: number }) {
         return (
           <li key={label} className="flex flex-1 flex-col items-center text-center">
             <div className="flex w-full items-center">
-              <span className={cn('h-0.5 flex-1', i === 0 ? 'opacity-0' : done || active ? 'bg-primary' : 'bg-border')} aria-hidden />
+              <span
+                className={cn(
+                  'h-0.5 flex-1',
+                  i === 0 ? 'opacity-0' : done || active ? 'bg-primary' : 'bg-border',
+                )}
+                aria-hidden
+              />
               <span
                 className={cn(
                   'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2',
-                  done ? 'border-primary bg-primary text-primary-foreground' : active ? 'border-primary text-primary' : 'border-border text-muted-foreground',
+                  done
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : active
+                      ? 'border-primary text-primary'
+                      : 'border-border text-muted-foreground',
                 )}
               >
-                {done ? <Check className="h-4 w-4" aria-hidden /> : <Icon className="h-4 w-4" aria-hidden />}
+                {done ? (
+                  <Check className="h-4 w-4" aria-hidden />
+                ) : (
+                  <Icon className="h-4 w-4" aria-hidden />
+                )}
               </span>
-              <span className={cn('h-0.5 flex-1', i === TRACKER_LABELS.length - 1 ? 'opacity-0' : done ? 'bg-primary' : 'bg-border')} aria-hidden />
+              <span
+                className={cn(
+                  'h-0.5 flex-1',
+                  i === TRACKER_LABELS.length - 1 ? 'opacity-0' : done ? 'bg-primary' : 'bg-border',
+                )}
+                aria-hidden
+              />
             </div>
-            <span className={cn('mt-2 text-xs', active || done ? 'font-medium text-foreground' : 'text-muted-foreground')}>{label}</span>
+            <span
+              className={cn(
+                'mt-2 text-xs',
+                active || done ? 'text-foreground font-medium' : 'text-muted-foreground',
+              )}
+            >
+              {label}
+            </span>
           </li>
         );
       })}
@@ -140,13 +167,18 @@ function Tracker({ step }: { step: number }) {
 function PropertyCard() {
   return (
     <div className="flex gap-4">
-      <div className="flex h-20 w-28 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-900/90 to-primary text-primary-foreground" aria-hidden>
+      <div
+        className="from-brand-900/90 to-primary text-primary-foreground flex h-20 w-28 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br"
+        aria-hidden
+      >
         <Building2 className="h-7 w-7" />
       </div>
       <div className="min-w-0">
         <p className="font-medium">{PROPERTY.headline}</p>
-        <p className="text-sm text-muted-foreground">{PROPERTY.location}</p>
-        <p className="text-sm text-muted-foreground" dir="ltr">{PROPERTY.facts}</p>
+        <p className="text-muted-foreground text-sm">{PROPERTY.location}</p>
+        <p className="text-muted-foreground text-sm" dir="ltr">
+          {PROPERTY.facts}
+        </p>
       </div>
     </div>
   );
@@ -155,8 +187,10 @@ function PropertyCard() {
 function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
   return (
     <div className="flex items-baseline justify-between gap-4 border-b py-2 last:border-0">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className={cn(strong ? 'text-lg font-semibold' : 'font-medium', 'text-end')} dir="auto">{value}</span>
+      <span className="text-muted-foreground text-sm">{label}</span>
+      <span className={cn(strong ? 'text-lg font-semibold' : 'font-medium', 'text-end')} dir="auto">
+        {value}
+      </span>
     </div>
   );
 }
@@ -165,7 +199,11 @@ function StepHeader({ title, badge }: { title: string; badge?: boolean }) {
   return (
     <div className="flex flex-wrap items-center gap-3">
       <h1 className="font-display text-2xl font-semibold">{title}</h1>
-      {badge ? <Badge variant="warning" className="uppercase tracking-wide">Demo</Badge> : null}
+      {badge ? (
+        <Badge variant="warning" className="uppercase tracking-wide">
+          Demo
+        </Badge>
+      ) : null}
     </div>
   );
 }
@@ -184,8 +222,8 @@ function TaskList({ title, items }: { title: string; items: string[] }) {
       <p className="text-sm font-semibold">{title}</p>
       <ul className="mt-2 space-y-1.5">
         {items.map((i) => (
-          <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-            <CircleDot className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden /> {i}
+          <li key={i} className="text-muted-foreground flex items-center gap-2 text-sm">
+            <CircleDot className="text-primary h-3.5 w-3.5 shrink-0" aria-hidden /> {i}
           </li>
         ))}
       </ul>
@@ -198,7 +236,7 @@ function Accepted({ amount, onNext }: { amount: string; onNext: () => void }) {
   return (
     <Card>
       <CardContent className="space-y-5 pt-6">
-        <div className="flex items-center gap-2 text-success">
+        <div className="text-success flex items-center gap-2">
           <CheckCircle2 className="h-5 w-5" aria-hidden />
           <span className="text-sm font-medium">Offer accepted</span>
         </div>
@@ -243,7 +281,7 @@ function Deposit({ locale, onNext }: { locale: string; onNext: () => void }) {
   return (
     <Card>
       <CardContent className="space-y-5 pt-6">
-        <div className="flex items-center gap-2 text-success">
+        <div className="text-success flex items-center gap-2">
           <CheckCircle2 className="h-5 w-5" aria-hidden />
           <span className="text-sm font-medium">Deposit confirmed — Demo</span>
         </div>
@@ -253,7 +291,9 @@ function Deposit({ locale, onNext }: { locale: string; onNext: () => void }) {
           <Row label="Confirmed on" value={ACCEPTED_DATE} />
         </div>
         <Alert variant="info">
-          <p className="text-sm">No real payment was made. This is a simulated confirmation for the prototype.</p>
+          <p className="text-sm">
+            No real payment was made. This is a simulated confirmation for the prototype.
+          </p>
         </Alert>
         <NextButton label="Continue to documents" onNext={onNext} />
       </CardContent>
@@ -276,16 +316,27 @@ function Documents({ onNext }: { onNext: () => void }) {
           {docs.map((d) => (
             <li key={d.label} className="flex items-center justify-between gap-3 py-3">
               <span className="flex items-center gap-2 text-sm">
-                {d.done ? <CheckCircle2 className="h-5 w-5 text-success" aria-hidden /> : <CircleDot className="h-5 w-5 text-warning" aria-hidden />}
+                {d.done ? (
+                  <CheckCircle2 className="text-success h-5 w-5" aria-hidden />
+                ) : (
+                  <CircleDot className="text-warning h-5 w-5" aria-hidden />
+                )}
                 {d.label}
               </span>
-              <span className={cn('text-xs font-medium', d.done ? 'text-muted-foreground' : 'text-warning')}>
+              <span
+                className={cn(
+                  'text-xs font-medium',
+                  d.done ? 'text-muted-foreground' : 'text-warning',
+                )}
+              >
                 {d.done ? 'Complete' : 'Ready for demo confirmation'}
               </span>
             </li>
           ))}
         </ul>
-        <p className="text-xs text-muted-foreground">No real documents are created or uploaded in this demo.</p>
+        <p className="text-muted-foreground text-xs">
+          No real documents are created or uploaded in this demo.
+        </p>
         <NextButton label="Confirm documents" onNext={onNext} />
       </CardContent>
     </Card>
@@ -302,10 +353,18 @@ function Transfer({ onNext }: { onNext: () => void }) {
           <Row label="Date and time" value="Sunday, 12 July 2026 · 11:00" />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <TaskList title="Buyer preparation" items={['Bring identification', 'Confirm payment readiness']} />
-          <TaskList title="Seller preparation" items={['Bring the title deed', 'Confirm ownership documents']} />
+          <TaskList
+            title="Buyer preparation"
+            items={['Bring identification', 'Confirm payment readiness']}
+          />
+          <TaskList
+            title="Seller preparation"
+            items={['Bring the title deed', 'Confirm ownership documents']}
+          />
         </div>
-        <Alert variant="info"><p className="text-sm">This is not a real DLD appointment.</p></Alert>
+        <Alert variant="info">
+          <p className="text-sm">This is not a real DLD appointment.</p>
+        </Alert>
         <NextButton label="Complete demo transaction" onNext={onNext} />
       </CardContent>
     </Card>
@@ -316,7 +375,7 @@ function Completed({ amount }: { amount: string }) {
   return (
     <Card>
       <CardContent className="space-y-5 pt-6 text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-success/15 text-success">
+        <div className="bg-success/15 text-success mx-auto flex h-14 w-14 items-center justify-center rounded-full">
           <CheckCircle2 className="h-8 w-8" aria-hidden />
         </div>
         <StepHeader title="Transaction completed — Demo" />
@@ -326,8 +385,12 @@ function Completed({ amount }: { amount: string }) {
           <Row label="Completed on" value={COMPLETED_DATE} />
         </div>
         <div className="flex flex-col justify-center gap-2 sm:flex-row">
-          <Button asChild><Link href="/dashboard">Back to dashboard</Link></Button>
-          <Button asChild variant="outline"><Link href="/properties">Browse properties</Link></Button>
+          <Button asChild>
+            <Link href="/dashboard">Back to dashboard</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/properties">Browse properties</Link>
+          </Button>
         </div>
       </CardContent>
     </Card>
@@ -335,15 +398,33 @@ function Completed({ amount }: { amount: string }) {
 }
 
 // --- Dev-only controls -------------------------------------------------------
-function DemoControls({ step, onPrev, onNext, onReset }: { step: number; onPrev: () => void; onNext: () => void; onReset: () => void }) {
+function DemoControls({
+  step,
+  onPrev,
+  onNext,
+  onReset,
+}: {
+  step: number;
+  onPrev: () => void;
+  onNext: () => void;
+  onReset: () => void;
+}) {
   return (
-    <div className="mt-8 flex flex-wrap items-center gap-2 rounded-lg border border-dashed bg-muted/40 p-3 text-sm">
-      <span className="font-medium text-muted-foreground">Demo controls</span>
-      <span className="text-xs text-muted-foreground">({step + 1}/{STEPS.length})</span>
+    <div className="bg-muted/40 mt-8 flex flex-wrap items-center gap-2 rounded-lg border border-dashed p-3 text-sm">
+      <span className="text-muted-foreground font-medium">Demo controls</span>
+      <span className="text-muted-foreground text-xs">
+        ({step + 1}/{STEPS.length})
+      </span>
       <div className="ms-auto flex gap-2">
-        <Button size="sm" variant="outline" onClick={onPrev} disabled={step === 0}>Previous</Button>
-        <Button size="sm" variant="outline" onClick={onNext} disabled={step === STEPS.length - 1}>Next</Button>
-        <Button size="sm" variant="ghost" onClick={onReset}><RotateCcw className="me-1.5 h-3.5 w-3.5" aria-hidden /> Reset</Button>
+        <Button size="sm" variant="outline" onClick={onPrev} disabled={step === 0}>
+          Previous
+        </Button>
+        <Button size="sm" variant="outline" onClick={onNext} disabled={step === STEPS.length - 1}>
+          Next
+        </Button>
+        <Button size="sm" variant="ghost" onClick={onReset}>
+          <RotateCcw className="me-1.5 h-3.5 w-3.5" aria-hidden /> Reset
+        </Button>
       </div>
     </div>
   );

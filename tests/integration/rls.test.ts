@@ -22,9 +22,17 @@ afterAll(async () => {
 });
 
 const asA = <T>(fn: Parameters<typeof withUserContext>[2]) =>
-  withUserContext(getAppDb(), { userId: ids!.customerA, accountType: 'CUSTOMER' }, fn) as Promise<T>;
+  withUserContext(
+    getAppDb(),
+    { userId: ids!.customerA, accountType: 'CUSTOMER' },
+    fn,
+  ) as Promise<T>;
 const asB = <T>(fn: Parameters<typeof withUserContext>[2]) =>
-  withUserContext(getAppDb(), { userId: ids!.customerB, accountType: 'CUSTOMER' }, fn) as Promise<T>;
+  withUserContext(
+    getAppDb(),
+    { userId: ids!.customerB, accountType: 'CUSTOMER' },
+    fn,
+  ) as Promise<T>;
 const asAdmin = <T>(fn: Parameters<typeof withUserContext>[2]) =>
   withUserContext(getAppDb(), { userId: ids!.admin, accountType: 'ADMIN' }, fn) as Promise<T>;
 
@@ -52,8 +60,12 @@ describe('RLS identity propagation', () => {
 
   it('Customer A reads only their own profile; cannot read Customer B', async () => {
     if (!ids) return;
-    const own = await asA((tx) => tx.execute(sql`select id::text from public.profiles where id = ${ids!.customerA}`));
-    const other = await asA((tx) => tx.execute(sql`select id::text from public.profiles where id = ${ids!.customerB}`));
+    const own = await asA((tx) =>
+      tx.execute(sql`select id::text from public.profiles where id = ${ids!.customerA}`),
+    );
+    const other = await asA((tx) =>
+      tx.execute(sql`select id::text from public.profiles where id = ${ids!.customerB}`),
+    );
     expect(rows(own)).toHaveLength(1);
     expect(rows(other)).toHaveLength(0);
   });
@@ -61,7 +73,9 @@ describe('RLS identity propagation', () => {
   it('public/anon and other customers see only LIVE listings', async () => {
     if (!ids) return;
     const anon = await withAnonContext(getAppDb(), (tx) =>
-      tx.execute(sql`select count(*) filter (where state <> 'LIVE')::int as non_live from public.listings`),
+      tx.execute(
+        sql`select count(*) filter (where state <> 'LIVE')::int as non_live from public.listings`,
+      ),
     );
     expect(Number(rows<{ non_live: number }>(anon)[0]?.non_live)).toBe(0);
 
@@ -79,7 +93,9 @@ describe('RLS identity propagation', () => {
   it('Admin can read all profiles and is_admin() is true', async () => {
     if (!ids) return;
     const r = await asAdmin((tx) =>
-      tx.execute(sql`select public.is_admin() as is_admin, (select count(*)::int from public.profiles) as n`),
+      tx.execute(
+        sql`select public.is_admin() as is_admin, (select count(*)::int from public.profiles) as n`,
+      ),
     );
     expect(rows<{ is_admin: boolean; n: number }>(r)[0]?.is_admin).toBe(true);
     expect(Number(rows<{ is_admin: boolean; n: number }>(r)[0]?.n)).toBeGreaterThanOrEqual(3);
@@ -88,10 +104,16 @@ describe('RLS identity propagation', () => {
   it('a customer cannot promote themselves to ADMIN', async () => {
     if (!ids) return;
     await expect(
-      asA((tx) => tx.execute(sql`update public.profiles set account_type = 'ADMIN' where id = ${ids!.customerA}`)),
+      asA((tx) =>
+        tx.execute(
+          sql`update public.profiles set account_type = 'ADMIN' where id = ${ids!.customerA}`,
+        ),
+      ),
     ).rejects.toBeTruthy();
     const r = await asA((tx) =>
-      tx.execute(sql`select account_type::text as t from public.profiles where id = ${ids!.customerA}`),
+      tx.execute(
+        sql`select account_type::text as t from public.profiles where id = ${ids!.customerA}`,
+      ),
     );
     expect(rows<{ t: string }>(r)[0]?.t).toBe('CUSTOMER');
   });
@@ -125,7 +147,9 @@ describe('RLS identity propagation', () => {
     expect(rows(toB)).toHaveLength(0);
     const toA = await asA((tx) => tx.execute(sql`select id::text from public.ownership_documents`));
     expect(rows(toA).length).toBeGreaterThanOrEqual(1);
-    const toAdmin = await asAdmin((tx) => tx.execute(sql`select id::text from public.ownership_documents`));
+    const toAdmin = await asAdmin((tx) =>
+      tx.execute(sql`select id::text from public.ownership_documents`),
+    );
     expect(rows(toAdmin).length).toBeGreaterThanOrEqual(1);
   });
 });

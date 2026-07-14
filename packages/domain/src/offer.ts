@@ -208,14 +208,21 @@ export function actorSide(nextActor: OfferNextActor): OfferSide | null {
 }
 
 /** Thread status + next_actor after a side submits a counter (§21.3). */
-export function afterCounter(side: OfferSide): { status: OfferThreadStatus; nextActor: OfferNextActor } {
+export function afterCounter(side: OfferSide): {
+  status: OfferThreadStatus;
+  nextActor: OfferNextActor;
+} {
   return side === 'BUYER'
     ? { status: 'AWAITING_SELLER', nextActor: 'SELLER' }
     : { status: 'AWAITING_BUYER', nextActor: 'BUYER' };
 }
 
 /** Is it `side`'s turn to act on this thread? */
-export function canAct(status: OfferThreadStatus, nextActor: OfferNextActor, side: OfferSide): boolean {
+export function canAct(
+  status: OfferThreadStatus,
+  nextActor: OfferNextActor,
+  side: OfferSide,
+): boolean {
   return isThreadActionable(status) && nextActor === side;
 }
 
@@ -228,7 +235,10 @@ export function canWithdraw(status: OfferThreadStatus, side: OfferSide): boolean
  * Hard product rule (§3): a customer can NEVER offer on a listing they own.
  * Enforced in SQL + RLS; surfaced in the UI; covered by tests.
  */
-export function canSubmitOffer(params: { offeringUserId: string; listingOwnerId: string }): boolean {
+export function canSubmitOffer(params: {
+  offeringUserId: string;
+  listingOwnerId: string;
+}): boolean {
   return params.offeringUserId !== params.listingOwnerId;
 }
 

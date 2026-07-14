@@ -11,7 +11,9 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   return (
     <AdminAuthShell>
       <SuccessPanel title={t('signedOutTitle')} description={t('signedOutBody')}>
-        <Button asChild className="mt-2 w-full"><Link href="/login">{t('return')}</Link></Button>
+        <Button asChild className="mt-2 w-full">
+          <Link href="/login">{t('return')}</Link>
+        </Button>
       </SuccessPanel>
     </AdminAuthShell>
   );

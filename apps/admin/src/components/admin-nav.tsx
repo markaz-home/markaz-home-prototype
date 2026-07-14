@@ -33,9 +33,9 @@ export function AdminNav({ email }: { email: string | null }) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-60 shrink-0 flex-col bg-brand-900 text-brand-100">
-      <div className="flex h-16 items-center gap-2 border-b border-brand-800 px-4 font-semibold text-white">
-        <ShieldCheck className="h-5 w-5 text-brand-300" aria-hidden />
+    <aside className="bg-brand-900 text-brand-100 flex w-60 shrink-0 flex-col">
+      <div className="border-brand-800 flex h-16 items-center gap-2 border-b px-4 font-semibold text-white">
+        <ShieldCheck className="text-brand-300 h-5 w-5" aria-hidden />
         {t('appName')}
       </div>
       <nav className="flex-1 space-y-1 p-2" aria-label="Admin">
@@ -60,8 +60,8 @@ export function AdminNav({ email }: { email: string | null }) {
           );
         })}
       </nav>
-      <div className="space-y-2 border-t border-brand-800 p-3 text-brand-100">
-        <p className="truncate px-1 text-xs text-brand-300">{email}</p>
+      <div className="border-brand-800 text-brand-100 space-y-2 border-t p-3">
+        <p className="text-brand-300 truncate px-1 text-xs">{email}</p>
         <div className="flex items-center justify-between">
           <LanguageSwitcher />
           <AdminSignOut />

@@ -10,39 +10,43 @@ const h = vi.hoisted(() => ({
 }));
 
 vi.mock('@/i18n/navigation', () => ({
-  Link: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a>,
+  Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
+  ),
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
 vi.mock('@markaz/realtime', () => ({ useTransactionChannel: () => ({ status: 'connected' }) }));
 vi.mock('@/trpc/react', () => {
   const mut = () => ({ mutate: vi.fn(), isPending: false });
   return {
-  trpc: {
-    useUtils: () => ({
+    trpc: {
+      useUtils: () => ({
+        transactions: {
+          get: { invalidate: vi.fn() },
+          listMine: { invalidate: vi.fn() },
+          getActionCounts: { invalidate: vi.fn() },
+        },
+      }),
       transactions: {
-        get: { invalidate: vi.fn() },
-        listMine: { invalidate: vi.fn() },
-        getActionCounts: { invalidate: vi.fn() },
+        listMine: { useQuery: () => h.Q.listMine },
+        get: { useQuery: () => h.Q.get },
+        confirmDetails: {
+          useMutation: () => ({ mutate: h.confirmDetailsMutate, isPending: false }),
+        },
+        selectRoute: { useMutation: mut },
+        setFinancing: { useMutation: mut },
+        confirmDeposit: { useMutation: mut },
+        markDocumentsComplete: { useMutation: mut },
+        reviewSummary: { useMutation: mut },
+        runDueDiligence: { useMutation: mut },
+        proposeTransferDate: { useMutation: mut },
+        confirmReadiness: { useMutation: mut },
+        createAppointment: { useMutation: mut },
+        confirmCompletion: { useMutation: mut },
+        requestCancellation: { useMutation: mut },
+        resolveCancellation: { useMutation: mut },
       },
-    }),
-    transactions: {
-      listMine: { useQuery: () => h.Q.listMine },
-      get: { useQuery: () => h.Q.get },
-      confirmDetails: { useMutation: () => ({ mutate: h.confirmDetailsMutate, isPending: false }) },
-      selectRoute: { useMutation: mut },
-      setFinancing: { useMutation: mut },
-      confirmDeposit: { useMutation: mut },
-      markDocumentsComplete: { useMutation: mut },
-      reviewSummary: { useMutation: mut },
-      runDueDiligence: { useMutation: mut },
-      proposeTransferDate: { useMutation: mut },
-      confirmReadiness: { useMutation: mut },
-      createAppointment: { useMutation: mut },
-      confirmCompletion: { useMutation: mut },
-      requestCancellation: { useMutation: mut },
-      resolveCancellation: { useMutation: mut },
     },
-  },
   };
 });
 
@@ -51,7 +55,12 @@ import { TransactionWorkspace } from '@/components/transactions/transaction-work
 
 function r(ui: React.ReactElement, locale: 'en' | 'ar' = 'en') {
   return render(
-    <NextIntlClientProvider locale={locale} messages={loadMessages(locale)} timeZone="Asia/Dubai" now={new Date('2026-07-14T09:00:00Z')}>
+    <NextIntlClientProvider
+      locale={locale}
+      messages={loadMessages(locale)}
+      timeZone="Asia/Dubai"
+      now={new Date('2026-07-14T09:00:00Z')}
+    >
       {ui}
     </NextIntlClientProvider>,
   );
@@ -68,7 +77,17 @@ const detail = (over: Record<string, unknown> = {}) => ({
     nextActor: 'BOTH',
     nextActorKey: 'nextActor.both',
     perspective: 'BUYER',
-    property: { publicId: 'p1', slug: 's', headline: 'Marina Villa', community: 'Dubai Marina', emirate: 'Dubai', bedrooms: 2, bathrooms: 2, propertyType: 'APARTMENT', coverUrl: null },
+    property: {
+      publicId: 'p1',
+      slug: 's',
+      headline: 'Marina Villa',
+      community: 'Dubai Marina',
+      emirate: 'Dubai',
+      bedrooms: 2,
+      bathrooms: 2,
+      propertyType: 'APARTMENT',
+      coverUrl: null,
+    },
     acceptedAmountAed: 2_000_000,
     stageIndex: 0,
     completedStages: 0,
@@ -84,8 +103,24 @@ const detail = (over: Record<string, unknown> = {}) => ({
     transferAppointmentAt: null,
     cancellation: null,
     tasks: [
-      { code: 'BUYER_CONFIRM_DETAILS', stage: 'CONFIRMATION', actor: 'BUYER', status: 'ACTION_REQUIRED', required: true, mine: true, ownershipKey: 'task.you' },
-      { code: 'SELLER_CONFIRM_DETAILS', stage: 'CONFIRMATION', actor: 'SELLER', status: 'ACTION_REQUIRED', required: true, mine: false, ownershipKey: 'task.seller' },
+      {
+        code: 'BUYER_CONFIRM_DETAILS',
+        stage: 'CONFIRMATION',
+        actor: 'BUYER',
+        status: 'ACTION_REQUIRED',
+        required: true,
+        mine: true,
+        ownershipKey: 'task.you',
+      },
+      {
+        code: 'SELLER_CONFIRM_DETAILS',
+        stage: 'CONFIRMATION',
+        actor: 'SELLER',
+        status: 'ACTION_REQUIRED',
+        required: true,
+        mine: false,
+        ownershipKey: 'task.seller',
+      },
     ],
     ownDocuments: [],
     otherChecklist: {},
@@ -115,7 +150,10 @@ describe('TransactionsHub', () => {
     };
     r(<TransactionsHub />);
     expect(screen.getByText('You are buying')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'View transaction' })).toHaveAttribute('href', '/transactions/tx1');
+    expect(screen.getByRole('link', { name: 'View transaction' })).toHaveAttribute(
+      'href',
+      '/transactions/tx1',
+    );
   });
 });
 
@@ -138,11 +176,21 @@ describe('TransactionWorkspace', () => {
     await userEvent.click(ack);
     expect(btn).toBeEnabled();
     await userEvent.click(btn);
-    expect(h.confirmDetailsMutate).toHaveBeenCalledWith({ transactionId: 'tx1', expectedVersion: 1 });
+    expect(h.confirmDetailsMutate).toHaveBeenCalledWith({
+      transactionId: 'tx1',
+      expectedVersion: 1,
+    });
   });
 
   it('shows the completed-in-demo state without transaction workflow buttons', () => {
-    h.Q.get = detail({ status: 'COMPLETED_DEMO', statusKey: 'status.completed', stageIndex: 6, completedStages: 6, nextActor: 'NONE', nextActorKey: 'nextActor.none' });
+    h.Q.get = detail({
+      status: 'COMPLETED_DEMO',
+      statusKey: 'status.completed',
+      stageIndex: 6,
+      completedStages: 6,
+      nextActor: 'NONE',
+      nextActorKey: 'nextActor.none',
+    });
     r(<TransactionWorkspace transactionId="tx1" />);
     expect(screen.getByText('Transaction completed in demo')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /pay|deposit|confirm/i })).toBeNull();

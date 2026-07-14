@@ -3,7 +3,11 @@
 import { useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Alert, Badge, Button } from '@markaz/ui';
-import { ALLOWED_DOCUMENT_MIME, MAX_DOCUMENT_BYTES, type TransactionDocumentType } from '@markaz/domain';
+import {
+  ALLOWED_DOCUMENT_MIME,
+  MAX_DOCUMENT_BYTES,
+  type TransactionDocumentType,
+} from '@markaz/domain';
 import { createSupabaseBrowserClient } from '@markaz/auth/browser';
 import { trpc } from '@/trpc/react';
 
@@ -52,7 +56,10 @@ export function DocumentChecklist({
               transactionId={transactionId}
               type={d.type}
               required={d.required}
-              existing={ownDocuments.find((x) => x.documentType === d.type && x.status !== 'REMOVED') ?? null}
+              existing={
+                ownDocuments.find((x) => x.documentType === d.type && x.status !== 'REMOVED') ??
+                null
+              }
               refresh={refresh}
             />
           </li>
@@ -96,9 +103,14 @@ function DocRow({
     }
     setBusy(true);
     try {
-      const { path } = await utils.transactions.documentUploadPath.fetch({ transactionId, fileName: file.name });
+      const { path } = await utils.transactions.documentUploadPath.fetch({
+        transactionId,
+        fileName: file.name,
+      });
       const supabase = createSupabaseBrowserClient();
-      const up = await supabase.storage.from(BUCKET).upload(path, file, { contentType: file.type, upsert: false });
+      const up = await supabase.storage
+        .from(BUCKET)
+        .upload(path, file, { contentType: file.type, upsert: false });
       if (up.error) throw new Error(up.error.message);
       await register.mutateAsync({
         transactionId,
@@ -125,14 +137,16 @@ function DocRow({
       {existing ? (
         <span className="flex items-center gap-2">
           <Badge variant="outline">{t('accepted')}</Badge>
-          <span dir="ltr" className="max-w-[180px] truncate text-muted-foreground">
+          <span dir="ltr" className="text-muted-foreground max-w-[180px] truncate">
             {existing.fileName}
           </span>
           <Button
             size="sm"
             variant="ghost"
             loading={remove.isPending}
-            onClick={() => remove.mutate({ transactionId, documentId: existing.id }, { onSuccess: refresh })}
+            onClick={() =>
+              remove.mutate({ transactionId, documentId: existing.id }, { onSuccess: refresh })
+            }
           >
             {t('remove')}
           </Button>
@@ -150,13 +164,18 @@ function DocRow({
               if (f) void onFile(f);
             }}
           />
-          <Button size="sm" variant="outline" loading={busy} onClick={() => inputRef.current?.click()}>
+          <Button
+            size="sm"
+            variant="outline"
+            loading={busy}
+            onClick={() => inputRef.current?.click()}
+          >
             {t('upload')}
           </Button>
         </span>
       )}
       {error ? (
-        <p role="alert" className="w-full text-destructive">
+        <p role="alert" className="text-destructive w-full">
           {error}
         </p>
       ) : null}

@@ -27,7 +27,11 @@ export function isAllowedReturnPath(path: string): boolean {
 export function storeSaveIntent(intent: Omit<SaveIntent, 'action' | 'expiresAt'>): void {
   if (typeof window === 'undefined') return;
   if (!isAllowedReturnPath(intent.returnPath)) return;
-  const payload: SaveIntent = { action: 'SAVE_PROPERTY', expiresAt: Date.now() + TTL_MS, ...intent };
+  const payload: SaveIntent = {
+    action: 'SAVE_PROPERTY',
+    expiresAt: Date.now() + TTL_MS,
+    ...intent,
+  };
   try {
     window.sessionStorage.setItem(KEY, JSON.stringify(payload));
   } catch {

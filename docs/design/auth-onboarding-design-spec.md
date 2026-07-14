@@ -7,7 +7,7 @@
 **Applications:** Customer Web and MARKAZ Operations  
 **Primary languages:** English and Arabic  
 **Accessibility target:** WCAG 2.2 AA  
-**Last updated:** June 2026  
+**Last updated:** June 2026
 
 ---
 
@@ -158,10 +158,10 @@ Use this order of precedence:
 
 ## 3.1 Account types
 
-| Account type | Application | Creation method | Access |
-|---|---|---|---|
-| `CUSTOMER` | MARKAZ Home customer web | Public Create Account | All customer buying and selling journeys |
-| `ADMIN` | MARKAZ Operations | Internal provisioning only | Protected Operations application |
+| Account type | Application              | Creation method            | Access                                   |
+| ------------ | ------------------------ | -------------------------- | ---------------------------------------- |
+| `CUSTOMER`   | MARKAZ Home customer web | Public Create Account      | All customer buying and selling journeys |
+| `ADMIN`      | MARKAZ Operations        | Internal provisioning only | Protected Operations application         |
 
 ## 3.2 Non-negotiable product rules
 
@@ -332,38 +332,38 @@ Locale prefixes are mandatory.
 
 ### Customer web
 
-| Purpose | Route |
-|---|---|
-| Create Account | `/[locale]/sign-up` |
-| Account Created | `/[locale]/sign-up/check-email` |
-| Verify Email | `/[locale]/verify-email` |
-| Email Verified | `/[locale]/verify-email/success` |
-| Sign In | `/[locale]/sign-in` |
-| Forgot Password | `/[locale]/forgot-password` |
-| Recovery Email Sent | `/[locale]/forgot-password/check-email` |
-| Reset Password | `/[locale]/reset-password` |
-| Password Updated | `/[locale]/reset-password/success` |
-| Complete Profile | `/[locale]/onboarding/profile` |
-| Simulated UAE PASS | `/[locale]/onboarding/uae-pass` |
-| Session Expired | `/[locale]/sign-in?notice=session-expired` |
-| Signed Out | `/[locale]/signed-out` |
-| Persistent provider error | `/[locale]/auth/unavailable` |
-| Persistent unexpected error | `/[locale]/auth/error` |
+| Purpose                     | Route                                      |
+| --------------------------- | ------------------------------------------ |
+| Create Account              | `/[locale]/sign-up`                        |
+| Account Created             | `/[locale]/sign-up/check-email`            |
+| Verify Email                | `/[locale]/verify-email`                   |
+| Email Verified              | `/[locale]/verify-email/success`           |
+| Sign In                     | `/[locale]/sign-in`                        |
+| Forgot Password             | `/[locale]/forgot-password`                |
+| Recovery Email Sent         | `/[locale]/forgot-password/check-email`    |
+| Reset Password              | `/[locale]/reset-password`                 |
+| Password Updated            | `/[locale]/reset-password/success`         |
+| Complete Profile            | `/[locale]/onboarding/profile`             |
+| Simulated UAE PASS          | `/[locale]/onboarding/uae-pass`            |
+| Session Expired             | `/[locale]/sign-in?notice=session-expired` |
+| Signed Out                  | `/[locale]/signed-out`                     |
+| Persistent provider error   | `/[locale]/auth/unavailable`               |
+| Persistent unexpected error | `/[locale]/auth/error`                     |
 
 ### Admin application
 
 The Admin application is deployed separately; it does not use an `/admin` route inside customer web.
 
-| Purpose | Route |
-|---|---|
-| Admin Sign In | `/[locale]/sign-in` |
-| Admin Forgot Password | `/[locale]/forgot-password` |
-| Admin Recovery Email Sent | `/[locale]/forgot-password/check-email` |
-| Admin Reset Password | `/[locale]/reset-password` |
-| Admin Password Updated | `/[locale]/reset-password/success` |
-| Access Denied | `/[locale]/access-denied` |
-| Session Expired | `/[locale]/sign-in?notice=session-expired` |
-| Signed Out | `/[locale]/signed-out` |
+| Purpose                   | Route                                      |
+| ------------------------- | ------------------------------------------ |
+| Admin Sign In             | `/[locale]/sign-in`                        |
+| Admin Forgot Password     | `/[locale]/forgot-password`                |
+| Admin Recovery Email Sent | `/[locale]/forgot-password/check-email`    |
+| Admin Reset Password      | `/[locale]/reset-password`                 |
+| Admin Password Updated    | `/[locale]/reset-password/success`         |
+| Access Denied             | `/[locale]/access-denied`                  |
+| Session Expired           | `/[locale]/sign-in?notice=session-expired` |
+| Signed Out                | `/[locale]/signed-out`                     |
 
 Route names may be adapted to the current App Router folders, but user-visible behaviour and application separation are mandatory.
 
@@ -510,41 +510,41 @@ There is no Admin Create Account route.
 
 ## 8.1 Customer screens and states
 
-| ID | Screen / state | Type |
-|---|---|---|
-| C-01 | Landing Page authentication entry | Existing page integration |
-| C-02 | Create Account | Form |
-| C-03 | Account Created / Check Your Email | Success / transition |
-| C-04 | Verify Email Code | Form |
-| C-05 | Email Verified | Success |
-| C-06 | Profile Completion | Conditional form |
-| C-07 | Simulated UAE PASS Introduction | Onboarding |
-| C-08 | Simulated UAE PASS Pending | Onboarding status |
-| C-09 | Simulated UAE PASS Success | Success |
-| C-10 | Simulated UAE PASS Failure | Error / recovery |
-| C-11 | Sign In | Form |
-| C-12 | Forgot Password | Form |
-| C-13 | Recovery Email Sent | Generic success |
-| C-14 | Reset Password | Form |
-| C-15 | Password Updated | Success |
-| C-16 | Session Expired | Notice + Sign In |
-| C-17 | Signed-Out Confirmation | Confirmation |
-| C-18 | Authentication Provider Unavailable | Blocking recoverable error |
-| C-19 | Rate Limited | Inline or blocking recoverable state |
-| C-20 | Generic Unexpected Error | Blocking recoverable error |
+| ID   | Screen / state                      | Type                                 |
+| ---- | ----------------------------------- | ------------------------------------ |
+| C-01 | Landing Page authentication entry   | Existing page integration            |
+| C-02 | Create Account                      | Form                                 |
+| C-03 | Account Created / Check Your Email  | Success / transition                 |
+| C-04 | Verify Email Code                   | Form                                 |
+| C-05 | Email Verified                      | Success                              |
+| C-06 | Profile Completion                  | Conditional form                     |
+| C-07 | Simulated UAE PASS Introduction     | Onboarding                           |
+| C-08 | Simulated UAE PASS Pending          | Onboarding status                    |
+| C-09 | Simulated UAE PASS Success          | Success                              |
+| C-10 | Simulated UAE PASS Failure          | Error / recovery                     |
+| C-11 | Sign In                             | Form                                 |
+| C-12 | Forgot Password                     | Form                                 |
+| C-13 | Recovery Email Sent                 | Generic success                      |
+| C-14 | Reset Password                      | Form                                 |
+| C-15 | Password Updated                    | Success                              |
+| C-16 | Session Expired                     | Notice + Sign In                     |
+| C-17 | Signed-Out Confirmation             | Confirmation                         |
+| C-18 | Authentication Provider Unavailable | Blocking recoverable error           |
+| C-19 | Rate Limited                        | Inline or blocking recoverable state |
+| C-20 | Generic Unexpected Error            | Blocking recoverable error           |
 
 ## 8.2 Admin screens and states
 
-| ID | Screen / state | Type |
-|---|---|---|
-| A-01 | Admin Sign In | Form |
-| A-02 | Admin Forgot Password | Form |
-| A-03 | Admin Recovery Email Sent | Generic success |
-| A-04 | Admin Reset Password | Form |
-| A-05 | Admin Password Updated | Success |
-| A-06 | Admin Access Denied | Blocking state |
-| A-07 | Admin Session Expired | Notice + Sign In |
-| A-08 | Admin Signed Out | Confirmation |
+| ID   | Screen / state            | Type             |
+| ---- | ------------------------- | ---------------- |
+| A-01 | Admin Sign In             | Form             |
+| A-02 | Admin Forgot Password     | Form             |
+| A-03 | Admin Recovery Email Sent | Generic success  |
+| A-04 | Admin Reset Password      | Form             |
+| A-05 | Admin Password Updated    | Success          |
+| A-06 | Admin Access Denied       | Blocking state   |
+| A-07 | Admin Session Expired     | Notice + Sign In |
+| A-08 | Admin Signed Out          | Confirmation     |
 
 ---
 
@@ -556,19 +556,19 @@ Use the approved **Architectural Blue — Quiet Editorial Intelligence** system.
 
 ### Brand tokens
 
-| Token | Value |
-|---|---|
+| Token                   | Value     |
+| ----------------------- | --------- |
 | Deep Architectural Blue | `#0F2A44` |
-| Ocean Ink | `#163A5A` |
-| Clear Blue | `#1F4E73` |
-| Slate Blue | `#486A8A` |
-| Mist Blue | `#AFC6DA` |
-| Pale Blue | `#EAF2F7` |
-| Cool Off-White | `#F6F8FB` |
-| Surface White | `#FFFFFF` |
-| Blue Black | `#142332` |
-| Secondary Slate | `#647482` |
-| Border Blue Grey | `#D9E3EA` |
+| Ocean Ink               | `#163A5A` |
+| Clear Blue              | `#1F4E73` |
+| Slate Blue              | `#486A8A` |
+| Mist Blue               | `#AFC6DA` |
+| Pale Blue               | `#EAF2F7` |
+| Cool Off-White          | `#F6F8FB` |
+| Surface White           | `#FFFFFF` |
+| Blue Black              | `#142332` |
+| Secondary Slate         | `#647482` |
+| Border Blue Grey        | `#D9E3EA` |
 
 Use semantic green, amber, and red only for success, attention, and failure. Do not use colour as the only status signal.
 
@@ -740,7 +740,6 @@ When onboarding data is inconsistent or incomplete, do not imply the user moved 
 
 This makes the reason for routing explicit.
 
-
 ---
 
 # 10. Customer Sign Up Specification
@@ -761,10 +760,12 @@ Create a unified MARKAZ customer account and begin verification.
 
 **Progress:** `Step 1 of 3 · Account details`
 
-**Title:**  
+**Title:**
+
 > Create your MARKAZ account
 
-**Description:**  
+**Description:**
+
 > One account lets you browse properties, make offers, list a property, and track transactions.
 
 **Fields:**
@@ -780,13 +781,16 @@ Create a unified MARKAZ customer account and begin verification.
 
 > I agree to the Privacy Policy.
 
-**Primary button:**  
+**Primary button:**
+
 > Create account
 
-**Existing-account line:**  
+**Existing-account line:**
+
 > Already have an account? **Sign in**
 
-**Security reassurance:**  
+**Security reassurance:**
+
 > Your account details are protected using secure authentication.
 
 ## 10.4 Desktop layout
@@ -908,12 +912,12 @@ State treatment:
 
 The checklist is authoritative. Strength is supplementary.
 
-| Level | Condition | Label |
-|---|---|---|
-| Hidden | Empty | No label |
-| Incomplete | One or more requirements missing | `Does not yet meet the requirements` |
-| Meets requirements | All requirements met, 8–11 characters | `Meets the requirements` |
-| Strong | All requirements met and 12+ characters with variety | `Strong password` |
+| Level              | Condition                                            | Label                                |
+| ------------------ | ---------------------------------------------------- | ------------------------------------ |
+| Hidden             | Empty                                                | No label                             |
+| Incomplete         | One or more requirements missing                     | `Does not yet meet the requirements` |
+| Meets requirements | All requirements met, 8–11 characters                | `Meets the requirements`             |
+| Strong             | All requirements met and 12+ characters with variety | `Strong password`                    |
 
 Use a restrained three-segment line. Do not use point scores, emojis, red-to-green games, or terms such as “terrible”.
 
@@ -939,10 +943,12 @@ Use a restrained three-segment line. Do not use point scores, emojis, red-to-gre
 
 Form-level alert:
 
-**Title:**  
+**Title:**
+
 > We could not create a new account with these details.
 
-**Body:**  
+**Body:**
+
 > You may already have an account. Try signing in or resetting your password.
 
 **Actions:**
@@ -979,22 +985,28 @@ Confirm successful account creation before asking for the code.
 
 ### Copy
 
-**Title:**  
+**Title:**
+
 > Check your email
 
-**Description:**  
+**Description:**
+
 > We sent a six-digit verification code to **{maskedEmail}**.
 
-**Supporting copy:**  
+**Supporting copy:**
+
 > Enter the code to verify your email and continue setting up your account.
 
-**Primary button:**  
+**Primary button:**
+
 > Enter verification code
 
-**Secondary link:**  
+**Secondary link:**
+
 > Use a different email
 
-**Help:**  
+**Help:**
+
 > The code may take a few minutes. Check your spam or junk folder if you do not see it.
 
 ### Behaviour
@@ -1008,31 +1020,40 @@ Confirm successful account creation before asking for the code.
 
 ### Copy
 
-**Progress:**  
+**Progress:**
+
 > Step 2 of 3 · Email verification
 
-**Title:**  
+**Title:**
+
 > Verify your email
 
-**Description:**  
+**Description:**
+
 > Enter the six-digit code sent to **{maskedEmail}**.
 
-**Code label:**  
+**Code label:**
+
 > Verification code
 
-**Primary button:**  
+**Primary button:**
+
 > Verify email
 
-**Resend disabled:**  
+**Resend disabled:**
+
 > Resend code in 00:59
 
-**Resend enabled:**  
+**Resend enabled:**
+
 > Resend code
 
-**Change action:**  
+**Change action:**
+
 > Use a different email
 
-**Help:**  
+**Help:**
+
 > Codes can take a few minutes to arrive. Check your spam or junk folder.
 
 ## 11.3 Email masking
@@ -1109,25 +1130,27 @@ Preferred implementation:
 
 ## 11.6 Verification states and copy
 
-| State | Copy / behaviour |
-|---|---|
-| Code sent | `A verification code has been sent.` |
-| Verifying | Button: `Verifying…`; inputs read-only |
-| Invalid code | `That code is not correct. Check the six digits and try again.` |
-| Expired code | `This code has expired. Request a new code to continue.` |
-| Code resent | `A new verification code has been sent.` |
-| Too many attempts | `Too many unsuccessful attempts. Request a new code to continue.` |
-| Rate limited | `Too many requests. Please wait {time} before trying again.` |
+| State                | Copy / behaviour                                                                           |
+| -------------------- | ------------------------------------------------------------------------------------------ |
+| Code sent            | `A verification code has been sent.`                                                       |
+| Verifying            | Button: `Verifying…`; inputs read-only                                                     |
+| Invalid code         | `That code is not correct. Check the six digits and try again.`                            |
+| Expired code         | `This code has expired. Request a new code to continue.`                                   |
+| Code resent          | `A new verification code has been sent.`                                                   |
+| Too many attempts    | `Too many unsuccessful attempts. Request a new code to continue.`                          |
+| Rate limited         | `Too many requests. Please wait {time} before trying again.`                               |
 | Provider unavailable | `We cannot verify your email right now. Your account has been created; try again shortly.` |
-| Already verified | `Your email is already verified. Continue to account setup.` |
-| Successful | Navigate to Email Verified and announce success |
+| Already verified     | `Your email is already verified. Continue to account setup.`                               |
+| Successful           | Navigate to Email Verified and announce success                                            |
 
 ## 11.7 Email Verified screen
 
-**Title:**  
+**Title:**
+
 > Email verified
 
-**Description:**  
+**Description:**
+
 > Your email is confirmed. Next, complete the demo identity step.
 
 If profile data is missing, adapt the description:
@@ -1156,10 +1179,12 @@ Do not show both. The server-resolved next step determines the action.
 
 ## 12.1 Copy
 
-**Title:**  
+**Title:**
+
 > Welcome back
 
-**Description:**  
+**Description:**
+
 > Sign in to manage your properties, offers, and transactions.
 
 **Fields:**
@@ -1167,16 +1192,20 @@ Do not show both. The server-resolved next step determines the action.
 - Email address
 - Password
 
-**Primary button:**  
+**Primary button:**
+
 > Sign in
 
-**Password link:**  
+**Password link:**
+
 > Forgot password?
 
-**Create-account line:**  
+**Create-account line:**
+
 > New to MARKAZ? **Create account**
 
-**Security reassurance:**  
+**Security reassurance:**
+
 > MARKAZ will never ask for your password by email.
 
 ## 12.2 Form behaviour
@@ -1201,20 +1230,20 @@ Do not show both. The server-resolved next step determines the action.
 
 ## 12.3 Submit states
 
-| State | Behaviour |
-|---|---|
-| Empty form | Show required errors after submit |
-| Invalid email | Field error; no request |
-| Missing password | Field error; no request |
-| Signing in | Button `Signing in…`; disable fields and duplicate submit |
-| Incorrect credentials | Form-level generic message; keep email, clear password |
-| Unverified email | Explain verification required; actions to verify or resend |
-| Profile incomplete | Authenticate, then route to Complete Profile |
-| UAE PASS incomplete | Authenticate, then route to current identity state |
-| Suspended / unavailable account | Generic account-unavailable message; no detailed reason |
-| Rate limited | Retry-time alert |
-| Provider unavailable | Recoverable provider alert |
-| Successful | Resolve safe destination server-side |
+| State                           | Behaviour                                                  |
+| ------------------------------- | ---------------------------------------------------------- |
+| Empty form                      | Show required errors after submit                          |
+| Invalid email                   | Field error; no request                                    |
+| Missing password                | Field error; no request                                    |
+| Signing in                      | Button `Signing in…`; disable fields and duplicate submit  |
+| Incorrect credentials           | Form-level generic message; keep email, clear password     |
+| Unverified email                | Explain verification required; actions to verify or resend |
+| Profile incomplete              | Authenticate, then route to Complete Profile               |
+| UAE PASS incomplete             | Authenticate, then route to current identity state         |
+| Suspended / unavailable account | Generic account-unavailable message; no detailed reason    |
+| Rate limited                    | Retry-time alert                                           |
+| Provider unavailable            | Recoverable provider alert                                 |
+| Successful                      | Resolve safe destination server-side                       |
 
 ## 12.4 Generic credential error
 
@@ -1226,16 +1255,20 @@ Do not identify which field caused the failure.
 
 Form-level alert:
 
-**Title:**  
+**Title:**
+
 > Verify your email to continue
 
-**Body:**  
+**Body:**
+
 > Your account setup is not complete. Enter the verification code sent to your email.
 
-**Primary action:**  
+**Primary action:**
+
 > Verify email
 
-**Secondary action:**  
+**Secondary action:**
+
 > Resend code
 
 This state is shown only after the user has submitted valid credentials and the provider indicates the account is unverified. It does not appear from email lookup alone.
@@ -1264,22 +1297,28 @@ Then route to the first unmet requirement with a clear status indicator.
 
 ## 13.1 Copy
 
-**Title:**  
+**Title:**
+
 > Reset your password
 
-**Description:**  
+**Description:**
+
 > Enter the email address for your MARKAZ account.
 
-**Field:**  
+**Field:**
+
 > Email address
 
-**Primary button:**  
+**Primary button:**
+
 > Send recovery email
 
-**Secondary link:**  
+**Secondary link:**
+
 > Return to sign in
 
-**Security note:**  
+**Security note:**
+
 > For your security, we will not confirm whether an account exists for this email.
 
 ## 13.2 Behaviour
@@ -1296,22 +1335,28 @@ Then route to the first unmet requirement with a clear status indicator.
 
 ## 13.3 Recovery Email Sent
 
-**Title:**  
+**Title:**
+
 > Check your email
 
-**Body — required:**  
+**Body — required:**
+
 > If an account exists for this email, password recovery instructions have been sent.
 
-**Supporting copy:**  
+**Supporting copy:**
+
 > Open the recovery link in the email to choose a new password. Check your spam or junk folder if it does not arrive.
 
-**Primary button:**  
+**Primary button:**
+
 > Return to sign in
 
-**Secondary action after cooldown:**  
+**Secondary action after cooldown:**
+
 > Send again
 
-**Change action:**  
+**Change action:**
+
 > Use a different email
 
 ## 13.4 Rate-limit state
@@ -1338,10 +1383,12 @@ Do not imply whether an account exists.
 
 ## 14.2 Copy
 
-**Title:**  
+**Title:**
+
 > Choose a new password
 
-**Description:**  
+**Description:**
+
 > Create a password you have not used for this account before.
 
 **Fields:**
@@ -1349,10 +1396,12 @@ Do not imply whether an account exists.
 - New password
 - Confirm new password
 
-**Primary button:**  
+**Primary button:**
+
 > Update password
 
-**Security reassurance:**  
+**Security reassurance:**
+
 > Use a unique password that you do not use on other services.
 
 ## 14.3 Password behaviour
@@ -1383,29 +1432,36 @@ Autocomplete purpose must be new password.
 
 ## 14.5 Invalid or expired recovery session
 
-**Title:**  
+**Title:**
+
 > This password reset link is no longer valid
 
-**Description:**  
+**Description:**
+
 > The link may have expired or already been used. Request a new recovery email to continue.
 
-**Primary button:**  
+**Primary button:**
+
 > Request a new link
 
-**Secondary link:**  
+**Secondary link:**
+
 > Return to sign in
 
 Do not state a hard-coded expiry duration unless provider configuration is confirmed.
 
 ## 14.6 Password Updated
 
-**Title:**  
+**Title:**
+
 > Password updated
 
-**Description:**  
+**Description:**
+
 > Your password has been changed. Sign in with your new password.
 
-**Primary button:**  
+**Primary button:**
+
 > Sign in
 
 ---
@@ -1418,23 +1474,28 @@ Repair missing required profile data after email verification or a returning sig
 
 ## 15.2 Copy
 
-**Setup status:**  
+**Setup status:**
+
 > Account details · Action required
 
-**Title:**  
+**Title:**
+
 > Complete your profile
 
-**Description:**  
+**Description:**
+
 > We are missing a required account detail. Complete it to continue.
 
 When multiple items are missing:
 
 > We are missing a few required account details. Complete them to continue.
 
-**Primary button:**  
+**Primary button:**
+
 > Save and continue
 
-**Reassurance:**  
+**Reassurance:**
+
 > We only ask for information needed to set up your MARKAZ account.
 
 ## 15.3 Fields
@@ -1480,10 +1541,12 @@ Demonstrate the future identity-verification position in the onboarding journey 
 
 Use a small pale-blue information panel near the top of every UAE PASS state:
 
-**Badge:**  
+**Badge:**
+
 > Demo simulation
 
-**Disclosure — required:**  
+**Disclosure — required:**
+
 > Demo simulation only.  
 > This prototype is not connected to the live UAE PASS service.
 
@@ -1497,22 +1560,25 @@ The disclosure remains visible but should not dominate the page:
 
 ## 16.3 State model
 
-| Status | Meaning | User destination |
-|---|---|---|
-| `NOT_STARTED` | User has not started the demo step | Introduction |
-| `PENDING` | Demo check started and awaits selected result | Pending |
-| `VERIFIED_DEMO` | Demo outcome approved | Success / Dashboard |
-| `FAILED_DEMO` | Demo outcome rejected | Failure / Retry |
+| Status          | Meaning                                       | User destination    |
+| --------------- | --------------------------------------------- | ------------------- |
+| `NOT_STARTED`   | User has not started the demo step            | Introduction        |
+| `PENDING`       | Demo check started and awaits selected result | Pending             |
+| `VERIFIED_DEMO` | Demo outcome approved                         | Success / Dashboard |
+| `FAILED_DEMO`   | Demo outcome rejected                         | Failure / Retry     |
 
 ## 16.4 Introduction
 
-**Progress:**  
+**Progress:**
+
 > Step 3 of 3 · Demo identity
 
-**Title:**  
+**Title:**
+
 > Verify your identity for this demo
 
-**Description:**  
+**Description:**
+
 > This prototype includes a simulated identity step so you can experience the complete MARKAZ onboarding journey.
 
 **What happens panel:**
@@ -1523,39 +1589,48 @@ The disclosure remains visible but should not dominate the page:
 > - Show a pending state
 > - Record a demo result
 
-**Primary button:**  
+**Primary button:**
+
 > Start demo verification
 
-**Secondary action:**  
+**Secondary action:**
+
 > Sign out
 
 Do not request Emirates ID, passport, camera, selfie, biometric, date of birth, or nationality.
 
 ## 16.5 Pending
 
-**Title:**  
+**Title:**
+
 > Demo verification in progress
 
-**Description:**  
+**Description:**
+
 > Your demo identity check has started. Use the simulation controls below to choose the result.
 
-**Status chip:**  
+**Status chip:**
+
 > Pending · Demo
 
 ### Demo simulation controls
 
 Place in a distinct, dashed or pale-blue panel below the status content.
 
-**Panel title:**  
+**Panel title:**
+
 > Demo simulation controls
 
-**Panel description:**  
+**Panel description:**
+
 > These controls are available only in the prototype and do not connect to UAE PASS.
 
-**Primary button:**  
+**Primary button:**
+
 > Approve demo verification
 
-**Secondary button:**  
+**Secondary button:**
+
 > Reject
 
 The two actions may be visually distinct because they control the demo outcome:
@@ -1567,16 +1642,20 @@ The two actions may be visually distinct because they control the demo outcome:
 
 ## 16.6 Success
 
-**Title — required:**  
+**Title — required:**
+
 > Demo identity verified
 
-**Description:**  
+**Description:**
+
 > Your account setup is complete. You can now browse properties, make offers, and list a property.
 
-**Status chip:**  
+**Status chip:**
+
 > Verified · Demo
 
-**Primary button:**  
+**Primary button:**
+
 > Go to dashboard
 
 If a safe intended destination exists:
@@ -1591,19 +1670,24 @@ The demo disclosure remains visible.
 
 ## 16.7 Failure
 
-**Title:**  
+**Title:**
+
 > Demo verification was not completed
 
-**Description:**  
+**Description:**
+
 > No official identity check was performed. Try the simulation again to continue.
 
-**Status chip:**  
+**Status chip:**
+
 > Unsuccessful · Demo
 
-**Primary button:**  
+**Primary button:**
+
 > Try again
 
-**Secondary action:**  
+**Secondary action:**
+
 > Sign out
 
 Do not use words such as “fraud”, “rejected by UAE PASS”, or “identity failed”.
@@ -1649,26 +1733,32 @@ A confirmation dialog is not required for normal sign out. Unsaved-work confirma
 
 ## 17.2 Customer Signed Out
 
-**Title:**  
+**Title:**
+
 > You are signed out
 
-**Description:**  
+**Description:**
+
 > Your MARKAZ session has ended.
 
-**Primary button:**  
+**Primary button:**
+
 > Sign in
 
-**Secondary button:**  
+**Secondary button:**
+
 > Browse properties
 
 ## 17.3 Session Expired
 
 Use the Sign In shell with a notice above the form.
 
-**Notice title:**  
+**Notice title:**
+
 > Your session has expired
 
-**Notice body:**  
+**Notice body:**
+
 > For your security, please sign in again. We will return you to a safe page where possible.
 
 The form title remains:
@@ -1719,16 +1809,20 @@ Admin authentication must look related to MARKAZ but operationally distinct.
 
 ## 18.2 Admin Sign In
 
-**Brand label:**  
+**Brand label:**
+
 > MARKAZ Operations
 
-**Eyebrow:**  
+**Eyebrow:**
+
 > Authorised access only
 
-**Title:**  
+**Title:**
+
 > Sign in to Operations
 
-**Description:**  
+**Description:**
+
 > Use your authorised MARKAZ Admin account.
 
 **Fields:**
@@ -1736,13 +1830,16 @@ Admin authentication must look related to MARKAZ but operationally distinct.
 - Email address
 - Password
 
-**Primary button:**  
+**Primary button:**
+
 > Sign in
 
-**Link:**  
+**Link:**
+
 > Forgot password?
 
-**Security note:**  
+**Security note:**
+
 > Access is restricted to authorised MARKAZ personnel.
 
 Use the same generic credential error:
@@ -1763,35 +1860,44 @@ After successful provider authentication:
 
 ## 18.4 Admin Access Denied
 
-**Title:**  
+**Title:**
+
 > Access denied
 
-**Description:**  
+**Description:**
+
 > This account does not have permission to access MARKAZ Operations.
 
-**Supporting copy:**  
+**Supporting copy:**
+
 > Sign out and use an authorised Admin account.
 
-**Primary button:**  
+**Primary button:**
+
 > Sign out
 
-**Secondary link:**  
+**Secondary link:**
+
 > Return to MARKAZ Home
 
 Do not offer Admin registration or role elevation.
 
 ## 18.5 Admin Forgot Password
 
-**Title:**  
+**Title:**
+
 > Reset your Admin password
 
-**Description:**  
+**Description:**
+
 > Enter the email address for your authorised MARKAZ Admin account.
 
-**Primary button:**  
+**Primary button:**
+
 > Send recovery email
 
-**Secondary link:**  
+**Secondary link:**
+
 > Return to Admin sign in
 
 Use the same generic confirmation:
@@ -1802,47 +1908,57 @@ Use the same generic confirmation:
 
 Use the shared password rules and recovery-session handling.
 
-**Title:**  
+**Title:**
+
 > Choose a new Admin password
 
-**Description:**  
+**Description:**
+
 > Create a secure password for your MARKAZ Operations account.
 
-**Primary button:**  
+**Primary button:**
+
 > Update password
 
 ## 18.7 Admin Password Updated
 
-**Title:**  
+**Title:**
+
 > Password updated
 
-**Description:**  
+**Description:**
+
 > Your Admin password has been changed. Sign in with your new password.
 
-**Primary button:**  
+**Primary button:**
+
 > Return to Admin sign in
 
 ## 18.8 Admin Session Expired
 
-**Notice title:**  
+**Notice title:**
+
 > Your Admin session has expired
 
-**Notice body:**  
+**Notice body:**
+
 > For security, sign in again to continue using MARKAZ Operations.
 
 Do not restore a route unless it is an allowlisted Admin route and the account-type check succeeds again.
 
 ## 18.9 Admin Signed Out
 
-**Title:**  
+**Title:**
+
 > You are signed out of MARKAZ Operations
 
-**Description:**  
+**Description:**
+
 > Your Admin session has ended.
 
-**Primary button:**  
-> Return to Admin sign in
+**Primary button:**
 
+> Return to Admin sign in
 
 ---
 
@@ -1850,325 +1966,325 @@ Do not restore a route unless it is an allowlisted Admin route and the account-t
 
 ## 19.1 Authentication Page Shell
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Provides consistent header, main layout, footer, optional support panel, and locale direction |
-| Anatomy | Brand header, main landmark, form region, optional supporting panel, legal footer |
-| Variants | Customer split, customer centred, Admin split, Admin centred, status-only |
-| States | Normal, loading route, provider unavailable, RTL |
-| Interaction | Maintains focus within page flow; no modal trapping |
-| Accessibility | One `main`; skip link; one page-level `h1`; landmarks labelled |
-| RTL | Grid may mirror; content logical order remains form then support for screen readers |
-| Responsive | Support panel hides below 1024 px |
-| Reuse | All authentication, recovery, onboarding, and access states |
+| Attribute     | Specification                                                                                 |
+| ------------- | --------------------------------------------------------------------------------------------- |
+| Purpose       | Provides consistent header, main layout, footer, optional support panel, and locale direction |
+| Anatomy       | Brand header, main landmark, form region, optional supporting panel, legal footer             |
+| Variants      | Customer split, customer centred, Admin split, Admin centred, status-only                     |
+| States        | Normal, loading route, provider unavailable, RTL                                              |
+| Interaction   | Maintains focus within page flow; no modal trapping                                           |
+| Accessibility | One `main`; skip link; one page-level `h1`; landmarks labelled                                |
+| RTL           | Grid may mirror; content logical order remains form then support for screen readers           |
+| Responsive    | Support panel hides below 1024 px                                                             |
+| Reuse         | All authentication, recovery, onboarding, and access states                                   |
 
 ## 19.2 Authentication Form Container
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Groups heading, description, alerts, fields, and actions |
-| Anatomy | Progress, heading block, alert slot, form body, action area, support links |
-| Variants | Borderless, subtle bordered, status panel |
-| States | Default, submitting, success, error |
-| Interaction | Error summary receives focus after invalid submission |
-| Accessibility | Form has accessible name from heading; help and errors associated |
-| RTL | Text aligns to logical start |
-| Responsive | Full width on mobile; max 480–520 px desktop |
-| Reuse | Sign Up, Sign In, Forgot, Reset, Profile |
+| Attribute     | Specification                                                              |
+| ------------- | -------------------------------------------------------------------------- |
+| Purpose       | Groups heading, description, alerts, fields, and actions                   |
+| Anatomy       | Progress, heading block, alert slot, form body, action area, support links |
+| Variants      | Borderless, subtle bordered, status panel                                  |
+| States        | Default, submitting, success, error                                        |
+| Interaction   | Error summary receives focus after invalid submission                      |
+| Accessibility | Form has accessible name from heading; help and errors associated          |
+| RTL           | Text aligns to logical start                                               |
+| Responsive    | Full width on mobile; max 480–520 px desktop                               |
+| Reuse         | Sign Up, Sign In, Forgot, Reset, Profile                                   |
 
 ## 19.3 Brand Header
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Provides trusted product identity and locale control |
-| Anatomy | Logo, optional application label, language switcher, return-home link |
-| Variants | Customer, Operations, compact |
-| States | Default, dark-surface |
-| Interaction | Logo returns to correct application home |
-| Accessibility | Descriptive logo alt text; active locale announced |
-| RTL | Logo at logical start; controls at logical end |
-| Responsive | Compact wordmark on mobile |
-| Reuse | All auth shells |
+| Attribute     | Specification                                                         |
+| ------------- | --------------------------------------------------------------------- |
+| Purpose       | Provides trusted product identity and locale control                  |
+| Anatomy       | Logo, optional application label, language switcher, return-home link |
+| Variants      | Customer, Operations, compact                                         |
+| States        | Default, dark-surface                                                 |
+| Interaction   | Logo returns to correct application home                              |
+| Accessibility | Descriptive logo alt text; active locale announced                    |
+| RTL           | Logo at logical start; controls at logical end                        |
+| Responsive    | Compact wordmark on mobile                                            |
+| Reuse         | All auth shells                                                       |
 
 ## 19.4 Email Input
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Collects sign-up, sign-in, and recovery email |
-| Anatomy | Label, control, optional helper, error, optional verified state |
-| Variants | Editable, read-only verified |
-| States | Empty, focus, valid, invalid, disabled, autofilled |
-| Interaction | Trim outer whitespace on blur/submit; never expose account existence |
-| Accessibility | Persistent label; described-by relationship; error announced |
-| RTL | Input text and caret remain LTR; label aligns to locale |
-| Responsive | 48 px minimum height |
-| Reuse | Customer and Admin auth |
+| Attribute     | Specification                                                        |
+| ------------- | -------------------------------------------------------------------- |
+| Purpose       | Collects sign-up, sign-in, and recovery email                        |
+| Anatomy       | Label, control, optional helper, error, optional verified state      |
+| Variants      | Editable, read-only verified                                         |
+| States        | Empty, focus, valid, invalid, disabled, autofilled                   |
+| Interaction   | Trim outer whitespace on blur/submit; never expose account existence |
+| Accessibility | Persistent label; described-by relationship; error announced         |
+| RTL           | Input text and caret remain LTR; label aligns to locale              |
+| Responsive    | 48 px minimum height                                                 |
+| Reuse         | Customer and Admin auth                                              |
 
 ## 19.5 Password Input
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Secure password entry |
-| Anatomy | Label, password field, show/hide control, helper/error |
-| Variants | Current password, new password, confirm password |
-| States | Default, focus, visible, invalid, disabled, autofilled |
-| Interaction | Show/hide retains focus and caret; does not clear value |
+| Attribute     | Specification                                                                           |
+| ------------- | --------------------------------------------------------------------------------------- |
+| Purpose       | Secure password entry                                                                   |
+| Anatomy       | Label, password field, show/hide control, helper/error                                  |
+| Variants      | Current password, new password, confirm password                                        |
+| States        | Default, focus, visible, invalid, disabled, autofilled                                  |
+| Interaction   | Show/hide retains focus and caret; does not clear value                                 |
 | Accessibility | Toggle label changes between `Show password` and `Hide password`; pressed state exposed |
-| RTL | Password characters and caret remain LTR; toggle at logical end of field |
-| Responsive | 48 px minimum; toggle 44 px hit target |
-| Reuse | Sign Up, Sign In, Reset |
+| RTL           | Password characters and caret remain LTR; toggle at logical end of field                |
+| Responsive    | 48 px minimum; toggle 44 px hit target                                                  |
+| Reuse         | Sign Up, Sign In, Reset                                                                 |
 
 ## 19.6 Password Requirements Checklist
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Makes baseline requirements visible while creating/resetting password |
-| Anatomy | Intro label plus five requirement rows |
-| Variants | Neutral, partially met, all met, submitted error |
-| States | Hidden empty, visible focus, mixed, complete |
-| Interaction | Updates live without stealing focus |
+| Attribute     | Specification                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------- |
+| Purpose       | Makes baseline requirements visible while creating/resetting password                             |
+| Anatomy       | Intro label plus five requirement rows                                                            |
+| Variants      | Neutral, partially met, all met, submitted error                                                  |
+| States        | Hidden empty, visible focus, mixed, complete                                                      |
+| Interaction   | Updates live without stealing focus                                                               |
 | Accessibility | One polite summary announcement when all requirements become met; do not announce every keystroke |
-| RTL | Icons at logical start of each row |
-| Responsive | Stacks naturally below password |
-| Reuse | Sign Up, Reset, Admin Reset |
+| RTL           | Icons at logical start of each row                                                                |
+| Responsive    | Stacks naturally below password                                                                   |
+| Reuse         | Sign Up, Reset, Admin Reset                                                                       |
 
 ## 19.7 Password Strength Indicator
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Supplementary guidance beyond blocking requirements |
-| Anatomy | Three restrained segments and text label |
-| Variants | Incomplete, meets, strong |
-| States | Hidden empty; live update |
-| Interaction | No animation beyond subtle colour change |
-| Accessibility | Text communicates level; bar is decorative or labelled |
-| RTL | Segment filling follows reading direction visually, but label is authoritative |
-| Responsive | Full control width |
-| Reuse | Sign Up and Reset |
+| Attribute     | Specification                                                                  |
+| ------------- | ------------------------------------------------------------------------------ |
+| Purpose       | Supplementary guidance beyond blocking requirements                            |
+| Anatomy       | Three restrained segments and text label                                       |
+| Variants      | Incomplete, meets, strong                                                      |
+| States        | Hidden empty; live update                                                      |
+| Interaction   | No animation beyond subtle colour change                                       |
+| Accessibility | Text communicates level; bar is decorative or labelled                         |
+| RTL           | Segment filling follows reading direction visually, but label is authoritative |
+| Responsive    | Full control width                                                             |
+| Reuse         | Sign Up and Reset                                                              |
 
 ## 19.8 Verification Code Input
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Collects six-digit email-verification code |
-| Anatomy | Group label, single logical input, six visual cells, error |
-| Variants | Default, filled, invalid, expired, disabled |
-| States | Focused digit, complete, verifying |
-| Interaction | Auto-advance, backspace, arrows, full-code paste |
+| Attribute     | Specification                                                         |
+| ------------- | --------------------------------------------------------------------- |
+| Purpose       | Collects six-digit email-verification code                            |
+| Anatomy       | Group label, single logical input, six visual cells, error            |
+| Variants      | Default, filled, invalid, expired, disabled                           |
+| States        | Focused digit, complete, verifying                                    |
+| Interaction   | Auto-advance, backspace, arrows, full-code paste                      |
 | Accessibility | Single accessible input; one-time-code semantics; numeric description |
-| RTL | Digits remain LTR and ordered 1–6 |
-| Responsive | Cells shrink to minimum 44 px with 6 px gaps |
-| Reuse | Customer email verification only unless future approved use |
+| RTL           | Digits remain LTR and ordered 1–6                                     |
+| Responsive    | Cells shrink to minimum 44 px with 6 px gaps                          |
+| Reuse         | Customer email verification only unless future approved use           |
 
 ## 19.9 Legal Checkbox with Linked Text
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Records separate Terms and Privacy consent |
-| Anatomy | Checkbox, sentence, inline legal link, error |
-| Variants | Terms, Privacy |
-| States | Unchecked, focus, checked, invalid, disabled |
-| Interaction | Whole label toggles except link; link opens new tab without toggling |
-| Accessibility | Native/accessible checkbox; link announces new tab |
-| RTL | Checkbox at logical start; text flows RTL |
-| Responsive | Wrapped text remains aligned |
-| Reuse | Sign Up and Profile Completion |
+| Attribute     | Specification                                                        |
+| ------------- | -------------------------------------------------------------------- |
+| Purpose       | Records separate Terms and Privacy consent                           |
+| Anatomy       | Checkbox, sentence, inline legal link, error                         |
+| Variants      | Terms, Privacy                                                       |
+| States        | Unchecked, focus, checked, invalid, disabled                         |
+| Interaction   | Whole label toggles except link; link opens new tab without toggling |
+| Accessibility | Native/accessible checkbox; link announces new tab                   |
+| RTL           | Checkbox at logical start; text flows RTL                            |
+| Responsive    | Wrapped text remains aligned                                         |
+| Reuse         | Sign Up and Profile Completion                                       |
 
 ## 19.10 Primary Button
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Dominant screen action |
-| Anatomy | Label, optional leading spinner |
-| Variants | Standard, destructive only where explicitly approved |
-| States | Default, hover, focus, active, disabled, loading |
-| Interaction | Prevents double submit while loading |
+| Attribute     | Specification                                              |
+| ------------- | ---------------------------------------------------------- |
+| Purpose       | Dominant screen action                                     |
+| Anatomy       | Label, optional leading spinner                            |
+| Variants      | Standard, destructive only where explicitly approved       |
+| States        | Default, hover, focus, active, disabled, loading           |
+| Interaction   | Prevents double submit while loading                       |
 | Accessibility | Minimum 44 px; loading announced; label remains meaningful |
-| RTL | Icon position uses logical start |
-| Responsive | Full width on mobile; form width on desktop |
-| Reuse | All auth screens |
+| RTL           | Icon position uses logical start                           |
+| Responsive    | Full width on mobile; form width on desktop                |
+| Reuse         | All auth screens                                           |
 
 ## 19.11 Secondary Button
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Non-dominant alternative action |
-| Anatomy | Label, optional icon |
-| Variants | Outline, quiet |
-| States | Standard interactive states |
-| Interaction | Never competes visually with primary action |
-| Accessibility | Same target and focus requirements |
-| RTL | Logical icon positioning |
-| Responsive | Full width below primary when paired on mobile |
-| Reuse | Back, Browse, Reject demo, Return home |
+| Attribute     | Specification                                  |
+| ------------- | ---------------------------------------------- |
+| Purpose       | Non-dominant alternative action                |
+| Anatomy       | Label, optional icon                           |
+| Variants      | Outline, quiet                                 |
+| States        | Standard interactive states                    |
+| Interaction   | Never competes visually with primary action    |
+| Accessibility | Same target and focus requirements             |
+| RTL           | Logical icon positioning                       |
+| Responsive    | Full width below primary when paired on mobile |
+| Reuse         | Back, Browse, Reject demo, Return home         |
 
 ## 19.12 Text Link
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Low-emphasis navigation or recovery action |
-| Anatomy | Descriptive text with optional icon |
-| Variants | Inline, standalone, external |
-| States | Default, hover, focus, visited where appropriate |
-| Interaction | External legal links preserve form |
+| Attribute     | Specification                                                    |
+| ------------- | ---------------------------------------------------------------- |
+| Purpose       | Low-emphasis navigation or recovery action                       |
+| Anatomy       | Descriptive text with optional icon                              |
+| Variants      | Inline, standalone, external                                     |
+| States        | Default, hover, focus, visited where appropriate                 |
+| Interaction   | External legal links preserve form                               |
 | Accessibility | Never use `Click here`; visible focus; external intent announced |
-| RTL | Arrow mirrors when directional |
-| Responsive | 44 px effective touch area for standalone links |
-| Reuse | Sign In, Create Account, Forgot, change email |
+| RTL           | Arrow mirrors when directional                                   |
+| Responsive    | 44 px effective touch area for standalone links                  |
+| Reuse         | Sign In, Create Account, Forgot, change email                    |
 
 ## 19.13 Inline Field Error
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Explains a field-specific problem |
-| Anatomy | Error icon, concise text |
-| Variants | Error, warning only when non-blocking |
-| States | Appears on blur or submit according to field rule |
-| Interaction | Clears when field becomes valid; not merely on focus |
+| Attribute     | Specification                                          |
+| ------------- | ------------------------------------------------------ |
+| Purpose       | Explains a field-specific problem                      |
+| Anatomy       | Error icon, concise text                               |
+| Variants      | Error, warning only when non-blocking                  |
+| States        | Appears on blur or submit according to field rule      |
+| Interaction   | Clears when field becomes valid; not merely on focus   |
 | Accessibility | Associated through described-by; invalid state exposed |
-| RTL | Icon at logical start; text logical alignment |
-| Responsive | Wraps beneath field |
-| Reuse | All forms |
+| RTL           | Icon at logical start; text logical alignment          |
+| Responsive    | Wraps beneath field                                    |
+| Reuse         | All forms                                              |
 
 ## 19.14 Form-Level Alert
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Communicates account, provider, rate-limit, or cross-field failure |
-| Anatomy | Icon, title, body, optional actions |
-| Variants | Error, warning, information |
-| States | Static, dismissible only when safe |
-| Interaction | Receives focus after failed server submission |
+| Attribute     | Specification                                                      |
+| ------------- | ------------------------------------------------------------------ |
+| Purpose       | Communicates account, provider, rate-limit, or cross-field failure |
+| Anatomy       | Icon, title, body, optional actions                                |
+| Variants      | Error, warning, information                                        |
+| States        | Static, dismissible only when safe                                 |
+| Interaction   | Receives focus after failed server submission                      |
 | Accessibility | Alert semantics for immediate errors; avoid repeated announcements |
-| RTL | Logical alignment and action order |
-| Responsive | Actions stack on mobile |
-| Reuse | Duplicate safe, credentials, unverified, provider, rate limit |
+| RTL           | Logical alignment and action order                                 |
+| Responsive    | Actions stack on mobile                                            |
+| Reuse         | Duplicate safe, credentials, unverified, provider, rate limit      |
 
 ## 19.15 Loading Button
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Shows an in-progress action without layout shift |
-| Anatomy | Spinner, progressive label |
-| Variants | Primary and secondary |
-| States | Loading only |
-| Interaction | Disabled from repeat clicks; retains width |
-| Accessibility | Busy state; polite status text |
-| RTL | Spinner at logical start |
-| Responsive | Full width where parent button is full width |
-| Reuse | All submissions |
+| Attribute     | Specification                                    |
+| ------------- | ------------------------------------------------ |
+| Purpose       | Shows an in-progress action without layout shift |
+| Anatomy       | Spinner, progressive label                       |
+| Variants      | Primary and secondary                            |
+| States        | Loading only                                     |
+| Interaction   | Disabled from repeat clicks; retains width       |
+| Accessibility | Busy state; polite status text                   |
+| RTL           | Spinner at logical start                         |
+| Responsive    | Full width where parent button is full width     |
+| Reuse         | All submissions                                  |
 
 ## 19.16 Success Panel
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Confirms completion and next step |
-| Anatomy | Success icon, title, body, action |
-| Variants | Email verified, password updated, identity verified, signed out |
-| States | Static |
-| Interaction | Focus moves to heading after navigation |
-| Accessibility | Icon decorative; success conveyed in text |
-| RTL | Logical alignment |
-| Responsive | Max 520 px; action full width mobile |
-| Reuse | All success screens |
+| Attribute     | Specification                                                   |
+| ------------- | --------------------------------------------------------------- |
+| Purpose       | Confirms completion and next step                               |
+| Anatomy       | Success icon, title, body, action                               |
+| Variants      | Email verified, password updated, identity verified, signed out |
+| States        | Static                                                          |
+| Interaction   | Focus moves to heading after navigation                         |
+| Accessibility | Icon decorative; success conveyed in text                       |
+| RTL           | Logical alignment                                               |
+| Responsive    | Max 520 px; action full width mobile                            |
+| Reuse         | All success screens                                             |
 
 ## 19.17 Error Panel
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Handles blocking but recoverable failure |
-| Anatomy | Error icon, title, body, primary recovery, secondary exit, reference ID optional |
-| Variants | Provider unavailable, unexpected, invalid recovery |
-| States | Static or retrying |
-| Interaction | Retry uses loading state |
-| Accessibility | Heading focused after navigation |
-| RTL | Logical alignment |
-| Responsive | Max 520 px |
-| Reuse | Global auth errors |
+| Attribute     | Specification                                                                    |
+| ------------- | -------------------------------------------------------------------------------- |
+| Purpose       | Handles blocking but recoverable failure                                         |
+| Anatomy       | Error icon, title, body, primary recovery, secondary exit, reference ID optional |
+| Variants      | Provider unavailable, unexpected, invalid recovery                               |
+| States        | Static or retrying                                                               |
+| Interaction   | Retry uses loading state                                                         |
+| Accessibility | Heading focused after navigation                                                 |
+| RTL           | Logical alignment                                                                |
+| Responsive    | Max 520 px                                                                       |
+| Reuse         | Global auth errors                                                               |
 
 ## 19.18 Simulation Badge
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Prevents confusion between demo and official identity verification |
-| Anatomy | Information icon and `Demo simulation` text |
-| Variants | Neutral demo, pending demo, verified demo, unsuccessful demo |
-| States | Mirrors identity state without becoming an official seal |
-| Interaction | Non-interactive |
-| Accessibility | Full status text exposed |
-| RTL | Icon at logical start |
-| Responsive | Wraps; never truncates |
-| Reuse | All UAE PASS states |
+| Attribute     | Specification                                                      |
+| ------------- | ------------------------------------------------------------------ |
+| Purpose       | Prevents confusion between demo and official identity verification |
+| Anatomy       | Information icon and `Demo simulation` text                        |
+| Variants      | Neutral demo, pending demo, verified demo, unsuccessful demo       |
+| States        | Mirrors identity state without becoming an official seal           |
+| Interaction   | Non-interactive                                                    |
+| Accessibility | Full status text exposed                                           |
+| RTL           | Icon at logical start                                              |
+| Responsive    | Wraps; never truncates                                             |
+| Reuse         | All UAE PASS states                                                |
 
 ## 19.19 Authentication Progress Indicator
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Explains account-setup progress |
-| Anatomy | Three milestones or compact step label |
-| Variants | Linear new flow, setup-status resume |
-| States | Complete, current, upcoming, action required |
-| Interaction | Non-clickable; prevents skipping |
-| Accessibility | Ordered list with current step |
-| RTL | Visual order mirrors; semantic order remains correct for locale |
-| Responsive | Compact label + line on mobile |
-| Reuse | Sign Up, Verify, Profile, UAE PASS |
+| Attribute     | Specification                                                   |
+| ------------- | --------------------------------------------------------------- |
+| Purpose       | Explains account-setup progress                                 |
+| Anatomy       | Three milestones or compact step label                          |
+| Variants      | Linear new flow, setup-status resume                            |
+| States        | Complete, current, upcoming, action required                    |
+| Interaction   | Non-clickable; prevents skipping                                |
+| Accessibility | Ordered list with current step                                  |
+| RTL           | Visual order mirrors; semantic order remains correct for locale |
+| Responsive    | Compact label + line on mobile                                  |
+| Reuse         | Sign Up, Verify, Profile, UAE PASS                              |
 
 ## 19.20 Resend Countdown
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Communicates when a new code/request may be sent |
-| Anatomy | Disabled action with time, enabled action |
-| Variants | Verification, recovery |
-| States | Counting, available, sending, rate limited |
-| Interaction | Server retry time governs |
+| Attribute     | Specification                                       |
+| ------------- | --------------------------------------------------- |
+| Purpose       | Communicates when a new code/request may be sent    |
+| Anatomy       | Disabled action with time, enabled action           |
+| Variants      | Verification, recovery                              |
+| States        | Counting, available, sending, rate limited          |
+| Interaction   | Server retry time governs                           |
 | Accessibility | Do not announce every second; announce availability |
-| RTL | Time digits remain LTR |
-| Responsive | Inline or own row mobile |
-| Reuse | Verify and recovery confirmation |
+| RTL           | Time digits remain LTR                              |
+| Responsive    | Inline or own row mobile                            |
+| Reuse         | Verify and recovery confirmation                    |
 
 ## 19.21 Session-Expired Notice
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Explains why re-authentication is required |
-| Anatomy | Info icon, title, explanation |
-| Variants | Customer, Admin |
-| States | Static |
-| Interaction | Does not dismiss until sign-in or navigation away |
-| Accessibility | Read before form through DOM order |
-| RTL | Logical alignment |
-| Responsive | Full form width |
-| Reuse | Customer and Admin Sign In |
+| Attribute     | Specification                                     |
+| ------------- | ------------------------------------------------- |
+| Purpose       | Explains why re-authentication is required        |
+| Anatomy       | Info icon, title, explanation                     |
+| Variants      | Customer, Admin                                   |
+| States        | Static                                            |
+| Interaction   | Does not dismiss until sign-in or navigation away |
+| Accessibility | Read before form through DOM order                |
+| RTL           | Logical alignment                                 |
+| Responsive    | Full form width                                   |
+| Reuse         | Customer and Admin Sign In                        |
 
 ## 19.22 Access-Denied State
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Blocks non-Admin account from Operations |
-| Anatomy | Lock icon, heading, explanation, Sign Out, return link |
-| Variants | Admin only |
-| States | Static, signing out |
-| Interaction | No route into portal |
-| Accessibility | Focus heading; clear button labels |
-| RTL | Logical order |
-| Responsive | Centred max 520 px |
-| Reuse | Admin account-type denial |
+| Attribute     | Specification                                          |
+| ------------- | ------------------------------------------------------ |
+| Purpose       | Blocks non-Admin account from Operations               |
+| Anatomy       | Lock icon, heading, explanation, Sign Out, return link |
+| Variants      | Admin only                                             |
+| States        | Static, signing out                                    |
+| Interaction   | No route into portal                                   |
+| Accessibility | Focus heading; clear button labels                     |
+| RTL           | Logical order                                          |
+| Responsive    | Centred max 520 px                                     |
+| Reuse         | Admin account-type denial                              |
 
 ## 19.23 Account Menu Sign Out Item
 
-| Attribute | Specification |
-|---|---|
-| Purpose | Ends active session |
-| Anatomy | Sign-out icon, text |
-| Variants | Customer, Admin |
-| States | Default, hover, focus, loading |
-| Interaction | Immediate sign out; close menu; navigate to confirmation |
-| Accessibility | Menuitem semantics; keyboard activation |
-| RTL | Icon at logical start |
-| Responsive | Works in desktop menu and mobile account sheet |
-| Reuse | Both applications |
+| Attribute     | Specification                                            |
+| ------------- | -------------------------------------------------------- |
+| Purpose       | Ends active session                                      |
+| Anatomy       | Sign-out icon, text                                      |
+| Variants      | Customer, Admin                                          |
+| States        | Default, hover, focus, loading                           |
+| Interaction   | Immediate sign out; close menu; navigate to confirmation |
+| Accessibility | Menuitem semantics; keyboard activation                  |
+| RTL           | Icon at logical start                                    |
+| Responsive    | Works in desktop menu and mobile account sheet           |
+| Reuse         | Both applications                                        |
 
 ---
 
@@ -2176,42 +2292,42 @@ Do not restore a route unless it is an allowlisted Admin route and the account-t
 
 All messages below are approved English product copy. Arabic status indicates required review before release.
 
-| Field / state | Trigger | English message | Placement | Clears when | Submit allowed? | Arabic review |
-|---|---|---|---|---|---|---|
-| Full name empty | Blur after interaction or submit | `Enter your full name.` | Under field | Non-empty valid value | No | Language review |
-| Full name too short | Blur or submit; trimmed length < 2 | `Enter at least 2 characters.` | Under field | Length ≥ 2 | No | Language review |
-| Full name too long | Input/submit; length > 100 | `Full name must be 100 characters or fewer.` | Under field | Length ≤ 100 | No | Language review |
-| Email empty | Blur after interaction or submit | `Enter your email address.` | Under field | Non-empty | No | Language review |
-| Email invalid | Blur or submit | `Enter a valid email address.` | Under field | Valid syntax | No | Language review |
-| Email whitespace | Leading/trailing whitespace | No error; trim on blur/submission | Control value | Normalised | Yes if otherwise valid | N/A |
-| Existing-account-safe failure | Sign-up server response | `We could not create a new account with these details. You may already have an account. Try signing in or resetting your password.` | Form alert | User edits details or navigates | No pending retry | Security + language review |
-| Password empty | Submit or blur after interaction | `Enter a password.` | Under field | Non-empty | No | Language review |
-| Password too short | Checklist/live and submit | `Use at least 8 characters.` | Checklist and error | Requirement met | No | Language review |
-| Uppercase missing | Checklist/live and submit | `Add at least one uppercase letter.` | Checklist | Requirement met | No | Language review |
-| Lowercase missing | Checklist/live and submit | `Add at least one lowercase letter.` | Checklist | Requirement met | No | Language review |
-| Number missing | Checklist/live and submit | `Add at least one number.` | Checklist | Requirement met | No | Language review |
-| Special missing | Checklist/live and submit | `Add at least one special character.` | Checklist | Requirement met | No | Language review |
-| Password too long | Input/submit > 128 | `Password must be 128 characters or fewer.` | Under field | Length ≤ 128 | No | Language review |
-| Confirm password empty | Submit or blur after password entered | `Confirm your password.` | Under field | Non-empty | No | Language review |
-| Password mismatch | Confirm blur or submit | `Passwords do not match.` | Under confirm field | Exact match | No | Language review |
-| Terms not accepted | Submit | `Accept the Terms of Use to create an account.` | Under checkbox | Checked | No | Legal + language review |
-| Privacy not accepted | Submit | `Accept the Privacy Policy to create an account.` | Under checkbox | Checked | No | Legal + language review |
-| Incorrect credentials | Sign-in response | `The email or password is incorrect.` | Form alert | New submit / edit | No | Security + language review |
-| Email unverified | Sign-in state resolution | `Verify your email to continue.` | Form alert | Verification complete | No protected access | Language review |
-| Verification code empty | Submit | `Enter the six-digit verification code.` | Under code group | Six digits entered | No | Language review |
-| Verification code incomplete | Submit with 1–5 digits | `Enter all six digits.` | Under code group | Six digits | No | Language review |
-| Invalid verification code | Provider response | `That code is not correct. Check the six digits and try again.` | Under code group + summary | New valid verification | No | Security + language review |
-| Expired verification code | Provider response | `This code has expired. Request a new code to continue.` | Form alert | New code sent | No | Security + language review |
-| Too many code attempts | Provider/rule response | `Too many unsuccessful attempts. Request a new code to continue.` | Form alert | New code sent / cooldown | No | Security + language review |
-| Rate limited | Provider response | `Too many requests. Please wait {time} before trying again.` | Form alert | Retry time reached | No until retry | Security + language review |
-| Provider unavailable | Provider/network response | `The authentication service is temporarily unavailable. Try again shortly.` | Form alert or Error Panel | Retry succeeds | No | Language review |
-| Account unavailable | Auth response | `We cannot sign you in to this account right now. Contact MARKAZ support if you believe this is a mistake.` | Form alert | Support resolution | No | Security + language review |
-| Recovery email invalid | Client validation | `Enter a valid email address.` | Under field | Valid | No | Language review |
-| Invalid recovery session | Missing/invalid token/session | `This password reset link is no longer valid.` | Error panel | New valid link | No | Security + language review |
-| Expired recovery session | Provider response | `The link may have expired or already been used. Request a new recovery email to continue.` | Error panel | New valid link | No | Security + language review |
-| Expired session | Protected request/session event | `Your session has expired. Sign in again to continue.` | Notice above Sign In | New session | No protected access | Security + language review |
-| Admin access denied | Authenticated non-Admin | `This account does not have permission to access MARKAZ Operations.` | Access Denied panel | Admin sign-in | No | Security + language review |
-| Unexpected error | Unclassified safe error | `We could not complete this request. Try again.` | Error panel | Retry succeeds | No | Language review |
+| Field / state                 | Trigger                               | English message                                                                                                                     | Placement                  | Clears when                     | Submit allowed?        | Arabic review              |
+| ----------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------- | ---------------------- | -------------------------- |
+| Full name empty               | Blur after interaction or submit      | `Enter your full name.`                                                                                                             | Under field                | Non-empty valid value           | No                     | Language review            |
+| Full name too short           | Blur or submit; trimmed length < 2    | `Enter at least 2 characters.`                                                                                                      | Under field                | Length ≥ 2                      | No                     | Language review            |
+| Full name too long            | Input/submit; length > 100            | `Full name must be 100 characters or fewer.`                                                                                        | Under field                | Length ≤ 100                    | No                     | Language review            |
+| Email empty                   | Blur after interaction or submit      | `Enter your email address.`                                                                                                         | Under field                | Non-empty                       | No                     | Language review            |
+| Email invalid                 | Blur or submit                        | `Enter a valid email address.`                                                                                                      | Under field                | Valid syntax                    | No                     | Language review            |
+| Email whitespace              | Leading/trailing whitespace           | No error; trim on blur/submission                                                                                                   | Control value              | Normalised                      | Yes if otherwise valid | N/A                        |
+| Existing-account-safe failure | Sign-up server response               | `We could not create a new account with these details. You may already have an account. Try signing in or resetting your password.` | Form alert                 | User edits details or navigates | No pending retry       | Security + language review |
+| Password empty                | Submit or blur after interaction      | `Enter a password.`                                                                                                                 | Under field                | Non-empty                       | No                     | Language review            |
+| Password too short            | Checklist/live and submit             | `Use at least 8 characters.`                                                                                                        | Checklist and error        | Requirement met                 | No                     | Language review            |
+| Uppercase missing             | Checklist/live and submit             | `Add at least one uppercase letter.`                                                                                                | Checklist                  | Requirement met                 | No                     | Language review            |
+| Lowercase missing             | Checklist/live and submit             | `Add at least one lowercase letter.`                                                                                                | Checklist                  | Requirement met                 | No                     | Language review            |
+| Number missing                | Checklist/live and submit             | `Add at least one number.`                                                                                                          | Checklist                  | Requirement met                 | No                     | Language review            |
+| Special missing               | Checklist/live and submit             | `Add at least one special character.`                                                                                               | Checklist                  | Requirement met                 | No                     | Language review            |
+| Password too long             | Input/submit > 128                    | `Password must be 128 characters or fewer.`                                                                                         | Under field                | Length ≤ 128                    | No                     | Language review            |
+| Confirm password empty        | Submit or blur after password entered | `Confirm your password.`                                                                                                            | Under field                | Non-empty                       | No                     | Language review            |
+| Password mismatch             | Confirm blur or submit                | `Passwords do not match.`                                                                                                           | Under confirm field        | Exact match                     | No                     | Language review            |
+| Terms not accepted            | Submit                                | `Accept the Terms of Use to create an account.`                                                                                     | Under checkbox             | Checked                         | No                     | Legal + language review    |
+| Privacy not accepted          | Submit                                | `Accept the Privacy Policy to create an account.`                                                                                   | Under checkbox             | Checked                         | No                     | Legal + language review    |
+| Incorrect credentials         | Sign-in response                      | `The email or password is incorrect.`                                                                                               | Form alert                 | New submit / edit               | No                     | Security + language review |
+| Email unverified              | Sign-in state resolution              | `Verify your email to continue.`                                                                                                    | Form alert                 | Verification complete           | No protected access    | Language review            |
+| Verification code empty       | Submit                                | `Enter the six-digit verification code.`                                                                                            | Under code group           | Six digits entered              | No                     | Language review            |
+| Verification code incomplete  | Submit with 1–5 digits                | `Enter all six digits.`                                                                                                             | Under code group           | Six digits                      | No                     | Language review            |
+| Invalid verification code     | Provider response                     | `That code is not correct. Check the six digits and try again.`                                                                     | Under code group + summary | New valid verification          | No                     | Security + language review |
+| Expired verification code     | Provider response                     | `This code has expired. Request a new code to continue.`                                                                            | Form alert                 | New code sent                   | No                     | Security + language review |
+| Too many code attempts        | Provider/rule response                | `Too many unsuccessful attempts. Request a new code to continue.`                                                                   | Form alert                 | New code sent / cooldown        | No                     | Security + language review |
+| Rate limited                  | Provider response                     | `Too many requests. Please wait {time} before trying again.`                                                                        | Form alert                 | Retry time reached              | No until retry         | Security + language review |
+| Provider unavailable          | Provider/network response             | `The authentication service is temporarily unavailable. Try again shortly.`                                                         | Form alert or Error Panel  | Retry succeeds                  | No                     | Language review            |
+| Account unavailable           | Auth response                         | `We cannot sign you in to this account right now. Contact MARKAZ support if you believe this is a mistake.`                         | Form alert                 | Support resolution              | No                     | Security + language review |
+| Recovery email invalid        | Client validation                     | `Enter a valid email address.`                                                                                                      | Under field                | Valid                           | No                     | Language review            |
+| Invalid recovery session      | Missing/invalid token/session         | `This password reset link is no longer valid.`                                                                                      | Error panel                | New valid link                  | No                     | Security + language review |
+| Expired recovery session      | Provider response                     | `The link may have expired or already been used. Request a new recovery email to continue.`                                         | Error panel                | New valid link                  | No                     | Security + language review |
+| Expired session               | Protected request/session event       | `Your session has expired. Sign in again to continue.`                                                                              | Notice above Sign In       | New session                     | No protected access    | Security + language review |
+| Admin access denied           | Authenticated non-Admin               | `This account does not have permission to access MARKAZ Operations.`                                                                | Access Denied panel        | Admin sign-in                   | No                     | Security + language review |
+| Unexpected error              | Unclassified safe error               | `We could not complete this request. Try again.`                                                                                    | Error panel                | Retry succeeds                  | No                     | Language review            |
 
 ## 20.1 Validation timing summary
 
@@ -2573,7 +2689,6 @@ Additional requirements:
 - If a server retry time is known, display it
 - Do not require the user to act within an unnecessarily short UI-only timeout
 
-
 ---
 
 # 25. Exact English Copy
@@ -2582,205 +2697,205 @@ This section is the master English copy reference. Screen sections remain author
 
 ## 25.1 Navigation and common actions
 
-| Key | English |
-|---|---|
-| `auth.signIn` | Sign in |
-| `auth.createAccount` | Create account |
-| `auth.signOut` | Sign out |
-| `auth.returnHome` | Back to MARKAZ Home |
-| `auth.tryAgain` | Try again |
-| `auth.continue` | Continue |
-| `auth.cancel` | Cancel |
-| `auth.back` | Back |
-| `auth.languageEnglish` | English |
-| `auth.languageArabic` | العربية |
+| Key                    | English             |
+| ---------------------- | ------------------- |
+| `auth.signIn`          | Sign in             |
+| `auth.createAccount`   | Create account      |
+| `auth.signOut`         | Sign out            |
+| `auth.returnHome`      | Back to MARKAZ Home |
+| `auth.tryAgain`        | Try again           |
+| `auth.continue`        | Continue            |
+| `auth.cancel`          | Cancel              |
+| `auth.back`            | Back                |
+| `auth.languageEnglish` | English             |
+| `auth.languageArabic`  | العربية             |
 
 ## 25.2 Create Account
 
-| Key | English |
-|---|---|
-| `signup.title` | Create your MARKAZ account |
-| `signup.description` | One account lets you browse properties, make offers, list a property, and track transactions. |
-| `signup.fullName` | Full name |
-| `signup.fullNamePlaceholder` | Enter your full name |
-| `signup.email` | Email address |
-| `signup.emailPlaceholder` | you@example.com |
-| `signup.password` | Password |
-| `signup.passwordPlaceholder` | Create a password |
-| `signup.confirmPassword` | Confirm password |
-| `signup.confirmPasswordPlaceholder` | Re-enter your password |
-| `signup.terms` | I agree to the Terms of Use. |
-| `signup.privacy` | I agree to the Privacy Policy. |
-| `signup.submit` | Create account |
-| `signup.submitting` | Creating account… |
-| `signup.existing` | Already have an account? |
-| `signup.security` | Your account details are protected using secure authentication. |
+| Key                                 | English                                                                                       |
+| ----------------------------------- | --------------------------------------------------------------------------------------------- |
+| `signup.title`                      | Create your MARKAZ account                                                                    |
+| `signup.description`                | One account lets you browse properties, make offers, list a property, and track transactions. |
+| `signup.fullName`                   | Full name                                                                                     |
+| `signup.fullNamePlaceholder`        | Enter your full name                                                                          |
+| `signup.email`                      | Email address                                                                                 |
+| `signup.emailPlaceholder`           | you@example.com                                                                               |
+| `signup.password`                   | Password                                                                                      |
+| `signup.passwordPlaceholder`        | Create a password                                                                             |
+| `signup.confirmPassword`            | Confirm password                                                                              |
+| `signup.confirmPasswordPlaceholder` | Re-enter your password                                                                        |
+| `signup.terms`                      | I agree to the Terms of Use.                                                                  |
+| `signup.privacy`                    | I agree to the Privacy Policy.                                                                |
+| `signup.submit`                     | Create account                                                                                |
+| `signup.submitting`                 | Creating account…                                                                             |
+| `signup.existing`                   | Already have an account?                                                                      |
+| `signup.security`                   | Your account details are protected using secure authentication.                               |
 
 ## 25.3 Password
 
-| Key | English |
-|---|---|
-| `password.show` | Show password |
-| `password.hide` | Hide password |
-| `password.requirementsTitle` | Your password must include: |
-| `password.length` | At least 8 characters |
-| `password.uppercase` | One uppercase letter |
-| `password.lowercase` | One lowercase letter |
-| `password.number` | One number |
-| `password.special` | One special character |
-| `password.incomplete` | Does not yet meet the requirements |
-| `password.meets` | Meets the requirements |
-| `password.strong` | Strong password |
-| `password.unique` | Use a unique password that you do not use on other services. |
+| Key                          | English                                                      |
+| ---------------------------- | ------------------------------------------------------------ |
+| `password.show`              | Show password                                                |
+| `password.hide`              | Hide password                                                |
+| `password.requirementsTitle` | Your password must include:                                  |
+| `password.length`            | At least 8 characters                                        |
+| `password.uppercase`         | One uppercase letter                                         |
+| `password.lowercase`         | One lowercase letter                                         |
+| `password.number`            | One number                                                   |
+| `password.special`           | One special character                                        |
+| `password.incomplete`        | Does not yet meet the requirements                           |
+| `password.meets`             | Meets the requirements                                       |
+| `password.strong`            | Strong password                                              |
+| `password.unique`            | Use a unique password that you do not use on other services. |
 
 ## 25.4 Verification
 
-| Key | English |
-|---|---|
-| `verify.checkEmailTitle` | Check your email |
-| `verify.sentCode` | We sent a six-digit verification code to {email}. |
-| `verify.checkEmailBody` | Enter the code to verify your email and continue setting up your account. |
-| `verify.enterCode` | Enter verification code |
-| `verify.title` | Verify your email |
-| `verify.description` | Enter the six-digit code sent to {email}. |
-| `verify.codeLabel` | Verification code |
-| `verify.submit` | Verify email |
-| `verify.submitting` | Verifying… |
-| `verify.resend` | Resend code |
-| `verify.resendIn` | Resend code in {time} |
-| `verify.resending` | Sending new code… |
-| `verify.changeEmail` | Use a different email |
-| `verify.help` | Codes can take a few minutes to arrive. Check your spam or junk folder. |
-| `verify.resent` | A new verification code has been sent. |
-| `verify.successTitle` | Email verified |
-| `verify.successBody` | Your email is confirmed. Next, complete the demo identity step. |
-| `verify.continueIdentity` | Continue to demo identity |
-| `verify.completeProfile` | Complete profile |
+| Key                       | English                                                                   |
+| ------------------------- | ------------------------------------------------------------------------- |
+| `verify.checkEmailTitle`  | Check your email                                                          |
+| `verify.sentCode`         | We sent a six-digit verification code to {email}.                         |
+| `verify.checkEmailBody`   | Enter the code to verify your email and continue setting up your account. |
+| `verify.enterCode`        | Enter verification code                                                   |
+| `verify.title`            | Verify your email                                                         |
+| `verify.description`      | Enter the six-digit code sent to {email}.                                 |
+| `verify.codeLabel`        | Verification code                                                         |
+| `verify.submit`           | Verify email                                                              |
+| `verify.submitting`       | Verifying…                                                                |
+| `verify.resend`           | Resend code                                                               |
+| `verify.resendIn`         | Resend code in {time}                                                     |
+| `verify.resending`        | Sending new code…                                                         |
+| `verify.changeEmail`      | Use a different email                                                     |
+| `verify.help`             | Codes can take a few minutes to arrive. Check your spam or junk folder.   |
+| `verify.resent`           | A new verification code has been sent.                                    |
+| `verify.successTitle`     | Email verified                                                            |
+| `verify.successBody`      | Your email is confirmed. Next, complete the demo identity step.           |
+| `verify.continueIdentity` | Continue to demo identity                                                 |
+| `verify.completeProfile`  | Complete profile                                                          |
 
 ## 25.5 Sign In
 
-| Key | English |
-|---|---|
-| `signin.title` | Welcome back |
-| `signin.description` | Sign in to manage your properties, offers, and transactions. |
-| `signin.passwordPlaceholder` | Enter your password |
-| `signin.submit` | Sign in |
-| `signin.submitting` | Signing in… |
-| `signin.forgot` | Forgot password? |
-| `signin.new` | New to MARKAZ? |
-| `signin.security` | MARKAZ will never ask for your password by email. |
-| `signin.incorrect` | The email or password is incorrect. |
-| `signin.verifyTitle` | Verify your email to continue |
-| `signin.verifyBody` | Your account setup is not complete. Enter the verification code sent to your email. |
-| `signin.resuming` | Resuming your account setup… |
+| Key                          | English                                                                             |
+| ---------------------------- | ----------------------------------------------------------------------------------- |
+| `signin.title`               | Welcome back                                                                        |
+| `signin.description`         | Sign in to manage your properties, offers, and transactions.                        |
+| `signin.passwordPlaceholder` | Enter your password                                                                 |
+| `signin.submit`              | Sign in                                                                             |
+| `signin.submitting`          | Signing in…                                                                         |
+| `signin.forgot`              | Forgot password?                                                                    |
+| `signin.new`                 | New to MARKAZ?                                                                      |
+| `signin.security`            | MARKAZ will never ask for your password by email.                                   |
+| `signin.incorrect`           | The email or password is incorrect.                                                 |
+| `signin.verifyTitle`         | Verify your email to continue                                                       |
+| `signin.verifyBody`          | Your account setup is not complete. Enter the verification code sent to your email. |
+| `signin.resuming`            | Resuming your account setup…                                                        |
 
 ## 25.6 Recovery
 
-| Key | English |
-|---|---|
-| `forgot.title` | Reset your password |
-| `forgot.description` | Enter the email address for your MARKAZ account. |
-| `forgot.submit` | Send recovery email |
-| `forgot.submitting` | Sending recovery email… |
-| `forgot.return` | Return to sign in |
-| `forgot.security` | For your security, we will not confirm whether an account exists for this email. |
-| `forgot.sentTitle` | Check your email |
-| `forgot.sentBody` | If an account exists for this email, password recovery instructions have been sent. |
-| `forgot.sentHelp` | Open the recovery link in the email to choose a new password. Check your spam or junk folder if it does not arrive. |
-| `forgot.sendAgain` | Send again |
-| `forgot.changeEmail` | Use a different email |
-| `reset.title` | Choose a new password |
-| `reset.description` | Create a password you have not used for this account before. |
-| `reset.newPassword` | New password |
-| `reset.confirm` | Confirm new password |
-| `reset.submit` | Update password |
-| `reset.submitting` | Updating password… |
-| `reset.invalidTitle` | This password reset link is no longer valid |
-| `reset.invalidBody` | The link may have expired or already been used. Request a new recovery email to continue. |
-| `reset.requestNew` | Request a new link |
-| `reset.successTitle` | Password updated |
-| `reset.successBody` | Your password has been changed. Sign in with your new password. |
+| Key                  | English                                                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `forgot.title`       | Reset your password                                                                                                 |
+| `forgot.description` | Enter the email address for your MARKAZ account.                                                                    |
+| `forgot.submit`      | Send recovery email                                                                                                 |
+| `forgot.submitting`  | Sending recovery email…                                                                                             |
+| `forgot.return`      | Return to sign in                                                                                                   |
+| `forgot.security`    | For your security, we will not confirm whether an account exists for this email.                                    |
+| `forgot.sentTitle`   | Check your email                                                                                                    |
+| `forgot.sentBody`    | If an account exists for this email, password recovery instructions have been sent.                                 |
+| `forgot.sentHelp`    | Open the recovery link in the email to choose a new password. Check your spam or junk folder if it does not arrive. |
+| `forgot.sendAgain`   | Send again                                                                                                          |
+| `forgot.changeEmail` | Use a different email                                                                                               |
+| `reset.title`        | Choose a new password                                                                                               |
+| `reset.description`  | Create a password you have not used for this account before.                                                        |
+| `reset.newPassword`  | New password                                                                                                        |
+| `reset.confirm`      | Confirm new password                                                                                                |
+| `reset.submit`       | Update password                                                                                                     |
+| `reset.submitting`   | Updating password…                                                                                                  |
+| `reset.invalidTitle` | This password reset link is no longer valid                                                                         |
+| `reset.invalidBody`  | The link may have expired or already been used. Request a new recovery email to continue.                           |
+| `reset.requestNew`   | Request a new link                                                                                                  |
+| `reset.successTitle` | Password updated                                                                                                    |
+| `reset.successBody`  | Your password has been changed. Sign in with your new password.                                                     |
 
 ## 25.7 Profile
 
-| Key | English |
-|---|---|
-| `profile.title` | Complete your profile |
-| `profile.descriptionOne` | We are missing a required account detail. Complete it to continue. |
+| Key                       | English                                                                   |
+| ------------------------- | ------------------------------------------------------------------------- |
+| `profile.title`           | Complete your profile                                                     |
+| `profile.descriptionOne`  | We are missing a required account detail. Complete it to continue.        |
 | `profile.descriptionMany` | We are missing a few required account details. Complete them to continue. |
-| `profile.submit` | Save and continue |
-| `profile.submitting` | Saving profile… |
-| `profile.reassurance` | We only ask for information needed to set up your MARKAZ account. |
-| `profile.verifiedEmail` | Verified |
+| `profile.submit`          | Save and continue                                                         |
+| `profile.submitting`      | Saving profile…                                                           |
+| `profile.reassurance`     | We only ask for information needed to set up your MARKAZ account.         |
+| `profile.verifiedEmail`   | Verified                                                                  |
 
 ## 25.8 Simulated UAE PASS
 
-| Key | English |
-|---|---|
-| `identity.badge` | Demo simulation |
-| `identity.disclosureTitle` | Demo simulation only. |
-| `identity.disclosureBody` | This prototype is not connected to the live UAE PASS service. |
-| `identity.introTitle` | Verify your identity for this demo |
-| `identity.introBody` | This prototype includes a simulated identity step so you can experience the complete MARKAZ onboarding journey. |
-| `identity.start` | Start demo verification |
-| `identity.starting` | Starting demo verification… |
-| `identity.pendingTitle` | Demo verification in progress |
-| `identity.pendingBody` | Your demo identity check has started. Use the simulation controls below to choose the result. |
-| `identity.pendingStatus` | Pending · Demo |
-| `identity.controlsTitle` | Demo simulation controls |
-| `identity.controlsBody` | These controls are available only in the prototype and do not connect to UAE PASS. |
-| `identity.approve` | Approve demo verification |
-| `identity.reject` | Reject |
-| `identity.saving` | Saving demo result… |
-| `identity.successTitle` | Demo identity verified |
-| `identity.successBody` | Your account setup is complete. You can now browse properties, make offers, and list a property. |
-| `identity.successStatus` | Verified · Demo |
-| `identity.dashboard` | Go to dashboard |
-| `identity.failureTitle` | Demo verification was not completed |
-| `identity.failureBody` | No official identity check was performed. Try the simulation again to continue. |
-| `identity.failureStatus` | Unsuccessful · Demo |
-| `identity.retry` | Try again |
+| Key                        | English                                                                                                         |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `identity.badge`           | Demo simulation                                                                                                 |
+| `identity.disclosureTitle` | Demo simulation only.                                                                                           |
+| `identity.disclosureBody`  | This prototype is not connected to the live UAE PASS service.                                                   |
+| `identity.introTitle`      | Verify your identity for this demo                                                                              |
+| `identity.introBody`       | This prototype includes a simulated identity step so you can experience the complete MARKAZ onboarding journey. |
+| `identity.start`           | Start demo verification                                                                                         |
+| `identity.starting`        | Starting demo verification…                                                                                     |
+| `identity.pendingTitle`    | Demo verification in progress                                                                                   |
+| `identity.pendingBody`     | Your demo identity check has started. Use the simulation controls below to choose the result.                   |
+| `identity.pendingStatus`   | Pending · Demo                                                                                                  |
+| `identity.controlsTitle`   | Demo simulation controls                                                                                        |
+| `identity.controlsBody`    | These controls are available only in the prototype and do not connect to UAE PASS.                              |
+| `identity.approve`         | Approve demo verification                                                                                       |
+| `identity.reject`          | Reject                                                                                                          |
+| `identity.saving`          | Saving demo result…                                                                                             |
+| `identity.successTitle`    | Demo identity verified                                                                                          |
+| `identity.successBody`     | Your account setup is complete. You can now browse properties, make offers, and list a property.                |
+| `identity.successStatus`   | Verified · Demo                                                                                                 |
+| `identity.dashboard`       | Go to dashboard                                                                                                 |
+| `identity.failureTitle`    | Demo verification was not completed                                                                             |
+| `identity.failureBody`     | No official identity check was performed. Try the simulation again to continue.                                 |
+| `identity.failureStatus`   | Unsuccessful · Demo                                                                                             |
+| `identity.retry`           | Try again                                                                                                       |
 
 ## 25.9 Sessions and errors
 
-| Key | English |
-|---|---|
-| `session.expiredTitle` | Your session has expired |
-| `session.expiredBody` | For your security, please sign in again. We will return you to a safe page where possible. |
-| `session.signedOutTitle` | You are signed out |
-| `session.signedOutBody` | Your MARKAZ session has ended. |
-| `session.browse` | Browse properties |
-| `error.providerTitle` | Sign-in service temporarily unavailable |
-| `error.providerBody` | We cannot connect to the authentication service right now. Your non-sensitive progress has been preserved. |
-| `error.rateTitle` | Too many attempts |
-| `error.rateBody` | Please wait {time} before trying again. |
-| `error.genericTitle` | Something went wrong |
-| `error.genericBody` | We could not complete this request. Try again. |
-| `error.reference` | Reference: {reference} |
+| Key                      | English                                                                                                    |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `session.expiredTitle`   | Your session has expired                                                                                   |
+| `session.expiredBody`    | For your security, please sign in again. We will return you to a safe page where possible.                 |
+| `session.signedOutTitle` | You are signed out                                                                                         |
+| `session.signedOutBody`  | Your MARKAZ session has ended.                                                                             |
+| `session.browse`         | Browse properties                                                                                          |
+| `error.providerTitle`    | Sign-in service temporarily unavailable                                                                    |
+| `error.providerBody`     | We cannot connect to the authentication service right now. Your non-sensitive progress has been preserved. |
+| `error.rateTitle`        | Too many attempts                                                                                          |
+| `error.rateBody`         | Please wait {time} before trying again.                                                                    |
+| `error.genericTitle`     | Something went wrong                                                                                       |
+| `error.genericBody`      | We could not complete this request. Try again.                                                             |
+| `error.reference`        | Reference: {reference}                                                                                     |
 
 ## 25.10 Admin
 
-| Key | English |
-|---|---|
-| `admin.brand` | MARKAZ Operations |
-| `admin.authorised` | Authorised access only |
-| `admin.signinTitle` | Sign in to Operations |
-| `admin.signinBody` | Use your authorised MARKAZ Admin account. |
-| `admin.security` | Access is restricted to authorised MARKAZ personnel. |
-| `admin.forgotTitle` | Reset your Admin password |
-| `admin.forgotBody` | Enter the email address for your authorised MARKAZ Admin account. |
-| `admin.returnSignIn` | Return to Admin sign in |
-| `admin.resetTitle` | Choose a new Admin password |
-| `admin.resetBody` | Create a secure password for your MARKAZ Operations account. |
-| `admin.deniedTitle` | Access denied |
-| `admin.deniedBody` | This account does not have permission to access MARKAZ Operations. |
-| `admin.deniedHelp` | Sign out and use an authorised Admin account. |
-| `admin.returnHome` | Return to MARKAZ Home |
-| `admin.expiredTitle` | Your Admin session has expired |
-| `admin.expiredBody` | For security, sign in again to continue using MARKAZ Operations. |
-| `admin.signedOutTitle` | You are signed out of MARKAZ Operations |
-| `admin.signedOutBody` | Your Admin session has ended. |
-| `admin.return` | Return to Admin sign in |
+| Key                    | English                                                            |
+| ---------------------- | ------------------------------------------------------------------ |
+| `admin.brand`          | MARKAZ Operations                                                  |
+| `admin.authorised`     | Authorised access only                                             |
+| `admin.signinTitle`    | Sign in to Operations                                              |
+| `admin.signinBody`     | Use your authorised MARKAZ Admin account.                          |
+| `admin.security`       | Access is restricted to authorised MARKAZ personnel.               |
+| `admin.forgotTitle`    | Reset your Admin password                                          |
+| `admin.forgotBody`     | Enter the email address for your authorised MARKAZ Admin account.  |
+| `admin.returnSignIn`   | Return to Admin sign in                                            |
+| `admin.resetTitle`     | Choose a new Admin password                                        |
+| `admin.resetBody`      | Create a secure password for your MARKAZ Operations account.       |
+| `admin.deniedTitle`    | Access denied                                                      |
+| `admin.deniedBody`     | This account does not have permission to access MARKAZ Operations. |
+| `admin.deniedHelp`     | Sign out and use an authorised Admin account.                      |
+| `admin.returnHome`     | Return to MARKAZ Home                                              |
+| `admin.expiredTitle`   | Your Admin session has expired                                     |
+| `admin.expiredBody`    | For security, sign in again to continue using MARKAZ Operations.   |
+| `admin.signedOutTitle` | You are signed out of MARKAZ Operations                            |
+| `admin.signedOutBody`  | Your Admin session has ended.                                      |
+| `admin.return`         | Return to Admin sign in                                            |
 
 ---
 
@@ -2799,75 +2914,75 @@ Do not label any Arabic legal or identity wording as approved until reviewed.
 
 ## 26.2 Draft core Arabic copy
 
-| English | Draft Arabic | Review |
-|---|---|---|
-| Create your MARKAZ account | أنشئ حسابك في MARKAZ | Language |
-| One account lets you browse properties, make offers, list a property, and track transactions. | يتيح لك حساب واحد تصفح العقارات وتقديم العروض وإدراج عقارك ومتابعة المعاملات. | Language |
-| Full name | الاسم الكامل | Language |
-| Enter your full name | أدخل اسمك الكامل | Language |
-| Email address | البريد الإلكتروني | Language |
-| Password | كلمة المرور | Language |
-| Confirm password | تأكيد كلمة المرور | Language |
-| Create account | إنشاء حساب | Language |
-| Already have an account? | لديك حساب بالفعل؟ | Language |
-| Sign in | تسجيل الدخول | Language |
-| I agree to the Terms of Use. | أوافق على شروط الاستخدام. | Legal + language |
-| I agree to the Privacy Policy. | أوافق على سياسة الخصوصية. | Legal + language |
-| Your password must include: | يجب أن تتضمن كلمة المرور ما يلي: | Language |
-| At least 8 characters | 8 أحرف على الأقل | Language |
-| One uppercase letter | حرف إنجليزي كبير واحد | Language |
-| One lowercase letter | حرف إنجليزي صغير واحد | Language |
-| One number | رقم واحد | Language |
-| One special character | رمز خاص واحد | Language |
-| Show password | إظهار كلمة المرور | Language |
-| Hide password | إخفاء كلمة المرور | Language |
-| Check your email | تحقّق من بريدك الإلكتروني | Language |
-| We sent a six-digit verification code to {email}. | أرسلنا رمز تحقق مكوّنًا من ستة أرقام إلى {email}. | Security + language |
-| Verify your email | تحقّق من بريدك الإلكتروني | Language |
-| Verification code | رمز التحقق | Language |
-| Verify email | التحقق من البريد الإلكتروني | Language |
-| Resend code | إعادة إرسال الرمز | Language |
-| Resend code in {time} | يمكنك إعادة إرسال الرمز خلال {time} | Language |
-| Use a different email | استخدام بريد إلكتروني آخر | Language |
-| Email verified | تم التحقق من البريد الإلكتروني | Language |
-| Welcome back | مرحبًا بعودتك | Language |
-| Sign in to manage your properties, offers, and transactions. | سجّل الدخول لإدارة عقاراتك وعروضك ومعاملاتك. | Language |
-| Forgot password? | هل نسيت كلمة المرور؟ | Language |
-| New to MARKAZ? | جديد في MARKAZ؟ | Language |
-| The email or password is incorrect. | البريد الإلكتروني أو كلمة المرور غير صحيحة. | Security + language |
-| Reset your password | إعادة تعيين كلمة المرور | Language |
-| Send recovery email | إرسال رسالة استعادة | Language |
-| If an account exists for this email, password recovery instructions have been sent. | إذا كان هناك حساب مرتبط بهذا البريد الإلكتروني، فقد تم إرسال تعليمات استعادة كلمة المرور. | Security + language |
-| Choose a new password | اختر كلمة مرور جديدة | Language |
-| New password | كلمة المرور الجديدة | Language |
-| Confirm new password | تأكيد كلمة المرور الجديدة | Language |
-| Update password | تحديث كلمة المرور | Language |
-| Password updated | تم تحديث كلمة المرور | Language |
-| Complete your profile | أكمل ملفك الشخصي | Language |
-| Save and continue | حفظ ومتابعة | Language |
-| Demo simulation | محاكاة تجريبية | Business/legal + language |
-| Demo simulation only. | محاكاة تجريبية فقط. | Business/legal + language |
-| This prototype is not connected to the live UAE PASS service. | هذا النموذج الأولي غير متصل بخدمة UAE PASS الفعلية. | Business/legal + language |
-| Verify your identity for this demo | تحقّق من هويتك لأغراض هذا العرض التجريبي | Business/legal + language |
-| Start demo verification | بدء التحقق التجريبي | Business/legal + language |
-| Demo verification in progress | التحقق التجريبي قيد التنفيذ | Business/legal + language |
-| Approve demo verification | اعتماد نتيجة التحقق التجريبي | Business/legal + language |
-| Reject | رفض | Language |
-| Demo identity verified | تم التحقق من الهوية تجريبيًا | Business/legal + language |
-| Go to dashboard | الانتقال إلى لوحة التحكم | Language |
-| Demo verification was not completed | لم يكتمل التحقق التجريبي | Business/legal + language |
-| Try again | المحاولة مرة أخرى | Language |
-| Your session has expired | انتهت صلاحية جلستك | Security + language |
-| You are signed out | تم تسجيل خروجك | Language |
-| Sign-in service temporarily unavailable | خدمة تسجيل الدخول غير متاحة مؤقتًا | Language |
-| Too many attempts | عدد كبير جدًا من المحاولات | Security + language |
-| Something went wrong | حدث خطأ ما | Language |
-| MARKAZ Operations | عمليات MARKAZ | Brand review |
-| Authorised access only | الدخول للمصرّح لهم فقط | Security + language |
-| Sign in to Operations | تسجيل الدخول إلى بوابة العمليات | Language |
-| Access denied | تم رفض الوصول | Security + language |
-| This account does not have permission to access MARKAZ Operations. | لا يملك هذا الحساب صلاحية الوصول إلى بوابة عمليات MARKAZ. | Security + language |
-| Return to MARKAZ Home | العودة إلى MARKAZ Home | Brand + language |
+| English                                                                                       | Draft Arabic                                                                              | Review                    |
+| --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------- |
+| Create your MARKAZ account                                                                    | أنشئ حسابك في MARKAZ                                                                      | Language                  |
+| One account lets you browse properties, make offers, list a property, and track transactions. | يتيح لك حساب واحد تصفح العقارات وتقديم العروض وإدراج عقارك ومتابعة المعاملات.             | Language                  |
+| Full name                                                                                     | الاسم الكامل                                                                              | Language                  |
+| Enter your full name                                                                          | أدخل اسمك الكامل                                                                          | Language                  |
+| Email address                                                                                 | البريد الإلكتروني                                                                         | Language                  |
+| Password                                                                                      | كلمة المرور                                                                               | Language                  |
+| Confirm password                                                                              | تأكيد كلمة المرور                                                                         | Language                  |
+| Create account                                                                                | إنشاء حساب                                                                                | Language                  |
+| Already have an account?                                                                      | لديك حساب بالفعل؟                                                                         | Language                  |
+| Sign in                                                                                       | تسجيل الدخول                                                                              | Language                  |
+| I agree to the Terms of Use.                                                                  | أوافق على شروط الاستخدام.                                                                 | Legal + language          |
+| I agree to the Privacy Policy.                                                                | أوافق على سياسة الخصوصية.                                                                 | Legal + language          |
+| Your password must include:                                                                   | يجب أن تتضمن كلمة المرور ما يلي:                                                          | Language                  |
+| At least 8 characters                                                                         | 8 أحرف على الأقل                                                                          | Language                  |
+| One uppercase letter                                                                          | حرف إنجليزي كبير واحد                                                                     | Language                  |
+| One lowercase letter                                                                          | حرف إنجليزي صغير واحد                                                                     | Language                  |
+| One number                                                                                    | رقم واحد                                                                                  | Language                  |
+| One special character                                                                         | رمز خاص واحد                                                                              | Language                  |
+| Show password                                                                                 | إظهار كلمة المرور                                                                         | Language                  |
+| Hide password                                                                                 | إخفاء كلمة المرور                                                                         | Language                  |
+| Check your email                                                                              | تحقّق من بريدك الإلكتروني                                                                 | Language                  |
+| We sent a six-digit verification code to {email}.                                             | أرسلنا رمز تحقق مكوّنًا من ستة أرقام إلى {email}.                                         | Security + language       |
+| Verify your email                                                                             | تحقّق من بريدك الإلكتروني                                                                 | Language                  |
+| Verification code                                                                             | رمز التحقق                                                                                | Language                  |
+| Verify email                                                                                  | التحقق من البريد الإلكتروني                                                               | Language                  |
+| Resend code                                                                                   | إعادة إرسال الرمز                                                                         | Language                  |
+| Resend code in {time}                                                                         | يمكنك إعادة إرسال الرمز خلال {time}                                                       | Language                  |
+| Use a different email                                                                         | استخدام بريد إلكتروني آخر                                                                 | Language                  |
+| Email verified                                                                                | تم التحقق من البريد الإلكتروني                                                            | Language                  |
+| Welcome back                                                                                  | مرحبًا بعودتك                                                                             | Language                  |
+| Sign in to manage your properties, offers, and transactions.                                  | سجّل الدخول لإدارة عقاراتك وعروضك ومعاملاتك.                                              | Language                  |
+| Forgot password?                                                                              | هل نسيت كلمة المرور؟                                                                      | Language                  |
+| New to MARKAZ?                                                                                | جديد في MARKAZ؟                                                                           | Language                  |
+| The email or password is incorrect.                                                           | البريد الإلكتروني أو كلمة المرور غير صحيحة.                                               | Security + language       |
+| Reset your password                                                                           | إعادة تعيين كلمة المرور                                                                   | Language                  |
+| Send recovery email                                                                           | إرسال رسالة استعادة                                                                       | Language                  |
+| If an account exists for this email, password recovery instructions have been sent.           | إذا كان هناك حساب مرتبط بهذا البريد الإلكتروني، فقد تم إرسال تعليمات استعادة كلمة المرور. | Security + language       |
+| Choose a new password                                                                         | اختر كلمة مرور جديدة                                                                      | Language                  |
+| New password                                                                                  | كلمة المرور الجديدة                                                                       | Language                  |
+| Confirm new password                                                                          | تأكيد كلمة المرور الجديدة                                                                 | Language                  |
+| Update password                                                                               | تحديث كلمة المرور                                                                         | Language                  |
+| Password updated                                                                              | تم تحديث كلمة المرور                                                                      | Language                  |
+| Complete your profile                                                                         | أكمل ملفك الشخصي                                                                          | Language                  |
+| Save and continue                                                                             | حفظ ومتابعة                                                                               | Language                  |
+| Demo simulation                                                                               | محاكاة تجريبية                                                                            | Business/legal + language |
+| Demo simulation only.                                                                         | محاكاة تجريبية فقط.                                                                       | Business/legal + language |
+| This prototype is not connected to the live UAE PASS service.                                 | هذا النموذج الأولي غير متصل بخدمة UAE PASS الفعلية.                                       | Business/legal + language |
+| Verify your identity for this demo                                                            | تحقّق من هويتك لأغراض هذا العرض التجريبي                                                  | Business/legal + language |
+| Start demo verification                                                                       | بدء التحقق التجريبي                                                                       | Business/legal + language |
+| Demo verification in progress                                                                 | التحقق التجريبي قيد التنفيذ                                                               | Business/legal + language |
+| Approve demo verification                                                                     | اعتماد نتيجة التحقق التجريبي                                                              | Business/legal + language |
+| Reject                                                                                        | رفض                                                                                       | Language                  |
+| Demo identity verified                                                                        | تم التحقق من الهوية تجريبيًا                                                              | Business/legal + language |
+| Go to dashboard                                                                               | الانتقال إلى لوحة التحكم                                                                  | Language                  |
+| Demo verification was not completed                                                           | لم يكتمل التحقق التجريبي                                                                  | Business/legal + language |
+| Try again                                                                                     | المحاولة مرة أخرى                                                                         | Language                  |
+| Your session has expired                                                                      | انتهت صلاحية جلستك                                                                        | Security + language       |
+| You are signed out                                                                            | تم تسجيل خروجك                                                                            | Language                  |
+| Sign-in service temporarily unavailable                                                       | خدمة تسجيل الدخول غير متاحة مؤقتًا                                                        | Language                  |
+| Too many attempts                                                                             | عدد كبير جدًا من المحاولات                                                                | Security + language       |
+| Something went wrong                                                                          | حدث خطأ ما                                                                                | Language                  |
+| MARKAZ Operations                                                                             | عمليات MARKAZ                                                                             | Brand review              |
+| Authorised access only                                                                        | الدخول للمصرّح لهم فقط                                                                    | Security + language       |
+| Sign in to Operations                                                                         | تسجيل الدخول إلى بوابة العمليات                                                           | Language                  |
+| Access denied                                                                                 | تم رفض الوصول                                                                             | Security + language       |
+| This account does not have permission to access MARKAZ Operations.                            | لا يملك هذا الحساب صلاحية الوصول إلى بوابة عمليات MARKAZ.                                 | Security + language       |
+| Return to MARKAZ Home                                                                         | العودة إلى MARKAZ Home                                                                    | Brand + language          |
 
 ## 26.3 Arabic legal links
 
@@ -2879,79 +2994,79 @@ The Arabic titles for Terms of Use and Privacy Policy must match the final legal
 
 ## 27.1 Customer screens — route and interaction
 
-| ID | Route | Screen | User | Entry condition | Required data | Primary action | Secondary actions | Components |
-|---|---|---|---|---|---|---|---|---|
-| C-01 | `/[locale]` | Landing auth entry | Public | Anonymous visitor | Optional safe intent | Sign in or gated CTA | Browse, Create account path | Public header, links |
-| C-02 | `/[locale]/sign-up` | Create Account | Public | No active customer session | Name, email, password, legal acceptance, safe intent | Create account | Sign in, legal links, back home | Auth shell, progress, inputs, checklist, checkboxes |
-| C-03 | `/[locale]/sign-up/check-email` | Check Your Email | New customer | Account created, email unverified | Masked email | Enter verification code | Change email | Success panel, masked email |
-| C-04 | `/[locale]/verify-email` | Verify Email | Customer pending verification | Unverified account/session | Masked email, code state, resend time | Verify email | Resend, change email | Progress, OTP, countdown, alerts |
-| C-05 | `/[locale]/verify-email/success` | Email Verified | Customer | Verification success | Next onboarding state | Continue to next required step | None | Success panel |
-| C-06 | `/[locale]/onboarding/profile` | Profile Completion | Authenticated CUSTOMER | Missing required profile data | Missing fields, verified email | Save and continue | Sign out | Progress/status, form controls |
-| C-07 | `/[locale]/onboarding/uae-pass` | UAE PASS Intro | Authenticated CUSTOMER | `NOT_STARTED` | Identity status, safe intent | Start demo verification | Sign out | Simulation badge, info panel |
-| C-08 | Same route/state | UAE PASS Pending | Authenticated CUSTOMER | `PENDING` | Identity record | Approve demo verification | Reject, sign out | Status, simulation controls |
-| C-09 | Same route/state | UAE PASS Success | Authenticated CUSTOMER | `VERIFIED_DEMO` | Safe destination | Go to dashboard / Continue | None | Success panel, demo badge |
-| C-10 | Same route/state | UAE PASS Failure | Authenticated CUSTOMER | `FAILED_DEMO` | Identity state | Try again | Sign out | Error panel, demo badge |
-| C-11 | `/[locale]/sign-in` | Sign In | Public / expired | No valid customer session | Email, password, safe return | Sign in | Forgot password, Create account | Auth form, notice slot |
-| C-12 | `/[locale]/forgot-password` | Forgot Password | Public | User requests recovery | Email | Send recovery email | Return to sign in | Email form |
-| C-13 | `/[locale]/forgot-password/check-email` | Recovery Email Sent | Public | Recovery request complete | Optional masked email, cooldown | Return to sign in | Send again, change email | Success panel, countdown |
-| C-14 | `/[locale]/reset-password` | Reset Password | Recovery session | Valid provider recovery session | New password, confirm | Update password | Return to sign in | Password components |
-| C-15 | `/[locale]/reset-password/success` | Password Updated | Public | Reset success | None | Sign in | None | Success panel |
-| C-16 | `/[locale]/sign-in?notice=session-expired` | Session Expired | Customer | Session invalidated | Safe return | Sign in | Browse properties | Session notice + Sign In |
-| C-17 | `/[locale]/signed-out` | Signed Out | Public | Sign out success | None | Sign in | Browse properties | Success panel |
-| C-18 | `/[locale]/auth/unavailable` or route state | Provider Unavailable | Any auth user | Persistent provider/network failure | Safe retry context | Try again | Return home | Error panel |
-| C-19 | Current auth route state | Rate Limited | Any auth user | Provider/server limit | Retry time | Retry when available | Return/back | Form alert, countdown |
-| C-20 | `/[locale]/auth/error` or boundary | Unexpected Error | Any | Unhandled safe failure | Support reference | Try again | Return home | Error panel |
+| ID   | Route                                       | Screen               | User                          | Entry condition                     | Required data                                        | Primary action                 | Secondary actions               | Components                                          |
+| ---- | ------------------------------------------- | -------------------- | ----------------------------- | ----------------------------------- | ---------------------------------------------------- | ------------------------------ | ------------------------------- | --------------------------------------------------- |
+| C-01 | `/[locale]`                                 | Landing auth entry   | Public                        | Anonymous visitor                   | Optional safe intent                                 | Sign in or gated CTA           | Browse, Create account path     | Public header, links                                |
+| C-02 | `/[locale]/sign-up`                         | Create Account       | Public                        | No active customer session          | Name, email, password, legal acceptance, safe intent | Create account                 | Sign in, legal links, back home | Auth shell, progress, inputs, checklist, checkboxes |
+| C-03 | `/[locale]/sign-up/check-email`             | Check Your Email     | New customer                  | Account created, email unverified   | Masked email                                         | Enter verification code        | Change email                    | Success panel, masked email                         |
+| C-04 | `/[locale]/verify-email`                    | Verify Email         | Customer pending verification | Unverified account/session          | Masked email, code state, resend time                | Verify email                   | Resend, change email            | Progress, OTP, countdown, alerts                    |
+| C-05 | `/[locale]/verify-email/success`            | Email Verified       | Customer                      | Verification success                | Next onboarding state                                | Continue to next required step | None                            | Success panel                                       |
+| C-06 | `/[locale]/onboarding/profile`              | Profile Completion   | Authenticated CUSTOMER        | Missing required profile data       | Missing fields, verified email                       | Save and continue              | Sign out                        | Progress/status, form controls                      |
+| C-07 | `/[locale]/onboarding/uae-pass`             | UAE PASS Intro       | Authenticated CUSTOMER        | `NOT_STARTED`                       | Identity status, safe intent                         | Start demo verification        | Sign out                        | Simulation badge, info panel                        |
+| C-08 | Same route/state                            | UAE PASS Pending     | Authenticated CUSTOMER        | `PENDING`                           | Identity record                                      | Approve demo verification      | Reject, sign out                | Status, simulation controls                         |
+| C-09 | Same route/state                            | UAE PASS Success     | Authenticated CUSTOMER        | `VERIFIED_DEMO`                     | Safe destination                                     | Go to dashboard / Continue     | None                            | Success panel, demo badge                           |
+| C-10 | Same route/state                            | UAE PASS Failure     | Authenticated CUSTOMER        | `FAILED_DEMO`                       | Identity state                                       | Try again                      | Sign out                        | Error panel, demo badge                             |
+| C-11 | `/[locale]/sign-in`                         | Sign In              | Public / expired              | No valid customer session           | Email, password, safe return                         | Sign in                        | Forgot password, Create account | Auth form, notice slot                              |
+| C-12 | `/[locale]/forgot-password`                 | Forgot Password      | Public                        | User requests recovery              | Email                                                | Send recovery email            | Return to sign in               | Email form                                          |
+| C-13 | `/[locale]/forgot-password/check-email`     | Recovery Email Sent  | Public                        | Recovery request complete           | Optional masked email, cooldown                      | Return to sign in              | Send again, change email        | Success panel, countdown                            |
+| C-14 | `/[locale]/reset-password`                  | Reset Password       | Recovery session              | Valid provider recovery session     | New password, confirm                                | Update password                | Return to sign in               | Password components                                 |
+| C-15 | `/[locale]/reset-password/success`          | Password Updated     | Public                        | Reset success                       | None                                                 | Sign in                        | None                            | Success panel                                       |
+| C-16 | `/[locale]/sign-in?notice=session-expired`  | Session Expired      | Customer                      | Session invalidated                 | Safe return                                          | Sign in                        | Browse properties               | Session notice + Sign In                            |
+| C-17 | `/[locale]/signed-out`                      | Signed Out           | Public                        | Sign out success                    | None                                                 | Sign in                        | Browse properties               | Success panel                                       |
+| C-18 | `/[locale]/auth/unavailable` or route state | Provider Unavailable | Any auth user                 | Persistent provider/network failure | Safe retry context                                   | Try again                      | Return home                     | Error panel                                         |
+| C-19 | Current auth route state                    | Rate Limited         | Any auth user                 | Provider/server limit               | Retry time                                           | Retry when available           | Return/back                     | Form alert, countdown                               |
+| C-20 | `/[locale]/auth/error` or boundary          | Unexpected Error     | Any                           | Unhandled safe failure              | Support reference                                    | Try again                      | Return home                     | Error panel                                         |
 
 ## 27.2 Customer screens — states, destinations, and implementation notes
 
-| ID | Loading state | Empty state | Error states | Success destination | Responsive notes | RTL notes | Accessibility notes | Claude Code notes |
-|---|---|---|---|---|---|---|---|---|
-| C-01 | Existing landing loading | N/A | N/A | Sign In or Sign Up | Existing approved landing behaviour | Header mirrors | Links labelled | Preserve `returnTo` only for allowlisted customer paths |
-| C-02 | Creating account | N/A | Validation, duplicate-safe, provider, rate | C-03 | Support panel hidden tablet/mobile | Password/email LTR | Error summary; autocomplete | Replace OTP sign-in registration mechanic; idempotent profile creation |
-| C-03 | None | N/A | Provider state if code dispatch failed | C-04 | Centred status | Masked email LTR | Focus heading | Reuse existing code-sent state |
-| C-04 | Verifying/resending | Six blank digits | Invalid, expired, attempts, rate, provider | C-05 | OTP cells minimum sizes | Digits LTR | One logical input | Reuse/refine Week 1 OTP component for verification only |
-| C-05 | Checking next step | N/A | Route-resolution error | C-06/C-07/C-08/C-10/C-09 | Centred | Standard | Focus heading, announce success | Server resolves next state |
-| C-06 | Saving profile | Only rendered if data missing | Validation, save error | Current identity state | Single column | Logical alignment | Only missing fields | Reuse profile model and resolver |
-| C-07 | Starting demo | N/A | Start failure | C-08 | Panel stacks | Mirrors except brand terms | Disclosure read before action | Keep persisted status |
-| C-08 | Saving result | N/A | Result-save error | C-09 or C-10 | Buttons stack mobile | Logical order | Status announced | Prototype-only controls behind service interface |
-| C-09 | Resolving destination | N/A | Destination fallback | Safe route / dashboard | Full-width mobile action | Standard | Focus success heading | Consume safe intent once |
-| C-10 | Restarting | N/A | Retry failure | C-07/C-08 | Stack actions | Standard | Error not colour-only | Do not use official rejection wording |
-| C-11 | Signing in / resolving | Empty fields | Validation, credentials, unverified, unavailable, rate | Current onboarding or safe route | Support panel hidden mobile | Values LTR | Password manager compatible | Email/password Supabase flow; generic errors |
-| C-12 | Sending | Empty email | Validation, provider, rate | C-13 | Compact form | Email LTR | Generic response | Official supported recovery method |
-| C-13 | Resending | N/A | Provider/rate | C-11 | Status panel | Email/time LTR | Generic confirmation | Do not branch copy on account existence |
-| C-14 | Validating recovery/saving | N/A | Invalid/expired session, validation, provider | C-15 | No support image required mobile | Password LTR | New-password autocomplete | Do not log recovery token |
-| C-15 | None | N/A | N/A | C-11 | Centred | Standard | Focus heading | No automatic sign-in |
-| C-16 | Signing in | Empty form | Same as C-11 | Safe route/dashboard | Same as Sign In | Same | Notice before form | Allowlist return route |
-| C-17 | None | N/A | Sign-out failure should retry before route | Public | Status panel | Standard | Focus heading | Clear protected return intent |
-| C-18 | Retrying | N/A | Persistent unavailable | Previous safe auth route | Centred panel | Standard | Focus error heading | Preserve non-sensitive fields only |
-| C-19 | Countdown | N/A | Continued limit | Current route | Alert wraps | Time LTR | No per-second announcement | Server retry time source |
-| C-20 | Retrying | N/A | Persistent failure | Previous safe route | Centred | Standard | Safe reference only | Error boundary; no stack trace |
+| ID   | Loading state              | Empty state                   | Error states                                           | Success destination              | Responsive notes                    | RTL notes                  | Accessibility notes             | Claude Code notes                                                      |
+| ---- | -------------------------- | ----------------------------- | ------------------------------------------------------ | -------------------------------- | ----------------------------------- | -------------------------- | ------------------------------- | ---------------------------------------------------------------------- |
+| C-01 | Existing landing loading   | N/A                           | N/A                                                    | Sign In or Sign Up               | Existing approved landing behaviour | Header mirrors             | Links labelled                  | Preserve `returnTo` only for allowlisted customer paths                |
+| C-02 | Creating account           | N/A                           | Validation, duplicate-safe, provider, rate             | C-03                             | Support panel hidden tablet/mobile  | Password/email LTR         | Error summary; autocomplete     | Replace OTP sign-in registration mechanic; idempotent profile creation |
+| C-03 | None                       | N/A                           | Provider state if code dispatch failed                 | C-04                             | Centred status                      | Masked email LTR           | Focus heading                   | Reuse existing code-sent state                                         |
+| C-04 | Verifying/resending        | Six blank digits              | Invalid, expired, attempts, rate, provider             | C-05                             | OTP cells minimum sizes             | Digits LTR                 | One logical input               | Reuse/refine Week 1 OTP component for verification only                |
+| C-05 | Checking next step         | N/A                           | Route-resolution error                                 | C-06/C-07/C-08/C-10/C-09         | Centred                             | Standard                   | Focus heading, announce success | Server resolves next state                                             |
+| C-06 | Saving profile             | Only rendered if data missing | Validation, save error                                 | Current identity state           | Single column                       | Logical alignment          | Only missing fields             | Reuse profile model and resolver                                       |
+| C-07 | Starting demo              | N/A                           | Start failure                                          | C-08                             | Panel stacks                        | Mirrors except brand terms | Disclosure read before action   | Keep persisted status                                                  |
+| C-08 | Saving result              | N/A                           | Result-save error                                      | C-09 or C-10                     | Buttons stack mobile                | Logical order              | Status announced                | Prototype-only controls behind service interface                       |
+| C-09 | Resolving destination      | N/A                           | Destination fallback                                   | Safe route / dashboard           | Full-width mobile action            | Standard                   | Focus success heading           | Consume safe intent once                                               |
+| C-10 | Restarting                 | N/A                           | Retry failure                                          | C-07/C-08                        | Stack actions                       | Standard                   | Error not colour-only           | Do not use official rejection wording                                  |
+| C-11 | Signing in / resolving     | Empty fields                  | Validation, credentials, unverified, unavailable, rate | Current onboarding or safe route | Support panel hidden mobile         | Values LTR                 | Password manager compatible     | Email/password Supabase flow; generic errors                           |
+| C-12 | Sending                    | Empty email                   | Validation, provider, rate                             | C-13                             | Compact form                        | Email LTR                  | Generic response                | Official supported recovery method                                     |
+| C-13 | Resending                  | N/A                           | Provider/rate                                          | C-11                             | Status panel                        | Email/time LTR             | Generic confirmation            | Do not branch copy on account existence                                |
+| C-14 | Validating recovery/saving | N/A                           | Invalid/expired session, validation, provider          | C-15                             | No support image required mobile    | Password LTR               | New-password autocomplete       | Do not log recovery token                                              |
+| C-15 | None                       | N/A                           | N/A                                                    | C-11                             | Centred                             | Standard                   | Focus heading                   | No automatic sign-in                                                   |
+| C-16 | Signing in                 | Empty form                    | Same as C-11                                           | Safe route/dashboard             | Same as Sign In                     | Same                       | Notice before form              | Allowlist return route                                                 |
+| C-17 | None                       | N/A                           | Sign-out failure should retry before route             | Public                           | Status panel                        | Standard                   | Focus heading                   | Clear protected return intent                                          |
+| C-18 | Retrying                   | N/A                           | Persistent unavailable                                 | Previous safe auth route         | Centred panel                       | Standard                   | Focus error heading             | Preserve non-sensitive fields only                                     |
+| C-19 | Countdown                  | N/A                           | Continued limit                                        | Current route                    | Alert wraps                         | Time LTR                   | No per-second announcement      | Server retry time source                                               |
+| C-20 | Retrying                   | N/A                           | Persistent failure                                     | Previous safe route              | Centred                             | Standard                   | Safe reference only             | Error boundary; no stack trace                                         |
 
 ## 27.3 Admin screens — route and interaction
 
-| ID | Route | Screen | User | Entry condition | Required data | Primary action | Secondary actions | Components |
-|---|---|---|---|---|---|---|---|---|
-| A-01 | `/[locale]/sign-in` | Admin Sign In | Public/Admin | No valid Admin session | Email, password | Sign in | Forgot password | Admin shell, form |
-| A-02 | `/[locale]/forgot-password` | Admin Forgot Password | Public | Recovery requested | Email | Send recovery email | Return to Admin sign in | Admin shell, email form |
-| A-03 | `/[locale]/forgot-password/check-email` | Admin Recovery Sent | Public | Recovery request complete | Cooldown | Return to Admin sign in | Send again | Success panel |
-| A-04 | `/[locale]/reset-password` | Admin Reset Password | Recovery session | Valid recovery session | New password, confirm | Update password | Return to Admin sign in | Password components |
-| A-05 | `/[locale]/reset-password/success` | Admin Password Updated | Public | Reset complete | None | Return to Admin sign in | None | Success panel |
-| A-06 | `/[locale]/access-denied` | Admin Access Denied | Authenticated non-Admin | Account-type check fails | Authenticated user state | Sign out | Return to MARKAZ Home | Access-denied state |
-| A-07 | `/[locale]/sign-in?notice=session-expired` | Admin Session Expired | Admin | Session invalid | Allowlisted Admin return | Sign in | None | Notice + Admin Sign In |
-| A-08 | `/[locale]/signed-out` | Admin Signed Out | Public | Admin sign out complete | None | Return to Admin sign in | None | Success panel |
+| ID   | Route                                      | Screen                 | User                    | Entry condition           | Required data            | Primary action          | Secondary actions       | Components              |
+| ---- | ------------------------------------------ | ---------------------- | ----------------------- | ------------------------- | ------------------------ | ----------------------- | ----------------------- | ----------------------- |
+| A-01 | `/[locale]/sign-in`                        | Admin Sign In          | Public/Admin            | No valid Admin session    | Email, password          | Sign in                 | Forgot password         | Admin shell, form       |
+| A-02 | `/[locale]/forgot-password`                | Admin Forgot Password  | Public                  | Recovery requested        | Email                    | Send recovery email     | Return to Admin sign in | Admin shell, email form |
+| A-03 | `/[locale]/forgot-password/check-email`    | Admin Recovery Sent    | Public                  | Recovery request complete | Cooldown                 | Return to Admin sign in | Send again              | Success panel           |
+| A-04 | `/[locale]/reset-password`                 | Admin Reset Password   | Recovery session        | Valid recovery session    | New password, confirm    | Update password         | Return to Admin sign in | Password components     |
+| A-05 | `/[locale]/reset-password/success`         | Admin Password Updated | Public                  | Reset complete            | None                     | Return to Admin sign in | None                    | Success panel           |
+| A-06 | `/[locale]/access-denied`                  | Admin Access Denied    | Authenticated non-Admin | Account-type check fails  | Authenticated user state | Sign out                | Return to MARKAZ Home   | Access-denied state     |
+| A-07 | `/[locale]/sign-in?notice=session-expired` | Admin Session Expired  | Admin                   | Session invalid           | Allowlisted Admin return | Sign in                 | None                    | Notice + Admin Sign In  |
+| A-08 | `/[locale]/signed-out`                     | Admin Signed Out       | Public                  | Admin sign out complete   | None                     | Return to Admin sign in | None                    | Success panel           |
 
 ## 27.4 Admin screens — states, destinations, and implementation notes
 
-| ID | Loading state | Error states | Success destination | Responsive notes | RTL notes | Accessibility notes | Claude Code notes |
-|---|---|---|---|---|---|---|---|
-| A-01 | Signing in + account check | Validation, generic credentials, rate, provider | Overview or A-06 | Hide side panel mobile | Values LTR | Password manager support | Account-type check before rendering portal |
-| A-02 | Sending | Validation, provider, rate | A-03 | Compact | Email LTR | Generic confirmation | Same recovery service; Admin app origin |
-| A-03 | Resending | Provider, rate | A-01 | Centred | Time LTR | Status heading focus | Do not reveal Admin-account existence |
-| A-04 | Validating/saving | Invalid recovery, validation, provider | A-05 | Single column | Password LTR | New-password autocomplete | Validate redirect belongs to Admin app |
-| A-05 | None | N/A | A-01 | Centred | Standard | Focus heading | End recovery session |
-| A-06 | Signing out | Sign-out retry | A-08 | Centred | Standard | No portal controls exposed | Record non-sensitive denial event |
-| A-07 | Signing in | Sign-in errors | Allowlisted Admin route/Overview | Same as A-01 | Same | Notice before form | Re-check `ADMIN` on every session |
-| A-08 | None | N/A | A-01 | Centred | Standard | Focus heading | Clear Admin return intent |
+| ID   | Loading state              | Error states                                    | Success destination              | Responsive notes       | RTL notes    | Accessibility notes        | Claude Code notes                          |
+| ---- | -------------------------- | ----------------------------------------------- | -------------------------------- | ---------------------- | ------------ | -------------------------- | ------------------------------------------ |
+| A-01 | Signing in + account check | Validation, generic credentials, rate, provider | Overview or A-06                 | Hide side panel mobile | Values LTR   | Password manager support   | Account-type check before rendering portal |
+| A-02 | Sending                    | Validation, provider, rate                      | A-03                             | Compact                | Email LTR    | Generic confirmation       | Same recovery service; Admin app origin    |
+| A-03 | Resending                  | Provider, rate                                  | A-01                             | Centred                | Time LTR     | Status heading focus       | Do not reveal Admin-account existence      |
+| A-04 | Validating/saving          | Invalid recovery, validation, provider          | A-05                             | Single column          | Password LTR | New-password autocomplete  | Validate redirect belongs to Admin app     |
+| A-05 | None                       | N/A                                             | A-01                             | Centred                | Standard     | Focus heading              | End recovery session                       |
+| A-06 | Signing out                | Sign-out retry                                  | A-08                             | Centred                | Standard     | No portal controls exposed | Record non-sensitive denial event          |
+| A-07 | Signing in                 | Sign-in errors                                  | Allowlisted Admin route/Overview | Same as A-01           | Same         | Notice before form         | Re-check `ADMIN` on every session          |
+| A-08 | None                       | N/A                                             | A-01                             | Centred                | Standard     | Focus heading              | Clear Admin return intent                  |
 
 ## 27.5 Requirement-type labels for engineering tickets
 
@@ -2971,23 +3086,23 @@ Use these labels in Claude Code subtasks:
 
 The specification is implementation-ready, but these items require owner confirmation or review before production release.
 
-| Decision | Current specification | Owner / review |
-|---|---|---|
-| Final production SVG logo | Working concept: M + architectural home symbol + RKAZ | Brand / design |
-| Final Terms URL and legal version | Separate required Terms checkbox | Legal/product |
-| Final Privacy URL and legal version | Separate required Privacy checkbox | Legal/privacy |
-| Arabic Terms and Privacy wording | Draft only | Arabic legal counsel |
-| Arabic product copy | Draft provided | Professional Arabic reviewer |
-| UAE PASS simulation Arabic wording | Draft provided | Business/legal + Arabic reviewer |
-| Verification-code expiry | Do not hard-code in copy; provider configuration governs | Engineering/security |
-| Resend cooldown | 60-second UI default; server governs | Engineering/security |
-| Failed-code attempt threshold | Provider/server governs; UI supports too-many-attempts state | Engineering/security |
-| Recovery-link expiry | Do not state duration until configured | Engineering/security |
-| Admin recovery sender/domain | Same supported provider flow; application-specific redirect | Platform/security |
-| Support contact route | Copy currently says contact MARKAZ support without a link | Product/operations |
-| Account-unavailable reason policy | Generic message | Security/operations |
-| Whether Account Created is separate route | Recommended separate state/route | Product/engineering |
-| Whether demo identity auto-resolves in seeded demos | Manual Approve/Reject by default | Demo owner |
+| Decision                                            | Current specification                                        | Owner / review                   |
+| --------------------------------------------------- | ------------------------------------------------------------ | -------------------------------- |
+| Final production SVG logo                           | Working concept: M + architectural home symbol + RKAZ        | Brand / design                   |
+| Final Terms URL and legal version                   | Separate required Terms checkbox                             | Legal/product                    |
+| Final Privacy URL and legal version                 | Separate required Privacy checkbox                           | Legal/privacy                    |
+| Arabic Terms and Privacy wording                    | Draft only                                                   | Arabic legal counsel             |
+| Arabic product copy                                 | Draft provided                                               | Professional Arabic reviewer     |
+| UAE PASS simulation Arabic wording                  | Draft provided                                               | Business/legal + Arabic reviewer |
+| Verification-code expiry                            | Do not hard-code in copy; provider configuration governs     | Engineering/security             |
+| Resend cooldown                                     | 60-second UI default; server governs                         | Engineering/security             |
+| Failed-code attempt threshold                       | Provider/server governs; UI supports too-many-attempts state | Engineering/security             |
+| Recovery-link expiry                                | Do not state duration until configured                       | Engineering/security             |
+| Admin recovery sender/domain                        | Same supported provider flow; application-specific redirect  | Platform/security                |
+| Support contact route                               | Copy currently says contact MARKAZ support without a link    | Product/operations               |
+| Account-unavailable reason policy                   | Generic message                                              | Security/operations              |
+| Whether Account Created is separate route           | Recommended separate state/route                             | Product/engineering              |
+| Whether demo identity auto-resolves in seeded demos | Manual Approve/Reject by default                             | Demo owner                       |
 
 None of these open items should cause engineering to invent UI structure. Where a value is unknown, use the generic wording defined in this document.
 
@@ -3143,17 +3258,17 @@ None of these open items should cause engineering to invent UI structure. Where 
 
 These are application audit considerations, not product analytics.
 
-| Event | When | Safe metadata |
-|---|---|---|
-| `account.profile_completed` | Required profile fields saved | User ID, timestamp, profile version |
-| `auth.email_verified` | Email verification completes | User ID, timestamp, verification method category |
-| `identity.demo_started` | Demo verification begins | User ID, identity record ID, timestamp |
-| `identity.demo_verified` | Demo result approved | User ID, identity record ID, timestamp, `VERIFIED_DEMO` |
-| `identity.demo_failed` | Demo result rejected | User ID, identity record ID, timestamp, `FAILED_DEMO` |
-| `auth.password_recovery_requested` | Recovery request accepted by application | Timestamp, request result category; user ID only if safely resolved server-side |
-| `auth.password_reset_completed` | Password update completes | User ID, timestamp |
-| `auth.admin_access_denied` | Authenticated non-Admin reaches Operations | User ID, account type, timestamp, application ID |
-| `auth.session_signed_out` | Optional sign-out audit | User ID, timestamp, application ID |
+| Event                              | When                                       | Safe metadata                                                                   |
+| ---------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------- |
+| `account.profile_completed`        | Required profile fields saved              | User ID, timestamp, profile version                                             |
+| `auth.email_verified`              | Email verification completes               | User ID, timestamp, verification method category                                |
+| `identity.demo_started`            | Demo verification begins                   | User ID, identity record ID, timestamp                                          |
+| `identity.demo_verified`           | Demo result approved                       | User ID, identity record ID, timestamp, `VERIFIED_DEMO`                         |
+| `identity.demo_failed`             | Demo result rejected                       | User ID, identity record ID, timestamp, `FAILED_DEMO`                           |
+| `auth.password_recovery_requested` | Recovery request accepted by application   | Timestamp, request result category; user ID only if safely resolved server-side |
+| `auth.password_reset_completed`    | Password update completes                  | User ID, timestamp                                                              |
+| `auth.admin_access_denied`         | Authenticated non-Admin reaches Operations | User ID, account type, timestamp, application ID                                |
+| `auth.session_signed_out`          | Optional sign-out audit                    | User ID, timestamp, application ID                                              |
 
 Never include:
 

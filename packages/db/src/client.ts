@@ -26,8 +26,8 @@ const g = globalThis as unknown as {
 function connectionString(kind: 'app' | 'direct'): string {
   const url =
     kind === 'direct'
-      ? process.env.DIRECT_DATABASE_URL ?? process.env.DATABASE_URL
-      : process.env.DATABASE_URL ?? process.env.DIRECT_DATABASE_URL;
+      ? (process.env.DIRECT_DATABASE_URL ?? process.env.DATABASE_URL)
+      : (process.env.DATABASE_URL ?? process.env.DIRECT_DATABASE_URL);
   if (!url) {
     throw new Error(
       'DATABASE_URL / DIRECT_DATABASE_URL is not set. Copy .env.example to .env and run `pnpm supabase:start`.',
@@ -40,7 +40,11 @@ function connectionString(kind: 'app' | 'direct'): string {
 export function getAppDb(): Database {
   if (!g.__markazAppDb) {
     // Small pool + prepare:false works behind a Supabase transaction/session pooler.
-    g.__markazAppClient = postgres(connectionString('app'), { max: 5, prepare: false, idle_timeout: 20 });
+    g.__markazAppClient = postgres(connectionString('app'), {
+      max: 5,
+      prepare: false,
+      idle_timeout: 20,
+    });
     g.__markazAppDb = drizzle(g.__markazAppClient, { schema });
   }
   return g.__markazAppDb;

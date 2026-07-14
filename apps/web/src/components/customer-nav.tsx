@@ -33,16 +33,19 @@ export function CustomerNav({ displayName }: { displayName: string | null }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
+    <header className="bg-background/95 sticky top-0 z-40 border-b backdrop-blur">
       <div className="container flex h-16 items-center justify-between gap-4">
         <div className="flex items-center gap-6">
           <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-            <Home className="h-5 w-5 text-primary" aria-hidden />
+            <Home className="text-primary h-5 w-5" aria-hidden />
             MARKAZ Home
           </Link>
           <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
             {NAV_ITEMS.map((item) => {
-              const active = item.href === '/properties' ? pathname.startsWith('/properties') : pathname === item.href;
+              const active =
+                item.href === '/properties'
+                  ? pathname.startsWith('/properties')
+                  : pathname === item.href;
               return (
                 <Link
                   key={item.href}
@@ -107,14 +110,14 @@ export function CustomerNav({ displayName }: { displayName: string | null }) {
       </div>
 
       {open ? (
-        <nav className="border-t bg-background md:hidden" aria-label="Mobile">
+        <nav className="bg-background border-t md:hidden" aria-label="Mobile">
           <div className="container flex flex-col py-2">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground rounded-md px-3 py-2 text-sm font-medium"
               >
                 {t(item.key)}
               </Link>

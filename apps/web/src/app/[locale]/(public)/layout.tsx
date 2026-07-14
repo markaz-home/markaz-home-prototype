@@ -20,7 +20,10 @@ export default async function PublicLayout({
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-background focus:p-3">
+      <a
+        href="#main"
+        className="focus:bg-background sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-3"
+      >
         {t('continue')}
       </a>
       <MarketplaceHeader
@@ -30,8 +33,10 @@ export default async function PublicLayout({
       <main id="main" className="flex-1">
         {children}
       </main>
-      <footer className="border-t py-6 text-center text-xs text-muted-foreground">
-        <div className="container">{t('appName')} · {t('demoBadge')}</div>
+      <footer className="text-muted-foreground border-t py-6 text-center text-xs">
+        <div className="container">
+          {t('appName')} · {t('demoBadge')}
+        </div>
       </footer>
     </div>
   );

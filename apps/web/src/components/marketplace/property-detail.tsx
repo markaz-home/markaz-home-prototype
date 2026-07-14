@@ -64,19 +64,25 @@ export function PropertyDetail({
   }
 
   const ic = detail.investmentCase;
-  const furn = detail.furnishingStatus ? tf(`furnishing${detail.furnishingStatus}` as 'furnishingFURNISHED') : null;
-  const comp = detail.completionStatus ? tf(`completion${detail.completionStatus}` as 'completionREADY') : null;
+  const furn = detail.furnishingStatus
+    ? tf(`furnishing${detail.furnishingStatus}` as 'furnishingFURNISHED')
+    : null;
+  const comp = detail.completionStatus
+    ? tf(`completion${detail.completionStatus}` as 'completionREADY')
+    : null;
 
   return (
     <div className="container max-w-[1360px] py-8">
-      <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
-        <Link href="/properties" className="hover:text-foreground">{t('breadcrumb')}</Link>
+      <nav aria-label="Breadcrumb" className="text-muted-foreground mb-4 text-sm">
+        <Link href="/properties" className="hover:text-foreground">
+          {t('breadcrumb')}
+        </Link>
         {detail.community && <span> · {detail.community}</span>}
       </nav>
 
       <Alert className="mb-4">
         <p className="font-medium">{tm('prototypeTitle')}</p>
-        <p className="text-sm text-muted-foreground">{tm('prototypeBody')}</p>
+        <p className="text-muted-foreground text-sm">{tm('prototypeBody')}</p>
       </Alert>
 
       <PropertyGallery photos={detail.photoUrls} headline={detail.headline} />
@@ -85,7 +91,7 @@ export function PropertyDetail({
         <div>
           <p className="text-3xl font-semibold">{formatAed(detail.askingPriceAed, locale)}</p>
           <h1 className="mt-1 text-xl font-medium">{detail.headline}</h1>
-          <p className="mt-1 text-muted-foreground">
+          <p className="text-muted-foreground mt-1">
             {[detail.community, detail.emirate].filter(Boolean).join(' · ')}
           </p>
         </div>
@@ -96,33 +102,67 @@ export function PropertyDetail({
               {detail.manageListingId && (
                 <>
                   <Button variant="outline" asChild>
-                    <Link href={`/sell/listings/${detail.manageListingId}/offers`}>{to('cta.viewOffers')}</Link>
+                    <Link href={`/sell/listings/${detail.manageListingId}/offers`}>
+                      {to('cta.viewOffers')}
+                    </Link>
                   </Button>
                   <Button asChild>
-                    <Link href={`/sell/listings/${detail.manageListingId}/manage`}>{t('manage')}</Link>
+                    <Link href={`/sell/listings/${detail.manageListingId}/manage`}>
+                      {t('manage')}
+                    </Link>
                   </Button>
                 </>
               )}
             </>
           ) : (
             <>
-              <SaveButton publicId={detail.publicId ?? ''} isAuthenticated={isAuthenticated} returnPath={returnPath} initialSaved={initialSaved} variant="icon" />
-              <MakeOfferButton publicId={detail.publicId ?? ''} slug={detail.slug ?? ''} isAuthenticated={isAuthenticated} />
+              <SaveButton
+                publicId={detail.publicId ?? ''}
+                isAuthenticated={isAuthenticated}
+                returnPath={returnPath}
+                initialSaved={initialSaved}
+                variant="icon"
+              />
+              <MakeOfferButton
+                publicId={detail.publicId ?? ''}
+                slug={detail.slug ?? ''}
+                isAuthenticated={isAuthenticated}
+              />
             </>
           )}
           <Button variant="outline" onClick={share}>
-            <Share2 className="h-4 w-4 me-2" /> {t('share')}
+            <Share2 className="me-2 h-4 w-4" /> {t('share')}
           </Button>
         </div>
       </div>
 
       {/* Core facts */}
       <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-y py-4 text-sm">
-        {detail.bedrooms != null && <Fact icon={<BedDouble className="h-4 w-4" />} label={detail.bedrooms === 0 ? t('bedsStudio') : t('beds', { count: detail.bedrooms })} />}
-        {detail.bathrooms != null && <Fact icon={<Bath className="h-4 w-4" />} label={t('baths', { count: detail.bathrooms })} />}
-        {detail.sizeSqft != null && <Fact icon={<Maximize className="h-4 w-4" />} label={t('sqft', { size: formatNumber(detail.sizeSqft, locale) })} />}
+        {detail.bedrooms != null && (
+          <Fact
+            icon={<BedDouble className="h-4 w-4" />}
+            label={detail.bedrooms === 0 ? t('bedsStudio') : t('beds', { count: detail.bedrooms })}
+          />
+        )}
+        {detail.bathrooms != null && (
+          <Fact
+            icon={<Bath className="h-4 w-4" />}
+            label={t('baths', { count: detail.bathrooms })}
+          />
+        )}
+        {detail.sizeSqft != null && (
+          <Fact
+            icon={<Maximize className="h-4 w-4" />}
+            label={t('sqft', { size: formatNumber(detail.sizeSqft, locale) })}
+          />
+        )}
         {furn && <Fact icon={<Sofa className="h-4 w-4" />} label={furn} />}
-        {detail.parkingSpaces != null && detail.parkingSpaces > 0 && <Fact icon={<Car className="h-4 w-4" />} label={t('parkingSpaces', { count: detail.parkingSpaces })} />}
+        {detail.parkingSpaces != null && detail.parkingSpaces > 0 && (
+          <Fact
+            icon={<Car className="h-4 w-4" />}
+            label={t('parkingSpaces', { count: detail.parkingSpaces })}
+          />
+        )}
       </div>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-3">
@@ -130,7 +170,12 @@ export function PropertyDetail({
           {detail.description && (
             <section>
               <h2 className="text-lg font-semibold">{t('about')}</h2>
-              <div className="mt-2 whitespace-pre-line text-sm leading-relaxed text-foreground" dir="auto">{detail.description}</div>
+              <div
+                className="text-foreground mt-2 whitespace-pre-line text-sm leading-relaxed"
+                dir="auto"
+              >
+                {detail.description}
+              </div>
             </section>
           )}
 
@@ -138,7 +183,11 @@ export function PropertyDetail({
             <section>
               <h2 className="text-lg font-semibold">{t('amenities')}</h2>
               <ul className="mt-2 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
-                {detail.features.map((f) => <li key={f} className="rounded-md bg-muted px-3 py-2">{titleCaseFeature(f)}</li>)}
+                {detail.features.map((f) => (
+                  <li key={f} className="bg-muted rounded-md px-3 py-2">
+                    {titleCaseFeature(f)}
+                  </li>
+                ))}
               </ul>
             </section>
           )}
@@ -146,19 +195,33 @@ export function PropertyDetail({
           <section>
             <h2 className="text-lg font-semibold">{t('details')}</h2>
             <dl className="mt-2 grid grid-cols-1 gap-x-8 gap-y-2 text-sm sm:grid-cols-2">
-              {detail.propertyType && <Row label={t('labelType')} value={tf(`type${titleCase(detail.propertyType)}` as 'typeApartment')} />}
+              {detail.propertyType && (
+                <Row
+                  label={t('labelType')}
+                  value={tf(`type${titleCase(detail.propertyType)}` as 'typeApartment')}
+                />
+              )}
               {detail.community && <Row label={t('labelCommunity')} value={detail.community} />}
-              {detail.buildingOrProject && <Row label={t('labelBuilding')} value={detail.buildingOrProject} />}
-              {detail.sizeSqft != null && <Row label={t('labelSize')} value={t('sqft', { size: formatNumber(detail.sizeSqft, locale) })} />}
+              {detail.buildingOrProject && (
+                <Row label={t('labelBuilding')} value={detail.buildingOrProject} />
+              )}
+              {detail.sizeSqft != null && (
+                <Row
+                  label={t('labelSize')}
+                  value={t('sqft', { size: formatNumber(detail.sizeSqft, locale) })}
+                />
+              )}
               {furn && <Row label={t('labelFurnishing')} value={furn} />}
               {comp && <Row label={t('labelCompletion')} value={comp} />}
-              {detail.parkingSpaces != null && <Row label={t('labelParking')} value={String(detail.parkingSpaces)} />}
+              {detail.parkingSpaces != null && (
+                <Row label={t('labelParking')} value={String(detail.parkingSpaces)} />
+              )}
             </dl>
           </section>
 
           <Alert>
             <p className="font-medium">{t('directTitle')}</p>
-            <p className="text-sm text-muted-foreground">{t('directBody')}</p>
+            <p className="text-muted-foreground text-sm">{t('directBody')}</p>
           </Alert>
         </div>
 
@@ -169,40 +232,56 @@ export function PropertyDetail({
               <CardContent className="space-y-4 pt-6">
                 <div>
                   <h2 className="text-lg font-semibold">{ti('title')}</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">{ti('intro')}</p>
+                  <p className="text-muted-foreground mt-1 text-sm">{ti('intro')}</p>
                 </div>
                 <dl className="space-y-3">
                   <Metric label={ti('roi')} value={formatPct(ic.estimatedRoiPct, locale)} />
-                  <Metric label={ti('annualised')} value={ic.estimatedAnnualisedReturnPct != null ? formatPct(ic.estimatedAnnualisedReturnPct, locale) : ti('unavailable')} />
+                  <Metric
+                    label={ti('annualised')}
+                    value={
+                      ic.estimatedAnnualisedReturnPct != null
+                        ? formatPct(ic.estimatedAnnualisedReturnPct, locale)
+                        : ti('unavailable')
+                    }
+                  />
                   <Metric label={ti('priceSqft')} value={formatAed(ic.pricePerSqftAed, locale)} />
                 </dl>
-                <p className="text-xs leading-relaxed text-muted-foreground">{ti('disclosure')}</p>
+                <p className="text-muted-foreground text-xs leading-relaxed">{ti('disclosure')}</p>
               </CardContent>
             </Card>
           </aside>
         )}
       </div>
 
-      <span role="status" aria-live="polite" className="sr-only">{announce}</span>
+      <span role="status" aria-live="polite" className="sr-only">
+        {announce}
+      </span>
     </div>
   );
 }
 
 function Fact({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return <span className="inline-flex items-center gap-1.5 text-muted-foreground">{icon}<span className="text-foreground">{label}</span></span>;
+  return (
+    <span className="text-muted-foreground inline-flex items-center gap-1.5">
+      {icon}
+      <span className="text-foreground">{label}</span>
+    </span>
+  );
 }
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-4 border-b py-1.5">
       <dt className="text-muted-foreground">{label}</dt>
-      <dd className="font-medium" dir="auto">{value}</dd>
+      <dd className="font-medium" dir="auto">
+        {value}
+      </dd>
     </div>
   );
 }
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline justify-between gap-2">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
+      <dt className="text-muted-foreground text-sm">{label}</dt>
       <dd className="text-lg font-semibold">{value}</dd>
     </div>
   );
@@ -211,5 +290,8 @@ function titleCase(s: string): string {
   return s.charAt(0) + s.slice(1).toLowerCase();
 }
 function titleCaseFeature(s: string): string {
-  return s.split('_').map((w) => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
+  return s
+    .split('_')
+    .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
+    .join(' ');
 }

@@ -4,7 +4,14 @@
  * Run: SUPABASE_SERVICE_ROLE_KEY=<local secret> pnpm --filter @markaz/web test:e2e
  */
 import { test, expect } from '@playwright/test';
-import { createCustomer, createLiveListing, acceptedTransaction, driveToCompletion, teardown, type Customer } from './helpers/provision';
+import {
+  createCustomer,
+  createLiveListing,
+  acceptedTransaction,
+  driveToCompletion,
+  teardown,
+  type Customer,
+} from './helpers/provision';
 import { signIn } from './helpers/flows';
 
 const skip = !process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -38,7 +45,9 @@ test('buyer confirms transaction details from the workspace', async ({ page }) =
   await expect(page.getByRole('button', { name: 'Confirm transaction details' })).toHaveCount(0);
 });
 
-test('both participants confirm completion → Transaction completed in demo', async ({ browser }) => {
+test('both participants confirm completion → Transaction completed in demo', async ({
+  browser,
+}) => {
   test.skip(skip, 'full stack required');
   const listingId = (await createLiveListing(seller.id, { askingPrice: 2_000_000 })).id;
   const txId = await acceptedTransaction(buyer.id, seller.id, listingId);

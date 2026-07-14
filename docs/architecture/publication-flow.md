@@ -12,9 +12,9 @@ enum is **unchanged** — only `READY_TO_PUBLISH`, `LIVE`, and `PAUSED` are used
 The **review** status lives in its own record so a returned review never corrupts
 the listing journey (§5.1):
 
-| Listing state (`listings.state`) | Publication-request status (`listing_publication_requests.status`) |
-| --- | --- |
-| `READY_TO_PUBLISH` → `LIVE` → `PAUSED` → `LIVE` | `NOT_SUBMITTED` → `PENDING` → `APPROVED_DEMO` / `REJECTED_DEMO` |
+| Listing state (`listings.state`)                | Publication-request status (`listing_publication_requests.status`) |
+| ----------------------------------------------- | ------------------------------------------------------------------ |
+| `READY_TO_PUBLISH` → `LIVE` → `PAUSED` → `LIVE` | `NOT_SUBMITTED` → `PENDING` → `APPROVED_DEMO` / `REJECTED_DEMO`    |
 
 `publication.ts` (domain) defines the request-status enum and the safe
 `PublicationResultCategory` set; the listing enum is untouched.

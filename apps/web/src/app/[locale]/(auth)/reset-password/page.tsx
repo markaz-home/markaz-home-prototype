@@ -29,7 +29,10 @@ export default async function Page({
             <Button asChild>
               <Link href="/forgot-password">{t('requestNew')}</Link>
             </Button>
-            <Link href="/sign-in" className="text-center text-sm text-muted-foreground hover:text-foreground">
+            <Link
+              href="/sign-in"
+              className="text-muted-foreground hover:text-foreground text-center text-sm"
+            >
               {tf('return')}
             </Link>
           </div>

@@ -92,7 +92,10 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
     setForm((f) => ({ ...f, [k]: v }));
   }
   function toggleFeature(a: string) {
-    setForm((f) => ({ ...f, features: f.features.includes(a) ? f.features.filter((x) => x !== a) : [...f.features, a] }));
+    setForm((f) => ({
+      ...f,
+      features: f.features.includes(a) ? f.features.filter((x) => x !== a) : [...f.features, a],
+    }));
   }
 
   // Debounced autosave: persist partial details 800ms after the last edit.
@@ -161,12 +164,20 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
   const selectCls = 'h-10 w-full rounded-md border border-input bg-background px-3 text-sm';
 
   return (
-    <WizardShell listing={data as unknown as WizardListing} current="details" autosave={autosave.state}>
+    <WizardShell
+      listing={data as unknown as WizardListing}
+      current="details"
+      autosave={autosave.state}
+    >
       <div className="space-y-6">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('stepLabel')}</p>
-          <h1 className="mt-1 font-display text-2xl font-medium tracking-tight text-brand-900">{t('title')}</h1>
-          <p className="mt-1 text-muted-foreground">{t('description')}</p>
+          <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+            {t('stepLabel')}
+          </p>
+          <h1 className="font-display text-brand-900 mt-1 text-2xl font-medium tracking-tight">
+            {t('title')}
+          </h1>
+          <p className="text-muted-foreground mt-1">{t('description')}</p>
         </div>
 
         {Object.keys(fieldErrors).length > 0 || saveError ? (
@@ -181,14 +192,24 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
         ) : null}
 
         <form onSubmit={onSubmit} className="space-y-5" noValidate>
-          <FormField id="propertyType" label={t('propertyType')} error={fieldErrors.propertyType} required>
+          <FormField
+            id="propertyType"
+            label={t('propertyType')}
+            error={fieldErrors.propertyType}
+            required
+          >
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {PROPERTY_TYPES.map((pt) => (
                 <button
                   type="button"
                   key={pt}
                   onClick={() => set('propertyType', pt)}
-                  className={cn('rounded-md border p-3 text-sm', form.propertyType === pt ? 'border-primary bg-brand-100 font-medium' : 'border-input')}
+                  className={cn(
+                    'rounded-md border p-3 text-sm',
+                    form.propertyType === pt
+                      ? 'border-primary bg-brand-100 font-medium'
+                      : 'border-input',
+                  )}
                   aria-pressed={form.propertyType === pt}
                 >
                   {t(`type${pt.charAt(0)}${pt.slice(1).toLowerCase()}` as never)}
@@ -199,75 +220,165 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
 
           <FormField id="emirate" label={t('emirate')}>
             <Input id="emirate" value="Dubai" readOnly aria-readonly />
-            <p className="mt-1 text-xs text-muted-foreground">{t('emirateHelp')}</p>
+            <p className="text-muted-foreground mt-1 text-xs">{t('emirateHelp')}</p>
           </FormField>
 
           <div className="grid gap-5 sm:grid-cols-2">
-            <FormField id="community" label={t("community")} error={fieldErrors.community} required>
-              <Input id="community" value={form.community} onChange={(e) => set('community', e.target.value)} placeholder={t('communityPlaceholder')} />
+            <FormField id="community" label={t('community')} error={fieldErrors.community} required>
+              <Input
+                id="community"
+                value={form.community}
+                onChange={(e) => set('community', e.target.value)}
+                placeholder={t('communityPlaceholder')}
+              />
             </FormField>
-            <FormField id="building" label={t("building")} error={fieldErrors.building}>
-              <Input id="building" value={form.buildingOrProject} onChange={(e) => set('buildingOrProject', e.target.value)} placeholder={t('buildingPlaceholder')} />
+            <FormField id="building" label={t('building')} error={fieldErrors.building}>
+              <Input
+                id="building"
+                value={form.buildingOrProject}
+                onChange={(e) => set('buildingOrProject', e.target.value)}
+                placeholder={t('buildingPlaceholder')}
+              />
             </FormField>
           </div>
 
-          <FormField id="unit" label={t("unit")} error={fieldErrors.unit} required>
-            <Input id="unit" value={form.unitIdentifier} onChange={(e) => set('unitIdentifier', e.target.value)} placeholder={t('unitPlaceholder')} />
-            <p className="mt-1 text-xs text-muted-foreground">{t('unitHelp')}</p>
+          <FormField id="unit" label={t('unit')} error={fieldErrors.unit} required>
+            <Input
+              id="unit"
+              value={form.unitIdentifier}
+              onChange={(e) => set('unitIdentifier', e.target.value)}
+              placeholder={t('unitPlaceholder')}
+            />
+            <p className="text-muted-foreground mt-1 text-xs">{t('unitHelp')}</p>
           </FormField>
 
           <div className="grid gap-5 sm:grid-cols-3">
-            <FormField id="bedrooms" label={t("bedrooms")} error={fieldErrors.bedrooms} required>
-              <select id="bedrooms" className={selectCls} value={form.bedrooms} onChange={(e) => set('bedrooms', Number(e.target.value))}>
+            <FormField id="bedrooms" label={t('bedrooms')} error={fieldErrors.bedrooms} required>
+              <select
+                id="bedrooms"
+                className={selectCls}
+                value={form.bedrooms}
+                onChange={(e) => set('bedrooms', Number(e.target.value))}
+              >
                 {BEDROOM_OPTIONS.map((n) => (
-                  <option key={n} value={n}>{n === 0 ? t('studio') : n}</option>
+                  <option key={n} value={n}>
+                    {n === 0 ? t('studio') : n}
+                  </option>
                 ))}
               </select>
             </FormField>
-            <FormField id="bathrooms" label={t("bathrooms")} error={fieldErrors.bathrooms} required>
-              <select id="bathrooms" className={selectCls} value={form.bathrooms} onChange={(e) => set('bathrooms', Number(e.target.value))}>
+            <FormField id="bathrooms" label={t('bathrooms')} error={fieldErrors.bathrooms} required>
+              <select
+                id="bathrooms"
+                className={selectCls}
+                value={form.bathrooms}
+                onChange={(e) => set('bathrooms', Number(e.target.value))}
+              >
                 {BATHROOM_OPTIONS.map((n) => (
-                  <option key={n} value={n}>{n}</option>
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
                 ))}
               </select>
             </FormField>
-            <FormField id="size" label={t("size")} error={fieldErrors.size} required>
-              <Input id="size" type="number" inputMode="numeric" value={form.sizeSqft} onChange={(e) => set('sizeSqft', e.target.value)} placeholder={t('sizePlaceholder')} />
+            <FormField id="size" label={t('size')} error={fieldErrors.size} required>
+              <Input
+                id="size"
+                type="number"
+                inputMode="numeric"
+                value={form.sizeSqft}
+                onChange={(e) => set('sizeSqft', e.target.value)}
+                placeholder={t('sizePlaceholder')}
+              />
             </FormField>
           </div>
 
           <div className="grid gap-5 sm:grid-cols-3">
-            <FormField id="furnishing" label={t("furnishing")} error={fieldErrors.furnishing} required>
-              <select id="furnishing" className={selectCls} value={form.furnishingStatus} onChange={(e) => set('furnishingStatus', e.target.value)}>
-                <option value="" disabled>—</option>
+            <FormField
+              id="furnishing"
+              label={t('furnishing')}
+              error={fieldErrors.furnishing}
+              required
+            >
+              <select
+                id="furnishing"
+                className={selectCls}
+                value={form.furnishingStatus}
+                onChange={(e) => set('furnishingStatus', e.target.value)}
+              >
+                <option value="" disabled>
+                  —
+                </option>
                 {FURNISHING_STATUSES.map((s) => (
-                  <option key={s} value={s}>{t(`furnishing${s === 'PARTLY_FURNISHED' ? 'Partly' : s === 'FURNISHED' ? 'Furnished' : 'Unfurnished'}`)}</option>
+                  <option key={s} value={s}>
+                    {t(
+                      `furnishing${s === 'PARTLY_FURNISHED' ? 'Partly' : s === 'FURNISHED' ? 'Furnished' : 'Unfurnished'}`,
+                    )}
+                  </option>
                 ))}
               </select>
             </FormField>
-            <FormField id="occupancy" label={t("occupancy")} error={fieldErrors.occupancy} required>
-              <select id="occupancy" className={selectCls} value={form.occupancyStatus} onChange={(e) => set('occupancyStatus', e.target.value)}>
-                <option value="" disabled>—</option>
+            <FormField id="occupancy" label={t('occupancy')} error={fieldErrors.occupancy} required>
+              <select
+                id="occupancy"
+                className={selectCls}
+                value={form.occupancyStatus}
+                onChange={(e) => set('occupancyStatus', e.target.value)}
+              >
+                <option value="" disabled>
+                  —
+                </option>
                 {OCCUPANCY_STATUSES.map((s) => (
-                  <option key={s} value={s}>{t(`occupancy${s === 'OWNER_OCCUPIED' ? 'Owner' : s === 'TENANT_OCCUPIED' ? 'Tenant' : 'Vacant'}`)}</option>
+                  <option key={s} value={s}>
+                    {t(
+                      `occupancy${s === 'OWNER_OCCUPIED' ? 'Owner' : s === 'TENANT_OCCUPIED' ? 'Tenant' : 'Vacant'}`,
+                    )}
+                  </option>
                 ))}
               </select>
             </FormField>
-            <FormField id="completion" label={t("completion")} error={fieldErrors.completion} required>
-              <select id="completion" className={selectCls} value={form.completionStatus} onChange={(e) => set('completionStatus', e.target.value)}>
-                <option value="" disabled>—</option>
+            <FormField
+              id="completion"
+              label={t('completion')}
+              error={fieldErrors.completion}
+              required
+            >
+              <select
+                id="completion"
+                className={selectCls}
+                value={form.completionStatus}
+                onChange={(e) => set('completionStatus', e.target.value)}
+              >
+                <option value="" disabled>
+                  —
+                </option>
                 {COMPLETION_STATUSES.map((s) => (
-                  <option key={s} value={s}>{t(s === 'READY' ? 'completionReady' : 'completionOffPlan')}</option>
+                  <option key={s} value={s}>
+                    {t(s === 'READY' ? 'completionReady' : 'completionOffPlan')}
+                  </option>
                 ))}
               </select>
             </FormField>
           </div>
 
-          <FormField id="parking" label={t("parking")} error={fieldErrors.parking}>
-            <Input id="parking" type="number" inputMode="numeric" value={form.parkingSpaces} onChange={(e) => set('parkingSpaces', e.target.value)} placeholder={t('parkingPlaceholder')} className="max-w-[160px]" />
+          <FormField id="parking" label={t('parking')} error={fieldErrors.parking}>
+            <Input
+              id="parking"
+              type="number"
+              inputMode="numeric"
+              value={form.parkingSpaces}
+              onChange={(e) => set('parkingSpaces', e.target.value)}
+              placeholder={t('parkingPlaceholder')}
+              className="max-w-[160px]"
+            />
           </FormField>
 
-          <FormField id="description" label={t("descriptionLabel")} error={fieldErrors.descriptionShort ?? fieldErrors.descriptionLong} required>
+          <FormField
+            id="description"
+            label={t('descriptionLabel')}
+            error={fieldErrors.descriptionShort ?? fieldErrors.descriptionLong}
+            required
+          >
             <textarea
               id="description"
               value={form.description}
@@ -275,17 +386,23 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
               rows={5}
               maxLength={2000}
               placeholder={t('descriptionPlaceholder')}
-              className="w-full rounded-md border border-input bg-background p-3 text-sm"
+              className="border-input bg-background w-full rounded-md border p-3 text-sm"
             />
-            <p className="mt-1 text-xs text-muted-foreground">{form.description.length} / 2000 · {t('descriptionHelp')}</p>
+            <p className="text-muted-foreground mt-1 text-xs">
+              {form.description.length} / 2000 · {t('descriptionHelp')}
+            </p>
           </FormField>
 
-          <FormField id="features" label={t("amenities")} error={fieldErrors.amenities}>
-            <p className="mb-2 text-xs text-muted-foreground">{t('amenitiesHelp')}</p>
+          <FormField id="features" label={t('amenities')} error={fieldErrors.amenities}>
+            <p className="text-muted-foreground mb-2 text-xs">{t('amenitiesHelp')}</p>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {AMENITIES.map((a) => (
                 <label key={a} className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" checked={form.features.includes(a)} onChange={() => toggleFeature(a)} />
+                  <input
+                    type="checkbox"
+                    checked={form.features.includes(a)}
+                    onChange={() => toggleFeature(a)}
+                  />
                   <span>{a.toLowerCase().replace(/_/g, ' ')}</span>
                 </label>
               ))}
@@ -293,7 +410,9 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
           </FormField>
 
           <div className="flex justify-end gap-3 border-t pt-4">
-            <Button type="submit" loading={save.isPending}>{tl('saveContinue')}</Button>
+            <Button type="submit" loading={save.isPending}>
+              {tl('saveContinue')}
+            </Button>
           </div>
         </form>
       </div>

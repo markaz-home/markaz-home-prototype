@@ -40,29 +40,29 @@ by app code — Supabase Auth owns them all.
 
 ### Customer app (`apps/web`, port 3000)
 
-| Route | Notes |
-| --- | --- |
-| `/[locale]/sign-up` | name, email, password, confirm, Terms, Privacy → `signUp` |
-| `/[locale]/sign-up/check-email` | "Check your email" (verification code sent) |
-| `/[locale]/verify-email` (+ `/success`) | 6-digit signup code → `verifyOtp type:signup` |
-| `/[locale]/sign-in` | email + password; `?reset=…`, `?expired=1` hints |
-| `/[locale]/forgot-password` (+ `/check-email`) | `resetPasswordForEmail`; generic response |
-| `/auth/confirm` | **top-level** (outside `[locale]`) recovery/confirmation callback |
-| `/[locale]/reset-password` (+ `/success`) | new password only — **no code field**; recovery-session gated |
-| `/[locale]/onboarding/uae-pass` | simulated UAE PASS; `/onboarding/profile` is a fallback |
-| `/[locale]/signed-out`, `/[locale]/auth/error`, `/[locale]/auth/unavailable` | status panels |
-| `/[locale]/dashboard` | reached only by verified + complete customers |
+| Route                                                                        | Notes                                                             |
+| ---------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `/[locale]/sign-up`                                                          | name, email, password, confirm, Terms, Privacy → `signUp`         |
+| `/[locale]/sign-up/check-email`                                              | "Check your email" (verification code sent)                       |
+| `/[locale]/verify-email` (+ `/success`)                                      | 6-digit signup code → `verifyOtp type:signup`                     |
+| `/[locale]/sign-in`                                                          | email + password; `?reset=…`, `?expired=1` hints                  |
+| `/[locale]/forgot-password` (+ `/check-email`)                               | `resetPasswordForEmail`; generic response                         |
+| `/auth/confirm`                                                              | **top-level** (outside `[locale]`) recovery/confirmation callback |
+| `/[locale]/reset-password` (+ `/success`)                                    | new password only — **no code field**; recovery-session gated     |
+| `/[locale]/onboarding/uae-pass`                                              | simulated UAE PASS; `/onboarding/profile` is a fallback           |
+| `/[locale]/signed-out`, `/[locale]/auth/error`, `/[locale]/auth/unavailable` | status panels                                                     |
+| `/[locale]/dashboard`                                                        | reached only by verified + complete customers                     |
 
 ### Admin app (`apps/admin`, port 3001)
 
-| Route | Notes |
-| --- | --- |
-| `/[locale]/login` | email + password; requires `ADMIN` else `/access-denied` |
-| `/[locale]/forgot-password` (+ `/check-email`) | admin recovery (official link) |
-| `/auth/confirm` | **top-level** recovery callback (returns to the admin app) |
-| `/[locale]/reset-password` (+ `/success`) | new admin password — **no code field** |
-| `/[locale]/access-denied`, `/[locale]/signed-out` | status panels |
-| `/[locale]/overview` + portal sections | admin portal (Operations shell) |
+| Route                                             | Notes                                                      |
+| ------------------------------------------------- | ---------------------------------------------------------- |
+| `/[locale]/login`                                 | email + password; requires `ADMIN` else `/access-denied`   |
+| `/[locale]/forgot-password` (+ `/check-email`)    | admin recovery (official link)                             |
+| `/auth/confirm`                                   | **top-level** recovery callback (returns to the admin app) |
+| `/[locale]/reset-password` (+ `/success`)         | new admin password — **no code field**                     |
+| `/[locale]/access-denied`, `/[locale]/signed-out` | status panels                                              |
+| `/[locale]/overview` + portal sections            | admin portal (Operations shell)                            |
 
 The locale-independent `/auth/confirm` callback is intentional and documented
 (middleware excludes `/auth` from locale routing; ADR-0009).
@@ -193,19 +193,19 @@ migrations cleanly during validation.
 Validated against a clean local Supabase stack (`pnpm supabase:reset && pnpm
 db:setup`) on 2026-06-29. Exact commands and results:
 
-| Command / suite | Result |
-| --- | --- |
-| `pnpm typecheck` | ✅ 12/12 packages |
-| `pnpm lint` | ✅ 11/11 packages |
-| `pnpm test` (unit + component + integration) | ✅ **86 tests** across 8 packages |
-| &nbsp;&nbsp;`@markaz/domain` (unit) | ✅ 22 |
-| &nbsp;&nbsp;`@markaz/web` (component) | ✅ 31 |
-| &nbsp;&nbsp;`@markaz/admin` (component) | ✅ 7 |
-| &nbsp;&nbsp;`@markaz/auth` (unit) | ✅ 5 |
-| &nbsp;&nbsp;`@markaz/i18n` (unit) | ✅ 6 |
-| &nbsp;&nbsp;`@markaz/tests` (integration: RLS 9 + storage 3 + provisioning 3) | ✅ 15 |
-| `pnpm test:e2e` (Playwright, live stack + Mailpit) | ✅ **10/10** |
-| `pnpm build` (web + admin) | ✅ both compiled successfully |
+| Command / suite                                                               | Result                            |
+| ----------------------------------------------------------------------------- | --------------------------------- |
+| `pnpm typecheck`                                                              | ✅ 12/12 packages                 |
+| `pnpm lint`                                                                   | ✅ 11/11 packages                 |
+| `pnpm test` (unit + component + integration)                                  | ✅ **86 tests** across 8 packages |
+| &nbsp;&nbsp;`@markaz/domain` (unit)                                           | ✅ 22                             |
+| &nbsp;&nbsp;`@markaz/web` (component)                                         | ✅ 31                             |
+| &nbsp;&nbsp;`@markaz/admin` (component)                                       | ✅ 7                              |
+| &nbsp;&nbsp;`@markaz/auth` (unit)                                             | ✅ 5                              |
+| &nbsp;&nbsp;`@markaz/i18n` (unit)                                             | ✅ 6                              |
+| &nbsp;&nbsp;`@markaz/tests` (integration: RLS 9 + storage 3 + provisioning 3) | ✅ 15                             |
+| `pnpm test:e2e` (Playwright, live stack + Mailpit)                            | ✅ **10/10**                      |
+| `pnpm build` (web + admin)                                                    | ✅ both compiled successfully     |
 
 - **Skipped:** none. Integration and e2e ran against the **active** local stack
   (not self-skipped).

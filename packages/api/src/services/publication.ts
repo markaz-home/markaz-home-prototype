@@ -36,8 +36,16 @@ function fault(inject?: PublicationFault): PublicationFault {
   return isProd() ? {} : (inject ?? {});
 }
 
-async function audit(tx: Tx, actorId: string, action: string, entityId: string, metadata: Record<string, unknown> = {}) {
-  await tx.insert(auditEvents).values({ actorId, action, entityType: 'listing', entityId, metadata });
+async function audit(
+  tx: Tx,
+  actorId: string,
+  action: string,
+  entityId: string,
+  metadata: Record<string, unknown> = {},
+) {
+  await tx
+    .insert(auditEvents)
+    .values({ actorId, action, entityType: 'listing', entityId, metadata });
 }
 
 export interface PubCtx {
@@ -50,7 +58,12 @@ async function currentRequest(tx: Tx, listingId: string) {
   const [r] = await tx
     .select()
     .from(listingPublicationRequests)
-    .where(and(eq(listingPublicationRequests.listingId, listingId), isNull(listingPublicationRequests.supersededAt)))
+    .where(
+      and(
+        eq(listingPublicationRequests.listingId, listingId),
+        isNull(listingPublicationRequests.supersededAt),
+      ),
+    )
     .orderBy(desc(listingPublicationRequests.createdAt))
     .limit(1);
   return r ?? null;
@@ -86,15 +99,31 @@ export const PublicationReviewService = {
     const existing = await currentRequest(tx, listingId);
     if (existing && existing.status === 'PENDING') return existing; // idempotent (§5.2)
     if (existing) {
-      await tx.update(listingPublicationRequests).set({ supersededAt: new Date() }).where(eq(listingPublicationRequests.id, existing.id));
+      await tx
+        .update(listingPublicationRequests)
+        .set({ supersededAt: new Date() })
+        .where(eq(listingPublicationRequests.id, existing.id));
     }
-    const [l] = await tx.select({ publicId: listings.publicId }).from(listings).where(eq(listings.id, listingId)).limit(1);
+    const [l] = await tx
+      .select({ publicId: listings.publicId })
+      .from(listings)
+      .where(eq(listings.id, listingId))
+      .limit(1);
     if (l && !l.publicId) {
-      await tx.update(listings).set({ publicId: formatPublicId(randomBytes(6).toString('hex')) }).where(eq(listings.id, listingId));
+      await tx
+        .update(listings)
+        .set({ publicId: formatPublicId(randomBytes(6).toString('hex')) })
+        .where(eq(listings.id, listingId));
     }
     const [req] = await tx
       .insert(listingPublicationRequests)
-      .values({ listingId, sellerUserId: userId, status: 'PENDING', submittedAt: new Date(), outcomeCategory: forcedFailure(force) ? 'DEMO_REVIEW_RETURNED' : null })
+      .values({
+        listingId,
+        sellerUserId: userId,
+        status: 'PENDING',
+        submittedAt: new Date(),
+        outcomeCategory: forcedFailure(force) ? 'DEMO_REVIEW_RETURNED' : null,
+      })
       .returning();
     await audit(tx, userId, 'LISTING_PUBLICATION_SUBMITTED', listingId);
     return req!;
@@ -113,7 +142,11 @@ export const PublicationReviewService = {
         .set({ status: 'REJECTED_DEMO', outcomeCategory: category, resolvedAt: new Date() })
         .where(eq(listingPublicationRequests.id, req.id));
       await audit(tx, userId, action, listingId, { category });
-      const [updated] = await tx.select().from(listingPublicationRequests).where(eq(listingPublicationRequests.id, req.id)).limit(1);
+      const [updated] = await tx
+        .select()
+        .from(listingPublicationRequests)
+        .where(eq(listingPublicationRequests.id, req.id))
+        .limit(1);
       return updated ?? null;
     };
 
@@ -124,8 +157,13 @@ export const PublicationReviewService = {
 
     // Re-validate the §4.4 gate at resolve time.
     const [listing] = await tx.select().from(listings).where(eq(listings.id, listingId)).limit(1);
-    if (!listing || listing.state !== 'READY_TO_PUBLISH') return reject('CHECKLIST_INCOMPLETE', 'LISTING_PUBLICATION_RETURNED_DEMO');
-    const photos = await tx.select().from(propertyPhotos).where(eq(propertyPhotos.listingId, listingId)).orderBy(propertyPhotos.sortOrder);
+    if (!listing || listing.state !== 'READY_TO_PUBLISH')
+      return reject('CHECKLIST_INCOMPLETE', 'LISTING_PUBLICATION_RETURNED_DEMO');
+    const photos = await tx
+      .select()
+      .from(propertyPhotos)
+      .where(eq(propertyPhotos.listingId, listingId))
+      .orderBy(propertyPhotos.sortOrder);
     const hasCover = photos.some((p) => p.isCover);
     const askingOk = listing.askingPrice != null && Number(listing.askingPrice) > 0;
     const [permit] = await tx
@@ -154,18 +192,23 @@ export const PublicationReviewService = {
         await copyDraftPhotoToPublic(photo.storagePath, key, photo.contentType ?? undefined);
         await setPublicPhotoPath(photo.id, key);
       }
-      if (!(await verifyPublicPhotos(publicId, photoIds))) throw new Error('public photo verification failed');
+      if (!(await verifyPublicPhotos(publicId, photoIds)))
+        throw new Error('public photo verification failed');
     } catch {
       await compensate();
       return reject('PHOTO_PROCESSING_FAILED', 'LISTING_PUBLIC_PHOTOS_FAILED');
     }
-    await audit(tx, userId, 'LISTING_PUBLIC_PHOTOS_PREPARED', listingId, { count: photoIds.length });
+    await audit(tx, userId, 'LISTING_PUBLIC_PHOTOS_PREPARED', listingId, {
+      count: photoIds.length,
+    });
 
     // --- Phase 2: ATOMIC database LIVE transition --------------------------------
     try {
       if (f.dbTxFail) throw new Error('injected database transition failure');
       const slug = await (async () => {
-        const [property] = listing.propertyId ? await tx.select().from(properties).where(eq(properties.id, listing.propertyId)).limit(1) : [null];
+        const [property] = listing.propertyId
+          ? await tx.select().from(properties).where(eq(properties.id, listing.propertyId)).limit(1)
+          : [null];
         return buildListingSlug({
           bedrooms: property?.bedrooms ?? null,
           propertyType: property?.propertyType ?? null,
@@ -192,7 +235,11 @@ export const PublicationReviewService = {
         .where(eq(listingPublicationRequests.id, req.id));
       await audit(tx, userId, 'LISTING_PUBLICATION_APPROVED_DEMO', listingId);
       await audit(tx, userId, 'LISTING_PUBLISHED', listingId, { publicId });
-      const [updated] = await tx.select().from(listingPublicationRequests).where(eq(listingPublicationRequests.id, req.id)).limit(1);
+      const [updated] = await tx
+        .select()
+        .from(listingPublicationRequests)
+        .where(eq(listingPublicationRequests.id, req.id))
+        .limit(1);
       return updated ?? null;
     } catch {
       // Database transition failed AFTER Storage preparation → compensate and keep
@@ -208,6 +255,12 @@ export const PublicationReviewService = {
     await tx
       .update(listingPublicationRequests)
       .set({ supersededAt: new Date() })
-      .where(and(eq(listingPublicationRequests.listingId, listingId), eq(listingPublicationRequests.status, 'PENDING'), isNull(listingPublicationRequests.supersededAt)));
+      .where(
+        and(
+          eq(listingPublicationRequests.listingId, listingId),
+          eq(listingPublicationRequests.status, 'PENDING'),
+          isNull(listingPublicationRequests.supersededAt),
+        ),
+      );
   },
 };

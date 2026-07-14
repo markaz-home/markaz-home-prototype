@@ -30,7 +30,13 @@ import { Link, useRouter } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import type { RouterOutputs } from '@/trpc/types';
 import { formatAed } from '@/lib/format';
-import { AmountComparison, NonBindingDisclosure, OfferStatusBadge, RealtimeBanner, useOfferErrorMessage } from './shared';
+import {
+  AmountComparison,
+  NonBindingDisclosure,
+  OfferStatusBadge,
+  RealtimeBanner,
+  useOfferErrorMessage,
+} from './shared';
 import { OfferTimeline } from './offer-timeline';
 
 /** Shared, perspective-aware offer thread (offers-design-spec §19–24). */
@@ -64,7 +70,11 @@ export function OfferThread({ threadId }: { threadId: string }) {
         <EmptyState
           title={t('error.notAvailableTitle')}
           description={t('error.notAvailableBody')}
-          action={<Button asChild variant="outline"><Link href="/offers">{t('closed.returnOffers')}</Link></Button>}
+          action={
+            <Button asChild variant="outline">
+              <Link href="/offers">{t('closed.returnOffers')}</Link>
+            </Button>
+          }
         />
       </div>
     );
@@ -80,26 +90,39 @@ export function OfferThread({ threadId }: { threadId: string }) {
 
   return (
     <div className="space-y-6">
-      <span role="status" aria-live="polite" className="sr-only">{announce}</span>
-      <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
-        <Link href="/offers" className="hover:text-foreground">{t('title')}</Link>
+      <span role="status" aria-live="polite" className="sr-only">
+        {announce}
+      </span>
+      <nav aria-label="Breadcrumb" className="text-muted-foreground text-sm">
+        <Link href="/offers" className="hover:text-foreground">
+          {t('title')}
+        </Link>
       </nav>
 
       <header className="space-y-1">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-semibold" dir="auto">{title}</h1>
+          <h1 className="text-2xl font-semibold" dir="auto">
+            {title}
+          </h1>
           <OfferStatusBadge statusKey={thread.statusKey} />
         </div>
-        <p className="text-muted-foreground">{[thread.property.community, thread.property.emirate].filter(Boolean).join(' · ')}</p>
+        <p className="text-muted-foreground">
+          {[thread.property.community, thread.property.emirate].filter(Boolean).join(' · ')}
+        </p>
       </header>
 
-      <RealtimeBanner status={rtStatus} onRefresh={() => void utils.offers.getThread.invalidate({ threadId })} />
+      <RealtimeBanner
+        status={rtStatus}
+        onRefresh={() => void utils.offers.getThread.invalidate({ threadId })}
+      />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
           <CurrentProposal thread={thread} />
           <section aria-labelledby="timeline-h">
-            <h2 id="timeline-h" className="text-lg font-semibold">{t('thread.history')}</h2>
+            <h2 id="timeline-h" className="text-lg font-semibold">
+              {t('thread.history')}
+            </h2>
             <OfferTimeline events={timeline} perspective={perspective} buyerLabel={buyerLabel} />
           </section>
         </div>
@@ -130,17 +153,33 @@ function CurrentProposal({ thread }: { thread: ThreadData }) {
   const locale = useLocale();
   const cp = thread.currentProposal;
   if (!cp) return null;
-  const byLabel = cp.byYou ? t('thread.proposedByYou') : cp.bySide === 'BUYER' ? t('thread.proposedByBuyer') : t('thread.proposedBySeller');
+  const byLabel = cp.byYou
+    ? t('thread.proposedByYou')
+    : cp.bySide === 'BUYER'
+      ? t('thread.proposedByBuyer')
+      : t('thread.proposedBySeller');
   return (
     <Card>
       <CardContent className="space-y-3 pt-6">
-        <p className="text-sm text-muted-foreground">{t('thread.current')}</p>
-        <p className="text-3xl font-semibold tabular-nums" dir="ltr">{formatAed(cp.amountAed, locale)}</p>
+        <p className="text-muted-foreground text-sm">{t('thread.current')}</p>
+        <p className="text-3xl font-semibold tabular-nums" dir="ltr">
+          {formatAed(cp.amountAed, locale)}
+        </p>
         <AmountComparison comparison={thread.comparison} />
         <dl className="grid grid-cols-2 gap-2 text-sm">
           <Meta label={t('thread.nextAction')} value={byLabel} />
-          <Meta label={t('askingPrice')} value={formatAed(thread.property.askingPriceAed, locale)} />
-          {cp.expiresAt ? <Meta label={t('thread.validUntil', { date: new Date(cp.expiresAt).toLocaleString(locale) })} value="" /> : null}
+          <Meta
+            label={t('askingPrice')}
+            value={formatAed(thread.property.askingPriceAed, locale)}
+          />
+          {cp.expiresAt ? (
+            <Meta
+              label={t('thread.validUntil', {
+                date: new Date(cp.expiresAt).toLocaleString(locale),
+              })}
+              value=""
+            />
+          ) : null}
         </dl>
       </CardContent>
     </Card>
@@ -151,7 +190,11 @@ function Meta({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <dt className="text-muted-foreground">{label}</dt>
-      {value ? <dd className="font-medium" dir="ltr">{value}</dd> : null}
+      {value ? (
+        <dd className="font-medium" dir="ltr">
+          {value}
+        </dd>
+      ) : null}
     </div>
   );
 }
@@ -188,30 +231,74 @@ function DecisionPanel({
       <CardContent className="space-y-3 pt-6">
         {canAct ? (
           <>
-            <Button className="w-full" onClick={() => setDialog('accept')}>{t('actions.accept')}</Button>
-            <Button className="w-full" variant="outline" onClick={() => setDialog('counter')}>{t('actions.counter')}</Button>
-            <Button className="w-full" variant="ghost" onClick={() => setDialog('reject')}>{t('actions.reject')}</Button>
+            <Button className="w-full" onClick={() => setDialog('accept')}>
+              {t('actions.accept')}
+            </Button>
+            <Button className="w-full" variant="outline" onClick={() => setDialog('counter')}>
+              {t('actions.counter')}
+            </Button>
+            <Button className="w-full" variant="ghost" onClick={() => setDialog('reject')}>
+              {t('actions.reject')}
+            </Button>
           </>
         ) : (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {thread.perspective === 'BUYER' ? t('status.waitingSeller') : t('status.waitingBuyer')}
           </p>
         )}
         {canWithdraw ? (
-          <Button className="w-full" variant="ghost" onClick={() => setDialog('withdraw')}>{t('actions.withdraw')}</Button>
+          <Button className="w-full" variant="ghost" onClick={() => setDialog('withdraw')}>
+            {t('actions.withdraw')}
+          </Button>
         ) : null}
 
         {dialog === 'counter' ? (
-          <CounterDialog thread={thread} threadId={threadId} onClose={() => setDialog(null)} onDone={() => { setDialog(null); onDone(); }} onError={onError} />
+          <CounterDialog
+            thread={thread}
+            threadId={threadId}
+            onClose={() => setDialog(null)}
+            onDone={() => {
+              setDialog(null);
+              onDone();
+            }}
+            onError={onError}
+          />
         ) : null}
         {dialog === 'accept' ? (
-          <AcceptDialog thread={thread} threadId={threadId} onClose={() => setDialog(null)} onDone={() => { setDialog(null); onDone('accepted'); }} onError={onError} />
+          <AcceptDialog
+            thread={thread}
+            threadId={threadId}
+            onClose={() => setDialog(null)}
+            onDone={() => {
+              setDialog(null);
+              onDone('accepted');
+            }}
+            onError={onError}
+          />
         ) : null}
         {dialog === 'reject' ? (
-          <RejectDialog thread={thread} threadId={threadId} onClose={() => setDialog(null)} onDone={() => { setDialog(null); onDone('declined'); }} onError={onError} />
+          <RejectDialog
+            thread={thread}
+            threadId={threadId}
+            onClose={() => setDialog(null)}
+            onDone={() => {
+              setDialog(null);
+              onDone('declined');
+            }}
+            onError={onError}
+          />
         ) : null}
         {dialog === 'withdraw' ? (
-          <WithdrawDialog threadId={threadId} version={thread.version} onClose={() => setDialog(null)} onDone={() => { setDialog(null); onDone('withdrew'); }} onError={onError} />
+          <WithdrawDialog
+            threadId={threadId}
+            version={thread.version}
+            onClose={() => setDialog(null)}
+            onDone={() => {
+              setDialog(null);
+              onDone('withdrew');
+            }}
+            onError={onError}
+          />
         ) : null}
       </CardContent>
     </Card>
@@ -229,16 +316,27 @@ function AcceptedPanel({ thread, threadId }: { thread: ThreadData; threadId: str
     <Card>
       <CardContent className="space-y-3 pt-6">
         <h2 className="text-lg font-semibold">{t('accept.successTitle')}</h2>
-        <p className="text-sm text-muted-foreground">{thread.perspective === 'SELLER' ? t('accept.sellerSuccess') : t('accept.buyerSuccess')}</p>
+        <p className="text-muted-foreground text-sm">
+          {thread.perspective === 'SELLER' ? t('accept.sellerSuccess') : t('accept.buyerSuccess')}
+        </p>
         <NonBindingDisclosure variant="accept" />
         <div className="flex flex-col gap-2">
           {/* Week-5 handoff: open the shared transaction workspace (idempotent create). */}
-          <Button loading={create.isPending} onClick={() => create.mutate({ offerThreadId: threadId })}>
+          <Button
+            loading={create.isPending}
+            onClick={() => create.mutate({ offerThreadId: threadId })}
+          >
             {tt('continue')}
           </Button>
-          <Button asChild variant="outline"><Link href="/offers">{t('closed.returnOffers')}</Link></Button>
+          <Button asChild variant="outline">
+            <Link href="/offers">{t('closed.returnOffers')}</Link>
+          </Button>
           {thread.property.publicId ? (
-            <Button asChild variant="ghost"><Link href={`/properties/${thread.property.publicId}/${thread.property.slug ?? ''}`}>{t('closed.viewProperty')}</Link></Button>
+            <Button asChild variant="ghost">
+              <Link href={`/properties/${thread.property.publicId}/${thread.property.slug ?? ''}`}>
+                {t('closed.viewProperty')}
+              </Link>
+            </Button>
           ) : null}
         </div>
       </CardContent>
@@ -253,14 +351,19 @@ function ClosedPanel({ thread }: { thread: ThreadData }) {
     WITHDRAWN: t('closed.withdrawnBody'),
     EXPIRED: t('closed.expiredBody'),
     CLOSED_OTHER_ACCEPTED: t('closed.otherAcceptedBody'),
-    CLOSED_LISTING_UNAVAILABLE: thread.closedReason === 'LISTING_PAUSED' ? t('closed.pausedBody') : t('closed.changedBody'),
+    CLOSED_LISTING_UNAVAILABLE:
+      thread.closedReason === 'LISTING_PAUSED' ? t('closed.pausedBody') : t('closed.changedBody'),
   };
   return (
     <Card>
       <CardContent className="space-y-3 pt-6">
         <OfferStatusBadge statusKey={thread.statusKey} />
-        <p className="text-sm text-muted-foreground">{body[thread.status] ?? t('closed.withdrawnBody')}</p>
-        <Button asChild variant="outline" className="w-full"><Link href="/offers">{t('closed.returnOffers')}</Link></Button>
+        <p className="text-muted-foreground text-sm">
+          {body[thread.status] ?? t('closed.withdrawnBody')}
+        </p>
+        <Button asChild variant="outline" className="w-full">
+          <Link href="/offers">{t('closed.returnOffers')}</Link>
+        </Button>
       </CardContent>
     </Card>
   );
@@ -268,8 +371,18 @@ function ClosedPanel({ thread }: { thread: ThreadData }) {
 
 // --- Action dialogs ----------------------------------------------------------
 function CounterDialog({
-  thread, threadId, onClose, onDone, onError,
-}: { thread: ThreadData; threadId: string; onClose: () => void; onDone: () => void; onError: (e: unknown) => void }) {
+  thread,
+  threadId,
+  onClose,
+  onDone,
+  onError,
+}: {
+  thread: ThreadData;
+  threadId: string;
+  onClose: () => void;
+  onDone: () => void;
+  onError: (e: unknown) => void;
+}) {
   const t = useTranslations('offers');
   const tv = useTranslations('offers.validation');
   const locale = useLocale();
@@ -281,12 +394,19 @@ function CounterDialog({
   const amountError = validateOfferAmount(amount);
   const equal = amount != null && current != null && amount === current;
   const isBuyer = thread.perspective === 'BUYER';
-  const counter = (isBuyer ? trpc.offers.submitBuyerCounter : trpc.offers.submitSellerCounter).useMutation();
+  const counter = (
+    isBuyer ? trpc.offers.submitBuyerCounter : trpc.offers.submitSellerCounter
+  ).useMutation();
 
   async function go() {
     if (amountError || equal) return;
     try {
-      await counter.mutateAsync({ threadId, amountAed: amount!, expiry, expectedVersion: thread.version });
+      await counter.mutateAsync({
+        threadId,
+        amountAed: amount!,
+        expiry,
+        expectedVersion: thread.version,
+      });
       onDone();
     } catch (e) {
       onError(e);
@@ -300,29 +420,71 @@ function CounterDialog({
         <DialogHeader>
           <DialogTitle>{isBuyer ? t('counter.buyerTitle') : t('counter.sellerTitle')}</DialogTitle>
         </DialogHeader>
-        <p className="text-sm text-muted-foreground">{t('counter.description')}</p>
+        <p className="text-muted-foreground text-sm">{t('counter.description')}</p>
         {current != null ? (
-          <p className="text-sm">{t('counter.previous')}: <span dir="ltr" className="font-medium">{formatAed(current, locale)}</span></p>
+          <p className="text-sm">
+            {t('counter.previous')}:{' '}
+            <span dir="ltr" className="font-medium">
+              {formatAed(current, locale)}
+            </span>
+          </p>
         ) : null}
         <div className="space-y-2">
           <Label htmlFor="counter-amount">{t('form.amount')}</Label>
           <div className="flex items-center gap-2 rounded-md border px-3">
-            <span aria-hidden className="text-muted-foreground">AED</span>
-            <input id="counter-amount" inputMode="numeric" dir="ltr" value={raw} onChange={(e) => setRaw(e.target.value)} placeholder={t('form.placeholder')} className="h-11 flex-1 bg-transparent tabular-nums outline-none" aria-invalid={!!amountError || equal} aria-describedby="counter-err" />
+            <span aria-hidden className="text-muted-foreground">
+              AED
+            </span>
+            <input
+              id="counter-amount"
+              inputMode="numeric"
+              dir="ltr"
+              value={raw}
+              onChange={(e) => setRaw(e.target.value)}
+              placeholder={t('form.placeholder')}
+              className="h-11 flex-1 bg-transparent tabular-nums outline-none"
+              aria-invalid={!!amountError || equal}
+              aria-describedby="counter-err"
+            />
           </div>
-          <AmountComparison comparison={amount != null && asking ? offerComparison(amount, asking) : null} />
-          {equal ? <p id="counter-err" role="alert" className="text-sm text-destructive">{t('counter.equalError')}</p> : amountError && raw ? <p id="counter-err" role="alert" className="text-sm text-destructive">{tv('invalid')}</p> : null}
+          <AmountComparison
+            comparison={amount != null && asking ? offerComparison(amount, asking) : null}
+          />
+          {equal ? (
+            <p id="counter-err" role="alert" className="text-destructive text-sm">
+              {t('counter.equalError')}
+            </p>
+          ) : amountError && raw ? (
+            <p id="counter-err" role="alert" className="text-destructive text-sm">
+              {tv('invalid')}
+            </p>
+          ) : null}
         </div>
         <div className="space-y-2">
           <Label htmlFor="counter-expiry">{t('form.expiry')}</Label>
-          <select id="counter-expiry" value={expiry} onChange={(e) => setExpiry(e.target.value as ExpiryOption)} className="h-11 w-full rounded-md border bg-background px-3">
-            {EXPIRY_OPTIONS.map((o) => <option key={o} value={o}>{t(`expiry.${o === '48h' ? 'h48' : o === '3d' ? 'd3' : o === '7d' ? 'd7' : 'none'}` as 'expiry.d7')}</option>)}
+          <select
+            id="counter-expiry"
+            value={expiry}
+            onChange={(e) => setExpiry(e.target.value as ExpiryOption)}
+            className="bg-background h-11 w-full rounded-md border px-3"
+          >
+            {EXPIRY_OPTIONS.map((o) => (
+              <option key={o} value={o}>
+                {t(
+                  `expiry.${o === '48h' ? 'h48' : o === '3d' ? 'd3' : o === '7d' ? 'd7' : 'none'}` as 'expiry.d7',
+                )}
+              </option>
+            ))}
           </select>
         </div>
         <NonBindingDisclosure variant="counter" />
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={counter.isPending}>{t('form.cancel')}</Button>
-          <Button onClick={go} loading={counter.isPending} disabled={!!amountError || equal}>{counter.isPending ? t('counter.submitting') : t('counter.submit')}</Button>
+          <Button variant="outline" onClick={onClose} disabled={counter.isPending}>
+            {t('form.cancel')}
+          </Button>
+          <Button onClick={go} loading={counter.isPending} disabled={!!amountError || equal}>
+            {counter.isPending ? t('counter.submitting') : t('counter.submit')}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -330,18 +492,34 @@ function CounterDialog({
 }
 
 function AcceptDialog({
-  thread, threadId, onClose, onDone, onError,
-}: { thread: ThreadData; threadId: string; onClose: () => void; onDone: () => void; onError: (e: unknown) => void }) {
+  thread,
+  threadId,
+  onClose,
+  onDone,
+  onError,
+}: {
+  thread: ThreadData;
+  threadId: string;
+  onClose: () => void;
+  onDone: () => void;
+  onError: (e: unknown) => void;
+}) {
   const t = useTranslations('offers');
   const locale = useLocale();
   const isBuyer = thread.perspective === 'BUYER';
-  const accept = (isBuyer ? trpc.offers.acceptSellerCounter : trpc.offers.acceptBuyerProposal).useMutation();
+  const accept = (
+    isBuyer ? trpc.offers.acceptSellerCounter : trpc.offers.acceptBuyerProposal
+  ).useMutation();
   const amount = thread.currentProposal?.amountAed ?? 0;
 
   async function go() {
     if (!thread.currentProposal) return;
     try {
-      await accept.mutateAsync({ threadId, proposalId: thread.currentProposal.id, expectedVersion: thread.version });
+      await accept.mutateAsync({
+        threadId,
+        proposalId: thread.currentProposal.id,
+        expectedVersion: thread.version,
+      });
       onDone();
     } catch (e) {
       onError(e);
@@ -355,12 +533,26 @@ function AcceptDialog({
         <DialogHeader>
           <DialogTitle>{isBuyer ? t('accept.counterTitle') : t('accept.title')}</DialogTitle>
         </DialogHeader>
-        <p className="text-sm text-muted-foreground">{isBuyer ? t('accept.counterBody', { amount: formatAed(amount, locale) }) : t('accept.body')}</p>
-        <Alert variant="info"><p className="text-sm">{t('accept.week5')}</p></Alert>
+        <p className="text-muted-foreground text-sm">
+          {isBuyer
+            ? t('accept.counterBody', { amount: formatAed(amount, locale) })
+            : t('accept.body')}
+        </p>
+        <Alert variant="info">
+          <p className="text-sm">{t('accept.week5')}</p>
+        </Alert>
         <NonBindingDisclosure variant="accept" />
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={accept.isPending}>{t('accept.cancel')}</Button>
-          <Button onClick={go} loading={accept.isPending}>{accept.isPending ? t('accept.accepting') : isBuyer ? t('accept.counterAction') : t('accept.action')}</Button>
+          <Button variant="outline" onClick={onClose} disabled={accept.isPending}>
+            {t('accept.cancel')}
+          </Button>
+          <Button onClick={go} loading={accept.isPending}>
+            {accept.isPending
+              ? t('accept.accepting')
+              : isBuyer
+                ? t('accept.counterAction')
+                : t('accept.action')}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -368,8 +560,18 @@ function AcceptDialog({
 }
 
 function RejectDialog({
-  thread, threadId, onClose, onDone, onError,
-}: { thread: ThreadData; threadId: string; onClose: () => void; onDone: () => void; onError: (e: unknown) => void }) {
+  thread,
+  threadId,
+  onClose,
+  onDone,
+  onError,
+}: {
+  thread: ThreadData;
+  threadId: string;
+  onClose: () => void;
+  onDone: () => void;
+  onError: (e: unknown) => void;
+}) {
   const t = useTranslations('offers');
   const isBuyer = thread.perspective === 'BUYER';
   const [reason, setReason] = useState<string>('');
@@ -377,8 +579,16 @@ function RejectDialog({
 
   async function go() {
     try {
-      if (isBuyer) await (reject as ReturnType<typeof trpc.offers.rejectSellerCounter.useMutation>).mutateAsync({ threadId, expectedVersion: thread.version });
-      else await (reject as ReturnType<typeof trpc.offers.reject.useMutation>).mutateAsync({ threadId, expectedVersion: thread.version, reasonCode: reason || undefined });
+      if (isBuyer)
+        await (
+          reject as ReturnType<typeof trpc.offers.rejectSellerCounter.useMutation>
+        ).mutateAsync({ threadId, expectedVersion: thread.version });
+      else
+        await (reject as ReturnType<typeof trpc.offers.reject.useMutation>).mutateAsync({
+          threadId,
+          expectedVersion: thread.version,
+          reasonCode: reason || undefined,
+        });
       onDone();
     } catch (e) {
       onError(e);
@@ -392,19 +602,38 @@ function RejectDialog({
         <DialogHeader>
           <DialogTitle>{isBuyer ? t('reject.counterTitle') : t('reject.title')}</DialogTitle>
         </DialogHeader>
-        <p className="text-sm text-muted-foreground">{isBuyer ? t('reject.counterBody') : t('reject.body')}</p>
+        <p className="text-muted-foreground text-sm">
+          {isBuyer ? t('reject.counterBody') : t('reject.body')}
+        </p>
         {!isBuyer ? (
           <div className="space-y-2">
             <Label htmlFor="reject-reason">{t('reject.reasonLabel')}</Label>
-            <select id="reject-reason" value={reason} onChange={(e) => setReason(e.target.value)} className="h-11 w-full rounded-md border bg-background px-3">
+            <select
+              id="reject-reason"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              className="bg-background h-11 w-full rounded-md border px-3"
+            >
               <option value="">—</option>
-              {REJECT_REASON_CODES.map((c) => <option key={c} value={c}>{t(`reject.reason${c}` as 'reject.reasonOTHER')}</option>)}
+              {REJECT_REASON_CODES.map((c) => (
+                <option key={c} value={c}>
+                  {t(`reject.reason${c}` as 'reject.reasonOTHER')}
+                </option>
+              ))}
             </select>
           </div>
         ) : null}
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={reject.isPending}>{isBuyer ? t('reject.continue') : t('reject.keep')}</Button>
-          <Button variant="destructive" onClick={go} loading={reject.isPending}>{reject.isPending ? t('reject.rejecting') : isBuyer ? t('reject.counterAction') : t('reject.action')}</Button>
+          <Button variant="outline" onClick={onClose} disabled={reject.isPending}>
+            {isBuyer ? t('reject.continue') : t('reject.keep')}
+          </Button>
+          <Button variant="destructive" onClick={go} loading={reject.isPending}>
+            {reject.isPending
+              ? t('reject.rejecting')
+              : isBuyer
+                ? t('reject.counterAction')
+                : t('reject.action')}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -412,8 +641,18 @@ function RejectDialog({
 }
 
 function WithdrawDialog({
-  threadId, version, onClose, onDone, onError,
-}: { threadId: string; version: number; onClose: () => void; onDone: () => void; onError: (e: unknown) => void }) {
+  threadId,
+  version,
+  onClose,
+  onDone,
+  onError,
+}: {
+  threadId: string;
+  version: number;
+  onClose: () => void;
+  onDone: () => void;
+  onError: (e: unknown) => void;
+}) {
   const t = useTranslations('offers');
   const withdraw = trpc.offers.withdraw.useMutation();
   async function go() {
@@ -431,10 +670,14 @@ function WithdrawDialog({
         <DialogHeader>
           <DialogTitle>{t('withdraw.title')}</DialogTitle>
         </DialogHeader>
-        <p className="text-sm text-muted-foreground">{t('withdraw.body')}</p>
+        <p className="text-muted-foreground text-sm">{t('withdraw.body')}</p>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={withdraw.isPending}>{t('withdraw.keep')}</Button>
-          <Button variant="destructive" onClick={go} loading={withdraw.isPending}>{withdraw.isPending ? t('withdraw.withdrawing') : t('withdraw.action')}</Button>
+          <Button variant="outline" onClick={onClose} disabled={withdraw.isPending}>
+            {t('withdraw.keep')}
+          </Button>
+          <Button variant="destructive" onClick={go} loading={withdraw.isPending}>
+            {withdraw.isPending ? t('withdraw.withdrawing') : t('withdraw.action')}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

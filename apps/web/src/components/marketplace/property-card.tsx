@@ -25,14 +25,20 @@ export function PropertyCard({ card, isAuthenticated, saved, owned }: PropertyCa
   const href = `/properties/${card.publicId}/${card.slug ?? ''}`;
   const returnPath = `/${locale}/properties/${card.publicId}/${card.slug ?? ''}`;
   const beds =
-    card.bedrooms === 0 ? t('bedsStudio') : card.bedrooms != null ? t('beds', { count: card.bedrooms }) : null;
+    card.bedrooms === 0
+      ? t('bedsStudio')
+      : card.bedrooms != null
+        ? t('beds', { count: card.bedrooms })
+        : null;
 
   return (
     <Card className="group relative flex flex-col overflow-hidden">
       {/* Save / owner control — rendered above the link, not inside it. */}
       <div className="absolute end-3 top-3 z-10">
         {owned ? (
-          <Badge variant="outline" className="bg-background">{t('yourListing')}</Badge>
+          <Badge variant="outline" className="bg-background">
+            {t('yourListing')}
+          </Badge>
         ) : (
           <SaveButton
             publicId={card.publicId ?? ''}
@@ -44,7 +50,7 @@ export function PropertyCard({ card, isAuthenticated, saved, owned }: PropertyCa
       </div>
 
       <Link href={href} className="flex flex-1 flex-col focus:outline-none">
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
+        <div className="bg-muted relative aspect-[4/3] w-full overflow-hidden">
           {card.coverUrl ? (
             <img
               src={card.coverUrl}
@@ -53,7 +59,7 @@ export function PropertyCard({ card, isAuthenticated, saved, owned }: PropertyCa
               className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
+            <div className="text-muted-foreground flex h-full w-full items-center justify-center text-sm">
               {t('imageUnavailable')}
             </div>
           )}
@@ -61,12 +67,12 @@ export function PropertyCard({ card, isAuthenticated, saved, owned }: PropertyCa
 
         <div className="flex flex-1 flex-col gap-2 p-4">
           <p className="text-lg font-semibold">{formatAed(card.askingPriceAed, locale)}</p>
-          <p className="line-clamp-2 text-sm font-medium text-foreground">{card.headline}</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-foreground line-clamp-2 text-sm font-medium">{card.headline}</p>
+          <p className="text-muted-foreground text-sm">
             {[card.community, card.emirate].filter(Boolean).join(' · ')}
           </p>
 
-          <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-2 text-sm text-muted-foreground">
+          <div className="text-muted-foreground mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-2 text-sm">
             {beds && (
               <span className="inline-flex items-center gap-1">
                 <BedDouble className="h-4 w-4" aria-hidden /> {beds}

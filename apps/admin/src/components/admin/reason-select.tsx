@@ -30,7 +30,7 @@ export function ReasonSelect({
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="border-input bg-background focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm focus-visible:outline-none focus-visible:ring-2"
       >
         <option value="">{`— ${t('reasonLabel')} —`}</option>
         {values.map((v) => (
@@ -70,9 +70,11 @@ export function NoteField({
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
         rows={3}
-        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="border-input bg-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
       />
-      <p className="text-right text-xs text-muted-foreground">{t('charCount', { count: value.length, max })}</p>
+      <p className="text-muted-foreground text-right text-xs">
+        {t('charCount', { count: value.length, max })}
+      </p>
     </div>
   );
 }

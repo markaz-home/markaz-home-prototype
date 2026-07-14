@@ -30,7 +30,12 @@ export function NotesPanel({ entityType, entityId }: { entityType: string; entit
   const canSubmit = category !== '' && body.trim().length >= 3;
 
   async function submit() {
-    await add.mutateAsync({ entityType, entityId, category: category as (typeof ADMIN_NOTE_CATEGORIES)[number], body: body.trim() });
+    await add.mutateAsync({
+      entityType,
+      entityId,
+      category: category as (typeof ADMIN_NOTE_CATEGORIES)[number],
+      body: body.trim(),
+    });
     setBody('');
     setCategory('');
     setOpen(false);
@@ -40,7 +45,7 @@ export function NotesPanel({ entityType, entityId }: { entityType: string; entit
     <Card>
       <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <StickyNote className="h-4 w-4 text-muted-foreground" aria-hidden />
+          <StickyNote className="text-muted-foreground h-4 w-4" aria-hidden />
           {t('note.title')}
         </CardTitle>
         <Button size="sm" variant="outline" onClick={() => setOpen((v) => !v)}>
@@ -49,15 +54,32 @@ export function NotesPanel({ entityType, entityId }: { entityType: string; entit
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-xs text-muted-foreground">{t('note.privacyWarning')}</p>
+        <p className="text-muted-foreground text-xs">{t('note.privacyWarning')}</p>
 
         {open ? (
-          <div className="space-y-3 rounded-md border bg-muted/30 p-3">
-            <ReasonSelect id="note-category" label={t('note.categoryLabel')} basePath="note.category" values={ADMIN_NOTE_CATEGORIES} value={category} onChange={setCategory} />
-            <NoteField id="note-body" label={t('note.bodyLabel')} value={body} onChange={setBody} placeholder={t('note.bodyPlaceholder')} />
-            {add.isError ? <Alert variant="destructive">{add.error.message || t('error.generic')}</Alert> : null}
+          <div className="bg-muted/30 space-y-3 rounded-md border p-3">
+            <ReasonSelect
+              id="note-category"
+              label={t('note.categoryLabel')}
+              basePath="note.category"
+              values={ADMIN_NOTE_CATEGORIES}
+              value={category}
+              onChange={setCategory}
+            />
+            <NoteField
+              id="note-body"
+              label={t('note.bodyLabel')}
+              value={body}
+              onChange={setBody}
+              placeholder={t('note.bodyPlaceholder')}
+            />
+            {add.isError ? (
+              <Alert variant="destructive">{add.error.message || t('error.generic')}</Alert>
+            ) : null}
             <div className="flex justify-end gap-2">
-              <Button variant="outline" size="sm" onClick={() => setOpen(false)}>{t('cancel')}</Button>
+              <Button variant="outline" size="sm" onClick={() => setOpen(false)}>
+                {t('cancel')}
+              </Button>
               <Button size="sm" disabled={!canSubmit || add.isPending} onClick={submit}>
                 {add.isPending ? t('result.pending') : t('note.submit')}
               </Button>
@@ -66,22 +88,28 @@ export function NotesPanel({ entityType, entityId }: { entityType: string; entit
         ) : null}
 
         {notes.isLoading ? (
-          <p className="text-sm text-muted-foreground">{t('loading')}</p>
+          <p className="text-muted-foreground text-sm">{t('loading')}</p>
         ) : notes.data && notes.data.length > 0 ? (
           <ul className="space-y-3">
             {notes.data.map((n) => (
               <li key={n.id} className="rounded-md border p-3">
-                <div className="mb-1 flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                  <span className="font-medium text-foreground">{t(`note.category.${n.category}`)}</span>
+                <div className="text-muted-foreground mb-1 flex items-center justify-between gap-2 text-xs">
+                  <span className="text-foreground font-medium">
+                    {t(`note.category.${n.category}`)}
+                  </span>
                   <span>{formatWhen(n.createdAt)}</span>
                 </div>
                 <p className="whitespace-pre-wrap text-sm">{n.body}</p>
-                {n.followUpDate ? <p className="mt-1 text-xs text-muted-foreground">{t('note.followUpLabel')}: {n.followUpDate}</p> : null}
+                {n.followUpDate ? (
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    {t('note.followUpLabel')}: {n.followUpDate}
+                  </p>
+                ) : null}
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-muted-foreground">{t('note.empty')}</p>
+          <p className="text-muted-foreground text-sm">{t('note.empty')}</p>
         )}
       </CardContent>
     </Card>

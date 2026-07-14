@@ -21,7 +21,10 @@ test.beforeAll(async () => {
   test.skip(skip, 'SUPABASE_SERVICE_ROLE_KEY not set — full stack required');
   seller = await createCustomer('a11y_seller');
   buyer = await createCustomer('a11y_buyer');
-  listing = await createLiveListing(seller.id, { askingPrice: 2_000_000, minNotificationPrice: 1_800_000 });
+  listing = await createLiveListing(seller.id, {
+    askingPrice: 2_000_000,
+    minNotificationPrice: 1_800_000,
+  });
 });
 
 test.afterAll(async () => {
@@ -30,9 +33,18 @@ test.afterAll(async () => {
 
 async function assertNoSeriousViolations(page: Page, label: string): Promise<void> {
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
-  const serious = results.violations.filter((v) => v.impact === 'critical' || v.impact === 'serious');
+  const serious = results.violations.filter(
+    (v) => v.impact === 'critical' || v.impact === 'serious',
+  );
   if (serious.length) {
-    console.error(`[axe:${label}]`, JSON.stringify(serious.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length })), null, 2));
+    console.error(
+      `[axe:${label}]`,
+      JSON.stringify(
+        serious.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length })),
+        null,
+        2,
+      ),
+    );
   }
   expect(serious, `axe serious/critical violations on ${label}`).toEqual([]);
 }
