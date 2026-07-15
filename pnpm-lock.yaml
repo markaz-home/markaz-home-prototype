@@ -411,6 +411,9 @@ importers:
 
   packages/db:
     dependencies:
+      '@markaz/auth':
+        specifier: workspace:*
+        version: link:../auth
       '@markaz/domain':
         specifier: workspace:*
         version: link:../domain

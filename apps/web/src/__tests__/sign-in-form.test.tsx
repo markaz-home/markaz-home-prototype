@@ -4,11 +4,12 @@ import userEvent from '@testing-library/user-event';
 import { renderWithIntl } from './test-utils';
 
 const signInWithPassword = vi.fn();
+const signInWithOAuth = vi.fn();
 const replace = vi.fn();
 const push = vi.fn();
 
 vi.mock('@markaz/auth/browser', () => ({
-  createSupabaseBrowserClient: () => ({ auth: { signInWithPassword } }),
+  createSupabaseBrowserClient: () => ({ auth: { signInWithPassword, signInWithOAuth } }),
 }));
 vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({ replace, push, refresh: vi.fn() }),
@@ -21,6 +22,7 @@ import { SignInForm } from '@/components/sign-in-form';
 
 beforeEach(() => {
   signInWithPassword.mockReset().mockResolvedValue({ error: null });
+  signInWithOAuth.mockReset().mockResolvedValue({ error: null });
   replace.mockReset();
   push.mockReset();
 });
@@ -31,6 +33,36 @@ describe('SignInForm', () => {
     expect(screen.getByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
     expect(screen.getByLabelText(/Email address/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Password/)).toBeInTheDocument();
+  });
+
+  // --- UAE PASS staging (POC) — an optional sign-in method, server-gated --------
+  it('does NOT show UAE PASS in simulated mode (default) — email/password unchanged', () => {
+    renderWithIntl(<SignInForm />);
+    expect(screen.queryByRole('button', { name: /UAE PASS/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
+  });
+
+  it('shows "Continue with UAE PASS Staging" only when staging mode is enabled', () => {
+    renderWithIntl(<SignInForm uaePassStaging locale="en" />);
+    expect(
+      screen.getByRole('button', { name: /Continue with UAE PASS Staging/i }),
+    ).toBeInTheDocument();
+    // Still a test-environment disclaimer + email/password kept.
+    expect(screen.getByText(/Test environment/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
+  });
+
+  it('the UAE PASS button starts the Supabase custom-provider OAuth flow', async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<SignInForm uaePassStaging locale="ar" />);
+    await user.click(screen.getByRole('button', { name: /Continue with UAE PASS Staging/i }));
+    await waitFor(() => expect(signInWithOAuth).toHaveBeenCalledTimes(1));
+    const arg = signInWithOAuth.mock.calls[0]![0];
+    expect(arg.provider).toBe('custom:uae-pass');
+    expect(arg.options.redirectTo).toContain('/auth/callback');
+    expect(arg.options.redirectTo).toContain('locale=ar');
+    // Password sign-in must not have been triggered.
+    expect(signInWithPassword).not.toHaveBeenCalled();
   });
 
   it('validates an invalid email without calling the provider', async () => {

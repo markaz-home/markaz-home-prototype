@@ -1,0 +1,37 @@
+import { type NextRequest, NextResponse } from 'next/server';
+import { createSupabaseServerClient } from '@markaz/auth/server';
+import { isLocale, defaultLocale } from '@markaz/i18n';
+
+/**
+ * OAuth code-exchange callback (PKCE). Used by the UAE PASS Staging login and any
+ * future Supabase OAuth provider. Supabase Auth (GoTrue) has already completed the
+ * provider round-trip and account resolution (by provider subject) and redirected
+ * here with `?code=`; we exchange it for a STANDARD Supabase session in secure
+ * cookies. `auth.uid()` / RLS then work exactly as for email-password sign-in.
+ *
+ * On first UAE PASS sign-in the `handle_new_user` trigger creates the normal CUSTOMER
+ * profile; the (app) layout guard (`requireCustomerStep`) then reroutes the user to
+ * the correct onboarding step (verify-email / profile-setup / uae-pass) if incomplete,
+ * so we simply forward to the localized dashboard. Never logs the code or tokens.
+ */
+export async function GET(request: NextRequest) {
+  const { searchParams, origin } = new URL(request.url);
+  const code = searchParams.get('code');
+  const providerError = searchParams.get('error'); // e.g. access_denied (user cancelled)
+  const localeParam = searchParams.get('locale');
+  const locale = localeParam && isLocale(localeParam) ? localeParam : defaultLocale;
+
+  const backToSignIn = (reason: string) =>
+    NextResponse.redirect(new URL(`/${locale}/sign-in?error=${reason}`, origin));
+
+  // Provider cancellation / error → safe recoverable sign-in screen.
+  if (providerError) return backToSignIn('uae_pass_cancelled');
+  if (!code) return backToSignIn('uae_pass');
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (error) return backToSignIn('uae_pass');
+
+  // Session established. The (app) guard reroutes onboarding as needed.
+  return NextResponse.redirect(new URL(`/${locale}/dashboard`, origin));
+}

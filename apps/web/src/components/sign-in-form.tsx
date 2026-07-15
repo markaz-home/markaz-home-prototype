@@ -14,17 +14,52 @@ import { PasswordField } from '@/components/auth/password-field';
 import { ErrorSummary } from '@/components/auth/error-summary';
 import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
 
-export function SignInForm() {
+export function SignInForm({
+  uaePassStaging = false,
+  locale = 'en',
+}: {
+  uaePassStaging?: boolean;
+  locale?: string;
+}) {
   const t = useTranslations('signin');
   const tv = useTranslations('validation');
   const ta = useTranslations('auth');
   const ts = useTranslations('session');
   const tf = useTranslations('signup');
+  const tu = useTranslations('uaePass');
   const router = useRouter();
   const params = useSearchParams();
   const [supabase] = useState(() => createSupabaseBrowserClient());
   const [formError, setFormError] = useState<string | null>(null);
+  const [uaeLoading, setUaeLoading] = useState(false);
   const sessionExpired = params.get('notice') === 'session-expired';
+  // Error redirected here by /auth/callback (provider failure or cancellation).
+  const callbackError = params.get('error');
+  const uaePassError =
+    callbackError === 'uae_pass_cancelled'
+      ? tu('cancelled')
+      : callbackError === 'uae_pass'
+        ? tu('error')
+        : null;
+
+  // UAE PASS Staging (POC): a REAL staging OAuth login via the Supabase custom OAuth
+  // provider `custom:uae-pass`. Supabase handles the exchange + session; on return
+  // /auth/callback exchanges the code. Never available in simulated mode.
+  async function onUaePass() {
+    setFormError(null);
+    setUaeLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      // supabase-js 2.47's Provider union predates custom providers; the identifier
+      // is the public `custom:<name>` slug, not a secret.
+      provider: 'custom:uae-pass' as 'google',
+      options: { redirectTo: `${window.location.origin}/auth/callback?locale=${locale}` },
+    });
+    if (error) {
+      setFormError(tu('error'));
+      setUaeLoading(false);
+    }
+    // On success the browser is redirected to UAE PASS by Supabase.
+  }
 
   const {
     register,
@@ -69,6 +104,7 @@ export function SignInForm() {
           </Alert>
         ) : null}
         <AuthHeading title={t('title')} description={t('description')} />
+        {uaePassError ? <Alert variant="destructive">{uaePassError}</Alert> : null}
         <ErrorSummary errors={errorList} />
         {formError ? <Alert variant="destructive">{formError}</Alert> : null}
 
@@ -122,6 +158,26 @@ export function SignInForm() {
           </p>
           <p className="text-muted-foreground text-center text-xs">{t('security')}</p>
         </form>
+
+        {uaePassStaging ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-3" aria-hidden>
+              <span className="bg-border h-px flex-1" />
+              <span className="text-muted-foreground text-xs uppercase">{tu('or')}</span>
+              <span className="bg-border h-px flex-1" />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              loading={uaeLoading}
+              onClick={onUaePass}
+            >
+              {uaeLoading ? tu('starting') : tu('button')}
+            </Button>
+            <p className="text-muted-foreground text-center text-xs">{tu('testEnvNote')}</p>
+          </div>
+        ) : null}
       </div>
     </AuthShell>
   );

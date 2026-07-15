@@ -255,7 +255,13 @@
     "successBody": "You're all set. Continuing to your dashboard.",
     "failedTitle": "Demo verification failed",
     "failedBody": "The simulated check did not pass. You can try again.",
-    "continueToDashboard": "Continue to dashboard"
+    "continueToDashboard": "Continue to dashboard",
+    "or": "or",
+    "button": "Continue with UAE PASS Staging",
+    "starting": "Redirecting to UAE PASS…",
+    "testEnvNote": "Test environment — no production identity verification was performed. UAE PASS confirms identity only; it does not verify property ownership.",
+    "error": "UAE PASS staging authentication could not be completed. Please try again, or sign in with your email and password.",
+    "cancelled": "UAE PASS staging authentication was cancelled. You can try again or sign in with email and password."
   },
   "dashboard": {
     "welcome": "Welcome, {name}",

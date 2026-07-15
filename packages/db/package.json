@@ -16,9 +16,11 @@
     "generate": "drizzle-kit generate",
     "seed": "tsx src/scripts/seed.ts",
     "test": "vitest run --passWithNoTests",
-    "setup:demo": "tsx src/scripts/setup-demo.ts"
+    "setup:demo": "tsx src/scripts/setup-demo.ts",
+    "setup:uae-pass": "tsx src/scripts/setup-uae-pass.ts"
   },
   "dependencies": {
+    "@markaz/auth": "workspace:*",
     "@markaz/domain": "workspace:*",
     "@markaz/observability": "workspace:*",
     "@supabase/supabase-js": "^2.47.10",
