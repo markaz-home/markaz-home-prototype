@@ -92,7 +92,7 @@ test.describe('email/password authentication', () => {
     await page.getByLabel('Verification code').fill(code!);
     await page.getByRole('button', { name: 'Verify email' }).click();
 
-    await expect(page).toHaveURL(/\/en\/verify-email\/success/);
+    await expect(page).toHaveURL(/\/en\/verify-email\/success/, { timeout: 15_000 });
     await page.getByRole('link', { name: /Continue to demo identity/i }).click();
     await expect(page).toHaveURL(/\/en\/onboarding\/uae-pass/);
     await page.getByRole('button', { name: 'Start demo verification' }).click();

@@ -13,8 +13,11 @@ env:
   # These deterministic LOCAL Supabase values are NOT secrets. They exist so builds
   # and unit tests never fall back to (or touch) the hosted deploy. The full-stack
   # job OVERRIDES the Supabase keys with values read from the running local stack.
-  NEXT_PUBLIC_WEB_URL: http://127.0.0.1:3000
-  NEXT_PUBLIC_ADMIN_URL: http://127.0.0.1:3001
+  # Keep the application origins aligned with Supabase's configured site URL.
+  # Auth callbacks set cookies on these origins, so localhost and 127.0.0.1 are
+  # not interchangeable for recovery and OAuth flows.
+  NEXT_PUBLIC_WEB_URL: http://localhost:3000
+  NEXT_PUBLIC_ADMIN_URL: http://localhost:3001
   NEXT_PUBLIC_DEFAULT_LOCALE: en
   NEXT_PUBLIC_SUPPORTED_LOCALES: en,ar
 
