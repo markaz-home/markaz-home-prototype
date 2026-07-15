@@ -1,30 +1,29 @@
-# E2E self-provision follow-up
+# E2E self-provision — DONE
 
-The **integration** test layer (`tests/integration/`) was fully rewritten to
-self-provision (no demo seed) — see `WEEK-6.md` / the review-response notes. Seven
-suites there now genuinely run (101 tests, 0 skipped).
+All six previously demo-seed-dependent e2e specs were ported to **self-provision**
+their own data via `helpers/provision.ts` (no demo seed). They now run and pass like
+the offers/transactions suites: **31 passed, 1 skipped** (serial).
 
-These **six e2e specs** still assume the removed demo seed (fixed
-`customer-a@markaz.demo` / `Markaz!Demo1`, fixed listing UUIDs, and `mkz-…`
-publicIds). They are marked `test.describe.skip` with this file referenced, so they
-are **honestly reported as skipped** (never a vacuous green) until ported. The
-self-provision toolkit already exists in `apps/web/e2e/helpers/provision.ts`
-(`createCustomer`, `createLiveListing`, `acceptedTransaction`, `driveTo*`) — the
-same pattern the offers/transactions specs already use and pass with.
+| Spec | Status |
+| --- | --- |
+| `marketplace.spec.ts` | ported — 4/4 |
+| `marketplace-detail.spec.ts` | ported — 8/8 |
+| `auth-password.spec.ts` | ported — 5 pass, 1 skip |
+| `listing-journey.spec.ts` | ported — 3/3 (incl. the full wizard drive-through) |
+| `listing-quality.spec.ts` | ported — 4/4 |
+| `seller-publication.spec.ts` | ported — 7/7 |
 
-| Spec                         | What it needs to self-provision                                                                                                             | Effort |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| `marketplace.spec.ts`        | A LIVE listing (browse) + a saved available/unavailable pair. Swap `mkz-` selectors for the provisioned `publicId`.                         | Medium |
-| `marketplace-detail.spec.ts` | Two LIVE listings — one with a **visible** investment case + photos, one without. Extend `createLiveListing` with photos + investment case. | Medium |
-| `auth-password.spec.ts`      | A confirmed customer with a **known password** (`createCustomer` already gives `DEFAULT_PASSWORD`). Replace demo email/password constants.  | Medium |
-| `listing-journey.spec.ts`    | Self-provisioned DRAFT(s) in specific wizard states owned by the signed-in customer.                                                        | Heavy  |
-| `listing-quality.spec.ts`    | DRAFT / OWNERSHIP_REVIEW / READY_TO_PUBLISH listings owned by the customer.                                                                 | Heavy  |
-| `seller-publication.spec.ts` | READY / returned-for-changes / photo-fail / LIVE listings + publication-request states, driven through the UI.                              | Heavy  |
+Each spec provisions its own customer(s) + listings (any state), photos, investment
+cases, saved/paused listings, and publication-request states in a `beforeAll`, signs
+in as the created customer, and tears down in `afterAll`. They self-skip cleanly
+(`test.skip(!SUPABASE_SERVICE_ROLE_KEY, …)`) when the full stack is unavailable —
+never a vacuous pass.
 
-**Helper extensions required** (add to `provision.ts`): create a listing in an
-arbitrary lifecycle state; attach photos (draft + public) and an investment case;
-create a saved-property row (available + paused/unavailable stub); create a
-publication request in `RETURNED`/`PHOTO_PROCESSING_FAILED` states.
+**The one intentional skip:** `auth-password.spec.ts` › "a customer cannot reach the
+admin application". The web Playwright `webServer` starts only the web app (port
+3000), not the admin app (3001), so the cross-app redirect check can't run reliably
+here. Admin access control is covered by the admin app's own e2e suite. Un-skip this
+only in an environment that starts both apps.
 
-`foundation.spec.ts`, `offers*.spec.ts`, and `transactions*.spec.ts` already
-self-provision (or need no data) and run in CI.
+New provision helpers: `createListing(state)`, `addPhotos`, `addInvestmentCase`,
+`saveListing`, `makePublishable`, `createPublishableListing`, `createPublicationRequest`.
