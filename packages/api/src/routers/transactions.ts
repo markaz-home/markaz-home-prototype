@@ -7,6 +7,8 @@ import {
   transactionTasks,
   transactionEvents,
   transactionDocuments,
+  execRow,
+  execRows,
 } from '@markaz/db';
 import {
   purchaseRouteSchema,
@@ -59,8 +61,11 @@ function mapTxError(e: unknown): never {
 }
 
 async function propertyFor(tx: Tx, listingId: string): Promise<TxPropertyJson | null> {
-  const r = await tx.execute(sql`select public.offer_listing_summary(${listingId}::uuid) as j`);
-  return (r as unknown as Array<{ j: TxPropertyJson | null }>)[0]?.j ?? null;
+  const row = await execRow<{ j: TxPropertyJson | null }>(
+    tx,
+    sql`select public.offer_listing_summary(${listingId}::uuid) as j`,
+  );
+  return row?.j ?? null;
 }
 
 /**
@@ -78,10 +83,13 @@ async function propertiesFor(
     listingIds.map((id) => sql`${id}::uuid`),
     sql`, `,
   );
-  const rows = (await tx.execute(sql`
-    select t.id::text as listing_id, public.offer_listing_summary(t.id) as j
-    from unnest(array[${idParams}]) as t(id)
-  `)) as unknown as Array<{ listing_id: string; j: TxPropertyJson | null }>;
+  const rows = await execRows<{ listing_id: string; j: TxPropertyJson | null }>(
+    tx,
+    sql`
+      select t.id::text as listing_id, public.offer_listing_summary(t.id) as j
+      from unnest(array[${idParams}]) as t(id)
+    `,
+  );
   for (const r of rows) map.set(r.listing_id, r.j ?? null);
   return map;
 }
@@ -101,10 +109,11 @@ export const transactionsRouter = router({
     .input(z.object({ offerThreadId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       try {
-        const r = await ctx.tx.execute(
+        const row = await execRow<{ id: string }>(
+          ctx.tx,
           sql`select id from public.ensure_transaction(${input.offerThreadId}::uuid)`,
         );
-        const id = (r as unknown as Array<{ id: string }>)[0]?.id;
+        const id = row?.id;
         if (!id) throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_FOUND' });
         return { transactionId: id };
       } catch (e) {
@@ -340,10 +349,11 @@ export const transactionsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const r = await ctx.tx.execute(
+        const row = await execRow<{ id: string }>(
+          ctx.tx,
           sql`select id from public.tx_register_document(${input.transactionId}::uuid, ${input.documentType}, ${input.path}, ${input.fileName}, ${input.mimeType}, ${input.sizeBytes})`,
         );
-        return { ok: true as const, documentId: (r as unknown as Array<{ id: string }>)[0]?.id };
+        return { ok: true as const, documentId: row?.id };
       } catch (e) {
         mapTxError(e);
       }

@@ -1,7 +1,7 @@
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
-import { offerThreads, profiles, listings, marketplaceListings as mv } from '@markaz/db';
+import { offerThreads, profiles, listings, marketplaceListings as mv, execRow } from '@markaz/db';
 import { expiryOptionSchema, validateOfferAmount, type OfferThreadStatus } from '@markaz/domain';
 import { toBuyerThread, offerPropertySummary } from '../../offer-projection';
 import { router, customerProcedure } from '../../trpc';
@@ -58,11 +58,11 @@ export const buyerOffersRouter = router({
       // its participants — a non-participant buyer cannot see it under RLS. Use the
       // SECURITY DEFINER helper so eligibility is authoritative for everyone (§6.1),
       // matching the block that create_offer enforces at submit time.
-      const acc = await ctx.tx.execute(
+      const acc = await execRow<{ under_offer: boolean }>(
+        ctx.tx,
         sql`select public.listing_has_accepted_offer(${l.id}::uuid) as under_offer`,
       );
-      const underOffer =
-        (acc as unknown as Array<{ under_offer: boolean }>)[0]?.under_offer ?? false;
+      const underOffer = acc?.under_offer ?? false;
       if (underOffer) return { eligible: false as const, reason: 'UNDER_OFFER' as const };
 
       const [me] = await ctx.tx
@@ -130,10 +130,11 @@ export const buyerOffersRouter = router({
 
       const expiresAt = resolveExpiry(input.expiry);
       try {
-        const r = await ctx.tx.execute(
+        const row = await execRow<{ id: string }>(
+          ctx.tx,
           sql`select id::text as id from public.create_offer(${l.id}::uuid, ${input.amountAed}, ${expiresAt}::timestamptz)`,
         );
-        const id = (r as unknown as Array<{ id: string }>)[0]?.id;
+        const id = row?.id;
         return { threadId: id, created: true as const };
       } catch (e) {
         // A racing duplicate is treated as "view your existing offer".

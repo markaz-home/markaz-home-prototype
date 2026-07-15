@@ -1,5 +1,5 @@
 import { sql, count, eq, inArray, notInArray } from 'drizzle-orm';
-import { listings, offerThreads, transactions } from '@markaz/db';
+import { listings, offerThreads, transactions, execRow } from '@markaz/db';
 import { router, adminProcedure } from '../trpc';
 
 // Week-5 canonical transactions: "active" = not terminal; "flagged" = needs review (FAILED).
@@ -50,8 +50,10 @@ export const adminOverviewRouter = router({
 
   /** Confirms admin scope via the DB context. */
   contextProbe: adminProcedure.query(async ({ ctx }) => {
-    const r = await ctx.tx.execute(sql`select public.is_admin() as is_admin`);
-    const row = (r as unknown as Array<{ is_admin: boolean }>)[0];
+    const row = await execRow<{ is_admin: boolean }>(
+      ctx.tx,
+      sql`select public.is_admin() as is_admin`,
+    );
     return { isAdmin: row?.is_admin ?? false, accountType: ctx.user.accountType };
   }),
 });
