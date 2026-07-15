@@ -1,7 +1,7 @@
 import { eq, sql } from 'drizzle-orm';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
-import { offerProposals, type offerThreads, type Tx } from '@markaz/db';
+import { offerProposals, type offerThreads, type Tx, execRow } from '@markaz/db';
 import {
   expiryFromOption,
   validateOfferAmount,
@@ -81,8 +81,11 @@ export interface ListingSummaryRow {
 
 /** Public-safe property summary for a participant/owner via the SECURITY DEFINER helper. */
 export async function loadSummary(tx: Tx, listingId: string): Promise<ListingSummaryRow | null> {
-  const r = await tx.execute(sql`select public.offer_listing_summary(${listingId}::uuid) as j`);
-  const j = (r as unknown as Array<{ j: ListingSummaryRow | null }>)[0]?.j;
+  const row = await execRow<{ j: ListingSummaryRow | null }>(
+    tx,
+    sql`select public.offer_listing_summary(${listingId}::uuid) as j`,
+  );
+  const j = row?.j;
   return j ?? null;
 }
 

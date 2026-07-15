@@ -1,4 +1,5 @@
 import { sql } from 'drizzle-orm';
+import { execRow } from '@markaz/db';
 import { router, protectedProcedure, publicProcedure } from '../trpc';
 
 export const authContextRouter = router({
@@ -9,10 +10,10 @@ export const authContextRouter = router({
    * role — demonstrating the service-role key is not used for customer requests.
    */
   whoami: protectedProcedure.query(async ({ ctx }) => {
-    const result = await ctx.tx.execute(
+    const row = await execRow<{ db_uid: string | null; db_role: string | null }>(
+      ctx.tx,
       sql`select auth.uid()::text as db_uid, current_setting('role', true) as db_role`,
     );
-    const row = (result as unknown as Array<{ db_uid: string | null; db_role: string | null }>)[0];
     return {
       sessionUserId: ctx.user.id,
       accountType: ctx.user.accountType,
