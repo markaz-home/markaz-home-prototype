@@ -22,14 +22,22 @@ export const router = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const middleware = t.middleware;
 
-/** Structured request logging on every procedure. */
+/**
+ * Slow-request threshold (ms). A request at or above this logs at WARN with
+ * `slow: true` so it surfaces in ops dashboards without trawling the info stream.
+ * Tune per environment via `SLOW_REQUEST_MS` (default 500). See
+ * `docs/runbooks/measurement.md`.
+ */
+const SLOW_REQUEST_MS = Number(process.env.SLOW_REQUEST_MS ?? 500);
+
+/** Structured request logging + timing on every procedure. */
 const logging = middleware(async ({ ctx, path, type, next }) => {
   const start = Date.now();
   const result = await next();
-  ctx.log.info(
-    { path, type, ok: result.ok, ms: Date.now() - start, userId: ctx.user?.id },
-    'trpc.request',
-  );
+  const ms = Date.now() - start;
+  const fields = { path, type, ok: result.ok, ms, userId: ctx.user?.id };
+  if (ms >= SLOW_REQUEST_MS) ctx.log.warn({ ...fields, slow: true }, 'trpc.request.slow');
+  else ctx.log.info(fields, 'trpc.request');
   return result;
 });
 
