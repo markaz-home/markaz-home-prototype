@@ -4,6 +4,12 @@ import { profileRouter } from './routers/profile';
 import { authContextRouter } from './routers/auth-context';
 import { adminOverviewRouter } from './routers/admin-overview';
 import { realtimeRouter } from './routers/realtime';
+import { auditRouter } from './routers/audit';
+import { listingRouter } from './routers/listing';
+import { marketplaceRouter } from './routers/marketplace';
+import { offersRouter } from './routers/offers';
+import { transactionsRouter } from './routers/transactions';
+import { adminRouter } from './routers/admin';
 
 export const appRouter = router({
   health: healthRouter,
@@ -11,6 +17,12 @@ export const appRouter = router({
   authContext: authContextRouter,
   adminOverview: adminOverviewRouter,
   realtime: realtimeRouter,
+  audit: auditRouter,
+  listing: listingRouter,
+  marketplace: marketplaceRouter,
+  offers: offersRouter,
+  transactions: transactionsRouter,
+  admin: adminRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -1,8 +1,7 @@
-import { setRequestLocale } from 'next-intl/server';
-import { Placeholder } from '@/components/placeholder';
+import { redirect } from 'next/navigation';
 
 export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  setRequestLocale(locale);
-  return <Placeholder titleKey="myListingsTitle" bodyKey="myListingsBody" />;
+  // My Listings now lives at /sell (Week 2 listing journey).
+  redirect(`/${locale}/sell`);
 }

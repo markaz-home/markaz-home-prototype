@@ -32,14 +32,14 @@ environments.
 
 Data residency: all data stays in **me-central-1**.
 
-| Path | Connects via | Notes |
-| --- | --- | --- |
-| Customer app (`apps/web`) queries | **RDS Proxy** (where compatible) | Pooled app path |
-| Admin app (`apps/admin`) queries | **RDS Proxy** | Pooled app path |
-| Supabase **Realtime** | **Direct RDS endpoint** | Logical replication; **never** behind RDS Proxy (ADR 0005) |
-| **Migrations** | **Direct** | DDL + replication-slot management |
-| **Admin maintenance ops** | **Direct** | Trusted server ops |
-| Graphile Worker (`apps/worker`, future) | **Direct or a separately-validated pool** | Durable jobs; pooling must be validated for its workload |
+| Path                                    | Connects via                              | Notes                                                      |
+| --------------------------------------- | ----------------------------------------- | ---------------------------------------------------------- |
+| Customer app (`apps/web`) queries       | **RDS Proxy** (where compatible)          | Pooled app path                                            |
+| Admin app (`apps/admin`) queries        | **RDS Proxy**                             | Pooled app path                                            |
+| Supabase **Realtime**                   | **Direct RDS endpoint**                   | Logical replication; **never** behind RDS Proxy (ADR 0005) |
+| **Migrations**                          | **Direct**                                | DDL + replication-slot management                          |
+| **Admin maintenance ops**               | **Direct**                                | Trusted server ops                                         |
+| Graphile Worker (`apps/worker`, future) | **Direct or a separately-validated pool** | Durable jobs; pooling must be validated for its workload   |
 
 See `environment-contract.md` for the concrete connection-path / port / env-var
 requirements, and `terraform/README.md` for the intended resource inventory.

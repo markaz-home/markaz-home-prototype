@@ -41,7 +41,11 @@ export async function createTRPCContext(opts: CreateContextOptions): Promise<Con
 
   let user: AuthenticatedUser | null = null;
   if (opts.user) {
-    const provisional = { userId: opts.user.id, email: opts.user.email, accountType: 'CUSTOMER' as AccountType };
+    const provisional = {
+      userId: opts.user.id,
+      email: opts.user.email,
+      accountType: 'CUSTOMER' as AccountType,
+    };
     const profile = await withUserContext(db, provisional, async (tx) => {
       const rows = await tx
         .select({ accountType: profiles.accountType })

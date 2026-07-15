@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # These deterministic LOCAL Supabase values are NOT secrets. They exist so builds
+  # and unit tests never fall back to (or touch) the hosted deploy. The full-stack
+  # job OVERRIDES the Supabase keys with values read from the running local stack.
+  NEXT_PUBLIC_WEB_URL: http://127.0.0.1:3000
+  NEXT_PUBLIC_ADMIN_URL: http://127.0.0.1:3001
+  NEXT_PUBLIC_DEFAULT_LOCALE: en
+  NEXT_PUBLIC_SUPPORTED_LOCALES: en,ar
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # No Docker: format, lint, types, unit/component tests, and a production build.
+  # ---------------------------------------------------------------------------
+  quality:
+    name: quality (no Docker)
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH
+      # Build-time placeholder only — the real key is never needed without the stack.
+      SUPABASE_SERVICE_ROLE_KEY: sb_secret_ci_build_placeholder
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Prettier
+        run: pnpm format:check
+      - name: ESLint
+        run: pnpm lint
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Unit & component tests (excludes the Docker-backed integration suite)
+        run: pnpm exec turbo run test --filter='!@markaz/tests'
+      - name: Build (web + admin)
+        run: pnpm build
+
+  # ---------------------------------------------------------------------------
+  # Docker: real Supabase (migrations 0100→0815) + integration + E2E.
+  # Integration is gated so a skipped/vacuous run FAILS the build (reviewer #3).
+  # ---------------------------------------------------------------------------
+  full-stack:
+    name: full-stack (Supabase + integration + E2E)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.108.0
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        run: pnpm --filter @markaz/web exec playwright install --with-deps chromium
+
+      - name: Start Supabase (applies migrations 0100→0815)
+        run: supabase start
+
+      - name: Export local Supabase env
+        run: |
+          supabase status -o env > /tmp/sb.env
+          set -a; . /tmp/sb.env; set +a
+          if [ -z "$API_URL" ] || [ -z "$SERVICE_ROLE_KEY" ] || [ -z "$DB_URL" ]; then
+            echo "::error::supabase status did not yield the expected env (API_URL/SERVICE_ROLE_KEY/DB_URL)"; exit 1
+          fi
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+            echo "DATABASE_URL=$DB_URL"
+            echo "DIRECT_DATABASE_URL=$DB_URL"
+            echo "TEST_DATABASE_URL=$DB_URL"
+          } >> "$GITHUB_ENV"
+
+      - name: Integration tests (skip / vacuous = fail)
+        run: |
+          pnpm --filter @markaz/tests exec vitest run \
+            --reporter=default --reporter=json --outputFile=vitest-report.json
+          node .github/scripts/assert-tests-ran.mjs tests/vitest-report.json 40
+
+      # Playwright self-starts each app (webServer, fresh in CI). The demo-seed E2E
+      # specs are explicitly test.describe.skip (see e2e/FOLLOWUP-selfprovision.md);
+      # the self-provisioning specs (offers/transactions/foundation + axe) run for real.
+      - name: E2E — web
+        run: pnpm --filter @markaz/web test:e2e
+
+      - name: E2E — admin
+        run: pnpm --filter @markaz/admin test:e2e
+
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop || true

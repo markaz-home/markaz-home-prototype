@@ -28,7 +28,9 @@ export default async function AccountProfilePage({
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Identity</span>
             <StatusBadge tone={verified ? 'success' : 'warning'}>
-              {verified ? 'Demo identity verified' : (profile?.identityVerificationStatus ?? 'NOT_STARTED')}
+              {verified
+                ? 'Demo identity verified'
+                : (profile?.identityVerificationStatus ?? 'NOT_STARTED')}
             </StatusBadge>
           </div>
         </CardContent>

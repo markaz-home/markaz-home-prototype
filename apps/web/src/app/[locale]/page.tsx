@@ -4,6 +4,7 @@ import { Briefcase, Home, ShieldCheck } from 'lucide-react';
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { BrandLogo } from '@/components/brand-logo';
 
 export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -20,10 +21,9 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
     <div className="flex min-h-dvh flex-col">
       <header className="border-b">
         <div className="container flex h-16 items-center justify-between">
-          <span className="flex items-center gap-2 font-semibold">
-            <Home className="h-5 w-5 text-primary" aria-hidden />
-            MARKAZ Home
-          </span>
+          <Link href="/" aria-label="MARKAZ Home" className="flex items-center">
+            <BrandLogo />
+          </Link>
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
             <Button asChild variant="ghost" size="sm">
@@ -35,15 +35,15 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
 
       <main className="container flex-1 py-16">
         <section className="mx-auto max-w-3xl text-center">
-          <h1 className="text-balance font-display text-4xl font-medium leading-[1.08] tracking-tight text-brand-900 sm:text-5xl md:text-6xl">
+          <h1 className="font-display text-brand-900 text-balance text-4xl font-medium leading-[1.08] tracking-tight sm:text-5xl md:text-6xl">
             {t('title')}
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg text-muted-foreground">
+          <p className="text-muted-foreground mx-auto mt-6 max-w-2xl text-pretty text-lg">
             {t('subtitle')}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button asChild size="lg">
-              <Link href="/sign-in">{t('ctaBrowse')}</Link>
+              <Link href="/properties">{t('ctaBrowse')}</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
               <Link href="/sign-in">{t('ctaList')}</Link>
@@ -55,10 +55,10 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
           {points.map(({ icon: Icon, title, body }) => (
             <Card key={title}>
               <CardHeader>
-                <Icon className="h-6 w-6 text-primary" aria-hidden />
+                <Icon className="text-primary h-6 w-6" aria-hidden />
                 <CardTitle className="text-base">{title}</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">{body}</CardContent>
+              <CardContent className="text-muted-foreground text-sm">{body}</CardContent>
             </Card>
           ))}
         </section>

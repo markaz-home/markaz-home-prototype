@@ -1,7 +1,8 @@
 import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
 import { ZodError } from 'zod';
-import { withUserContext, type Tx } from '@markaz/db';
+import { withUserContext, withAnonContext, type Tx } from '@markaz/db';
+import { hasCapability, PROTOTYPE_ADMIN_CAPABILITIES, type AdminCapability } from '@markaz/domain';
 import type { Context, AuthenticatedUser } from './context';
 
 const t = initTRPC.context<Context>().create({
@@ -66,5 +67,41 @@ export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
   }
   return next();
 });
+
+/**
+ * Capability-gated ADMIN procedure (admin-portal-design-spec §5). The single prototype
+ * ADMIN holds every capability, but each consequential route/action still checks server-side
+ * so the model can evolve without redesign. This is the boundary; UI hiding is UX only.
+ * DB-level SECURITY DEFINER functions re-check `is_admin()` as defence-in-depth.
+ */
+export function adminCapabilityProcedure(cap: AdminCapability) {
+  return adminProcedure.use(async ({ next }) => {
+    if (!hasCapability(PROTOTYPE_ADMIN_CAPABILITIES, cap)) {
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'CAPABILITY_REQUIRED' });
+    }
+    return next();
+  });
+}
+
+/**
+ * Public marketplace procedure: runs the resolver inside an RLS-scoped tx as the
+ * authenticated user when present, or as `anon` otherwise. Either way RLS only
+ * exposes LIVE public data — anonymous browsing never needs the service-role key
+ * (§37.3, ADR-0013). Resolvers must still filter `state = 'LIVE'` explicitly.
+ */
+const publicWithRls = middleware(async ({ ctx, next }) => {
+  if (ctx.user) {
+    const user: AuthenticatedUser = ctx.user;
+    return withUserContext(
+      ctx.db,
+      { userId: user.id, email: user.email, accountType: user.accountType },
+      (tx) => next({ ctx: { ...ctx, tx } }),
+    );
+  }
+  return withAnonContext(ctx.db, (tx) => next({ ctx: { ...ctx, tx } }));
+});
+
+/** Anonymous-or-authenticated procedure with an RLS tx (`ctx.tx`). */
+export const publicTxProcedure = publicProcedure.use(publicWithRls);
 
 export type { Tx };

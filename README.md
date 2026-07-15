@@ -1,60 +1,28 @@
 # MARKAZ Home
 
-A property marketplace for the UAE (initial focus: Dubai). A single customer
+A property marketplace for the UAE (initial focus: Dubai). A single **customer**
 account can both **sell** (list a property) and **buy** (browse, make offers, move
-through a transaction). Admin operations live in a separate application.
+through a transaction). Admin operations live in a **separate** application. Real
+engineering throughout; only the regulated integrations (UAE PASS, DLD, Trakheesi,
+payment) are **simulated** — behind named interfaces, with persisted outcomes.
 
-This repository is the **Week 1 application foundation**: the monorepo, shared
-packages, real authentication, the database with Row-Level Security, storage, a
-Realtime proof, and the documentation set.
+This repository implements **Weeks 1–6**: the application foundation, the listing
+wizard, publication + marketplace, offers & negotiation, the transaction tracker,
+and the admin portal.
 
-## Week 1 scope
+## What's built
 
-- Turborepo + pnpm monorepo with strict TypeScript.
-- Two apps: customer/public (`apps/web`) and a separate admin app (`apps/admin`).
-- Shared `@markaz/*` packages (config, ui, i18n, domain, db, auth, api, realtime,
-  observability).
-- **Real Supabase email OTP** auth + onboarding routing.
-- Profiles + marketplace schema with a full **RLS policy set** and an
-  integration-test gate.
-- Storage buckets (private + public) with boundary tests.
-- A Supabase **Realtime** end-to-end proof.
-- Canonical SQL migrations + fictional seed data.
-- Architecture decisions (ADRs) and runbooks.
+| Milestone  | Summary                                                                                                                                                                           | Report                     |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| **Week 1** | Monorepo, strict TS, email+password auth + onboarding, RLS-first schema, storage buckets, realtime proof                                                                          | `WEEK-1.md`, `WEEK-1.5.md` |
+| **Week 2** | Listing wizard `DRAFT → READY_TO_PUBLISH` (details, ownership + simulated verification, investment case, photos, simulated Form A / Trakheesi)                                    | `WEEK-2.md`                |
+| **Week 3** | Publication (`READY_TO_PUBLISH → LIVE`) via an idempotent compensated photo pipeline; anonymous + authed marketplace; saved properties                                            | `WEEK-3.md`                |
+| **Week 4** | Non-binding buyer offers / seller offer management — one thread per (buyer, listing), immutable proposals, single-accepted-offer enforcement                                      | `WEEK-4.md`                |
+| **Week 5** | Shared **simulated** transaction tracker on an accepted offer (17 milestones / 6 stages), private participant-scoped documents                                                    | `WEEK-5.md`                |
+| **Week 6** | Separate **admin portal** — capability-gated, reason-coded, audited operational controls (restriction, publication review, listing/transaction recovery, audited document access) | `WEEK-6.md`                |
 
-## Repository structure
-
-```
-markaz-home-prototype/
-├─ apps/
-│  ├─ web/                 # Customer/public app (port 3000)
-│  ├─ admin/               # Separate admin app (port 3001)
-│  └─ worker/              # Durable jobs — placeholder only (Week 1)
-├─ packages/
-│  ├─ config/             # eslint / tsconfig / tailwind presets
-│  ├─ ui/                 # shadcn/Radix design system + tokens (RTL-safe)
-│  ├─ i18n/               # next-intl (en + ar), RTL, AED formatting
-│  ├─ domain/             # types, state machines, zod, resolvePostAuthDestination
-│  ├─ db/                 # Drizzle schema + client + withUserContext (RLS)
-│  ├─ auth/               # Supabase SSR clients + RBAC
-│  ├─ api/                # tRPC routers + procedure tiers
-│  ├─ realtime/           # Supabase Realtime hook
-│  └─ observability/      # pino logging
-├─ supabase/
-│  ├─ migrations/         # Canonical ordered SQL history
-│  ├─ seed.sql            # Fictional demo data (runs after migrations)
-│  └─ config.toml         # Local Supabase stack config
-├─ docs/
-│  ├─ adr/                # Architecture Decision Records
-│  ├─ architecture/       # Overview, auth & RLS, realtime
-│  └─ runbooks/           # local-development, authentication, database-reset
-├─ infra/                 # Boundary contracts/placeholders (AWS NOT provisioned)
-├─ tests/
-├─ .env.example
-├─ package.json
-├─ pnpm-workspace.yaml
-└─ turbo.json
-```
+Everything regulated is **simulated** — no real payment, escrow, contract, DLD,
+Trakheesi, or UAE PASS integration is performed.
 
 ## Required software
 
@@ -67,180 +35,174 @@ install it globally.
 
 ## Stack
 
-Turborepo 2, TypeScript 5 (strict), Next.js 15 (App Router), React 19,
-Tailwind 3.4, shadcn/Radix, next-intl 3, TanStack Query 5, tRPC 11, Drizzle ORM
-0.38 + postgres-js, Supabase (auth/realtime/storage), react-hook-form 7 + zod 3,
-Vitest 2, Playwright, pino.
+Turborepo 2, TypeScript 5 (strict), Next.js 15 (App Router), React 19, Tailwind 3.4,
+shadcn/Radix, next-intl 3, TanStack Query 5, tRPC 11, Drizzle ORM + postgres-js,
+Supabase (auth/realtime/storage), react-hook-form 7 + zod 3, Vitest 2, Playwright, pino.
 
 ## Local installation
 
 ```bash
 pnpm install
-cp .env.example .env
 pnpm supabase:start    # start the local Supabase Docker stack (Docker engine must be running)
-# Copy the keys printed by `supabase start` into .env (see "Supabase keys" below)
-pnpm supabase:reset    # apply canonical migrations + seed
-pnpm dev               # web on :3000, admin on :3001
 ```
 
-See `docs/runbooks/local-development.md` for ports and troubleshooting, and the
-**Troubleshooting** section at the bottom of this file for the common
-Docker-engine / Supabase-key / OTP-email gotchas.
-
-### Supabase keys
-
-`pnpm supabase:start` prints the keys your local stack expects. **Newer Supabase
-CLIs (≥ 2.10x) use the new key format** — copy them into `.env` like this:
-
-| `supabase start` output | `.env` variable |
-| --- | --- |
-| `Publishable` (`sb_publishable_…`) **or** legacy `anon` | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
-| `Secret` (`sb_secret_…`) **or** legacy `service_role` | `SUPABASE_SERVICE_ROLE_KEY` |
-| `DB URL` (`postgresql://postgres:postgres@127.0.0.1:54322/postgres`) | `DATABASE_URL` and `DIRECT_DATABASE_URL` |
-
-The publishable key is browser-safe and works as the client key; the secret key
-is server-only and is **never** used for customer-scoped requests.
-
-## Environment variables
-
-All variables are enumerated in **`.env.example`** (copy to `.env`). Public
-(`NEXT_PUBLIC_*`) values are browser-safe; `DATABASE_URL`,
-`DIRECT_DATABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY` are **server-only**. See
-`infra/environment-contract.md` for which connection path uses the pooler vs the
-direct endpoint.
-
-## Supabase local setup & OTP testing
-
-The local stack runs in Docker. Service URLs (after `pnpm supabase:start`):
-
-| Service | URL |
-| --- | --- |
-| Supabase API | http://127.0.0.1:54321 |
-| Postgres | 127.0.0.1:54322 |
-| Studio | http://127.0.0.1:54323 |
-| **Mail inbox** (OTP codes) — Inbucket or Mailpit depending on CLI version | http://127.0.0.1:54324 |
-
-Authentication is **real email OTP**. Locally, no real email is sent — request a
-code in the app, then read the **6-digit code** from the local mail inbox
-(http://127.0.0.1:54324). `supabase/templates/*.html` force the email to contain
-the OTP token (`{{ .Token }}`) rather than a magic link, so the code-entry UI
-works. OTP codes are never built, stored, or logged by app code. See
-`docs/runbooks/authentication.md`.
-
-Seeded fictional demo accounts: `customer-a@markaz.demo` (seller),
-`customer-b@markaz.demo` (buyer), `admin@markaz.demo` (admin).
-
-## Database: migrate, seed, reset
+Then point local dev at the **local** stack. Env precedence is `.env.local`
+(local, gitignored) → `.env` (the hosted/deploy contract). Create `.env.local`
+from the keys `supabase start` printed:
 
 ```bash
-pnpm supabase:reset    # drop + re-apply all migrations + seed (deterministic)
-pnpm db:migrate        # apply pending migrations
-pnpm db:seed           # run supabase/seed.sql
+# .env.local  — local overrides; both apps + db scripts prefer this over .env
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<sb_publishable_… from `supabase status`>
+SUPABASE_SERVICE_ROLE_KEY=<sb_secret_… from `supabase status`>
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
+DIRECT_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
+```
+
+```bash
+pnpm supabase:reset            # apply canonical migrations (see the reset note below)
+pnpm dev                       # web on :3000, admin on :3001
+```
+
+> **Why `.env.local`?** If you point local dev at a _hosted_ project (e.g. Supabase
+> in Mumbai), every SSR query round-trips out of region and the app feels laggy.
+> `.env.local` keeps local dev on the local Docker DB (fast). `.env` stays the
+> hosted/deploy contract (Vercel reads those from its dashboard).
+
+### `supabase:reset` note (local)
+
+In some environments `supabase db reset` hangs at **"Recreating database…"** — a
+`pg_cron`/`pg_net` reconnect quirk that blocks `DROP DATABASE`. If it hangs, use a
+fresh start instead (this initializes a new DB and applies the whole migration chain
+without a drop step):
+
+```bash
+pnpm supabase stop --no-backup && pnpm supabase start
+```
+
+### Admin account
+
+There is **no demo-customer seed** — customers sign up through the app (the
+`handle_new_user` trigger creates each `profiles` row). To create the single ADMIN,
+run the env-driven bootstrap:
+
+```bash
+BOOTSTRAP_ADMIN_EMAIL=you@example.com BOOTSTRAP_ADMIN_PASSWORD='<strong>' pnpm db:setup
+```
+
+`db:setup` is a no-op without those env vars. It uses the Supabase Admin API (writing
+Auth tables via SQL is unsupported) and is idempotent. See ADR-0003 / ADR-0009.
+
+## Repository structure
+
+```
+markaz-home-prototype/
+├─ apps/{web,admin,worker}       # web=customer (:3000), admin=separate (:3001), worker=placeholder
+├─ packages/                     # config, ui, i18n, domain, db, auth, api, realtime, observability
+├─ supabase/{migrations,seed.sql,config.toml,templates}
+├─ docs/{adr,architecture,runbooks,design}
+├─ infra/                        # boundary contracts/placeholders (AWS NOT provisioned)
+├─ tests/integration             # RLS/storage/publication/offer/transaction/admin (need the stack)
+└─ .github/workflows             # CI (lint/typecheck/unit + a mandatory full-stack job)
+```
+
+## Local services (after `pnpm supabase:start`)
+
+| Service                                                      | URL                    |
+| ------------------------------------------------------------ | ---------------------- |
+| Supabase API                                                 | http://127.0.0.1:54321 |
+| Postgres                                                     | 127.0.0.1:54322        |
+| Studio                                                       | http://127.0.0.1:54323 |
+| **Mail inbox** (verification code + recovery link) — Mailpit | http://127.0.0.1:54324 |
+
+Authentication is **email + password** (ADR-0009). A 6-digit email code verifies a
+**new account**; **password recovery uses the official Supabase LINK**. Locally no
+real email is sent — read the code / click the link in the mail inbox. Codes, links,
+and tokens are never built, stored, or logged by app code.
+
+## Database commands
+
+```bash
+pnpm supabase:reset    # drop + re-apply all migrations (+ minimal seed)
+pnpm db:migrate        # apply pending migrations (Supabase CLI — local)
+pnpm db:setup          # env-driven ADMIN bootstrap (Admin API); no-op without BOOTSTRAP_ADMIN_*
 pnpm db:generate       # drizzle-kit generate (REVIEW only; fold into canonical SQL)
 ```
 
-Schema is a **single ordered SQL history** in `supabase/migrations/`; Drizzle is
-the typed mirror and generated SQL is reviewed in, never applied separately. See
-`docs/runbooks/database-reset.md`.
-
-## Running web + admin
-
-`pnpm dev` runs both apps. The customer app (`apps/web`) is on **:3000**; the
-admin app (`apps/admin`) is on **:3001**. The customer app exposes **no admin
-routes or navigation**; the admin app requires `account_type === 'ADMIN'`.
+Schema is a **single ordered SQL history** in `supabase/migrations/` (0100 → 0815);
+Drizzle is the typed mirror and generated SQL is reviewed in, never applied separately.
+`supabase/seed.sql` is intentionally minimal — **no** demo Auth users. `db:setup` and
+the seed/migrate scripts prefer `.env.local`, so local runs never touch a hosted DB
+by accident. See `docs/runbooks/database-reset.md`.
 
 ## Running tests
 
 ```bash
-pnpm test       # unit / component (Vitest)
-pnpm test:e2e   # end-to-end (Playwright)
+pnpm typecheck && pnpm lint && pnpm test && pnpm build   # what CI runs
+pnpm test:e2e                                            # Playwright (needs the stack + apps)
 ```
 
-> **Integration tests and e2e tests require the local Supabase stack running**
-> (`pnpm supabase:start`). Unit/component tests do not.
+> **Integration + e2e tests require the local Supabase stack** and the service-role
+> key. They **skip** when the stack/keys are absent (so `pnpm test` stays green on a
+> machine without Docker) — a **skip is not a pass**. CI runs a **mandatory
+> full-stack job** where skipped integration/e2e counts as a failure (see
+> `.github/workflows`). Run the two app e2e suites **serially** on a memory-limited
+> Docker (the concurrent turbo run can exhaust it).
 
 ## Architecture decisions
 
-- [ADR 0001 — Monorepo](docs/adr/0001-monorepo.md)
-- [ADR 0002 — Unified customer account](docs/adr/0002-unified-customer-account.md)
-- [ADR 0003 — Canonical migrations](docs/adr/0003-canonical-migrations.md)
-- [ADR 0004 — tRPC + Drizzle RLS context](docs/adr/0004-trpc-drizzle-rls-context.md)
-- [ADR 0005 — Realtime direct database connection](docs/adr/0005-realtime-direct-database-connection.md)
-- [ADR 0006 — Self-hosted Supabase on RDS (validation pending)](docs/adr/0006-self-hosted-supabase-rds-validation.md)
-- [ADR 0007 — Demo-auth fallback (disabled)](docs/adr/0007-demo-auth-fallback.md)
-- [ADR 0008 — Separate admin application](docs/adr/0008-separate-admin-application.md)
+ADRs 0001–0029 in `docs/adr/`. Highlights by milestone:
 
-See also `docs/architecture/` (overview, auth & RLS, realtime) and
-`docs/runbooks/`.
+- **Foundation** 0001–0009 (monorepo, unified customer account, canonical migrations,
+  tRPC+Drizzle RLS context, realtime direct connection, separate admin app, email+password).
+- **Listing/marketplace** 0010–0013 (state-machine retry, draft-photo privacy, public-photo
+  pipeline, anonymous marketplace access).
+- **Offers** 0014–0018 · **Transactions** 0019–0023 · **Admin** 0024–0029.
 
-## Platform workstream boundary
+See also `docs/architecture/` (incl. `admin-portal.md`, `offers.md`, `transactions.md`,
+`marketplace.md`, `auth-and-rls.md`) and `docs/runbooks/`.
 
-The **platform-engineering team** owns AWS/Terraform/RDS/ECS/ECR/SES/ElastiCache/
-SonarQube and the self-hosted Supabase deployment in **me-central-1 (UAE)**.
-Week 1 did **not** provision AWS. `infra/` contains **boundary contracts and
-placeholders only** — no real Terraform. Application development runs on the
-official Supabase local Docker stack; a managed-Supabase bridge is available for
-demo-only environments.
+## Deferred (next milestone+)
 
-## Deferred functionality
-
-- The full property-**listing wizard** (see next milestone).
-- The live **marketplace / browse**.
-- **Offers** and counter-offers UX.
-- **Transactions** UX.
-- **Durable background jobs** (`apps/worker`).
-- The full **admin application** surface.
+- **Durable background jobs** (`apps/worker` is a placeholder).
+- **Real** DLD / Trakheesi / Madmoun / payment / UAE PASS integrations.
+- Any **AWS provisioning** (`infra/` holds boundary contracts only).
+- Free-form messaging/chat, contact exchange, email/SMS/push delivery, map search.
 
 ## Known limitations
 
-- **Demo-auth one-click fallback is DISABLED** — only the env contract and docs
-  exist; the blocker is a supported, secure server-side session-minting mechanism
-  (ADR 0007).
-- **Arabic legal copy needs business review** — Arabic strings are present but the
-  legal/business wording is **not yet reviewed**.
-- **Self-hosted-Supabase-on-RDS is NOT validated** — the §6A.1 gate
-  (`infra/supabase/rds-compatibility-checklist.md`, ADR 0006) must pass before any
-  production claim.
+- **Arabic copy is machine-draft** — present but **not** business/legal-reviewed.
+- **Edge-runtime build warning** — `A Node.js API (process.version) … not supported in
+the Edge Runtime` comes from a transitive dependency of `@supabase/ssr` used by the
+  auth middleware (our own `env`/`rbac` are edge-pure). It is **non-fatal** (Next shims
+  `process` in Edge; the middleware works) and cannot be removed without patching the
+  dependency.
+- **Self-hosted-Supabase-on-RDS is NOT validated** (ADR-0006).
+- **Session-expired detection is best-effort** (ADR-0009).
 
-## Next milestone: the property-listing journey
+## Platform workstream boundary
 
-A state-machine-driven listing wizard:
-
-`DRAFT → Property Details → Ownership Upload → Ownership Verification (sim) →
-Listing & Offer Settings → Investment Case → Form A (sim) → Photos →
-Trakheesi (sim) → Review → READY_TO_PUBLISH`
-
-Steps marked **(sim)** are simulated in the demo (ownership verification, Form A,
-and Trakheesi permit).
+The platform-engineering team owns AWS/Terraform/RDS/ECS/ECR/SES and the self-hosted
+Supabase deployment. This repo did **not** provision AWS; `infra/` contains boundary
+contracts and placeholders only. Application development runs on the official Supabase
+local Docker stack. For a hosted demo, the closest free Supabase region to the UAE is
+**Mumbai (`ap-south-1`)**; co-locate the app (e.g. Vercel region `bom1`) with the DB.
 
 ## Troubleshooting
 
-**`pnpm install` says "No package.json found".** You're in the parent folder. The
-monorepo root is `markaz-home-prototype/` — `cd` into it first.
+**`pnpm supabase:start` hangs with no output.** The Docker **engine** isn't running.
+`docker ps` will hang too. Start Docker Desktop, wait for green, confirm `docker ps`
+returns instantly, then retry.
 
-**`pnpm supabase:start` hangs with no output.** The Docker **engine** isn't
-running (Docker Desktop shows "Engine stopped"). `docker ps` will hang too. Start
-Docker Desktop, wait for the status to go green ("Engine running"), confirm with
-`docker ps` (must return instantly), then retry. If Docker won't start, a reboot
-clears stuck Docker processes.
+**`supabase db reset` hangs at "Recreating database…".** See the reset note above —
+use `pnpm supabase stop --no-backup && pnpm supabase start`.
 
-**`toomanyrequests: Rate exceeded` during first start.** Docker registry
-throttling while pulling Supabase images. The CLI retries automatically; just let
-it finish. Subsequent starts are fast (images are cached).
+**The app feels laggy locally.** Local dev is probably hitting a _hosted_ DB via `.env`.
+Add `.env.local` pointing at the local stack (see Local installation).
 
-**A stray `markaz-*` container is crash-looping** (`docker ps` shows
-`Restarting`). It's an unrelated leftover — remove it: `docker rm -f <name>`
-(removes only the container, not data volumes).
+**The _verification_ email shows a link instead of a code.** A **recovery** email
+correctly carries a link (ADR-0009); only **confirmation** carries the 6-digit code.
+Restart the stack and request a fresh email.
 
-**The OTP email shows a sign-in *link* instead of a code.** The email templates
-weren't picked up. They live in `supabase/templates/` and are wired in
-`supabase/config.toml` under `[auth.email.template.*]`. Restart the stack
-(`pnpm supabase:stop && pnpm supabase:start`) and request a **fresh** code.
-
-**Auth fails after the keys look set.** Make sure you copied the keys your CLI
-actually printed into `.env` (newer CLIs print `sb_publishable_…` / `sb_secret_…`
-— see "Supabase keys" above), and that `.env` is at the repo root (both apps load
-it from there).
-
-**`config section [inbucket] is deprecated` warning.** Harmless. Newer CLIs use
-Mailpit at the same port (54324); the local mail inbox still works.
+**`config section [inbucket] is deprecated` warning.** Harmless — newer CLIs use
+Mailpit at the same port (54324).

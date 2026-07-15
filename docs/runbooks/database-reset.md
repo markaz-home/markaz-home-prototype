@@ -3,14 +3,25 @@
 The database is rebuilt from a **single ordered SQL history** in
 `supabase/migrations/`, followed by `supabase/seed.sql` (ADR 0003).
 
+## The full local reset flow
+
+```bash
+pnpm supabase:reset    # rebuild schema; then SIGN UP in the app
+```
+
+`supabase:reset` rebuilds the schema (and runs the minimal seed). **No accounts are
+seeded** — open the web app and sign up. To create an admin (optional, env-driven):
+`BOOTSTRAP_ADMIN_EMAIL=… BOOTSTRAP_ADMIN_PASSWORD=… pnpm db:setup`.
+
 ## Commands
 
-| Command | What it does | When to use |
-| --- | --- | --- |
-| `pnpm supabase:reset` | Drops the DB, re-applies **all migrations in order**, then runs **seed** | The default. Use when you want a clean, deterministic database (stale schema, after pulling new migrations, before a demo). |
-| `pnpm db:migrate` | Applies pending migrations | Apply new migrations without wiping existing data. |
-| `pnpm db:seed` | Runs `supabase/seed.sql` | Re-seed the fictional demo data after migrations. |
-| `pnpm db:generate` | `drizzle-kit generate` → `packages/db/drizzle` | **Review only.** Produces SQL to read; do **not** apply it directly. |
+| Command               | What it does                                                                                               | When to use                                                                                                  |
+| --------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `pnpm supabase:reset` | Drops the DB, re-applies **all migrations in order**, then runs the **(minimal) seed**                     | The default first step. Clean, deterministic schema (stale schema, after pulling migrations, before a demo). |
+| `pnpm db:setup`       | **Optional** env-driven admin bootstrap (Admin API), **idempotent**; no-op without `BOOTSTRAP_ADMIN_EMAIL` | Only when you want to create/refresh the single admin account.                                               |
+| `pnpm db:migrate`     | Applies pending migrations                                                                                 | Apply new migrations without wiping existing data.                                                           |
+| `pnpm db:seed`        | Runs `supabase/seed.sql`                                                                                   | Rarely needed directly; the minimal seed runs as part of `supabase:reset`.                                   |
+| `pnpm db:generate`    | `drizzle-kit generate` → `packages/db/drizzle`                                                             | **Review only.** Produces SQL to read; do **not** apply it directly.                                         |
 
 ## Authoring a schema change into the canonical history
 
@@ -27,16 +38,23 @@ The database is rebuilt from a **single ordered SQL history** in
 > The generated Drizzle SQL is a **review aid only**. It is never applied from a
 > second mechanism — the `supabase/migrations/` history is the only apply path.
 
-## Seed data
+## Seed data and demo provisioning
 
-`supabase/seed.sql` runs **after** migrations and creates the fictional demo
-accounts (Customer A / Customer B / Admin, `@markaz.demo` emails) plus fictional
-Dubai properties, listings, offers, and transactions. Everything is clearly
-fictional; no real personal or property documents are used.
+`supabase/seed.sql` is **intentionally minimal**: it does **not** create Auth users or
+domain data. **Customers sign up through the app** (the `handle_new_user` trigger creates
+each `profiles` row), so nothing needs seeding for a usable environment. The only optional
+provisioning is the **env-driven admin bootstrap** `pnpm db:setup`
+(`packages/db/src/scripts/setup-demo.ts`), which — when `BOOTSTRAP_ADMIN_EMAIL` /
+`BOOTSTRAP_ADMIN_PASSWORD` are set — creates one ADMIN via the Supabase **Admin API**
+(`auth.admin.createUser`, then admin promotion). It is **idempotent** and a **no-op** when
+no admin env is set. Writing Supabase Auth tables via SQL is unsupported, hence the Admin
+API.
+
+See `demo-runbook.md` for the sign-up + admin-bootstrap steps.
 
 ## Notes
 
-- `pnpm supabase:reset` requires the local Supabase Docker stack
-  (`pnpm supabase:start`).
-- Migrations and admin/seed ops connect to the database **directly**
+- `pnpm supabase:reset` and `pnpm db:setup` require the local Supabase Docker
+  stack (`pnpm supabase:start`).
+- Migrations and admin/setup ops connect to the database **directly**
   (`DIRECT_DATABASE_URL`), not through the pooler (ADR 0005).

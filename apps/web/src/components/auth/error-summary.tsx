@@ -1,0 +1,36 @@
+'use client';
+import { useEffect, useRef } from 'react';
+import { AlertCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+/** Multi-error summary (design spec §24.3). Receives focus on submit failure. */
+export function ErrorSummary({ errors }: { errors: { id: string; message: string }[] }) {
+  const t = useTranslations('validation');
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (errors.length > 1) ref.current?.focus();
+  }, [errors]);
+  if (errors.length < 2) return null;
+  return (
+    <div
+      ref={ref}
+      tabIndex={-1}
+      role="alert"
+      className="border-destructive/40 bg-destructive/10 rounded-md border p-4 text-sm"
+    >
+      <p className="flex items-center gap-2 font-medium">
+        <AlertCircle className="text-destructive h-4 w-4" aria-hidden />
+        {t('errorSummaryTitle')}
+      </p>
+      <ul className="mt-2 list-inside list-disc space-y-1">
+        {errors.map((e) => (
+          <li key={e.id}>
+            <a href={`#${e.id}`} className="underline-offset-2 hover:underline">
+              {e.message}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}

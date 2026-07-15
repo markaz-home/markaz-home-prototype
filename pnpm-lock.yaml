@@ -14,6 +14,9 @@ importers:
       prettier:
         specifier: ^3.4.2
         version: 3.8.5
+      prettier-plugin-tailwindcss:
+        specifier: ^0.6.9
+        version: 0.6.14(prettier@3.8.5)
       supabase:
         specifier: ^2.6.8
         version: 2.108.0
@@ -26,12 +29,18 @@ importers:
 
   apps/admin:
     dependencies:
+      '@hookform/resolvers':
+        specifier: ^3.9.1
+        version: 3.10.0(react-hook-form@7.80.0(react@19.2.7))
       '@markaz/api':
         specifier: workspace:*
         version: link:../../packages/api
       '@markaz/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@markaz/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@markaz/domain':
         specifier: workspace:*
         version: link:../../packages/domain
@@ -41,6 +50,9 @@ importers:
       '@markaz/observability':
         specifier: workspace:*
         version: link:../../packages/observability
+      '@markaz/realtime':
+        specifier: workspace:*
+        version: link:../../packages/realtime
       '@markaz/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -80,6 +92,9 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.7(react@19.2.7)
+      react-hook-form:
+        specifier: ^7.54.2
+        version: 7.80.0(react@19.2.7)
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -90,6 +105,9 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
+      '@axe-core/playwright':
+        specifier: ^4.10.1
+        version: 4.12.1(playwright-core@1.61.1)
       '@markaz/config':
         specifier: workspace:*
         version: link:../../packages/config
@@ -129,6 +147,9 @@ importers:
       postcss:
         specifier: ^8.4.49
         version: 8.5.15
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.9
       tailwindcss:
         specifier: ^3.4.17
         version: 3.4.19(tsx@4.22.4)
@@ -259,6 +280,9 @@ importers:
       postcss:
         specifier: ^8.4.49
         version: 8.5.15
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.9
       tailwindcss:
         specifier: ^3.4.17
         version: 3.4.19(tsx@4.22.4)
@@ -354,6 +378,9 @@ importers:
       '@eslint/js':
         specifier: ^9.17.0
         version: 9.39.4
+      '@next/eslint-plugin-next':
+        specifier: ^15.5.19
+        version: 15.5.20
       eslint:
         specifier: ^9.0.0
         version: 9.39.4(jiti@1.21.7)
@@ -384,16 +411,25 @@ importers:
       '@markaz/observability':
         specifier: workspace:*
         version: link:../observability
+      '@supabase/supabase-js':
+        specifier: ^2.47.10
+        version: 2.108.2
       drizzle-orm:
         specifier: ^0.38.3
         version: 0.38.4(@types/react@19.2.17)(postgres@3.4.9)(react@19.2.7)
       postgres:
         specifier: ^3.4.5
         version: 3.4.9
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
     devDependencies:
       '@markaz/config':
         specifier: workspace:*
         version: link:../config
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.6.1
       drizzle-kit:
         specifier: ^0.30.1
         version: 0.30.6
@@ -549,12 +585,18 @@ importers:
 
   tests:
     dependencies:
+      '@markaz/api':
+        specifier: workspace:*
+        version: link:../packages/api
       '@markaz/db':
         specifier: workspace:*
         version: link:../packages/db
       '@markaz/domain':
         specifier: workspace:*
         version: link:../packages/domain
+      '@markaz/observability':
+        specifier: workspace:*
+        version: link:../packages/observability
       '@supabase/supabase-js':
         specifier: ^2.47.10
         version: 2.108.2
@@ -1539,6 +1581,9 @@ packages:
 
   '@next/env@15.5.19':
     resolution: {integrity: sha512-sWWluFvcv5v3Fxznmf2ZfjyoVQt/64oCnYqS90inQWGzMPK1VjvekPiz3OPHKmFT30EnHrjlbyaHLt3M0vWabw==}
+
+  '@next/eslint-plugin-next@15.5.20':
+    resolution: {integrity: sha512-MZUgFpVd9rGSZpb8bNceUWvkAZe6aQw/6h2SSqHQuYzKfaiEUEVPIO6mXqaBmiBEBSN1f1sOc1uV8GCM90oegg==}
 
   '@next/swc-darwin-arm64@15.5.19':
     resolution: {integrity: sha512-jx9wWlTKueHKPvVOndyr7WuaevWCkuYqsQ8gC0TMPKAVWG3MhcdMrjfo9tvIZNXd0QOUYXXvAcZ325y8Uq7uzg==}
@@ -2819,6 +2864,10 @@ packages:
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
 
+  fast-glob@3.3.1:
+    resolution: {integrity: sha512-kNFPyjhh5cKjrUltxs+wFx+ZkbRaxxmZ+X0ZU31SOsxCEtP9VPgtq2teZw1DebupL5GmDaNQ6yKMMVcM41iqDg==}
+    engines: {node: '>=8.6.0'}
+
   fast-glob@3.3.3:
     resolution: {integrity: sha512-7MptL8U0cqcFdzIzwOTHoilX9x5BrNqye7Z/LuC7kCMRio1EMSyqRK3BEAUD7sXRq4iT4AzTVuZdhgQ2TCvYLg==}
     engines: {node: '>=8.6.0'}
@@ -3334,6 +3383,67 @@ packages:
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
+
+  prettier-plugin-tailwindcss@0.6.14:
+    resolution: {integrity: sha512-pi2e/+ZygeIqntN+vC573BcW5Cve8zUB0SSAGxqpB4f96boZF4M3phPVoOFCeypwkpRYdi7+jQ5YJJUwrkGUAg==}
+    engines: {node: '>=14.21.3'}
+    peerDependencies:
+      '@ianvs/prettier-plugin-sort-imports': '*'
+      '@prettier/plugin-hermes': '*'
+      '@prettier/plugin-oxc': '*'
+      '@prettier/plugin-pug': '*'
+      '@shopify/prettier-plugin-liquid': '*'
+      '@trivago/prettier-plugin-sort-imports': '*'
+      '@zackad/prettier-plugin-twig': '*'
+      prettier: ^3.0
+      prettier-plugin-astro: '*'
+      prettier-plugin-css-order: '*'
+      prettier-plugin-import-sort: '*'
+      prettier-plugin-jsdoc: '*'
+      prettier-plugin-marko: '*'
+      prettier-plugin-multiline-arrays: '*'
+      prettier-plugin-organize-attributes: '*'
+      prettier-plugin-organize-imports: '*'
+      prettier-plugin-sort-imports: '*'
+      prettier-plugin-style-order: '*'
+      prettier-plugin-svelte: '*'
+    peerDependenciesMeta:
+      '@ianvs/prettier-plugin-sort-imports':
+        optional: true
+      '@prettier/plugin-hermes':
+        optional: true
+      '@prettier/plugin-oxc':
+        optional: true
+      '@prettier/plugin-pug':
+        optional: true
+      '@shopify/prettier-plugin-liquid':
+        optional: true
+      '@trivago/prettier-plugin-sort-imports':
+        optional: true
+      '@zackad/prettier-plugin-twig':
+        optional: true
+      prettier-plugin-astro:
+        optional: true
+      prettier-plugin-css-order:
+        optional: true
+      prettier-plugin-import-sort:
+        optional: true
+      prettier-plugin-jsdoc:
+        optional: true
+      prettier-plugin-marko:
+        optional: true
+      prettier-plugin-multiline-arrays:
+        optional: true
+      prettier-plugin-organize-attributes:
+        optional: true
+      prettier-plugin-organize-imports:
+        optional: true
+      prettier-plugin-sort-imports:
+        optional: true
+      prettier-plugin-style-order:
+        optional: true
+      prettier-plugin-svelte:
+        optional: true
 
   prettier@3.8.5:
     resolution: {integrity: sha512-zxcTTCedNGJM4R8sj/Cq/F0W/c4iE0afWBcBwMTRtw4WHYP9TWkYjdiH3npPRUYsXQCPR0hTU9yjovOu+E6EQA==}
@@ -4528,6 +4638,10 @@ snapshots:
 
   '@next/env@15.5.19': {}
 
+  '@next/eslint-plugin-next@15.5.20':
+    dependencies:
+      fast-glob: 3.3.1
+
   '@next/swc-darwin-arm64@15.5.19':
     optional: true
 
@@ -5718,6 +5832,14 @@ snapshots:
 
   fast-deep-equal@3.1.3: {}
 
+  fast-glob@3.3.1:
+    dependencies:
+      '@nodelib/fs.stat': 2.0.5
+      '@nodelib/fs.walk': 1.2.8
+      glob-parent: 5.1.2
+      merge2: 1.4.1
+      micromatch: 4.0.8
+
   fast-glob@3.3.3:
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -6195,6 +6317,10 @@ snapshots:
   postgres@3.4.9: {}
 
   prelude-ls@1.2.1: {}
+
+  prettier-plugin-tailwindcss@0.6.14(prettier@3.8.5):
+    dependencies:
+      prettier: 3.8.5
 
   prettier@3.8.5: {}
 

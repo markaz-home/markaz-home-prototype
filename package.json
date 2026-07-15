@@ -23,11 +23,13 @@
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:reset": "supabase db reset",
-    "supabase:status": "supabase status"
+    "supabase:status": "supabase status",
+    "db:setup": "pnpm --filter @markaz/db run setup:demo"
   },
   "devDependencies": {
     "@markaz/config": "workspace:*",
     "prettier": "^3.4.2",
+    "prettier-plugin-tailwindcss": "^0.6.9",
     "supabase": "^2.6.8",
     "turbo": "^2.3.3",
     "typescript": "^5.7.2"

@@ -36,12 +36,10 @@ port = 54324
 [storage]
 enabled = true
 file_size_limit = "50MiB"
-
-[storage.buckets.ownership-documents]
-public = false
-
-[storage.buckets.listing-photos]
-public = true
+# Buckets (ownership-documents, listing-photos, listing-photos-draft) are created
+# by the canonical SQL migrations (04 + 07), not here. Declaring them in config.toml
+# too made `supabase db reset` prompt "Bucket … already exists. Overwrite? [Y/n]",
+# which blocked non-interactive resets. One source of truth = the migrations.
 
 [auth]
 enabled = true
@@ -58,26 +56,45 @@ refresh_token_reuse_interval = 10
 enable_signup = true
 enable_anonymous_sign_ins = false
 
-# Real email OTP. The 6-digit token lands in Inbucket locally.
+# Email + password is the normal sign-in method (Week 1.5, ADR-0009).
+# Email codes are used only for new-account verification and password recovery.
 [auth.email]
 enable_signup = true
-double_confirm_changes = false
-enable_confirmations = false
+double_confirm_changes = true
+# Require real email verification after sign-up. Do NOT disable to ease tests —
+# tests read the 6-digit code from the local Mailpit inbox.
+enable_confirmations = true
+secure_password_change = false
 otp_length = 6
 otp_expiry = 3600
+# NOTE: the application password policy (min 8; upper/lower/number/special; max
+# 128 — ADR-0009) is enforced in the app at two layers: the client form (live
+# checklist + strength meter) and the shared zod schema
+# (packages/domain/src/auth.ts) used by every form. The pinned local Supabase CLI
+# does NOT accept password-policy keys here, so this file does NOT enforce the full
+# policy. Production server-side enforcement is a platform-team responsibility:
+# configure + validate the deployed GoTrue password policy (see the platform
+# checklist in infra/supabase/rds-compatibility-checklist.md).
 
-# Send the 6-digit OTP code ({{ .Token }}) instead of a magic link, so the
-# code-entry UI works. Covers both returning (magic_link) and new (confirmation) users.
+# New-account verification uses a 6-digit code: the confirmation (and email-change)
+# templates carry {{ .Token }} for the code-entry UI. Password RECOVERY uses the
+# official Supabase LINK instead — recovery.html links to
+# {{ .RedirectTo }}/auth/confirm?token_hash=…&type=recovery&next=/reset-password
+# (verified server-side; no code is shown). See ADR-0009.
+[auth.email.template.confirmation]
+subject = "Verify your MARKAZ Home email"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.recovery]
+subject = "Reset your MARKAZ Home password"
+content_path = "./supabase/templates/recovery.html"
+
 [auth.email.template.magic_link]
 subject = "Your MARKAZ verification code"
 content_path = "./supabase/templates/magic_link.html"
 
-[auth.email.template.confirmation]
-subject = "Your MARKAZ verification code"
-content_path = "./supabase/templates/confirmation.html"
-
 [auth.email.template.email_change]
-subject = "Your MARKAZ verification code"
+subject = "Confirm your new MARKAZ Home email"
 content_path = "./supabase/templates/email_change.html"
 
 # We never send SMS in this prototype.

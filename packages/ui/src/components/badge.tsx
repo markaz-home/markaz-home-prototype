@@ -20,15 +20,18 @@ const badgeVariants = cva(
 );
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLSpanElement>,
-    VariantProps<typeof badgeVariants> {}
+  extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badgeVariants> {}
 
 export function Badge({ className, variant, ...props }: BadgeProps) {
   return <span className={cn(badgeVariants({ variant }), className)} {...props} />;
 }
 
 /** Always-visible label that content is a clearly-marked demo simulation. */
-export function DemoBadge({ className, label = 'Demo', ...props }: BadgeProps & { label?: string }) {
+export function DemoBadge({
+  className,
+  label = 'Demo',
+  ...props
+}: BadgeProps & { label?: string }) {
   return (
     <Badge variant="warning" className={cn('uppercase tracking-wide', className)} {...props}>
       {label}

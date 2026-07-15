@@ -7,20 +7,24 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./schema": "./src/schema.ts"
+    "./schema": "./src/schema.ts",
+    "./storage-admin": "./src/storage-admin.ts"
   },
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "generate": "drizzle-kit generate",
     "seed": "tsx src/scripts/seed.ts",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "setup:demo": "tsx src/scripts/setup-demo.ts"
   },
   "dependencies": {
     "@markaz/domain": "workspace:*",
     "@markaz/observability": "workspace:*",
+    "@supabase/supabase-js": "^2.47.10",
     "drizzle-orm": "^0.38.3",
-    "postgres": "^3.4.5"
+    "postgres": "^3.4.5",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@markaz/config": "workspace:*",
@@ -28,6 +32,7 @@
     "eslint": "^9.17.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "dotenv": "^16.4.7"
   }
 }

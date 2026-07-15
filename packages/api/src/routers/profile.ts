@@ -1,7 +1,7 @@
 import { eq, sql } from 'drizzle-orm';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
-import { profiles, type Tx } from '@markaz/db';
+import { profiles, auditEvents, type Tx } from '@markaz/db';
 import {
   profileSetupSchema,
   identityStatusSchema,
@@ -19,6 +19,7 @@ function toProfileDto(row: typeof profiles.$inferSelect) {
     identityVerificationStatus: row.identityVerificationStatus,
     termsAcceptedAt: row.termsAcceptedAt?.toISOString() ?? null,
     privacyAcceptedAt: row.privacyAcceptedAt?.toISOString() ?? null,
+    onboardingCompletedAt: row.onboardingCompletedAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
@@ -48,6 +49,13 @@ export const profileRouter = router({
         privacyAcceptedAt: now,
       })
       .where(eq(profiles.id, ctx.user.id));
+    await ctx.tx.insert(auditEvents).values({
+      actorId: ctx.user.id,
+      action: 'ACCOUNT_PROFILE_COMPLETED',
+      entityType: 'profile',
+      entityId: ctx.user.id,
+      metadata: {},
+    });
     const row = await loadOwnProfile(ctx.tx, ctx.user.id);
     return toProfileDto(row!);
   }),
@@ -65,10 +73,32 @@ export const profileRouter = router({
           message: `Invalid identity transition ${from} -> ${input.status}`,
         });
       }
+      const verified = input.status === 'VERIFIED_DEMO';
       await ctx.tx
         .update(profiles)
-        .set({ identityVerificationStatus: input.status })
+        .set({
+          identityVerificationStatus: input.status,
+          ...(verified ? { onboardingCompletedAt: new Date() } : {}),
+        })
         .where(eq(profiles.id, ctx.user.id));
+
+      const action =
+        input.status === 'PENDING'
+          ? 'DEMO_IDENTITY_STARTED'
+          : input.status === 'VERIFIED_DEMO'
+            ? 'DEMO_IDENTITY_VERIFIED'
+            : input.status === 'FAILED_DEMO'
+              ? 'DEMO_IDENTITY_FAILED'
+              : null;
+      if (action) {
+        await ctx.tx.insert(auditEvents).values({
+          actorId: ctx.user.id,
+          action,
+          entityType: 'profile',
+          entityId: ctx.user.id,
+          metadata: {},
+        });
+      }
       const row = await loadOwnProfile(ctx.tx, ctx.user.id);
       return toProfileDto(row!);
     }),

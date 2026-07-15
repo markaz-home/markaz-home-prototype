@@ -10,19 +10,25 @@ export interface ErrorStateProps {
   className?: string;
 }
 
-export function ErrorState({ title, description, retryLabel, onRetry, className }: ErrorStateProps) {
+export function ErrorState({
+  title,
+  description,
+  retryLabel,
+  onRetry,
+  className,
+}: ErrorStateProps) {
   return (
     <div
       role="alert"
       className={cn(
-        'flex flex-col items-center justify-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-10 text-center',
+        'border-destructive/30 bg-destructive/5 flex flex-col items-center justify-center gap-3 rounded-lg border p-10 text-center',
         className,
       )}
     >
-      <AlertTriangle className="h-8 w-8 text-destructive" aria-hidden />
+      <AlertTriangle className="text-destructive h-8 w-8" aria-hidden />
       <div className="space-y-1">
         <p className="font-medium">{title}</p>
-        {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
+        {description ? <p className="text-muted-foreground text-sm">{description}</p> : null}
       </div>
       {onRetry ? (
         <Button variant="outline" size="sm" onClick={onRetry}>

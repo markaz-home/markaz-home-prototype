@@ -2,7 +2,7 @@
 
 > **No Terraform is written in this repository.** Terraform for MARKAZ Home is
 > **owned by the platform-engineering team**. This directory documents the
-> *intended* resource inventory only. `main.tf.placeholder` is a text placeholder,
+> _intended_ resource inventory only. `main.tf.placeholder` is a text placeholder,
 > **not** a `.tf` file, and is intentionally not applied.
 
 ## Intended resources (to be authored by platform, NOT here)

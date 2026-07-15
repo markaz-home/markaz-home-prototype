@@ -5,12 +5,16 @@ import { renderWithIntl } from './test-utils';
 
 const completeSetupMutate = vi.fn();
 const setIdentityMutate = vi.fn();
-const replace = vi.fn();
+const auditMutateAsync = vi.fn().mockResolvedValue({});
+const signOut = vi.fn().mockResolvedValue({});
 
 vi.mock('@/i18n/navigation', () => ({
-  useRouter: () => ({ replace, refresh: vi.fn() }),
+  useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }),
   usePathname: () => '/',
   Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
+}));
+vi.mock('@markaz/auth/browser', () => ({
+  createSupabaseBrowserClient: () => ({ auth: { signOut } }),
 }));
 vi.mock('@/trpc/react', () => ({
   trpc: {
@@ -18,6 +22,7 @@ vi.mock('@/trpc/react', () => ({
       completeSetup: { useMutation: () => ({ mutate: completeSetupMutate, isPending: false }) },
       setIdentityStatus: { useMutation: () => ({ mutate: setIdentityMutate, isPending: false }) },
     },
+    audit: { record: { useMutation: () => ({ mutateAsync: auditMutateAsync }) } },
   },
 }));
 
@@ -30,11 +35,17 @@ beforeEach(() => {
 });
 
 describe('ProfileSetupForm', () => {
+  it('renders the spec title', () => {
+    renderWithIntl(<ProfileSetupForm />);
+    expect(screen.getByRole('heading', { name: 'Complete your profile' })).toBeInTheDocument();
+  });
+
   it('blocks submission until name + Terms + Privacy are provided', async () => {
     const user = userEvent.setup();
     renderWithIntl(<ProfileSetupForm />);
-    await user.click(screen.getByRole('button', { name: /Save and continue/i }));
-    expect(await screen.findByText('Please enter your full name.')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Save and continue' }));
+    // Appears in both the field error and the error summary.
+    expect((await screen.findAllByText('Enter at least 2 characters.')).length).toBeGreaterThan(0);
     expect(completeSetupMutate).not.toHaveBeenCalled();
   });
 
@@ -44,42 +55,38 @@ describe('ProfileSetupForm', () => {
     await user.type(screen.getByLabelText(/Full name/i), 'Demo Customer');
     await user.click(screen.getByLabelText(/Terms of Use/i));
     await user.click(screen.getByLabelText(/Privacy Policy/i));
-    await user.click(screen.getByRole('button', { name: /Save and continue/i }));
+    await user.click(screen.getByRole('button', { name: 'Save and continue' }));
     expect(completeSetupMutate).toHaveBeenCalledTimes(1);
   });
 });
 
-describe('UaePassFlow (simulated UAE PASS)', () => {
+describe('UaePassFlow (simulated UAE PASS, spec §16)', () => {
   it('shows the demo disclosure and start action when not started', () => {
     renderWithIntl(<UaePassFlow initialStatus="NOT_STARTED" />);
-    expect(
-      screen.getByText(/Demo simulation only\. This prototype is not connected/i),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Start demo verification/i })).toBeInTheDocument();
+    expect(screen.getByText(/Demo simulation only\./)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Start demo verification' })).toBeInTheDocument();
   });
 
   it('moves to PENDING on start', async () => {
     const user = userEvent.setup();
     renderWithIntl(<UaePassFlow initialStatus="NOT_STARTED" />);
-    await user.click(screen.getByRole('button', { name: /Start demo verification/i }));
+    await user.click(screen.getByRole('button', { name: 'Start demo verification' }));
     expect(setIdentityMutate).toHaveBeenCalledWith({ status: 'PENDING' });
   });
 
-  it('shows approve/reject while pending', () => {
+  it('shows approve/reject demo controls while pending', () => {
     renderWithIntl(<UaePassFlow initialStatus="PENDING" />);
-    expect(screen.getByRole('button', { name: /Approve demo verification/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Reject/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Approve demo verification' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Reject' })).toBeInTheDocument();
   });
 
-  it('shows the verified success copy', () => {
+  it('shows the exact verified success copy', () => {
     renderWithIntl(<UaePassFlow initialStatus="VERIFIED_DEMO" />);
-    expect(screen.getByText('Demo identity verified')).toBeInTheDocument();
+    expect(screen.getAllByText('Demo identity verified').length).toBeGreaterThan(0);
   });
 
-  it('renders Arabic disclosure (RTL locale)', () => {
-    const { container } = renderWithIntl(<UaePassFlow initialStatus="NOT_STARTED" />, 'ar');
-    expect(screen.getByText(/محاكاة تجريبية فقط/)).toBeInTheDocument();
-    // Arabic content present; direction is applied at the html level in the app layout.
-    expect(container).toBeTruthy();
+  it('renders Arabic disclosure', () => {
+    renderWithIntl(<UaePassFlow initialStatus="NOT_STARTED" />, 'ar');
+    expect(screen.getByText(/محاكاة تجريبية فقط\./)).toBeInTheDocument();
   });
 });
