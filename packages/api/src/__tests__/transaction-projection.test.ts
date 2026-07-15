@@ -11,6 +11,7 @@ const SELLER = 's0000000-0000-0000-0000-000000000000';
 
 const row = (over: Partial<TxRow> = {}): TxRow => ({
   id: 't1',
+  listingId: 'l0000000-0000-0000-0000-000000000000',
   reference: 'MKZ-TXN-2026-000001',
   status: 'DOCUMENTS',
   nextActor: 'BOTH',
