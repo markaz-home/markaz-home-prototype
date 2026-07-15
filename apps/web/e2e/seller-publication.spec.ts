@@ -1,3 +1,6 @@
+// SKIPPED — assumes the removed demo seed (fixed demo creds + mkz-* publicIds).
+// Honestly skipped (test.describe.skip), not vacuously green. Port to self-provision
+// via helpers/provision.ts — see FOLLOWUP-selfprovision.md.
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -78,7 +81,7 @@ test('publication checklist page has no critical accessibility violations', asyn
   expect(serious, JSON.stringify(serious.map((v) => v.id))).toEqual([]);
 });
 
-test.describe('pause and resume a live listing', () => {
+test.describe.skip('pause and resume a live listing', () => {
   test.describe.configure({ mode: 'serial' });
 
   test('owner pauses the listing', async ({ page }) => {

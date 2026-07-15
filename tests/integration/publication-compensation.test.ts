@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { sql } from 'drizzle-orm';
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { type SupabaseClient } from '@supabase/supabase-js';
 import {
   appRouter,
   createCallerFactory,
@@ -14,16 +14,25 @@ import {
   clearPublicPhotoPaths,
   publicPhotoKey,
 } from '@markaz/db/storage-admin';
-import { resolveDemoIds, type DemoIds } from './helpers';
+import { cleanup, closePool, createPrincipal, dbReachable } from './helpers/db';
+import { storageEnv, serviceClient } from './helpers/storage';
 
 /**
  * Week 3 closure — publication is an IDEMPOTENT, COMPENSATED workflow. These tests
  * inject controlled faults (non-production) into the real service to prove the
- * Storage/PostgreSQL cleanup, retry, and idempotency semantics. Requires the live
- * stack + seed. Supabase Storage and PostgreSQL never share one transaction; the
- * DB LIVE transition alone is atomic.
+ * Storage/PostgreSQL cleanup, retry, and idempotency semantics. They SELF-PROVISION
+ * their owner + listings (no demo seed). Supabase Storage and PostgreSQL never share
+ * one transaction; the DB LIVE transition alone is atomic.
  */
-let ids: DemoIds | null = null;
+const env = storageEnv();
+const reachable = env ? await dbReachable() : false;
+const d = reachable ? describe : describe.skip;
+if (!reachable) {
+  // eslint-disable-next-line no-console
+  console.warn('[publication-compensation] skipped — local Supabase stack/env not reachable');
+}
+
+let owner = '';
 let service: SupabaseClient | null = null;
 const created: string[] = [];
 const createCaller = createCallerFactory(appRouter);
@@ -57,18 +66,16 @@ const VALID_DETAILS = {
 };
 
 beforeAll(async () => {
-  ids = await resolveDemoIds();
-  if (!ids) return console.warn('[publication-compensation] Skipped — run `pnpm db:setup`.');
-  service = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false } },
-  );
+  if (!reachable) return;
+  owner = await createPrincipal('pubcomp');
+  service = serviceClient(env!);
 });
 afterAll(async () => {
-  if (ids) {
-    const a = callerFor(ids.customerA);
+  if (reachable) {
+    const a = callerFor(owner);
     for (const id of created) await a.listing.delete({ listingId: id }).catch(() => {});
+    await cleanup();
+    await closePool();
   }
   await closeConnections();
 });
@@ -108,12 +115,12 @@ async function driveToReady(ownerId: string, photoCount: number): Promise<string
 }
 
 const resolve = (listingId: string, inject?: { photoFailAt?: number; dbTxFail?: boolean }) =>
-  withUserContext(getAppDb(), { userId: ids!.customerA, accountType: 'CUSTOMER' }, (tx) =>
-    PublicationReviewService.resolve({ tx, userId: ids!.customerA, listingId }, inject),
+  withUserContext(getAppDb(), { userId: owner, accountType: 'CUSTOMER' }, (tx) =>
+    PublicationReviewService.resolve({ tx, userId: owner, listingId }, inject),
   );
 const submit = (listingId: string) =>
-  withUserContext(getAppDb(), { userId: ids!.customerA, accountType: 'CUSTOMER' }, (tx) =>
-    PublicationReviewService.submit({ tx, userId: ids!.customerA, listingId }),
+  withUserContext(getAppDb(), { userId: owner, accountType: 'CUSTOMER' }, (tx) =>
+    PublicationReviewService.submit({ tx, userId: owner, listingId }),
   );
 
 async function snapshot(listingId: string) {
@@ -139,10 +146,9 @@ async function publicObjectCount(publicId: string): Promise<number> {
   return data?.length ?? 0;
 }
 
-describe('publication compensation + idempotency', () => {
+d('publication compensation + idempotency', () => {
   it('Scenario A — a partial photo-copy failure cleans up and stays recoverable', async () => {
-    if (!ids) return;
-    const listingId = await driveToReady(ids.customerA, 2);
+    const listingId = await driveToReady(owner, 2);
     await submit(listingId);
     await resolve(listingId, { photoFailAt: 1 }); // 2nd photo fails
     const s = await snapshot(listingId);
@@ -154,8 +160,7 @@ describe('publication compensation + idempotency', () => {
   });
 
   it('Scenario B — a database failure after photo copy compensates; retry then succeeds', async () => {
-    if (!ids) return;
-    const listingId = await driveToReady(ids.customerA, 2);
+    const listingId = await driveToReady(owner, 2);
     await submit(listingId);
     await resolve(listingId, { dbTxFail: true });
     let s = await snapshot(listingId);
@@ -172,8 +177,7 @@ describe('publication compensation + idempotency', () => {
   });
 
   it('Scenario C — retry after a partial failure copies once (no duplicate objects)', async () => {
-    if (!ids) return;
-    const listingId = await driveToReady(ids.customerA, 2);
+    const listingId = await driveToReady(owner, 2);
     await submit(listingId);
     await resolve(listingId, { photoFailAt: 1 }); // fails → REJECTED
     await submit(listingId); // resubmit (supersede + new PENDING)
@@ -185,8 +189,7 @@ describe('publication compensation + idempotency', () => {
   });
 
   it('Scenario D — a repeated resolve after success is a no-op (no duplicate photos/requests)', async () => {
-    if (!ids) return;
-    const listingId = await driveToReady(ids.customerA, 2);
+    const listingId = await driveToReady(owner, 2);
     await submit(listingId);
     await resolve(listingId);
     const before = await snapshot(listingId);
@@ -203,8 +206,14 @@ describe('publication compensation + idempotency', () => {
   });
 
   it('Scenario E — repeated cleanup is safe and removes only the supplied keys', async () => {
-    if (!ids) return;
-    const listingId = await driveToReady(ids.customerA, 1);
+    // A sentinel object under an unrelated prefix must survive a targeted cleanup.
+    const sentinelPrefix = `itest-sentinel-${owner.replace(/-/g, '').slice(0, 8)}`;
+    const sentinelKey = `${sentinelPrefix}/keep.txt`;
+    await service!.storage
+      .from('listing-photos')
+      .upload(sentinelKey, new Blob(['keep']), { upsert: true, contentType: 'text/plain' });
+
+    const listingId = await driveToReady(owner, 1);
     await submit(listingId);
     await resolve(listingId);
     const s = await snapshot(listingId);
@@ -218,8 +227,9 @@ describe('publication compensation + idempotency', () => {
     await clearPublicPhotoPaths(listingId);
     await clearPublicPhotoPaths(listingId);
     expect(await publicObjectCount(s.publicId!)).toBe(0);
-    // An unrelated published listing's objects are untouched.
-    const other = await service!.storage.from('listing-photos').list('demo/public', { limit: 10 });
+    // The unrelated sentinel object is untouched.
+    const other = await service!.storage.from('listing-photos').list(sentinelPrefix, { limit: 10 });
     expect(other.data?.length ?? 0).toBeGreaterThan(0);
+    await service!.storage.from('listing-photos').remove([sentinelKey]);
   });
 });

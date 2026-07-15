@@ -1,267 +1,272 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { sql } from 'drizzle-orm';
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { withUserContext, closeConnections } from '@markaz/db';
-import { getAppDb, resolveDemoIds, LISTING_IDS, type DemoIds } from './helpers';
-
 /**
- * Week 3 closure — direct DATABASE and STORAGE boundary proofs. These bypass tRPC
- * and exercise the real RLS / trigger / storage policies (migration 08.3).
- * Requires the live stack + demo seed (`pnpm supabase:reset && pnpm db:setup`).
+ * Week 3 closure — direct DATABASE and STORAGE boundary proofs (migration 08.3).
+ * These bypass tRPC and exercise the real RLS / trigger / Storage policies.
+ * SELF-PROVISIONS its principals + listings (no demo seed) and targets the LOCAL
+ * Supabase stack (storageEnv() refuses any non-loopback URL). Skips honestly only
+ * when the local stack/env is unavailable.
  */
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const DEMO_PASSWORD = process.env.DEMO_CUSTOMER_A_PASSWORD ?? 'Markaz!Demo1';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { type SupabaseClient } from '@supabase/supabase-js';
+import {
+  asService,
+  asUser,
+  cleanup,
+  closePool,
+  createAuthedPrincipal,
+  createListing,
+  createPhoto,
+  createPrincipal,
+  dbReachable,
+  expectError,
+  saveListingAs,
+} from './helpers/db';
+import { anonClient, serviceClient, signedInClient, storageEnv } from './helpers/storage';
 
-// Fixed demo listing ids (setup-demo.ts).
-const L = {
-  aLive: '00000000-0000-0000-0000-0000000020a1',
-  bLive: '00000000-0000-0000-0000-0000000020b1',
-  bPaused: '00000000-0000-0000-0000-0000000020b2',
-  bDraft: '00000000-0000-0000-0000-0000000021b1',
-  aReady: LISTING_IDS.readyToPublish,
-} as const;
+const env = storageEnv();
+const reachable = env ? await dbReachable() : false;
+const d = reachable ? describe : describe.skip;
+if (!reachable) {
+  // eslint-disable-next-line no-console
+  console.warn('[publication-security] skipped — local Supabase stack/env not reachable');
+}
 
-let ids: DemoIds | null = null;
-beforeAll(async () => {
-  ids = await resolveDemoIds();
-  if (!ids) console.warn('[publication-security] Skipped — run `pnpm db:setup`.');
-});
+// One shared postgres pool backs every describe in this file — close it once, at the end.
 afterAll(async () => {
-  await closeConnections();
+  await closePool();
 });
-
-const asA = <T>(fn: Parameters<typeof withUserContext>[2]) =>
-  withUserContext(
-    getAppDb(),
-    { userId: ids!.customerA, accountType: 'CUSTOMER' },
-    fn,
-  ) as Promise<T>;
-const rows = <T = Record<string, unknown>>(r: unknown): T[] => r as T[];
 
 // --- Storage boundary --------------------------------------------------------
-describe('public photo Storage boundary (migration 08.3)', () => {
-  const PUBLIC_PATH = 'integration/published-cover.txt';
-  let service: SupabaseClient | null = null;
-  let authed: SupabaseClient | null = null;
-  let available = false;
+d('public photo Storage boundary (migration 08.3)', () => {
+  let service: SupabaseClient;
+  let anon: SupabaseClient;
+  let authed: SupabaseClient;
+  let prefix = '';
+  let publicPath = '';
 
   beforeAll(async () => {
-    if (!url || !anonKey || !serviceKey || !ids) return;
-    service = createClient(url, serviceKey, { auth: { persistSession: false } });
-    authed = createClient(url, anonKey, { auth: { persistSession: false } });
-    const signIn = await authed.auth.signInWithPassword({
-      email: 'customer-a@markaz.demo',
-      password: DEMO_PASSWORD,
+    service = serviceClient(env!);
+    anon = anonClient(env!);
+    const principal = await createAuthedPrincipal('pubsec_storage');
+    if (!principal) throw new Error('expected an authed principal in a reachable stack');
+    authed = await signedInClient(env!, principal.email, principal.password);
+    prefix = `itest-${principal.id.replace(/-/g, '').slice(0, 8)}`;
+    publicPath = `${prefix}/published-cover.txt`;
+    await service.storage.from('listing-photos').upload(publicPath, new Blob(['published cover']), {
+      upsert: true,
+      contentType: 'text/plain',
     });
-    if (signIn.error) return;
-    const up = await service.storage
-      .from('listing-photos')
-      .upload(PUBLIC_PATH, new Blob(['published cover']), {
-        upsert: true,
-        contentType: 'text/plain',
-      });
-    available = !up.error;
   });
   afterAll(async () => {
-    if (service)
-      await service.storage
-        .from('listing-photos')
-        .remove([PUBLIC_PATH, 'integration/customer-write.txt']);
+    await service.storage
+      .from('listing-photos')
+      .remove([publicPath, `${prefix}/customer-write.txt`, `${prefix}/service-copy.txt`]);
+    await cleanup();
   });
 
   it('the publication service (service-role) can copy and clean up public photos', async () => {
-    if (!available) return;
-    const tmp = 'integration/service-copy.txt';
-    const up = await service!.storage
+    const tmp = `${prefix}/service-copy.txt`;
+    const up = await service.storage
       .from('listing-photos')
       .upload(tmp, new Blob(['svc']), { upsert: true });
     expect(up.error).toBeNull();
-    const rm = await service!.storage.from('listing-photos').remove([tmp]);
+    const rm = await service.storage.from('listing-photos').remove([tmp]);
     expect(rm.error).toBeNull();
   });
 
   it('anonymous and authenticated customers can READ a published photo', async () => {
-    if (!available) return;
-    const pub = service!.storage.from('listing-photos').getPublicUrl(PUBLIC_PATH);
+    const pub = service.storage.from('listing-photos').getPublicUrl(publicPath);
     expect((await fetch(pub.data.publicUrl)).status).toBe(200);
-    const dl = await authed!.storage.from('listing-photos').download(PUBLIC_PATH);
+    const dl = await authed.storage.from('listing-photos').download(publicPath);
     expect(dl.error).toBeNull();
+    const anonDl = await anon.storage.from('listing-photos').download(publicPath);
+    expect(anonDl.error).toBeNull();
   });
 
   it('an authenticated customer CANNOT insert into the public bucket', async () => {
-    if (!available) return;
-    const up = await authed!.storage
+    const up = await authed.storage
       .from('listing-photos')
-      .upload('integration/customer-write.txt', new Blob(['nope']), { upsert: false });
+      .upload(`${prefix}/customer-write.txt`, new Blob(['nope']), { upsert: false });
     expect(up.error).not.toBeNull();
   });
 
   it('an authenticated customer CANNOT overwrite or delete a public object', async () => {
-    if (!available) return;
-    // Overwrite (update) attempt.
-    const over = await authed!.storage
+    const over = await authed.storage
       .from('listing-photos')
-      .upload(PUBLIC_PATH, new Blob(['hacked']), { upsert: true });
+      .upload(publicPath, new Blob(['hacked']), { upsert: true });
     expect(over.error).not.toBeNull();
     // Delete attempt — object must survive (RLS filters the delete to nothing).
-    await authed!.storage.from('listing-photos').remove([PUBLIC_PATH]);
-    const stillThere = await service!.storage.from('listing-photos').download(PUBLIC_PATH);
+    await authed.storage.from('listing-photos').remove([publicPath]);
+    const stillThere = await service.storage.from('listing-photos').download(publicPath);
     expect(stillThere.error).toBeNull();
   });
 });
 
 // --- property_photos.public_path protection ---------------------------------
-describe('public_path is server-only (guard_public_photo_path trigger)', () => {
+d('public_path is server-only (guard_public_photo_path trigger)', () => {
+  let customerA = '';
+  let ready = '';
+  let photoId = '';
+
+  beforeAll(async () => {
+    customerA = await createPrincipal('pubsec_pp');
+    ready = await createListing(customerA, { state: 'READY_TO_PUBLISH' });
+    photoId = await createPhoto(ready, {
+      isCover: true,
+      sortOrder: 0,
+      storagePath: `${customerA}/${ready}/p0.jpg`,
+    });
+    await createPhoto(ready, {
+      isCover: false,
+      sortOrder: 1,
+      storagePath: `${customerA}/${ready}/p1.jpg`,
+    });
+  });
+  afterAll(async () => {
+    await cleanup();
+  });
+
   it('an authenticated customer CANNOT set public_path on their own photo', async () => {
-    if (!ids) return;
-    await expect(
-      asA((tx) =>
-        tx.execute(sql`update public.property_photos set public_path = 'hack/cover.jpg'
-                       where listing_id = ${L.aReady}`),
-      ),
-    ).rejects.toThrow();
+    await expectError(
+      () =>
+        asUser(
+          customerA,
+          (tx) =>
+            tx`update public.property_photos set public_path = 'hack/cover.jpg' where listing_id = ${ready}`,
+        ),
+      /publication service|permission denied|check/i,
+    );
   });
 
   it('an authenticated customer CANNOT insert a photo carrying a public_path', async () => {
-    if (!ids) return;
-    await expect(
-      asA((tx) =>
-        tx.execute(sql`insert into public.property_photos (listing_id, storage_path, public_path, is_cover, sort_order)
-                       values (${L.aReady}, 'listing-photos-draft/x.jpg', 'hack/x.jpg', false, 99)`),
-      ),
-    ).rejects.toThrow();
+    await expectError(
+      () =>
+        asUser(
+          customerA,
+          (tx) =>
+            tx`insert into public.property_photos (listing_id, storage_path, public_path, is_cover, sort_order)
+               values (${ready}, 'listing-photos-draft/x.jpg', 'hack/x.jpg', false, 99)`,
+        ),
+      /publication service|permission denied|check|violates/i,
+    );
   });
 
   it('the elevated postgres role CAN set/clear public_path (publication pipeline path)', async () => {
-    if (!ids) return;
-    const db = getAppDb();
-    const before = rows<{ id: string; public_path: string | null }>(
-      await db.execute(
-        sql`select id::text, public_path from public.property_photos where listing_id = ${L.aReady} order by sort_order limit 1`,
-      ),
-    )[0];
-    if (!before) return;
-    await db.execute(
-      sql`update public.property_photos set public_path = 'integration/elevated.jpg' where id = ${before.id}`,
+    await asService(
+      (tx) =>
+        tx`update public.property_photos set public_path = 'integration/elevated.jpg' where id = ${photoId}`,
     );
-    const mid = rows<{ public_path: string }>(
-      await db.execute(sql`select public_path from public.property_photos where id = ${before.id}`),
-    )[0];
-    expect(mid?.public_path).toBe('integration/elevated.jpg');
-    // restore
-    await db.execute(
-      sql`update public.property_photos set public_path = ${before.public_path} where id = ${before.id}`,
+    const mid = await asService(
+      (tx) => tx`select public_path from public.property_photos where id = ${photoId}`,
+    );
+    expect((mid[0] as { public_path: string }).public_path).toBe('integration/elevated.jpg');
+    await asService(
+      (tx) => tx`update public.property_photos set public_path = null where id = ${photoId}`,
     );
   });
 });
 
 // --- saved_properties database boundary --------------------------------------
-describe('saved_properties database boundary (migration 08.3)', () => {
-  async function clearSave(listingId: string) {
-    await getAppDb().execute(
-      sql`delete from public.saved_properties where customer_id = ${ids!.customerA} and listing_id = ${listingId}`,
-    );
-  }
-  async function restoreSave(listingId: string) {
-    await getAppDb().execute(
-      sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${listingId}) on conflict do nothing`,
-    );
-  }
+d('saved_properties database boundary (migration 08.3)', () => {
+  let customerA = '';
+  let customerB = '';
+  let aLive = '';
+  let bLive = '';
+  let bPaused = '';
+  let bDraft = '';
+
+  beforeAll(async () => {
+    customerA = await createPrincipal('pubsec_save_a');
+    customerB = await createPrincipal('pubsec_save_b');
+    aLive = await createListing(customerA, { state: 'LIVE' });
+    bLive = await createListing(customerB, { state: 'LIVE' });
+    bPaused = await createListing(customerB, { state: 'PAUSED' });
+    bDraft = await createListing(customerB, { state: 'DRAFT' });
+  });
+  afterAll(async () => {
+    await cleanup();
+  });
 
   it("Customer A CAN save Customer B's LIVE listing", async () => {
-    if (!ids) return;
-    await clearSave(L.bLive);
-    await asA((tx) =>
-      tx.execute(
-        sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${L.bLive})`,
-      ),
+    await asUser(
+      customerA,
+      (tx) =>
+        tx`insert into public.saved_properties (customer_id, listing_id) values (${customerA}, ${bLive})`,
     );
-    const got = rows(
-      await getAppDb().execute(
-        sql`select id from public.saved_properties where customer_id = ${ids!.customerA} and listing_id = ${L.bLive}`,
-      ),
+    const got = await asService(
+      (tx) =>
+        tx`select id from public.saved_properties where customer_id = ${customerA} and listing_id = ${bLive}`,
     );
-    expect(got).toHaveLength(1);
+    expect(got.length).toBe(1);
   });
 
   it('Customer A CANNOT save their OWN listing', async () => {
-    if (!ids) return;
-    await clearSave(L.aLive);
-    await expect(
-      asA((tx) =>
-        tx.execute(
-          sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${L.aLive})`,
+    await expectError(
+      () =>
+        asUser(
+          customerA,
+          (tx) =>
+            tx`insert into public.saved_properties (customer_id, listing_id) values (${customerA}, ${aLive})`,
         ),
-      ),
-    ).rejects.toThrow();
+      /violates row-level security|new row violates|permission denied/i,
+    );
   });
 
   it('Customer A CANNOT save a PAUSED listing', async () => {
-    if (!ids) return;
-    await clearSave(L.bPaused);
-    await expect(
-      asA((tx) =>
-        tx.execute(
-          sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${L.bPaused})`,
+    await expectError(
+      () =>
+        asUser(
+          customerA,
+          (tx) =>
+            tx`insert into public.saved_properties (customer_id, listing_id) values (${customerA}, ${bPaused})`,
         ),
-      ),
-    ).rejects.toThrow();
-    await restoreSave(L.bPaused); // restore the seeded "unavailable saved" stub
+      /violates row-level security|new row violates|permission denied/i,
+    );
   });
 
   it('Customer A CANNOT save a non-LIVE (DRAFT) listing', async () => {
-    if (!ids) return;
-    await expect(
-      asA((tx) =>
-        tx.execute(
-          sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerA}, ${L.bDraft})`,
+    await expectError(
+      () =>
+        asUser(
+          customerA,
+          (tx) =>
+            tx`insert into public.saved_properties (customer_id, listing_id) values (${customerA}, ${bDraft})`,
         ),
-      ),
-    ).rejects.toThrow();
+      /violates row-level security|new row violates|permission denied/i,
+    );
   });
 
   it('Customer A CANNOT insert a save row on behalf of Customer B', async () => {
-    if (!ids) return;
-    await expect(
-      asA((tx) =>
-        tx.execute(
-          sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerB}, ${L.bLive})`,
+    await expectError(
+      () =>
+        asUser(
+          customerA,
+          (tx) =>
+            tx`insert into public.saved_properties (customer_id, listing_id) values (${customerB}, ${bLive})`,
         ),
-      ),
-    ).rejects.toThrow();
+      /violates row-level security|new row violates|permission denied/i,
+    );
   });
 
   it("Customer A CANNOT read Customer B's saved rows", async () => {
-    if (!ids) return;
-    // Ensure B has at least one save (as postgres).
-    await getAppDb().execute(
-      sql`insert into public.saved_properties (customer_id, listing_id) values (${ids!.customerB}, ${L.aLive}) on conflict do nothing`,
+    // Ensure B has at least one save (as the postgres role).
+    await saveListingAs(customerB, aLive);
+    const visible = await asUser(
+      customerA,
+      (tx) => tx`select id from public.saved_properties where customer_id = ${customerB}`,
     );
-    const visible = await asA((tx) =>
-      tx.execute(sql`select id from public.saved_properties where customer_id = ${ids!.customerB}`),
-    );
-    expect(rows(visible)).toHaveLength(0);
-    await getAppDb().execute(
-      sql`delete from public.saved_properties where customer_id = ${ids!.customerB} and listing_id = ${L.aLive}`,
-    );
+    expect(visible.length).toBe(0);
   });
 
   it('Customer A CAN remove their own save', async () => {
-    if (!ids) return;
-    await restoreSave(L.bLive);
-    await asA((tx) =>
-      tx.execute(
-        sql`delete from public.saved_properties where customer_id = ${ids!.customerA} and listing_id = ${L.bLive}`,
-      ),
+    await asUser(
+      customerA,
+      (tx) =>
+        tx`delete from public.saved_properties where customer_id = ${customerA} and listing_id = ${bLive}`,
     );
-    const got = rows(
-      await getAppDb().execute(
-        sql`select id from public.saved_properties where customer_id = ${ids!.customerA} and listing_id = ${L.bLive}`,
-      ),
+    const got = await asService(
+      (tx) =>
+        tx`select id from public.saved_properties where customer_id = ${customerA} and listing_id = ${bLive}`,
     );
-    expect(got).toHaveLength(0);
-    await restoreSave(L.bLive); // leave the seed's available-saved card intact
+    expect(got.length).toBe(0);
   });
 });

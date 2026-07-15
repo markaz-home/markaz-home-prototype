@@ -1,72 +1,81 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import postgres from 'postgres';
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { DEMO_EMAILS } from './helpers';
-
 /**
- * Account-provisioning + duplicate-email safety (Week 1.5).
- * Requires the local stack + `pnpm db:setup`. Self-skips otherwise.
+ * Account-provisioning + duplicate-email safety (Week 1.5). SELF-PROVISIONS its
+ * principals (no demo seed): the `handle_new_user` trigger creates each profile, and
+ * the Admin API rejects a duplicate email. Skips honestly only when the local
+ * stack/env is unavailable.
  */
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const dbUrl =
-  process.env.DIRECT_DATABASE_URL ??
-  process.env.DATABASE_URL ??
-  'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { type SupabaseClient } from '@supabase/supabase-js';
+import {
+  asService,
+  cleanup,
+  closePool,
+  createAdmin,
+  createNamedPrincipal,
+  dbReachable,
+  type Principal,
+} from './helpers/db';
+import { serviceClient, storageEnv } from './helpers/storage';
 
-let available = false;
-let admin: SupabaseClient | null = null;
-const sql = postgres(dbUrl, { max: 1, connect_timeout: 3 });
+const env = storageEnv();
+const reachable = env ? await dbReachable() : false;
+const d = reachable ? describe : describe.skip;
+if (!reachable) {
+  // eslint-disable-next-line no-console
+  console.warn('[provisioning] skipped — local Supabase stack/env not reachable');
+}
 
-beforeAll(async () => {
-  if (!url || !serviceKey) return;
-  admin = createClient(url, serviceKey, { auth: { persistSession: false } });
-  try {
-    const rows = await sql<
-      { n: number }[]
-    >`select count(*)::int as n from public.profiles where email = ${DEMO_EMAILS.admin}`;
-    available = Number(rows[0]?.n ?? 0) > 0;
-  } catch {
-    available = false;
-  }
-});
-afterAll(async () => {
-  await sql.end({ timeout: 2 });
-});
+d('account provisioning', () => {
+  let admin: SupabaseClient;
+  let customer: Principal;
+  let adminId = '';
 
-describe('account provisioning', () => {
-  it('the admin is provisioned as ADMIN; customers as CUSTOMER', async () => {
-    if (!available) return;
-    const rows = await sql<{ email: string; account_type: string }[]>`
-      select email, account_type::text as account_type from public.profiles
-      where email in (${DEMO_EMAILS.customerA}, ${DEMO_EMAILS.customerB}, ${DEMO_EMAILS.admin})`;
-    const byEmail = new Map(rows.map((r) => [r.email, r.account_type]));
-    expect(byEmail.get(DEMO_EMAILS.customerA)).toBe('CUSTOMER');
-    expect(byEmail.get(DEMO_EMAILS.customerB)).toBe('CUSTOMER');
-    expect(byEmail.get(DEMO_EMAILS.admin)).toBe('ADMIN');
+  beforeAll(async () => {
+    admin = serviceClient(env!);
+    customer = await createNamedPrincipal('prov_customer');
+    adminId = await createAdmin('prov_admin');
+  });
+  afterAll(async () => {
+    await cleanup();
+    await closePool();
+  });
+
+  it('a self-provisioned account is CUSTOMER; the bootstrapped admin is ADMIN', async () => {
+    const rows = await asService(
+      (tx) =>
+        tx`select id::text, account_type::text as account_type from public.profiles
+           where id in (${customer.id}, ${adminId})`,
+    );
+    const byId = new Map(
+      (rows as unknown as Array<{ id: string; account_type: string }>).map((r) => [
+        r.id,
+        r.account_type,
+      ]),
+    );
+    expect(byId.get(customer.id)).toBe('CUSTOMER');
+    expect(byId.get(adminId)).toBe('ADMIN');
   });
 
   it('signing up an existing email does not create a second profile', async () => {
-    if (!available || !admin) return;
     // Admin API createUser for an existing email must fail (no duplicate Auth user).
     const { error } = await admin.auth.admin.createUser({
-      email: DEMO_EMAILS.customerA,
+      email: customer.email,
       password: 'Another!Pass1',
       email_confirm: true,
     });
     expect(error).toBeTruthy();
-    // And exactly one profile remains for that email.
-    const rows = await sql<
-      { n: number }[]
-    >`select count(*)::int as n from public.profiles where email = ${DEMO_EMAILS.customerA}`;
-    expect(Number(rows[0]?.n)).toBe(1);
+    const rows = await asService(
+      (tx) => tx`select count(*)::int as n from public.profiles where email = ${customer.email}`,
+    );
+    expect((rows[0] as { n: number }).n).toBe(1);
   });
 
-  it('every profile maps 1:1 to an auth user (idempotent creation)', async () => {
-    if (!available) return;
-    const rows = await sql<{ orphans: number }[]>`
-      select count(*)::int as orphans from public.profiles p
-      left join auth.users u on u.id = p.id where u.id is null`;
-    expect(Number(rows[0]?.orphans)).toBe(0);
+  it('every profile maps 1:1 to an auth user (no orphans)', async () => {
+    const rows = await asService(
+      (tx) =>
+        tx`select count(*)::int as orphans from public.profiles p
+           left join auth.users u on u.id = p.id where u.id is null`,
+    );
+    expect((rows[0] as { orphans: number }).orphans).toBe(0);
   });
 });

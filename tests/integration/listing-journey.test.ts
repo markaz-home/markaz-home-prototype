@@ -2,14 +2,22 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { appRouter, createCallerFactory, type Context } from '@markaz/api';
 import { logger } from '@markaz/observability';
 import { getAppDb, closeConnections } from '@markaz/db';
-import { resolveDemoIds, type DemoIds } from './helpers';
+import { cleanup, closePool, createPrincipal, dbReachable } from './helpers/db';
 
 /**
  * Property-listing journey — backend integration (Week 2). Drives the real tRPC
  * router under each customer's RLS context against the live local stack.
- * Requires: pnpm supabase:start && pnpm supabase:reset && pnpm db:setup.
+ * SELF-PROVISIONS its customers (no demo seed).
  */
-let ids: DemoIds | null = null;
+const reachable = await dbReachable();
+const d = reachable ? describe : describe.skip;
+if (!reachable) {
+  // eslint-disable-next-line no-console
+  console.warn('[listing-journey] skipped — local Postgres not reachable');
+}
+
+let customerA = '';
+let customerB = '';
 const createCaller = createCallerFactory(appRouter);
 
 function callerFor(userId: string) {
@@ -42,14 +50,17 @@ const VALID_DETAILS = {
 const created: string[] = [];
 
 beforeAll(async () => {
-  ids = await resolveDemoIds();
-  if (!ids) console.warn('[listing-journey] Skipped — run `pnpm db:setup`.');
+  if (!reachable) return;
+  customerA = await createPrincipal('journey_a');
+  customerB = await createPrincipal('journey_b');
 });
 afterAll(async () => {
-  if (ids) {
-    const a = callerFor(ids.customerA);
+  if (reachable) {
+    const a = callerFor(customerA);
     for (const id of created)
       await a.listing.delete({ listingId: id, confirm: true } as never).catch(() => {});
+    await cleanup();
+    await closePool();
   }
   await closeConnections();
 });
@@ -91,10 +102,9 @@ async function drive(a: ReturnType<typeof callerFor>, listingId: string) {
   await a.listing.permit.status({ listingId });
 }
 
-describe('listing journey (backend)', () => {
+d('listing journey (backend)', () => {
   it('a customer drives a draft all the way to READY_TO_PUBLISH', async () => {
-    if (!ids) return;
-    const a = callerFor(ids.customerA);
+    const a = callerFor(customerA);
     const { listingId } = await a.listing.create();
     created.push(listingId);
 
@@ -111,9 +121,8 @@ describe('listing journey (backend)', () => {
   });
 
   it('another customer cannot read or mutate the draft (NOT_FOUND)', async () => {
-    if (!ids) return;
-    const a = callerFor(ids.customerA);
-    const b = callerFor(ids.customerB);
+    const a = callerFor(customerA);
+    const b = callerFor(customerB);
     const { listingId } = await a.listing.create();
     created.push(listingId);
     await expect(b.listing.get({ listingId })).rejects.toMatchObject({ code: 'NOT_FOUND' });
@@ -123,8 +132,7 @@ describe('listing journey (backend)', () => {
   });
 
   it('server readiness blocks markReady until every required section is complete', async () => {
-    if (!ids) return;
-    const a = callerFor(ids.customerA);
+    const a = callerFor(customerA);
     const { listingId } = await a.listing.create();
     created.push(listingId);
     await a.listing.saveDetails({ listingId, ...VALID_DETAILS });
@@ -132,8 +140,7 @@ describe('listing journey (backend)', () => {
   });
 
   it('ownership verification supports failure then retry; permit too', async () => {
-    if (!ids) return;
-    const a = callerFor(ids.customerA);
+    const a = callerFor(customerA);
     const { listingId } = await a.listing.create();
     created.push(listingId);
     await a.listing.saveDetails({ listingId, ...VALID_DETAILS });
@@ -154,8 +161,7 @@ describe('listing journey (backend)', () => {
   });
 
   it('the preview projection excludes private fields (unit id, occupancy, hidden IC)', async () => {
-    if (!ids) return;
-    const a = callerFor(ids.customerA);
+    const a = callerFor(customerA);
     const { listingId } = await a.listing.create();
     created.push(listingId);
     await drive(a, listingId);
@@ -169,8 +175,7 @@ describe('listing journey (backend)', () => {
   });
 
   it('replacing the document resets verification and rewinds the listing', async () => {
-    if (!ids) return;
-    const a = callerFor(ids.customerA);
+    const a = callerFor(customerA);
     const { listingId } = await a.listing.create();
     created.push(listingId);
     await a.listing.saveDetails({ listingId, ...VALID_DETAILS });

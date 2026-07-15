@@ -1,17 +1,27 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { type SupabaseClient } from '@supabase/supabase-js';
 import { appRouter, createCallerFactory, type Context } from '@markaz/api';
 import { logger } from '@markaz/observability';
 import { getAppDb, closeConnections } from '@markaz/db';
-import { resolveDemoIds, type DemoIds } from './helpers';
+import { cleanup, closePool, createPrincipal, dbReachable } from './helpers/db';
+import { storageEnv, serviceClient } from './helpers/storage';
 
 /**
  * Publication → marketplace backend integration (Week 3). Drives a listing to
  * LIVE through the real publication review + public-photo pipeline, then exercises
- * the anonymous marketplace, saves, privacy, and pause/resume. Requires the live
- * stack + `pnpm db:setup`.
+ * the anonymous marketplace, saves, privacy, and pause/resume. SELF-PROVISIONS its
+ * customers (no demo seed); runs against the live local stack.
  */
-let ids: DemoIds | null = null;
+const env = storageEnv();
+const reachable = env ? await dbReachable() : false;
+const d = reachable ? describe : describe.skip;
+if (!reachable) {
+  // eslint-disable-next-line no-console
+  console.warn('[publication-marketplace] skipped — local Supabase stack/env not reachable');
+}
+
+let customerA = '';
+let customerB = '';
 let admin: SupabaseClient | null = null;
 const createCaller = createCallerFactory(appRouter);
 const created: string[] = [];
@@ -48,18 +58,17 @@ const VALID_DETAILS = {
 };
 
 beforeAll(async () => {
-  ids = await resolveDemoIds();
-  if (!ids) return console.warn('[publication-marketplace] Skipped — run `pnpm db:setup`.');
-  admin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false } },
-  );
+  if (!reachable) return;
+  customerA = await createPrincipal('mkt_a');
+  customerB = await createPrincipal('mkt_b');
+  admin = serviceClient(env!);
 });
 afterAll(async () => {
-  if (ids) {
-    const a = callerFor(ids.customerA);
+  if (reachable) {
+    const a = callerFor(customerA);
     for (const id of created) await a.listing.delete({ listingId: id }).catch(() => {});
+    await cleanup();
+    await closePool();
   }
   await closeConnections();
 });
@@ -97,11 +106,10 @@ async function driveToLive(a: ReturnType<typeof callerFor>, ownerId: string): Pr
   return listingId;
 }
 
-describe('publication → marketplace', () => {
+d('publication → marketplace', () => {
   it('publishes a READY listing to LIVE and exposes it in the anonymous marketplace', async () => {
-    if (!ids) return;
-    const a = callerFor(ids.customerA);
-    const listingId = await driveToLive(a, ids.customerA);
+    const a = callerFor(customerA);
+    const listingId = await driveToLive(a, customerA);
 
     const got = await a.listing.get({ listingId });
     expect(got.state).toBe('LIVE');
@@ -119,15 +127,14 @@ describe('publication → marketplace', () => {
     // Privacy: no unit id, owner id, or private storage path in the public response.
     const json = JSON.stringify(detail);
     expect(json).not.toContain('Unit 9090');
-    expect(json).not.toContain(ids.customerA);
+    expect(json).not.toContain(customerA);
     expect(json).not.toContain('listing-photos-draft');
     expect((detail as Record<string, unknown>).unitIdentifier).toBeUndefined();
   });
 
   it('READY_TO_PUBLISH / PAUSED listings are not public; pause+resume work', async () => {
-    if (!ids) return;
-    const a = callerFor(ids.customerA);
-    const listingId = await driveToLive(a, ids.customerA);
+    const a = callerFor(customerA);
+    const listingId = await driveToLive(a, customerA);
     const publicId = (await a.listing.publication.status({ listingId })).publicId!;
     const anon = anonCaller();
 
@@ -144,10 +151,9 @@ describe('publication → marketplace', () => {
   });
 
   it("save rules: customer saves another customer's LIVE listing; owner cannot save own; unavailable stays safe", async () => {
-    if (!ids) return;
-    const a = callerFor(ids.customerA);
-    const b = callerFor(ids.customerB);
-    const listingId = await driveToLive(a, ids.customerA);
+    const a = callerFor(customerA);
+    const b = callerFor(customerB);
+    const listingId = await driveToLive(a, customerA);
     const publicId = (await a.listing.publication.status({ listingId })).publicId!;
 
     await b.marketplace.saved.save({ publicId });
@@ -169,7 +175,6 @@ describe('publication → marketplace', () => {
   });
 
   it('search filters + sort work over the public view', async () => {
-    if (!ids) return;
     const anon = anonCaller();
     const apts = await anon.marketplace.search({ type: 'APARTMENT', sort: 'PRICE_ASC' });
     expect(apts.items.every((i) => i.propertyType === 'APARTMENT')).toBe(true);
