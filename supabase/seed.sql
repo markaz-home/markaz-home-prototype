@@ -1,16 +1,19 @@
 -- =============================================================================
 -- MARKAZ Home — seed (runs automatically after canonical migrations on reset).
 --
--- Demo Auth users and demo domain data are NO LONGER created here. Writing the
--- Supabase Auth tables from SQL is not an officially supported operation
--- (Week 1.5, ADR-0009), so demo provisioning moved to a supported, idempotent,
--- production-guarded Admin-API script:
+-- No demo customers or demo domain data are seeded — customers sign up through the
+-- app (the handle_new_user trigger creates each profiles row), so a deployment works
+-- with real accounts and needs no demo data.
 --
 --     pnpm supabase:reset      # migrations + this (intentionally empty) seed
---     pnpm db:setup            # creates demo Auth users + demo domain data
+--     pnpm db:setup            # OPTIONAL, env-driven: bootstraps ONE admin via the
+--                              #   Supabase Admin API (BOOTSTRAP_ADMIN_EMAIL/PASSWORD);
+--                              #   a no-op without those env vars. Creates no customers.
 --
--- Keep only schema-independent, Auth-independent setup below (currently none —
--- the realtime_counters 'demo' row is created by migration 05).
+-- Writing the Supabase Auth tables from SQL is not officially supported (ADR-0009),
+-- which is why the admin bootstrap uses the Admin API, not this seed. Keep only
+-- schema-independent, Auth-independent setup below (currently none — the
+-- realtime_counters 'demo' row is created by migration 05).
 -- =============================================================================
 
 -- (intentionally empty)
