@@ -29,15 +29,20 @@ export interface PostAuthState {
 /**
  * Decide where an authenticated user should land. Centralised + fully tested.
  *
- *   email not verified            → verify-email
- *   verified, profile incomplete  → profile-setup (fallback; normal path fills it at sign-up)
- *   verified, complete, identity NOT_STARTED/PENDING/FAILED_DEMO → uae-pass (resumes sub-state)
- *   verified, complete, VERIFIED_DEMO or trusted provider identity → dashboard
+ *   email/password email not verified → verify-email
+ *   authenticated, profile incomplete → profile-setup (fallback; normal path fills it at sign-up)
+ *   complete, identity NOT_STARTED/PENDING/FAILED_DEMO → uae-pass (resumes sub-state)
+ *   complete, VERIFIED_DEMO or trusted provider identity → dashboard
  *
- * Unverified or incomplete customers can never reach the dashboard.
+ * Incomplete customers can never reach the dashboard. Provider-authenticated sessions
+ * do not additionally require MARKAZ's email/password verification code.
  */
 export function resolvePostAuthDestination(state: PostAuthState): PostAuthDestination {
-  if (!state.emailVerified) return 'verify-email';
+  // A trusted external provider (e.g. UAE PASS staging) already authenticated this
+  // session. MARKAZ's own 6-digit email verification is only for email/password
+  // sign-ups — the provider may report the email as unverified (UAE PASS returns
+  // email_verified=false), which must NOT trap the user on the verify-email screen.
+  if (!state.identityAuthenticatedByProvider && !state.emailVerified) return 'verify-email';
   if (!state.profile || !isProfileComplete(state.profile)) return 'profile-setup';
   if (
     !state.identityAuthenticatedByProvider &&

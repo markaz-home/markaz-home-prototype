@@ -29,6 +29,8 @@ export const UAE_PASS_STAGING_ENDPOINTS = {
 /** POC defaults (docs.uaepass.ae): general-profile scope + web SOP-low ACR. */
 export const UAE_PASS_STAGING_SCOPE = 'urn:uae:digitalid:profile:general';
 export const UAE_PASS_STAGING_ACR = 'urn:safelayer:tws:policies:authentication:level:low';
+/** Do not reuse an existing UAE PASS browser SSO session for a new MARKAZ login. */
+export const UAE_PASS_FORCE_AUTH = 'true';
 
 export type UaePassMode = 'simulated' | 'staging';
 
@@ -56,6 +58,10 @@ export interface UaePassProviderConfig {
   userinfoUrl: string;
   scopes: string[];
   authorizationParams: Record<string, string>;
+  /** UAE PASS returns an email only for some account levels; allow email-less logins. */
+  emailOptional: boolean;
+  /** Map the UAE PASS UserInfo claims GoTrue must extract for a generic OAuth2 provider. */
+  attributeMapping: { keys: Record<string, { name: string }> };
 }
 
 /**
@@ -85,6 +91,18 @@ export function getUaePassProviderConfig(): UaePassProviderConfig {
     // Keep the POC deliberately narrow. Expanding scopes or assurance policy is
     // a production-onboarding decision, not an environment-variable override.
     scopes: [UAE_PASS_STAGING_SCOPE],
-    authorizationParams: { acr_values: UAE_PASS_STAGING_ACR },
+    // UAE PASS otherwise defaults `forceAuth` to false and may reuse its browser SSO
+    // session. Its WSO2 authorization layer derives the downstream force-auth flag
+    // from OAuth `prompt=login`; retain the explicit provider flag as well.
+    authorizationParams: {
+      acr_values: UAE_PASS_STAGING_ACR,
+      forceAuth: UAE_PASS_FORCE_AUTH,
+      prompt: 'login',
+    },
+    // UAE PASS may authenticate a tester by mobile/EID with no email; the profile
+    // trigger tolerates that (migration 08.17). For a generic OAuth2 provider GoTrue
+    // needs the claim mapping to extract the subject + email from UserInfo.
+    emailOptional: true,
+    attributeMapping: { keys: { sub: { name: 'sub' }, email: { name: 'email' } } },
   };
 }

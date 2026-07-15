@@ -48,6 +48,7 @@ Sign In → "Continue with UAE PASS Staging"
 | UserInfo           | `https://stg-id.uaepass.ae/idshub/userinfo`                      |
 | Scope              | `urn:uae:digitalid:profile:general`                              |
 | `acr_values` (web) | `urn:safelayer:tws:policies:authentication:level:low`            |
+| Forced re-auth     | `prompt=login` + `forceAuth=true`                                |
 | Token auth         | HTTP Basic `base64(client_id:client_secret)` (handled by GoTrue) |
 | Subject (linking)  | `sub` (UUID)                                                     |
 | SOP field          | `userType` ∈ {SOP1, SOP2, SOP3}                                  |
@@ -74,8 +75,9 @@ UAE_PASS_CLIENT_SECRET=sandbox_stage
 UAE_PASS_ALLOW_REMOTE_SETUP=true
 ```
 
-The POC scope and `acr_values` are fixed in server-only code. They cannot be widened
-through environment variables.
+The POC scope, `acr_values`, and forced re-authentication policy (`prompt=login` plus
+`forceAuth=true`) are fixed in server-only code. They cannot be changed through
+environment variables.
 
 ## Create a UAE PASS staging account
 
@@ -124,7 +126,11 @@ Open `/en/sign-in` → the **"Continue with UAE PASS Staging"** button appears.
 
 Click → redirected to UAE PASS staging → authenticate → back to `/auth/callback` →
 standard Supabase session → first-time users complete profile setup → dashboard. The
-trusted provider identity skips the old simulated UAE PASS step.
+trusted provider identity skips the old simulated UAE PASS step. Each new UAE PASS
+login attempt sends `prompt=login` and `forceAuth=true`, so an existing UAE PASS
+browser SSO session is not silently reused and UAE PASS must start a fresh interactive
+mobile challenge. The matching-code screen and mobile approval UI remain controlled by
+UAE PASS.
 
 ### Expected cancellation / failure flows
 

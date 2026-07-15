@@ -76,6 +76,8 @@ async function main() {
     userinfo_url: cfg.userinfoUrl,
     scopes: cfg.scopes,
     authorization_params: cfg.authorizationParams,
+    email_optional: cfg.emailOptional,
+    attribute_mapping: cfg.attributeMapping,
     enabled: true,
   };
 
