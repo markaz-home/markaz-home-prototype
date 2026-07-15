@@ -10,6 +10,7 @@ import { marketplaceRouter } from './routers/marketplace';
 import { offersRouter } from './routers/offers';
 import { transactionsRouter } from './routers/transactions';
 import { adminRouter } from './routers/admin';
+import { externalPropertiesRouter } from './routers/external-properties';
 
 export const appRouter = router({
   health: healthRouter,
@@ -23,6 +24,7 @@ export const appRouter = router({
   offers: offersRouter,
   transactions: transactionsRouter,
   admin: adminRouter,
+  externalProperties: externalPropertiesRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -101,6 +101,16 @@ async function loadLiveListing(
 }
 
 export const marketplaceRouter = router({
+  /** Small public-safe set for the landing page; avoids loading a full search page. */
+  featured: publicTxProcedure.query(async ({ ctx }) => {
+    const rows = await ctx.tx
+      .select()
+      .from(mv)
+      .orderBy(desc(mv.publishedAt), asc(mv.publicId))
+      .limit(3);
+    return rows.map((row) => toPublicCard(toRow(row)));
+  }),
+
   /** Public, paginated marketplace search (anonymous-or-authenticated). */
   search: publicTxProcedure.input(marketplaceQuerySchema).query(async ({ ctx, input }) => {
     const conds = buildConditions(input);

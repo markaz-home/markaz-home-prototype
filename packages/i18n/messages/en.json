@@ -26,7 +26,15 @@
     "pointListTitle": "List your property",
     "pointListBody": "Create a listing, complete the demo verification steps, publish, and manage offers.",
     "pointSecureTitle": "Real, secure foundation",
-    "pointSecureBody": "Email and password sign-in, in-country data, and server-enforced access control."
+    "pointSecureBody": "Email and password sign-in, in-country data, and server-enforced access control.",
+    "featuredTitle": "Featured properties",
+    "featuredBody": "Explore recently published MARKAZ listings and selected external properties.",
+    "featuredViewAll": "View all properties",
+    "featuredSourceMarkaz": "Listed on MARKAZ",
+    "featuredSourceBayut": "External via BayutAPI",
+    "featuredExternalNotice": "External listings are supplied by an unaffiliated third-party API and open on Bayut.",
+    "featuredOpenExternal": "Open external property",
+    "featuredOpenInternal": "View property"
   },
   "auth": {
     "signIn": "Sign in",

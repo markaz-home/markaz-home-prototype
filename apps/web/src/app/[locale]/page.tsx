@@ -5,6 +5,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { BrandLogo } from '@/components/brand-logo';
+import { FeaturedProperties } from '@/components/landing/featured-properties';
 
 export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -50,6 +51,8 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             </Button>
           </div>
         </section>
+
+        <FeaturedProperties />
 
         <section className="mx-auto mt-16 grid max-w-4xl gap-4 sm:grid-cols-3">
           {points.map(({ icon: Icon, title, body }) => (
