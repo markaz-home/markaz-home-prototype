@@ -2,7 +2,7 @@
   "name": "markaz-home",
   "private": true,
   "version": "0.1.0",
-  "description": "MARKAZ Home — UAE real estate marketplace prototype (Week 1 application foundation)",
+  "description": "MARKAZ Home — UAE (Dubai-first) property marketplace prototype: auth/onboarding, listing wizard, publication + public marketplace, offers/negotiation, simulated transactions, and a separate admin operations portal (Weeks 1–6).",
   "packageManager": "pnpm@9.15.4",
   "engines": {
     "node": ">=22.0.0",

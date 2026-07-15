@@ -46,6 +46,18 @@ export function serviceClient(env: StorageEnv): SupabaseClient {
   return createClient(env.url, env.serviceKey, { auth: { persistSession: false } });
 }
 
+/** Is the local Storage API reachable? Used to skip (never vacuously pass) when it is down. */
+export async function storageReachable(env: StorageEnv): Promise<boolean> {
+  try {
+    const { error } = await serviceClient(env)
+      .storage.from('listing-photos')
+      .list('', { limit: 1 });
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
 export function anonClient(env: StorageEnv): SupabaseClient {
   return createClient(env.url, env.anonKey, { auth: { persistSession: false } });
 }
