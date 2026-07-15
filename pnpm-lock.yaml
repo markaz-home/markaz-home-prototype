@@ -344,6 +344,9 @@ importers:
       '@trpc/client':
         specifier: ^11.0.0-rc.660
         version: 11.18.0(@trpc/server@11.18.0(typescript@5.9.3))(typescript@5.9.3)
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.0
       eslint:
         specifier: ^9.17.0
         version: 9.39.4(jiti@1.21.7)
@@ -372,6 +375,9 @@ importers:
       '@markaz/config':
         specifier: workspace:*
         version: link:../config
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.0
       eslint:
         specifier: ^9.17.0
         version: 9.39.4(jiti@1.21.7)
@@ -442,6 +448,9 @@ importers:
       '@markaz/config':
         specifier: workspace:*
         version: link:../config
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.0
       dotenv:
         specifier: ^16.4.7
         version: 16.6.1
@@ -470,6 +479,9 @@ importers:
       '@markaz/config':
         specifier: workspace:*
         version: link:../config
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.0
       eslint:
         specifier: ^9.17.0
         version: 9.39.4(jiti@1.21.7)
@@ -489,6 +501,9 @@ importers:
       '@markaz/config':
         specifier: workspace:*
         version: link:../config
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.0
       eslint:
         specifier: ^9.17.0
         version: 9.39.4(jiti@1.21.7)
@@ -508,6 +523,9 @@ importers:
       '@markaz/config':
         specifier: workspace:*
         version: link:../config
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.0
       eslint:
         specifier: ^9.17.0
         version: 9.39.4(jiti@1.21.7)
@@ -579,6 +597,9 @@ importers:
       '@markaz/config':
         specifier: workspace:*
         version: link:../config
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.0
       '@types/react':
         specifier: ^19.0.2
         version: 19.2.17
@@ -628,6 +649,9 @@ importers:
       '@markaz/config':
         specifier: workspace:*
         version: link:../packages/config
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.0
       dotenv:
         specifier: ^16.4.7
         version: 16.6.1
