@@ -63,6 +63,29 @@ async function propertyFor(tx: Tx, listingId: string): Promise<TxPropertyJson | 
   return (r as unknown as Array<{ j: TxPropertyJson | null }>)[0]?.j ?? null;
 }
 
+/**
+ * Batch-load the property summary for many listings in ONE round-trip (avoids the
+ * per-row N+1 that `listMine` previously incurred). Runs inside the caller's RLS
+ * transaction, so `offer_listing_summary` still authorises via `auth.uid()`.
+ */
+async function propertiesFor(
+  tx: Tx,
+  listingIds: string[],
+): Promise<Map<string, TxPropertyJson | null>> {
+  const map = new Map<string, TxPropertyJson | null>();
+  if (listingIds.length === 0) return map;
+  const idParams = sql.join(
+    listingIds.map((id) => sql`${id}::uuid`),
+    sql`, `,
+  );
+  const rows = (await tx.execute(sql`
+    select t.id::text as listing_id, public.offer_listing_summary(t.id) as j
+    from unnest(array[${idParams}]) as t(id)
+  `)) as unknown as Array<{ listing_id: string; j: TxPropertyJson | null }>;
+  for (const r of rows) map.set(r.listing_id, r.j ?? null);
+  return map;
+}
+
 async function loadTransaction(tx: Tx, transactionId: string): Promise<TxRow | null> {
   const [row] = await tx
     .select()
@@ -107,22 +130,17 @@ export const transactionsRouter = router({
       .where(inArray(transactionTasks.transactionId, ids))) as unknown as (TaskRow & {
       transactionId: string;
     })[];
-    const out = [];
-    for (const row of rows) {
-      const property = await propertyFor(
-        ctx.tx,
-        (row as unknown as { listingId: string }).listingId,
-      );
-      out.push(
-        toTransactionListItem(
-          row,
-          ctx.user.id,
-          property,
-          tasks.filter((t) => t.transactionId === row.id),
-        ),
-      );
-    }
-    return out;
+    const propertyByListing = await propertiesFor(ctx.tx, [
+      ...new Set(rows.map((r) => r.listingId)),
+    ]);
+    return rows.map((row) =>
+      toTransactionListItem(
+        row,
+        ctx.user.id,
+        propertyByListing.get(row.listingId) ?? null,
+        tasks.filter((t) => t.transactionId === row.id),
+      ),
+    );
   }),
 
   /** Full perspective-aware workspace detail. Missing == forbidden (safe copy). */
@@ -131,7 +149,7 @@ export const transactionsRouter = router({
     .query(async ({ ctx, input }) => {
       const row = await loadTransaction(ctx.tx, input.transactionId);
       if (!row) throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_AVAILABLE' });
-      const listingId = (row as unknown as { listingId: string }).listingId;
+      const listingId = row.listingId;
       const [tasks, events, docs, property] = await Promise.all([
         ctx.tx
           .select()

@@ -53,6 +53,7 @@ export function mapProperty(p: TxPropertyJson | null) {
 
 export interface TxRow {
   id: string;
+  listingId: string;
   reference: string;
   status: TransactionStatus;
   nextActor: TransactionNextActor;
