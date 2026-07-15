@@ -29,7 +29,15 @@
     "pointListTitle": "أدرج عقارك",
     "pointListBody": "أنشئ إعلانًا وأكمل خطوات التحقق التجريبية وانشره وأدر العروض.",
     "pointSecureTitle": "أساس حقيقي وآمن",
-    "pointSecureBody": "تسجيل الدخول بالبريد الإلكتروني وكلمة المرور، وبيانات داخل الدولة، وتحكم في الوصول يُفرض من الخادم."
+    "pointSecureBody": "تسجيل الدخول بالبريد الإلكتروني وكلمة المرور، وبيانات داخل الدولة، وتحكم في الوصول يُفرض من الخادم.",
+    "featuredTitle": "عقارات مميزة",
+    "featuredBody": "استكشف أحدث إعلانات MARKAZ ومجموعة مختارة من العقارات الخارجية.",
+    "featuredViewAll": "عرض جميع العقارات",
+    "featuredSourceMarkaz": "مدرج على MARKAZ",
+    "featuredSourceBayut": "مصدر خارجي عبر BayutAPI",
+    "featuredExternalNotice": "يتم توفير الإعلانات الخارجية عبر واجهة برمجة تطبيقات خارجية غير تابعة لـ MARKAZ، وتُفتح على موقع بيوت.",
+    "featuredOpenExternal": "فتح العقار الخارجي",
+    "featuredOpenInternal": "عرض العقار"
   },
   "auth": {
     "signIn": "تسجيل الدخول",
