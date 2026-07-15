@@ -1,5 +1,6 @@
 import { config as loadEnv } from 'dotenv';
 import createNextIntlPlugin from 'next-intl/plugin';
+import withBundleAnalyzerFactory from '@next/bundle-analyzer';
 
 // Env precedence (Next convention): .env.local (gitignored, local-dev overrides) wins,
 // then the shared monorepo-root .env (the hosted/deploy contract). dotenv keeps the FIRST
@@ -9,6 +10,12 @@ loadEnv({ path: '../../.env.local' });
 loadEnv({ path: '../../.env' });
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
+// `ANALYZE=true pnpm --filter @markaz/web analyze` writes an interactive treemap of
+// the bundle to .next/analyze. Off by default (a no-op wrapper). See docs/runbooks/measurement.md.
+const withBundleAnalyzer = withBundleAnalyzerFactory({
+  enabled: process.env.ANALYZE === 'true',
+  openAnalyzer: false,
+});
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -32,4 +39,4 @@ const nextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withBundleAnalyzer(withNextIntl(nextConfig));
