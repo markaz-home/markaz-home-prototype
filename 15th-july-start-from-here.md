@@ -65,6 +65,28 @@ The last local full test command could not reach the local Supabase/Postgres sta
 integration suites self-skipped. The existing GitHub full-stack workflow remains the authoritative
 integration/E2E gate and should run on the pull request.
 
+### Open CI follow-up for 16 July
+
+The repository-side deployment structure was completed and release PR
+[#13](https://github.com/markaz-home/markaz-home-prototype/pull/13) was merged into `main` at
+`ae4d518`. The `develop` push and the protected release pull request both passed quality, build,
+Supabase integration, web E2E, and admin E2E.
+
+The final post-merge `main` run
+([GitHub Actions run 29434433191](https://github.com/markaz-home/markaz-home-prototype/actions/runs/29434433191))
+is red because the existing end-to-end listing-wizard journey timed out twice. Its hard-coded
+five-second URL checks failed at different transitions on each attempt (`/sell` to `/details`,
+`/details` to `/ownership`, and `/ownership` to `/verification`). The remaining 55 web tests
+passed, as did the database integration suite and the quality/build job. Because the same release
+tree passed the full journey on both `develop` and the release PR, the evidence points to CI
+navigation latency rather than a deterministic application or Bayut regression.
+
+Recommended first task tomorrow: change only the URL waits in
+`apps/web/e2e/listing-journey.spec.ts` to use an explicit 20-second timeout, keeping assertions on
+every expected wizard destination so a failed save is not hidden. Run the focused listing journey,
+then the complete workflow, and promote the fix through `develop` to `main`. If it still fails,
+inspect the Playwright trace and the relevant tRPC mutation before widening any other timeout.
+
 ## Local environment
 
 Secrets are stored only in the ignored root `.env`/`.env.local` files. Do not copy their values into
