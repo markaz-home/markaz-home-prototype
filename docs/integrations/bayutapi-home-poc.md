@@ -1,9 +1,9 @@
-# BayutAPI home-feed POC
+# BayutAPI marketplace-feed POC
 
 ## Status and scope
 
-This is an **opt-in development/staging POC**, disabled by default. It adds selected UAE
-residential sale listings to the customer-app home page through the third-party
+This is an **opt-in development/staging POC**, disabled by default. It adds selected Dubai
+apartment and villa sale listings to the customer-app home and browse pages through the third-party
 [BayutAPI on RapidAPI](https://docs.bayutapi.com/). MARKAZ's own `LIVE` listings remain the
 first-party source.
 
@@ -17,12 +17,24 @@ written data-redistribution permission and legal approval. Bayut's current
 
 - The feed shows up to three newest internal MARKAZ listings first.
 - External results fill the remaining spaces, up to six cards in total.
+- Equivalent external units are collapsed by image or community/layout signature, and the
+  remaining apartment and villa results are selected round-robin when both are available.
 - External cards say **External via BayutAPI**, include an unaffiliated-source disclosure,
   and open the source listing on Bayut in a new tab.
 - External cards cannot be saved or offered on inside MARKAZ. Only internal `LIVE` listings
   participate in MARKAZ journeys.
 - If either source is unavailable, the other may still render. If both are unavailable, the
   optional section disappears and the primary home page remains usable.
+
+## Browse-page behaviour
+
+- Direct MARKAZ results continue to use the internal marketplace search and security-barrier view.
+- A separate, clearly labelled external section shows up to twelve selected BayutAPI apartments
+  and villas, so third-party cards are not mistaken for direct MARKAZ listings.
+- Search, property type, bedroom, bathroom, price, size, community, and sort controls are applied
+  client-side to this selected external set. Filters that cannot be verified from the public
+  provider projection hide the external set rather than returning misleading matches.
+- External cards open on Bayut and expose no MARKAZ Save or Make-an-Offer controls.
 
 ## Configuration
 
@@ -43,7 +55,7 @@ To switch the integration off, set `BAYUT_API_MODE=disabled` or remove both vari
 
 - The upstream host is fixed to `uae-real-estate2.p.rapidapi.com`; callers cannot supply a
   URL or hostname.
-- Searches are fixed to latest Dubai residential properties for sale. The browser cannot
+- Searches are fixed to the latest Dubai apartments and villas for sale. The browser cannot
   send arbitrary upstream search fields.
 - Only an explicit card allowlist crosses the public tRPC boundary: provider ID, title,
   price, type, emirate, community, beds, baths, size, approved image URL, Bayut URL, and the

@@ -98,7 +98,7 @@ describe('BayutAPI featured-property adapter', () => {
     expect(headers.get('X-RapidAPI-Key')).toBe('test-secret');
     expect(JSON.parse(String(init?.body))).toMatchObject({
       purpose: 'for-sale',
-      categories: ['residential'],
+      categories: ['apartments', 'villas'],
       locations_ids: [2],
       index: 'latest',
     });
@@ -107,6 +107,7 @@ describe('BayutAPI featured-property adapter', () => {
       providerId: '123456',
       title: 'Two-bedroom apartment in Dubai Marina',
       askingPriceAed: 2_450_000,
+      category: 'APARTMENT',
       propertyType: 'Apartment',
       emirate: 'Dubai',
       community: 'Dubai Marina',
@@ -144,9 +145,80 @@ describe('BayutAPI featured-property adapter', () => {
       propertyType: 'شقة',
       emirate: 'دبي',
       community: 'دبي مارينا',
+      category: 'APARTMENT',
       coverUrl: null,
       externalUrl: 'https://www.bayut.com/property/details-123456.html',
     });
+  });
+
+  it('uses the first allowlisted photo when the provider omits the cover photo', async () => {
+    const fetchMock = responseFetch({
+      results: [
+        apiProperty({
+          media: {
+            cover_photo: null,
+            photos: [
+              'https://tracking.example/property.jpg',
+              'https://images.bayut.com/thumbnails/property-800x600.jpeg',
+            ],
+          },
+        }),
+      ],
+    });
+
+    const [card] = await loadBayutFeaturedProperties({
+      locale: 'en',
+      limit: 1,
+      env: enabledEnv,
+      fetchImpl: fetchMock as unknown as typeof fetch,
+    });
+
+    expect(card?.coverUrl).toBe('https://images.bayut.com/thumbnails/property-800x600.jpeg');
+  });
+
+  it('deduplicates equivalent units and alternates apartments with villas', async () => {
+    const fetchMock = responseFetch({
+      results: [
+        apiProperty(),
+        apiProperty({
+          id: 123457,
+          title: 'Same marina layout with reordered marketing copy',
+          price: 2_475_000,
+          media: { cover_photo: 'https://images.bayut.com/duplicate-layout.jpg' },
+        }),
+        apiProperty({
+          id: 123458,
+          title: 'Apartment in Downtown Dubai',
+          location: {
+            city: { name: 'Dubai', name_ar: 'دبي' },
+            community: { name: 'Downtown Dubai', name_ar: 'وسط مدينة دبي' },
+          },
+          media: { cover_photo: 'https://images.bayut.com/downtown.jpg' },
+        }),
+        apiProperty({
+          id: 123459,
+          title: 'Four-bedroom villa in Dubai Hills',
+          type: { sub: 'Villas', sub_ar: 'فلل' },
+          area: { built_up: 4_200 },
+          details: { bedrooms: 4, bathrooms: 5 },
+          location: {
+            city: { name: 'Dubai', name_ar: 'دبي' },
+            community: { name: 'Dubai Hills Estate', name_ar: 'دبي هيلز استيت' },
+          },
+          media: { cover_photo: 'https://images.bayut.com/villa.jpg' },
+        }),
+      ],
+    });
+
+    const cards = await loadBayutFeaturedProperties({
+      locale: 'en',
+      limit: 4,
+      env: enabledEnv,
+      fetchImpl: fetchMock as unknown as typeof fetch,
+    });
+
+    expect(cards.map((card) => card.providerId)).toEqual(['123456', '123459', '123458']);
+    expect(cards.map((card) => card.category)).toEqual(['APARTMENT', 'VILLA', 'APARTMENT']);
   });
 
   it('caches identical requests for one hour to conserve the provider quota', async () => {

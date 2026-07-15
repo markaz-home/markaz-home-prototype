@@ -2,8 +2,15 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    # Both long-lived branches are deployment gates: `develop` feeds the shared
+    # development/staging environment and `main` feeds production.
+    branches: [develop, main]
   pull_request:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ci-${{ github.ref }}

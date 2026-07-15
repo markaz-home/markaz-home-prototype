@@ -2,12 +2,14 @@
 
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { Alert, Button, EmptyState, ErrorState, Skeleton, cn } from '@markaz/ui';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import type { RouterInputs } from '@/trpc/types';
+import { filterExternalBrowseCards } from './external-browse';
+import { ExternalPropertyCard } from './external-property-card';
 import { PropertyCard } from './property-card';
 
 const PARAM_KEYS = [
@@ -50,6 +52,7 @@ export function MarketplaceBrowse({
   scope: 'uae' | 'dubai';
 }) {
   const sp = useSearchParams();
+  const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations('marketplace');
@@ -74,6 +77,10 @@ export function MarketplaceBrowse({
     staleTime: 0,
     placeholderData: (prev) => prev,
   });
+  const external = trpc.externalProperties.featured.useQuery(
+    { locale: locale === 'ar' ? 'ar' : 'en', limit: 12 },
+    { staleTime: 60 * 60 * 1_000 },
+  );
   const savedIds = trpc.marketplace.saved.publicIds.useQuery(undefined, {
     enabled: isAuthenticated,
   });
@@ -82,6 +89,11 @@ export function MarketplaceBrowse({
   });
   const savedSet = useMemo(() => new Set(savedIds.data ?? []), [savedIds.data]);
   const ownedSet = useMemo(() => new Set(ownedIds.data ?? []), [ownedIds.data]);
+  const externalCards = useMemo(
+    () => filterExternalBrowseCards(external.data?.items ?? [], query),
+    [external.data?.items, query],
+  );
+  const externalExpected = external.isLoading || externalCards.length > 0;
 
   function update(patch: Record<string, string | null>, resetPage = true) {
     const params = new URLSearchParams(sp.toString());
@@ -399,6 +411,11 @@ export function MarketplaceBrowse({
             retryLabel={ter('retry')}
             onRetry={() => search.refetch()}
           />
+        ) : data && data.items.length === 0 && externalExpected ? (
+          <div className="rounded-md border border-dashed p-6">
+            <p className="font-medium">{t('directEmptyTitle')}</p>
+            <p className="text-muted-foreground mt-1 text-sm">{t('directEmptyBody')}</p>
+          </div>
         ) : data && data.items.length === 0 ? (
           <EmptyState
             title={te('resultsTitle')}
@@ -443,6 +460,26 @@ export function MarketplaceBrowse({
             {t('next')}
           </Button>
         </nav>
+      )}
+
+      {(external.isLoading || externalCards.length > 0) && (
+        <section className="mt-12" aria-labelledby="external-properties-title">
+          <h2 id="external-properties-title" className="font-display text-2xl font-semibold">
+            {t('externalTitle')}
+          </h2>
+          <p className="text-muted-foreground mt-2 max-w-3xl text-sm">{t('externalBody')}</p>
+          <div className="mt-5">
+            <Grid>
+              {external.isLoading
+                ? Array.from({ length: 6 }).map((_, index) => (
+                    <Skeleton key={index} className="aspect-[4/3] w-full rounded-lg" />
+                  ))
+                : externalCards.map((card) => (
+                    <ExternalPropertyCard key={card.providerId} card={card} />
+                  ))}
+            </Grid>
+          </div>
+        </section>
       )}
     </div>
   );

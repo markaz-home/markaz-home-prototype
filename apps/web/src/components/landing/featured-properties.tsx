@@ -12,6 +12,7 @@ interface FeaturedCard {
   id: string;
   href: string;
   title: string;
+  propertyType: string | null;
   askingPriceAed: number | null;
   emirate: string | null;
   community: string | null;
@@ -28,6 +29,7 @@ export function FeaturedProperties() {
   const locale = useLocale();
   const t = useTranslations('landing');
   const propertyT = useTranslations('property');
+  const filterT = useTranslations('filters');
   const apiLocale = locale === 'ar' ? 'ar' : 'en';
   const internal = trpc.marketplace.featured.useQuery(undefined, { staleTime: 60_000 });
   const external = trpc.externalProperties.featured.useQuery(
@@ -46,6 +48,16 @@ export function FeaturedProperties() {
           id: card.publicId,
           href: `/properties/${card.publicId}/${card.slug ?? ''}`,
           title: card.headline,
+          propertyType:
+            card.propertyType === 'APARTMENT'
+              ? filterT('typeApartment')
+              : card.propertyType === 'VILLA'
+                ? filterT('typeVilla')
+                : card.propertyType === 'TOWNHOUSE'
+                  ? filterT('typeTownhouse')
+                  : card.propertyType === 'PENTHOUSE'
+                    ? filterT('typePenthouse')
+                    : card.propertyType,
           askingPriceAed: card.askingPriceAed,
           emirate: card.emirate,
           community: card.community,
@@ -64,6 +76,7 @@ export function FeaturedProperties() {
       id: card.providerId,
       href: card.externalUrl,
       title: card.title,
+      propertyType: card.propertyType,
       askingPriceAed: card.askingPriceAed,
       emirate: card.emirate,
       community: card.community,
@@ -133,6 +146,11 @@ export function FeaturedProperties() {
                 <p className="text-muted-foreground text-sm">
                   {[card.community, card.emirate].filter(Boolean).join(' · ')}
                 </p>
+                {card.propertyType && (
+                  <Badge variant="outline" className="w-fit">
+                    {card.propertyType}
+                  </Badge>
+                )}
 
                 <div className="text-muted-foreground mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-2 text-sm">
                   {beds && (
