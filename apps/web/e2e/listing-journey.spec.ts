@@ -1,32 +1,42 @@
-// SKIPPED — assumes the removed demo seed (fixed demo creds + mkz-* publicIds).
-// Honestly skipped (test.describe.skip), not vacuously green. Port to self-provision
-// via helpers/provision.ts — see FOLLOWUP-selfprovision.md.
-import { test, expect, type Page } from '@playwright/test';
-
 /**
- * Property-listing journey E2E (Week 2). Drives the full wizard in a real browser
- * against the local stack + demo accounts. Requires: pnpm supabase:start &&
- * supabase:reset && db:setup, and both apps running. Sims default to SUCCESS.
+ * Property-listing journey E2E (Week 2). Drives the full wizard in a real browser and
+ * self-provisions its accounts + listings (no demo seed): a customer who owns a
+ * READY_TO_PUBLISH listing, a second customer who owns a DRAFT (for the cross-owner
+ * check), and a fresh customer for the end-to-end wizard. Sims default to SUCCESS.
+ * Requires the full local stack (SUPABASE_SERVICE_ROLE_KEY set) + the web app running.
  */
-const PASSWORD = 'Markaz!Demo1';
-const B_DRAFT = '00000000-0000-0000-0000-0000000021b1'; // seeded Customer B draft
+import { test, expect } from '@playwright/test';
+import { createCustomer, createListing, teardown, type Customer } from './helpers/provision';
+import { signIn } from './helpers/flows';
 
-async function signIn(page: Page, email: string) {
-  await page.goto('/en/sign-in');
-  await page.getByLabel(/Email address/i).fill(email);
-  await page.getByLabel(/^Password/).fill(PASSWORD);
-  await page.getByRole('button', { name: 'Sign in' }).click();
-  await expect(page).toHaveURL(/\/en\/dashboard/);
-}
+const skip = !process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+let customer: Customer;
+let wizardCustomer: Customer;
+let otherDraft: { id: string };
+
+test.beforeAll(async () => {
+  test.skip(skip, 'SUPABASE_SERVICE_ROLE_KEY not set — full stack required');
+  customer = await createCustomer('lj');
+  wizardCustomer = await createCustomer('lj-wizard');
+  // A ready-to-publish listing so "My listings" shows the "Ready to publish" chip.
+  await createListing(customer.id, { state: 'READY_TO_PUBLISH', title: 'E2E Ready Listing' });
+  const other = await createCustomer('lj-other');
+  otherDraft = await createListing(other.id, { state: 'DRAFT', title: 'E2E Other Draft' });
+});
+
+test.afterAll(async () => {
+  if (!skip) await teardown();
+});
 
 const PNG_1x1 = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
   'base64',
 );
 
-test.describe.skip('listing journey', () => {
-  test('My Listings shows seeded drafts for Customer A', async ({ page }) => {
-    await signIn(page, 'customer-a@markaz.demo');
+test.describe('listing journey', () => {
+  test('My Listings shows a ready-to-publish listing for the customer', async ({ page }) => {
+    await signIn(page, customer);
     await page.goto('/en/sell');
     await expect(page.getByRole('heading', { name: 'My listings' })).toBeVisible();
     await expect(page.getByText('Ready to publish').first()).toBeVisible();
@@ -34,7 +44,7 @@ test.describe.skip('listing journey', () => {
 
   test('a customer completes a new listing end-to-end to READY_TO_PUBLISH', async ({ page }) => {
     test.slow();
-    await signIn(page, 'customer-a@markaz.demo');
+    await signIn(page, wizardCustomer);
     await page.goto('/en/sell');
     await page.getByRole('button', { name: 'Create new listing' }).click();
     await expect(page).toHaveURL(/\/sell\/listings\/.+\/details/);
@@ -104,16 +114,16 @@ test.describe.skip('listing journey', () => {
     await page.getByText('I have reviewed the listing and understand').click();
     await page.getByRole('button', { name: 'Mark listing ready' }).click();
     await expect(page).toHaveURL(/\/ready/);
-    await expect(page.getByRole('heading', { name: 'Your listing is ready' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /Your listing setup is complete/i }),
+    ).toBeVisible();
   });
 
   test("a customer cannot access another customer's draft (safe not-available)", async ({
     page,
   }) => {
-    // Customer A (whose password is never mutated by other specs) tries to open
-    // Customer B's seeded draft → safe not-available (RLS + server ownership).
-    await signIn(page, 'customer-a@markaz.demo');
-    await page.goto(`/en/sell/listings/${B_DRAFT}/details`);
+    await signIn(page, customer);
+    await page.goto(`/en/sell/listings/${otherDraft.id}/details`);
     await expect(page.getByText('This listing is not available')).toBeVisible({ timeout: 15000 });
   });
 });

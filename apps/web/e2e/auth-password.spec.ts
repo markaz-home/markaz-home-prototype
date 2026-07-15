@@ -1,15 +1,29 @@
-// SKIPPED — assumes the removed demo seed (fixed demo creds + mkz-* publicIds).
-// Honestly skipped (test.describe.skip), not vacuously green. Port to self-provision
-// via helpers/provision.ts — see FOLLOWUP-selfprovision.md.
 import { test, expect, type Page } from '@playwright/test';
+import { createCustomer, DEFAULT_PASSWORD, teardown, type Customer } from './helpers/provision';
 
 /**
  * Email/password auth (Week 1.5, design-spec fidelity) end-to-end via local Mailpit.
- * Requires: pnpm supabase:start && pnpm supabase:reset && pnpm db:setup, both apps
- * running. Skipped automatically if Mailpit is not reachable. Never a public inbox.
+ * Self-provisions confirmed customers via the Admin API (no demo seed); the sign-up
+ * and recovery paths still drive the real Mailpit code/link. Requires the full local
+ * stack (SUPABASE_SERVICE_ROLE_KEY set) + Mailpit; skipped otherwise. Never a public inbox.
  */
 const MAILPIT = 'http://127.0.0.1:54324';
 const STRONG_PASSWORD = 'Markaz!Demo1';
+
+const skip = !process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+let signInCustomer: Customer;
+let recoveryCustomer: Customer;
+
+test.beforeAll(async () => {
+  test.skip(skip, 'SUPABASE_SERVICE_ROLE_KEY not set — full stack required');
+  signInCustomer = await createCustomer('auth-signin');
+  recoveryCustomer = await createCustomer('auth-recovery');
+});
+
+test.afterAll(async () => {
+  if (!skip) await teardown();
+});
 
 async function mailpitReachable(): Promise<boolean> {
   try {
@@ -51,15 +65,16 @@ async function signIn(page: Page, email: string, password: string) {
   await page.getByRole('button', { name: 'Sign in' }).click();
 }
 
-test.describe.skip('email/password authentication', () => {
+test.describe('email/password authentication', () => {
   test.beforeEach(async () => {
+    test.skip(skip, 'SUPABASE_SERVICE_ROLE_KEY not set — full stack required');
     test.skip(!(await mailpitReachable()), 'Local Supabase/Mailpit not running');
   });
 
   test('new customer: sign up → check email → verify → demo identity → dashboard', async ({
     page,
   }) => {
-    const email = `new-${Date.now()}@markaz.demo`;
+    const email = `e2e-signup-${Date.now()}@markaz.test`;
     await page.goto('/en/sign-up');
     await page.getByLabel(/Full name/i).fill('Test Customer');
     await page.getByLabel(/Email address/i).fill(email);
@@ -89,19 +104,19 @@ test.describe.skip('email/password authentication', () => {
   });
 
   test('returning customer signs in and reaches the dashboard', async ({ page }) => {
-    await signIn(page, 'customer-a@markaz.demo', STRONG_PASSWORD);
+    await signIn(page, signInCustomer.email, DEFAULT_PASSWORD);
     await expect(page).toHaveURL(/\/en\/dashboard/);
   });
 
   test('incorrect password shows a generic error', async ({ page }) => {
-    await signIn(page, 'customer-a@markaz.demo', 'Wrongpass1!');
+    await signIn(page, signInCustomer.email, 'Wrongpass1!');
     await expect(page.getByText('The email or password is incorrect.')).toBeVisible();
   });
 
   test('duplicate email sign-up is handled safely', async ({ page }) => {
     await page.goto('/en/sign-up');
     await page.getByLabel(/Full name/i).fill('Dupe');
-    await page.getByLabel(/Email address/i).fill('customer-a@markaz.demo');
+    await page.getByLabel(/Email address/i).fill(signInCustomer.email);
     await page.getByLabel(/^Password/).fill(STRONG_PASSWORD);
     await page.getByLabel(/^Confirm password/).fill(STRONG_PASSWORD);
     await page.getByText('I agree to the Terms of Use.').click();
@@ -111,7 +126,7 @@ test.describe.skip('email/password authentication', () => {
   });
 
   test('password recovery via link → reset → sign in with new password', async ({ page }) => {
-    const email = 'customer-b@markaz.demo';
+    const email = recoveryCustomer.email;
     await page.goto('/en/forgot-password');
     await page.getByLabel(/Email address/i).fill(email);
     await page.getByRole('button', { name: /Send recovery email/i }).click();
@@ -132,8 +147,8 @@ test.describe.skip('email/password authentication', () => {
     await expect(page).toHaveURL(/\/reset-password\/success/);
     await page.getByRole('link', { name: 'Sign in' }).click();
 
-    // The old password (the demo default in a clean run) no longer works.
-    await signIn(page, email, STRONG_PASSWORD);
+    // The old (provisioned default) password no longer works.
+    await signIn(page, email, DEFAULT_PASSWORD);
     await expect(page.getByText('The email or password is incorrect.')).toBeVisible();
     await expect(page).not.toHaveURL(/\/en\/dashboard/);
 
@@ -142,8 +157,11 @@ test.describe.skip('email/password authentication', () => {
     await expect(page).toHaveURL(/\/en\/dashboard/);
   });
 
-  test('a customer cannot reach the admin application', async ({ page }) => {
-    await signIn(page, 'customer-a@markaz.demo', STRONG_PASSWORD);
+  // The admin app (port 3001) is not started by the web webServer, so this cross-app
+  // negative check cannot be exercised reliably from this project's Playwright config.
+  // Admin access control is covered by the admin app's own E2E suite.
+  test.skip('a customer cannot reach the admin application', async ({ page }) => {
+    await signIn(page, signInCustomer.email, DEFAULT_PASSWORD);
     await expect(page).toHaveURL(/\/en\/dashboard/);
     const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL ?? 'http://localhost:3001';
     await page.goto(`${adminUrl}/en/overview`);

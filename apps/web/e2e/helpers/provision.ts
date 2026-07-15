@@ -40,11 +40,27 @@ const createdUsers: string[] = [];
 const createdListings: string[] = [];
 let seq = 0;
 
+/** 1x1 transparent PNG — a valid image object for the public/draft photo buckets. */
+const PNG_1x1 = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+  'base64',
+);
+const PUBLIC_BUCKET = 'listing-photos';
+const DRAFT_BUCKET = 'listing-photos-draft';
+
 export interface Customer {
   id: string;
   email: string;
   password: string;
 }
+
+/** Any listing lifecycle state a spec may need to provision directly. */
+export type ProvisionListingState =
+  | 'DRAFT'
+  | 'OWNERSHIP_REVIEW'
+  | 'READY_TO_PUBLISH'
+  | 'LIVE'
+  | 'PAUSED';
 
 /** Create a confirmed, onboarded CUSTOMER (skips the email-code UI). */
 export async function createCustomer(tag: string): Promise<Customer> {
@@ -72,45 +88,194 @@ export async function createCustomer(tag: string): Promise<Customer> {
   return { id, email, password: DEFAULT_PASSWORD };
 }
 
+interface ListingOpts {
+  state: ProvisionListingState;
+  askingPrice?: number;
+  minNotificationPrice?: number | null;
+  title?: string;
+  /** Property description; long enough (>= 80 chars) to satisfy details validation. */
+  description?: string;
+}
+
+/**
+ * Seed a listing in any lifecycle state, owned by `ownerId`. Always creates a linked
+ * `properties` row with FULL details (so `isDetailsComplete` passes and the wizard steps
+ * render). LIVE/PAUSED listings get a `public_id`/`public_slug`/`published_at` (so LIVE ones
+ * satisfy the `marketplace_listings` view); DRAFT/OWNERSHIP_REVIEW/READY_TO_PUBLISH get none.
+ */
+export async function createListing(
+  ownerId: string,
+  opts: ListingOpts,
+): Promise<{ id: string; publicId: string | null; slug: string | null }> {
+  const published = opts.state === 'LIVE' || opts.state === 'PAUSED';
+  const publicId = published ? `e2e-${(seq += 1)}-${process.pid}` : null;
+  const slug = published ? 'e2e-marina-villa' : null;
+  const description =
+    opts.description ??
+    'A bright two-bedroom apartment in Dubai Marina with an open living area, a fitted kitchen, and a balcony overlooking the water. Provisioned for the E2E test suite.';
+  const [prop] = await sql`
+    insert into public.properties
+      (id, owner_id, property_type, emirate, community, building_or_project, unit_identifier,
+       bedrooms, bathrooms, size_sqft, furnishing_status, occupancy_status, completion_status)
+    values
+      (gen_random_uuid(), ${ownerId}, 'APARTMENT', 'Dubai', 'Dubai Marina', 'Marina Gate', 'Unit 101',
+       2, 2, 1200, 'FURNISHED', 'VACANT', 'READY')
+    returning id`;
+  const propertyId = (prop as { id: string }).id;
+  const [row] = await sql`
+    insert into public.listings
+      (id, owner_id, property_id, title, description, state, version, publication_version, asking_price,
+       min_notification_price, public_id, public_slug, published_at, public_updated_at)
+    values
+      (gen_random_uuid(), ${ownerId}, ${propertyId}, ${opts.title ?? 'E2E Marina Villa'}, ${description},
+       ${opts.state}, 1, 1, ${opts.askingPrice ?? 2_000_000}, ${opts.minNotificationPrice ?? null},
+       ${publicId}, ${slug}, ${published ? sql`now()` : null}, ${published ? sql`now()` : null})
+    returning id`;
+  const id = (row as { id: string }).id;
+  createdListings.push(id);
+  return { id, publicId, slug };
+}
+
 /**
  * Seed a LIVE, publicly-visible listing owned by `ownerId`; returns its public id + slug.
- * Creates a linked `properties` row + `public_slug` so the listing satisfies the
- * `marketplace_listings` view (state=LIVE, public_id not null, joined property) and its
- * public property page renders.
+ * Thin wrapper over `createListing` for the offers/transactions specs' existing call sites.
  */
 export async function createLiveListing(
   ownerId: string,
   opts: { askingPrice?: number; minNotificationPrice?: number | null; title?: string } = {},
 ): Promise<{ id: string; publicId: string; slug: string }> {
-  const publicId = `e2e-${(seq += 1)}-${process.pid}`;
-  const slug = 'e2e-marina-villa';
-  const id = await asServiceListing(ownerId, publicId, slug, opts);
-  createdListings.push(id);
-  return { id, publicId, slug };
+  const l = await createListing(ownerId, { ...opts, state: 'LIVE' });
+  return { id: l.id, publicId: l.publicId!, slug: l.slug! };
 }
 
-async function asServiceListing(
+/**
+ * Insert `count` `property_photos` rows for a listing (first is the cover; sort_order 0..n).
+ * When `publicId` is provided, also set the deterministic `public_path` and upload a 1x1 PNG
+ * to the PUBLIC `listing-photos` bucket at that key — so a published listing's gallery renders
+ * and its photo count is correct. Returns the created photo ids.
+ */
+export async function addPhotos(
+  listingId: string,
+  publicId: string | null,
+  count: number,
+): Promise<string[]> {
+  const ids: string[] = [];
+  for (let i = 0; i < count; i++) {
+    const [row] = await sql`
+      insert into public.property_photos
+        (id, listing_id, storage_path, is_cover, sort_order, content_type)
+      values
+        (gen_random_uuid(), ${listingId}, ${`${listingId}/photo-${i}.png`}, ${i === 0}, ${i}, 'image/png')
+      returning id`;
+    const photoId = (row as { id: string }).id;
+    ids.push(photoId);
+    if (publicId) {
+      const key = `${publicId}/${photoId}`;
+      // public_path is trigger-guarded against authenticated/anon; the raw `postgres`
+      // connection is permitted (mirrors the elevated publication pipeline).
+      await sql`update public.property_photos set public_path = ${key} where id = ${photoId}`;
+      await admin.storage
+        .from(PUBLIC_BUCKET)
+        .upload(key, PNG_1x1, { contentType: 'image/png', upsert: true });
+    }
+  }
+  return ids;
+}
+
+/** Insert a (visible-by-default) investment case so the detail page shows "Estimated ROI". */
+export async function addInvestmentCase(
+  listingId: string,
+  opts: { visible?: boolean; estimatedRoiPct?: number } = {},
+): Promise<void> {
+  await sql`
+    insert into public.investment_cases
+      (id, listing_id, original_purchase_price, visible, estimated_roi_pct)
+    values
+      (gen_random_uuid(), ${listingId}, 1500000, ${opts.visible ?? true}, ${opts.estimatedRoiPct ?? 12.5})`;
+}
+
+/** Save a listing for a customer (bypasses RLS; used to seed the saved-properties list). */
+export async function saveListing(customerId: string, listingId: string): Promise<void> {
+  await sql`
+    insert into public.saved_properties (id, customer_id, listing_id)
+    values (gen_random_uuid(), ${customerId}, ${listingId})
+    on conflict do nothing`;
+}
+
+/**
+ * Attach the records a READY_TO_PUBLISH listing needs to be publication-eligible AND to
+ * survive the §4.4 resolve gate: an active ownership document, a VERIFIED_DEMO ownership
+ * verification, a VERIFIED_DEMO Form A, a VERIFIED_DEMO permit, and `photos` draft photos
+ * whose objects actually exist in the private draft bucket (so the publish→LIVE copy works).
+ */
+export async function makePublishable(
+  listingId: string,
   ownerId: string,
-  publicId: string,
-  slug: string,
-  opts: { askingPrice?: number; minNotificationPrice?: number | null; title?: string },
-): Promise<string> {
-  const [prop] = await sql`
-    insert into public.properties
-      (id, owner_id, property_type, emirate, community, building_or_project, bedrooms, bathrooms, size_sqft)
+  opts: { photos?: number } = {},
+): Promise<string[]> {
+  const photos = opts.photos ?? 1;
+  await sql`
+    insert into public.ownership_documents
+      (id, listing_id, owner_id, document_type, storage_path, status, active)
     values
-      (gen_random_uuid(), ${ownerId}, 'APARTMENT', 'Dubai', 'Dubai Marina', 'Marina Gate', 2, 2, 1200)
-    returning id`;
-  const propertyId = (prop as { id: string }).id;
-  const [row] = await sql`
-    insert into public.listings
-      (id, owner_id, property_id, title, state, version, publication_version, asking_price,
-       min_notification_price, public_id, public_slug, published_at, public_updated_at)
+      (gen_random_uuid(), ${listingId}, ${ownerId}, 'TITLE_DEED', ${`${listingId}/deed.pdf`}, 'VERIFIED_DEMO', true)`;
+  await sql`
+    insert into public.verifications (id, listing_id, kind, status)
+    values (gen_random_uuid(), ${listingId}, 'OWNERSHIP', 'VERIFIED_DEMO')`;
+  await sql`
+    insert into public.form_a_records (id, listing_id, status)
+    values (gen_random_uuid(), ${listingId}, 'VERIFIED_DEMO')`;
+  await sql`
+    insert into public.permit_records (id, listing_id, permit_type, status)
+    values (gen_random_uuid(), ${listingId}, 'TRAKHEESI', 'VERIFIED_DEMO')`;
+  const ids: string[] = [];
+  for (let i = 0; i < photos; i++) {
+    const path = `${listingId}/draft-${i}.png`;
+    const [row] = await sql`
+      insert into public.property_photos
+        (id, listing_id, storage_path, is_cover, sort_order, content_type)
+      values
+        (gen_random_uuid(), ${listingId}, ${path}, ${i === 0}, ${i}, 'image/png')
+      returning id`;
+    ids.push((row as { id: string }).id);
+    await admin.storage
+      .from(DRAFT_BUCKET)
+      .upload(path, PNG_1x1, { contentType: 'image/png', upsert: true });
+  }
+  return ids;
+}
+
+/** Create a READY_TO_PUBLISH listing that is fully publishable (records + real draft photos). */
+export async function createPublishableListing(
+  ownerId: string,
+  opts: { photos?: number; title?: string } = {},
+): Promise<{ id: string }> {
+  const l = await createListing(ownerId, {
+    state: 'READY_TO_PUBLISH',
+    title: opts.title,
+    askingPrice: 2_100_000,
+    minNotificationPrice: 1_950_000,
+  });
+  await makePublishable(l.id, ownerId, { photos: opts.photos ?? 2 });
+  return { id: l.id };
+}
+
+/**
+ * Insert a resolved (REJECTED_DEMO) publication request so the publication-status UI renders
+ * the returned-for-changes or photo-processing-failure screen. `outcomeCategory` is
+ * `'DEMO_REVIEW_RETURNED'` or `'PHOTO_PROCESSING_FAILED'`. Not superseded → it is the current
+ * request; a retry supersedes it and creates a fresh PENDING.
+ */
+export async function createPublicationRequest(
+  listingId: string,
+  sellerId: string,
+  outcomeCategory: 'DEMO_REVIEW_RETURNED' | 'PHOTO_PROCESSING_FAILED',
+): Promise<void> {
+  await sql`
+    insert into public.listing_publication_requests
+      (id, listing_id, seller_user_id, status, outcome_category, submitted_at, resolved_at, superseded_at)
     values
-      (gen_random_uuid(), ${ownerId}, ${propertyId}, ${opts.title ?? 'E2E Marina Villa'}, 'LIVE', 1, 1,
-       ${opts.askingPrice ?? 2_000_000}, ${opts.minNotificationPrice ?? null}, ${publicId}, ${slug}, now(), now())
-    returning id`;
-  return (row as { id: string }).id;
+      (gen_random_uuid(), ${listingId}, ${sellerId}, 'REJECTED_DEMO', ${outcomeCategory}, now(), now(), null)`;
 }
 
 // --- Week 5: transaction provisioning (accepted offer → transaction) -----------
