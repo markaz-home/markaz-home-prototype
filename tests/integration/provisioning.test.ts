@@ -5,6 +5,7 @@
  * stack/env is unavailable.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { randomUUID } from 'node:crypto';
 import { type SupabaseClient } from '@supabase/supabase-js';
 import {
   asService,
@@ -77,5 +78,18 @@ d('account provisioning', () => {
            left join auth.users u on u.id = p.id where u.id is null`,
     );
     expect((rows[0] as { orphans: number }).orphans).toBe(0);
+  });
+
+  it('provisions an email-less OAuth identity with a stable non-deliverable profile email', async () => {
+    const userId = randomUUID();
+    const row = await asService(async (tx) => {
+      await tx`insert into auth.users (id, email, aud, role, created_at, updated_at)
+               values (${userId}, null, 'authenticated', 'authenticated', now(), now())`;
+      const rows = await tx`select email from public.profiles where id = ${userId}`;
+      await tx`delete from auth.users where id = ${userId}`;
+      return rows[0] as { email: string };
+    });
+
+    expect(row.email).toBe(`${userId}@no-email.uaepass.invalid`);
   });
 });

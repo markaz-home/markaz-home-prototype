@@ -25,13 +25,21 @@ export async function GET(request: NextRequest) {
   const backToSignIn = (reason: string) =>
     NextResponse.redirect(new URL(`/${locale}/sign-in?error=${reason}`, origin));
 
-  // Provider cancellation / error → safe recoverable sign-in screen.
-  if (providerError) return backToSignIn('uae_pass_cancelled');
+  if (providerError) {
+    // Do not log callback query values: they are provider/user-controlled and may
+    // contain sensitive detail. `access_denied` is a genuine cancellation; anything
+    // else (e.g. server_error) is a failure, shown with generic copy.
+    console.warn('[uae-pass] provider callback returned an error');
+    return backToSignIn(providerError === 'access_denied' ? 'uae_pass_cancelled' : 'uae_pass');
+  }
   if (!code) return backToSignIn('uae_pass');
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.exchangeCodeForSession(code);
-  if (error) return backToSignIn('uae_pass');
+  if (error) {
+    console.warn(`[uae-pass] code exchange failed: ${error.message}`);
+    return backToSignIn('uae_pass');
+  }
 
   // Session established. The (app) guard reroutes onboarding as needed.
   return NextResponse.redirect(new URL(`/${locale}/dashboard`, origin));

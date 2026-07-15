@@ -118,6 +118,31 @@ describe('profile completeness + post-auth routing', () => {
       }),
     ).toBe('profile-setup');
   });
+  it('a provider-authenticated session skips MARKAZ email verification (UAE PASS email_verified=false)', () => {
+    // Unverified email + complete profile + provider identity → straight to dashboard.
+    expect(
+      resolvePostAuthDestination({
+        emailVerified: false,
+        identityAuthenticatedByProvider: true,
+        profile: { ...complete, identityVerificationStatus: 'NOT_STARTED' },
+      }),
+    ).toBe('dashboard');
+    // Unverified email + incomplete profile → profile-setup, NOT verify-email.
+    expect(
+      resolvePostAuthDestination({
+        emailVerified: false,
+        identityAuthenticatedByProvider: true,
+        profile: { ...complete, fullName: null, identityVerificationStatus: 'NOT_STARTED' },
+      }),
+    ).toBe('profile-setup');
+    // A password sign-up (no provider) with an unverified email still verifies first.
+    expect(
+      resolvePostAuthDestination({
+        emailVerified: false,
+        profile: { ...complete, identityVerificationStatus: 'NOT_STARTED' },
+      }),
+    ).toBe('verify-email');
+  });
 });
 
 describe('auth helpers', () => {

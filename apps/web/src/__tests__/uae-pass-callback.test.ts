@@ -34,12 +34,18 @@ describe('/auth/callback (OAuth code exchange — UAE PASS staging)', () => {
     expect(locationOf(res).pathname).toBe('/en/dashboard');
   });
 
-  it('provider cancellation → recoverable sign-in screen (no exchange)', async () => {
+  it('user cancellation (access_denied) → recoverable "cancelled" message (no exchange)', async () => {
     const res = await GET(req('?error=access_denied&locale=en'));
     expect(exchangeCodeForSession).not.toHaveBeenCalled();
     const url = locationOf(res);
     expect(url.pathname).toBe('/en/sign-in');
     expect(url.searchParams.get('error')).toBe('uae_pass_cancelled');
+  });
+
+  it('a provider/server error (not cancellation) → generic failure, not "cancelled"', async () => {
+    const res = await GET(req('?error=server_error&error_code=unexpected_failure&locale=en'));
+    expect(exchangeCodeForSession).not.toHaveBeenCalled();
+    expect(locationOf(res).searchParams.get('error')).toBe('uae_pass');
   });
 
   it('missing code → safe sign-in error', async () => {

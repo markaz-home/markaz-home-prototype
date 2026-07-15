@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import {
   UAE_PASS_PROVIDER,
+  UAE_PASS_FORCE_AUTH,
   UAE_PASS_STAGING_ENDPOINTS,
   getUaePassMode,
   isUaePassStagingEnabled,
@@ -62,6 +63,9 @@ describe('UAE PASS config (POC)', () => {
     expect(cfg.authorizationParams.acr_values).toBe(
       'urn:safelayer:tws:policies:authentication:level:low',
     );
+    expect(UAE_PASS_FORCE_AUTH).toBe('true');
+    expect(cfg.authorizationParams.forceAuth).toBe('true');
+    expect(cfg.authorizationParams.prompt).toBe('login');
   });
 
   it('does not allow environment variables to widen the POC scope or change its ACR', () => {
@@ -75,5 +79,7 @@ describe('UAE PASS config (POC)', () => {
     expect(cfg.authorizationParams.acr_values).toBe(
       'urn:safelayer:tws:policies:authentication:level:low',
     );
+    expect(cfg.authorizationParams.forceAuth).toBe('true');
+    expect(cfg.authorizationParams.prompt).toBe('login');
   });
 });
