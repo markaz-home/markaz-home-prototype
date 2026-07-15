@@ -6,13 +6,14 @@ import { isLocale, defaultLocale } from '@markaz/i18n';
  * OAuth code-exchange callback (PKCE). Used by the UAE PASS Staging login and any
  * future Supabase OAuth provider. Supabase Auth (GoTrue) has already completed the
  * provider round-trip and account resolution (by provider subject) and redirected
- * here with `?code=`; we exchange it for a STANDARD Supabase session in secure
- * cookies. `auth.uid()` / RLS then work exactly as for email-password sign-in.
+ * here with `?code=`; we exchange it for a STANDARD Supabase SSR session.
+ * `auth.uid()` / RLS then work exactly as for email-password sign-in.
  *
  * On first UAE PASS sign-in the `handle_new_user` trigger creates the normal CUSTOMER
  * profile; the (app) layout guard (`requireCustomerStep`) then reroutes the user to
- * the correct onboarding step (verify-email / profile-setup / uae-pass) if incomplete,
- * so we simply forward to the localized dashboard. Never logs the code or tokens.
+ * profile setup if incomplete. A Supabase-controlled `custom:uae-pass` identity
+ * satisfies the old simulated UAE PASS step, so we forward to the localized
+ * dashboard and let the server guard decide. Never logs the code or tokens.
  */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);

@@ -23,13 +23,16 @@ Sign In → "Continue with UAE PASS Staging"
   → GoTrue /auth/v1/callback (token + userinfo, account resolution by `sub`)
   → app /auth/callback?code=…  → exchangeCodeForSession → standard Supabase session
   → first sign-in: handle_new_user trigger creates the normal CUSTOMER profile
-  → (app) guard routes onboarding as usual (verify-email / profile-setup / …)
+  → (app) guard requires profile setup, then treats the trusted provider identity
+    as satisfying the old simulated UAE PASS step
 ```
 
 - **First** UAE PASS sign-in creates the normal CUSTOMER profile via the existing safe
   `handle_new_user` trigger — no bespoke provisioning.
 - **Repeat** sign-ins with the same UAE PASS subject (`sub`) resolve to the **same**
   account (GoTrue links identities by provider subject natively).
+- Email/password customers continue through the existing simulated identity step;
+  customers authenticated by `custom:uae-pass` do not repeat that simulation.
 
 ## Official sources (verify before changing anything)
 
@@ -67,25 +70,32 @@ to it — do not hand-roll an insecure workaround.)
 UAE_PASS_MODE=staging                # default 'simulated' → feature OFF
 UAE_PASS_CLIENT_ID=sandbox_stage
 UAE_PASS_CLIENT_SECRET=sandbox_stage
-UAE_PASS_SCOPE=urn:uae:digitalid:profile:general            # optional (default shown)
-UAE_PASS_ACR_VALUES=urn:safelayer:tws:policies:authentication:level:low   # optional
+# Only for an intentional hosted-tenant configuration:
+UAE_PASS_ALLOW_REMOTE_SETUP=true
 ```
+
+The POC scope and `acr_values` are fixed in server-only code. They cannot be widened
+through environment variables.
 
 ## Create a UAE PASS staging account
 
-Request a UAE PASS **staging/sandbox** tester account through the official onboarding
-channel on `docs.uaepass.ae` / the UAE PASS partner portal. For the POC the published
-`sandbox_stage` client is used; a project-specific staging `client_id`/`client_secret`
-and **registered redirect URI** are issued during formal onboarding.
+Install the official UAE PASS **staging app** and create a separate staging account
+using the [official staging-account guide](https://docs.uaepass.ae/start-test-environment-implementation/create-uaepass-user).
+The public `sandbox_stage` client is sufficient for the POC. Project-specific staging
+credentials and formal redirect registration belong to the onboarding process, not
+this public sandbox test.
 
 ## Callback / redirect URL setup
 
-Register this **exact** redirect URI with UAE PASS (it is GoTrue's callback, not an app
+Use this **exact** redirect URI in the OAuth flow (it is GoTrue's callback, not an app
 route):
 
 ```
 {SUPABASE_URL}/auth/v1/callback        # local: http://127.0.0.1:54321/auth/v1/callback
 ```
+
+The public POC credentials allow a preferred callback URL. A project-specific staging
+or production client requires UAE PASS to register the exact callback.
 
 `signInWithOAuth`'s `redirectTo` (`{origin}/auth/callback?locale=…`) must also be in
 Supabase's redirect allow-list (local dev allows localhost by default).
@@ -113,7 +123,8 @@ Open `/en/sign-in` → the **"Continue with UAE PASS Staging"** button appears.
 ### Expected success flow
 
 Click → redirected to UAE PASS staging → authenticate → back to `/auth/callback` →
-standard Supabase session → first-time users complete the normal onboarding → dashboard.
+standard Supabase session → first-time users complete profile setup → dashboard. The
+trusted provider identity skips the old simulated UAE PASS step.
 
 ### Expected cancellation / failure flows
 
@@ -124,22 +135,36 @@ standard Supabase session → first-time users complete the normal onboarding �
 
 ## What is stored
 
-Only what **Supabase Auth** stores for any OAuth identity: the `auth.identities` row
-(provider `custom:uae-pass` + subject) and the `auth.users` row, plus the normal
-`public.profiles` CUSTOMER row created by `handle_new_user`.
+Supabase Auth creates an `auth.identities` row and an `auth.users` row, plus the normal
+`public.profiles` CUSTOMER row created by `handle_new_user`. For OAuth identities,
+Supabase stores provider identity metadata in `auth.identities.identity_data` and may
+also copy it into Auth user metadata. With UAE PASS's general-profile scope, that
+metadata can include names, mobile, nationality, and Emirates ID for some account
+types. It is protected inside the Auth schema, but it is still persisted data.
 
 ## What is deliberately **NOT** stored
 
-Access token, refresh token, authorization code, Emirates ID (`idn`), date of birth,
-mobile, address, or the full raw UserInfo payload — none are persisted by the app, and
-none are logged. Tokens are managed by Supabase in secure cookies and never returned to
-the browser by our code.
+MARKAZ application tables do not copy UAE PASS profile attributes, provider access
+tokens, provider refresh tokens, or authorization codes, and application code does not
+log them. Supabase does not persist provider tokens in the project database, but normal
+Supabase session access/refresh tokens are necessarily stored in SSR cookies to keep the
+customer signed in.
+
+Because direct generic OAuth does not provide a claim-minimization mapping, this POC
+must use staging/test identities only. Do not use production identities or claim that
+EID/mobile are never retained. A production design needs an approved minimal-attribute
+contract or a reviewed UserInfo-minimizing adapter before onboarding.
 
 ## Staging limitations
 
 - Real authorize → token → userinfo round-trip requires a live UAE PASS **staging
   tester** and is a **manual** test; automated tests are fully mocked and never call
   UAE PASS.
+- The direct generic-provider design persists the returned identity metadata inside
+  Supabase Auth. This is acceptable only for staging/test identities in this POC.
+- UAE PASS's sample UserInfo does not advertise an `email_verified` field. Confirm the
+  actual GoTrue email-confirmation behavior during the manual staging round-trip; do
+  not claim the first-login journey is proven until that succeeds.
 - GoTrue sets `pkce_enabled: true` on the provider. If the staging tenant rejects PKCE,
   disable it on the provider (re-register with `pkce_enabled:false`); the token
   `Content-Type` may also need `application/x-www-form-urlencoded` vs `multipart/form-data`
@@ -171,7 +196,8 @@ ownership-verification flow and, in production, DLD/Trakheesi — never by UAE P
 - A reviewed Arabic copy pass (the strings here are **draft/unreviewed**).
 - A decided policy for explicit account linking + the email auto-merge behaviour above.
 - Attribute-mapping review (which UserInfo claims map to Supabase user metadata) and an
-  SOP-level policy if a minimum assurance level is required.
+  SOP-level policy if a minimum assurance level is required. Production must minimize
+  persisted UserInfo attributes before real identities are allowed.
 
 ## Rollback to simulated mode
 

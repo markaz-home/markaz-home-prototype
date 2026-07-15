@@ -12,7 +12,13 @@ import { AuthProgress, type StepStatus } from '@/components/auth/auth-progress';
 import { ErrorSummary } from '@/components/auth/error-summary';
 import { FIELD_ERROR_KEYS } from '@/components/auth/error-keys';
 
-export function ProfileSetupForm({ email }: { email?: string | null }) {
+export function ProfileSetupForm({
+  email,
+  identityAuthenticatedByProvider = false,
+}: {
+  email?: string | null;
+  identityAuthenticatedByProvider?: boolean;
+}) {
   const t = useTranslations('profile');
   const tv = useTranslations('validation');
   const ts = useTranslations('signup');
@@ -30,7 +36,7 @@ export function ProfileSetupForm({ email }: { email?: string | null }) {
 
   const mutation = trpc.profile.completeSetup.useMutation({
     onSuccess: () => {
-      router.replace('/onboarding/uae-pass');
+      router.replace(identityAuthenticatedByProvider ? '/dashboard' : '/onboarding/uae-pass');
     },
     onError: () => setSaveError(tv('unexpectedError')),
   });

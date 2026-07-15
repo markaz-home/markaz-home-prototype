@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { setRequestLocale } from 'next-intl/server';
-import { isUaePassStagingEnabled } from '@markaz/auth/uae-pass';
+import { isUaePassStagingEnabled } from '@markaz/auth/uae-pass/server';
 import { SignInForm } from '@/components/sign-in-form';
 
 export default async function SignInPage({ params }: { params: Promise<{ locale: string }> }) {

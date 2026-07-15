@@ -13,7 +13,13 @@ export default async function AccountProfilePage({
   const session = await getSession();
   const profile = session?.profile;
 
-  const verified = profile?.identityVerificationStatus === 'VERIFIED_DEMO';
+  const verified =
+    session?.uaePassAuthenticated || profile?.identityVerificationStatus === 'VERIFIED_DEMO';
+  const identityLabel = session?.uaePassAuthenticated
+    ? t('identityUaePassStaging')
+    : profile?.identityVerificationStatus === 'VERIFIED_DEMO'
+      ? t('identityDemo')
+      : (profile?.identityVerificationStatus ?? 'NOT_STARTED');
 
   return (
     <div className="space-y-6">
@@ -23,15 +29,11 @@ export default async function AccountProfilePage({
           <CardTitle className="text-base">{profile?.fullName ?? '—'}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
-          <Row label="Email" value={profile?.email ?? session?.email ?? '—'} />
-          <Row label="Account type" value={profile?.accountType ?? 'CUSTOMER'} />
+          <Row label={t('emailLabel')} value={profile?.email ?? session?.email ?? '—'} />
+          <Row label={t('accountTypeLabel')} value={profile?.accountType ?? 'CUSTOMER'} />
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Identity</span>
-            <StatusBadge tone={verified ? 'success' : 'warning'}>
-              {verified
-                ? 'Demo identity verified'
-                : (profile?.identityVerificationStatus ?? 'NOT_STARTED')}
-            </StatusBadge>
+            <span className="text-muted-foreground">{t('identityLabel')}</span>
+            <StatusBadge tone={verified ? 'success' : 'warning'}>{identityLabel}</StatusBadge>
           </div>
         </CardContent>
       </Card>

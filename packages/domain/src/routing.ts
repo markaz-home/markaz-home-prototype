@@ -14,6 +14,12 @@ export const POST_AUTH_PATHS: Record<PostAuthDestination, string> = {
 export interface PostAuthState {
   /** Whether the Supabase Auth email is confirmed (user.email_confirmed_at). */
   emailVerified: boolean;
+  /**
+   * A trusted external identity provider already authenticated this session.
+   * The web app derives this from Supabase-controlled app_metadata, never from
+   * editable user metadata or a client-supplied value.
+   */
+  identityAuthenticatedByProvider?: boolean;
   profile: Pick<
     Profile,
     'fullName' | 'termsAcceptedAt' | 'privacyAcceptedAt' | 'identityVerificationStatus'
@@ -26,14 +32,18 @@ export interface PostAuthState {
  *   email not verified            → verify-email
  *   verified, profile incomplete  → profile-setup (fallback; normal path fills it at sign-up)
  *   verified, complete, identity NOT_STARTED/PENDING/FAILED_DEMO → uae-pass (resumes sub-state)
- *   verified, complete, VERIFIED_DEMO → dashboard
+ *   verified, complete, VERIFIED_DEMO or trusted provider identity → dashboard
  *
  * Unverified or incomplete customers can never reach the dashboard.
  */
 export function resolvePostAuthDestination(state: PostAuthState): PostAuthDestination {
   if (!state.emailVerified) return 'verify-email';
   if (!state.profile || !isProfileComplete(state.profile)) return 'profile-setup';
-  if (!isIdentityVerified(state.profile.identityVerificationStatus)) return 'uae-pass';
+  if (
+    !state.identityAuthenticatedByProvider &&
+    !isIdentityVerified(state.profile.identityVerificationStatus)
+  )
+    return 'uae-pass';
   return 'dashboard';
 }
 

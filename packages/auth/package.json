@@ -10,7 +10,8 @@
     "./server": "./src/server.ts",
     "./browser": "./src/browser.ts",
     "./middleware": "./src/middleware.ts",
-    "./uae-pass": "./src/uae-pass.ts"
+    "./uae-pass": "./src/uae-pass.ts",
+    "./uae-pass/server": "./src/uae-pass-server.ts"
   },
   "scripts": {
     "lint": "eslint .",
@@ -20,7 +21,8 @@
   "dependencies": {
     "@markaz/domain": "workspace:*",
     "@supabase/ssr": "^0.5.2",
-    "@supabase/supabase-js": "^2.47.10"
+    "@supabase/supabase-js": "^2.47.10",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@markaz/config": "workspace:*",

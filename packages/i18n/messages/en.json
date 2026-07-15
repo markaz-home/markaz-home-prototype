@@ -323,7 +323,12 @@
     "helpTitle": "Help",
     "helpBody": "Help and support content will appear here.",
     "profileTitle": "Profile",
-    "profileBody": "Your account details."
+    "profileBody": "Your account details.",
+    "emailLabel": "Email",
+    "accountTypeLabel": "Account type",
+    "identityLabel": "Identity",
+    "identityDemo": "Demo identity verified",
+    "identityUaePassStaging": "Authenticated with UAE PASS Staging"
   },
   "realtimeProof": {
     "title": "Realtime proof",

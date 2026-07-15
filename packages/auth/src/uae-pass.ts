@@ -27,8 +27,8 @@ export const UAE_PASS_STAGING_ENDPOINTS = {
 } as const;
 
 /** POC defaults (docs.uaepass.ae): general-profile scope + web SOP-low ACR. */
-const DEFAULT_SCOPE = 'urn:uae:digitalid:profile:general';
-const DEFAULT_ACR = 'urn:safelayer:tws:policies:authentication:level:low';
+export const UAE_PASS_STAGING_SCOPE = 'urn:uae:digitalid:profile:general';
+export const UAE_PASS_STAGING_ACR = 'urn:safelayer:tws:policies:authentication:level:low';
 
 export type UaePassMode = 'simulated' | 'staging';
 
@@ -75,8 +75,6 @@ export function getUaePassProviderConfig(): UaePassProviderConfig {
         'See docs/integrations/uae-pass-staging-poc.md.',
     );
   }
-  const scope = process.env.UAE_PASS_SCOPE?.trim() || DEFAULT_SCOPE;
-  const acr = process.env.UAE_PASS_ACR_VALUES?.trim() || DEFAULT_ACR;
   return {
     providerType: 'oauth2',
     identifier: UAE_PASS_PROVIDER,
@@ -84,7 +82,9 @@ export function getUaePassProviderConfig(): UaePassProviderConfig {
     clientId,
     clientSecret,
     ...UAE_PASS_STAGING_ENDPOINTS,
-    scopes: scope.split(/\s+/).filter(Boolean),
-    authorizationParams: { acr_values: acr },
+    // Keep the POC deliberately narrow. Expanding scopes or assurance policy is
+    // a production-onboarding decision, not an environment-variable override.
+    scopes: [UAE_PASS_STAGING_SCOPE],
+    authorizationParams: { acr_values: UAE_PASS_STAGING_ACR },
   };
 }

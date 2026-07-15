@@ -1,3 +1,4 @@
+import 'server-only';
 import { cookies } from 'next/headers';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { getPublicSupabaseConfig } from './env';
@@ -41,4 +42,14 @@ export async function getAuthUser() {
     data: { user },
   } = await supabase.auth.getUser();
   return user;
+}
+
+/** Provider identifiers from Supabase-controlled app_metadata (never user_metadata). */
+export function getAuthProviderIds(user: { app_metadata?: Record<string, unknown> }): string[] {
+  const primary =
+    typeof user.app_metadata?.provider === 'string' ? user.app_metadata.provider : null;
+  const providers = Array.isArray(user.app_metadata?.providers)
+    ? user.app_metadata.providers.filter((value): value is string => typeof value === 'string')
+    : [];
+  return [...new Set(primary ? [primary, ...providers] : providers)];
 }

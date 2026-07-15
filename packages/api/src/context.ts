@@ -7,6 +7,8 @@ export interface AuthenticatedUser {
   id: string;
   email?: string;
   accountType: AccountType;
+  /** Supabase-controlled provider identifiers; never sourced from user_metadata. */
+  authProviders?: string[];
 }
 
 export interface Context {
@@ -19,7 +21,7 @@ export interface Context {
 
 export interface CreateContextOptions {
   /** Already-validated Supabase user (from supabase.auth.getUser()), or null. */
-  user: { id: string; email?: string } | null;
+  user: { id: string; email?: string; authProviders?: string[] } | null;
   requestId?: string;
 }
 
@@ -58,6 +60,7 @@ export async function createTRPCContext(opts: CreateContextOptions): Promise<Con
       id: opts.user.id,
       email: opts.user.email,
       accountType: profile?.accountType ?? 'CUSTOMER',
+      authProviders: opts.user.authProviders ?? [],
     };
   }
 

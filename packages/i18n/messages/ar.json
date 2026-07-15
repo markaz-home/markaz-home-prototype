@@ -326,7 +326,12 @@
     "helpTitle": "المساعدة",
     "helpBody": "سيظهر محتوى المساعدة والدعم هنا.",
     "profileTitle": "الملف الشخصي",
-    "profileBody": "تفاصيل حسابك."
+    "profileBody": "تفاصيل حسابك.",
+    "emailLabel": "البريد الإلكتروني",
+    "accountTypeLabel": "نوع الحساب",
+    "identityLabel": "الهوية",
+    "identityDemo": "تم التحقق التجريبي من الهوية",
+    "identityUaePassStaging": "تمت المصادقة عبر UAE PASS (بيئة الاختبار)"
   },
   "realtimeProof": {
     "title": "إثبات التحديث الفوري",

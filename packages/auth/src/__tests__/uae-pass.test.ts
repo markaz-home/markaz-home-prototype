@@ -64,17 +64,16 @@ describe('UAE PASS config (POC)', () => {
     );
   });
 
-  it('honours overridden scope (space-separated) + acr from env', () => {
+  it('does not allow environment variables to widen the POC scope or change its ACR', () => {
     process.env.UAE_PASS_CLIENT_ID = 'x';
     process.env.UAE_PASS_CLIENT_SECRET = 'y';
     process.env.UAE_PASS_SCOPE =
       'urn:uae:digitalid:profile:general urn:uae:digitalid:profile:general:unifiedId';
     process.env.UAE_PASS_ACR_VALUES = 'custom:acr';
     const cfg = getUaePassProviderConfig();
-    expect(cfg.scopes).toEqual([
-      'urn:uae:digitalid:profile:general',
-      'urn:uae:digitalid:profile:general:unifiedId',
-    ]);
-    expect(cfg.authorizationParams.acr_values).toBe('custom:acr');
+    expect(cfg.scopes).toEqual(['urn:uae:digitalid:profile:general']);
+    expect(cfg.authorizationParams.acr_values).toBe(
+      'urn:safelayer:tws:policies:authentication:level:low',
+    );
   });
 });

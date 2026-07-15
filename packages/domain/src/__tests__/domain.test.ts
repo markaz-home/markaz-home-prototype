@@ -100,6 +100,24 @@ describe('profile completeness + post-auth routing', () => {
       }),
     ).toBe('dashboard');
   });
+  it('treats a trusted provider-authenticated identity as satisfying the demo identity gate', () => {
+    expect(
+      resolvePostAuthDestination({
+        emailVerified: true,
+        identityAuthenticatedByProvider: true,
+        profile: { ...complete, identityVerificationStatus: 'NOT_STARTED' },
+      }),
+    ).toBe('dashboard');
+  });
+  it('still requires profile completion before a trusted provider identity can reach dashboard', () => {
+    expect(
+      resolvePostAuthDestination({
+        emailVerified: true,
+        identityAuthenticatedByProvider: true,
+        profile: { ...complete, fullName: null, identityVerificationStatus: 'NOT_STARTED' },
+      }),
+    ).toBe('profile-setup');
+  });
 });
 
 describe('auth helpers', () => {

@@ -1,6 +1,6 @@
 import 'server-only';
 import { appRouter, createTRPCContext, createCallerFactory } from '@markaz/api';
-import { getAuthUser } from '@markaz/auth/server';
+import { getAuthProviderIds, getAuthUser } from '@markaz/auth/server';
 
 const createCaller = createCallerFactory(appRouter);
 
@@ -8,7 +8,13 @@ const createCaller = createCallerFactory(appRouter);
 export async function getServerApi() {
   const user = await getAuthUser();
   const ctx = await createTRPCContext({
-    user: user ? { id: user.id, email: user.email ?? undefined } : null,
+    user: user
+      ? {
+          id: user.id,
+          email: user.email ?? undefined,
+          authProviders: getAuthProviderIds(user),
+        }
+      : null,
   });
   return createCaller(ctx);
 }

@@ -1,6 +1,6 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
 import { appRouter, createTRPCContext } from '@markaz/api';
-import { getAuthUser } from '@markaz/auth/server';
+import { getAuthProviderIds, getAuthUser } from '@markaz/auth/server';
 
 const handler = (req: Request) =>
   fetchRequestHandler({
@@ -10,7 +10,13 @@ const handler = (req: Request) =>
     createContext: async () => {
       const user = await getAuthUser();
       return createTRPCContext({
-        user: user ? { id: user.id, email: user.email ?? undefined } : null,
+        user: user
+          ? {
+              id: user.id,
+              email: user.email ?? undefined,
+              authProviders: getAuthProviderIds(user),
+            }
+          : null,
       });
     },
   });

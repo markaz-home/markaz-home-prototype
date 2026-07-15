@@ -7,9 +7,11 @@ const completeSetupMutate = vi.fn();
 const setIdentityMutate = vi.fn();
 const auditMutateAsync = vi.fn().mockResolvedValue({});
 const signOut = vi.fn().mockResolvedValue({});
+const replace = vi.fn();
+let completeSetupOnSuccess: (() => void) | undefined;
 
 vi.mock('@/i18n/navigation', () => ({
-  useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }),
+  useRouter: () => ({ replace, refresh: vi.fn() }),
   usePathname: () => '/',
   Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
 }));
@@ -19,7 +21,12 @@ vi.mock('@markaz/auth/browser', () => ({
 vi.mock('@/trpc/react', () => ({
   trpc: {
     profile: {
-      completeSetup: { useMutation: () => ({ mutate: completeSetupMutate, isPending: false }) },
+      completeSetup: {
+        useMutation: (options?: { onSuccess?: () => void }) => {
+          completeSetupOnSuccess = options?.onSuccess;
+          return { mutate: completeSetupMutate, isPending: false };
+        },
+      },
       setIdentityStatus: { useMutation: () => ({ mutate: setIdentityMutate, isPending: false }) },
     },
     audit: { record: { useMutation: () => ({ mutateAsync: auditMutateAsync }) } },
@@ -32,6 +39,8 @@ import { UaePassFlow } from '@/components/uae-pass-flow';
 beforeEach(() => {
   completeSetupMutate.mockReset();
   setIdentityMutate.mockReset();
+  replace.mockReset();
+  completeSetupOnSuccess = undefined;
 });
 
 describe('ProfileSetupForm', () => {
@@ -57,6 +66,18 @@ describe('ProfileSetupForm', () => {
     await user.click(screen.getByLabelText(/Privacy Policy/i));
     await user.click(screen.getByRole('button', { name: 'Save and continue' }));
     expect(completeSetupMutate).toHaveBeenCalledTimes(1);
+  });
+
+  it('continues a UAE PASS-authenticated customer to the dashboard after profile setup', () => {
+    renderWithIntl(<ProfileSetupForm identityAuthenticatedByProvider />);
+    completeSetupOnSuccess?.();
+    expect(replace).toHaveBeenCalledWith('/dashboard');
+  });
+
+  it('continues an email/password customer to simulated identity after profile setup', () => {
+    renderWithIntl(<ProfileSetupForm />);
+    completeSetupOnSuccess?.();
+    expect(replace).toHaveBeenCalledWith('/onboarding/uae-pass');
   });
 });
 

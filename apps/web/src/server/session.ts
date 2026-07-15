@@ -1,7 +1,7 @@
 import 'server-only';
 import { cache } from 'react';
 import { redirect } from 'next/navigation';
-import { createSupabaseServerClient } from '@markaz/auth/server';
+import { createSupabaseServerClient, getAuthProviderIds } from '@markaz/auth/server';
 import { loadOwnProfileRow, type Profile as ProfileRow } from '@markaz/db';
 import {
   resolvePostAuthDestination,
@@ -14,6 +14,7 @@ export interface SessionContext {
   userId: string;
   email: string | null;
   emailVerified: boolean;
+  uaePassAuthenticated: boolean;
   profile: Profile | null;
 }
 
@@ -59,6 +60,9 @@ export const getSession = cache(async (): Promise<SessionContext | null> => {
     userId: user.id,
     email: user.email ?? null,
     emailVerified: !!user.email_confirmed_at,
+    // app_metadata is controlled by Supabase Auth. Do not derive this security
+    // decision from editable user_metadata or from a browser-provided flag.
+    uaePassAuthenticated: getAuthProviderIds(user).includes('custom:uae-pass'),
     profile,
   };
 });
@@ -75,6 +79,7 @@ export async function requireCustomerStep(
   if (!session) redirect(`/${locale}/sign-in`);
   const destination = resolvePostAuthDestination({
     emailVerified: session.emailVerified,
+    identityAuthenticatedByProvider: session.uaePassAuthenticated,
     profile: session.profile,
   });
   if (!allow.includes(destination)) {

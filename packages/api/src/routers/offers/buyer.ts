@@ -70,7 +70,8 @@ export const buyerOffersRouter = router({
         .from(profiles)
         .where(eq(profiles.id, ctx.user.id))
         .limit(1);
-      if (!me?.onboarded) return { eligible: false as const, reason: 'ONBOARDING' as const };
+      if (!me?.onboarded && !ctx.user.authProviders?.includes('custom:uae-pass'))
+        return { eligible: false as const, reason: 'ONBOARDING' as const };
 
       // Pre-thread property summary comes from the PUBLIC marketplace view — the
       // buyer is not yet a thread participant, so the participant-gated summary fn

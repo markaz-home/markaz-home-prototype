@@ -38,6 +38,14 @@ function fail(msg: string): never {
   process.exit(1);
 }
 
+function isLoopbackSupabase(url: string): boolean {
+  try {
+    return ['127.0.0.1', 'localhost', '::1'].includes(new URL(url).hostname);
+  } catch {
+    return false;
+  }
+}
+
 async function main() {
   if (getUaePassMode() !== 'staging') {
     console.log('→ UAE_PASS_MODE is not "staging" — nothing to register (simulated mode).');
@@ -48,6 +56,12 @@ async function main() {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !serviceKey)
     fail('NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are required.');
+  if (!isLoopbackSupabase(url) && process.env.UAE_PASS_ALLOW_REMOTE_SETUP !== 'true') {
+    fail(
+      'Refusing to configure a non-loopback Supabase Auth tenant. Set ' +
+        'UAE_PASS_ALLOW_REMOTE_SETUP=true only when you intentionally want to update that tenant.',
+    );
+  }
 
   const cfg = getUaePassProviderConfig();
   // GoTrue admin API payload (snake_case). Never printed.
@@ -85,8 +99,10 @@ async function main() {
   });
   if (!res.ok) {
     const body = await res.text().catch(() => '');
+    const safeBody = body.replaceAll(cfg.clientSecret, '[REDACTED]').slice(0, 1_000);
     fail(
-      `GoTrue custom-provider ${exists ? 'update' : 'create'} failed (HTTP ${res.status}): ${body}`,
+      `GoTrue custom-provider ${exists ? 'update' : 'create'} failed ` +
+        `(HTTP ${res.status}): ${safeBody}`,
     );
   }
 
@@ -95,8 +111,7 @@ async function main() {
       `(client_id=${cfg.clientId}, scopes=${cfg.scopes.join(' ')}).`,
   );
   console.log(
-    '  Register this redirect/callback URL with UAE PASS: ' +
-      `${url.replace(/\/$/, '')}/auth/v1/callback`,
+    '  UAE PASS / GoTrue redirect callback: ' + `${url.replace(/\/$/, '')}/auth/v1/callback`,
   );
 }
 
