@@ -304,6 +304,9 @@ importers:
       '@markaz/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.0
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -524,6 +527,9 @@ importers:
       '@markaz/config':
         specifier: workspace:*
         version: link:../config
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.0
       '@types/react':
         specifier: ^19.0.2
         version: 19.2.17
