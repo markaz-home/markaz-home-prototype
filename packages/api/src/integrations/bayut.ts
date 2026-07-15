@@ -8,12 +8,14 @@ const BAYUT_MAX_FEATURED = 12;
 
 export type BayutApiMode = 'disabled' | 'rapidapi';
 export type BayutLocale = 'en' | 'ar';
+export type BayutPropertyCategory = 'APARTMENT' | 'VILLA' | 'OTHER';
 
 export interface BayutPropertyCard {
   source: 'BAYUT_API';
   providerId: string;
   title: string;
   askingPriceAed: number;
+  category: BayutPropertyCategory;
   propertyType: string | null;
   emirate: string | null;
   community: string | null;
@@ -93,7 +95,10 @@ const propertySchema = z
       .nullable()
       .optional(),
     media: z
-      .object({ cover_photo: z.string().trim().max(2_000).nullable().optional() })
+      .object({
+        cover_photo: z.string().trim().max(2_000).nullable().optional(),
+        photos: z.array(z.string().trim().max(2_000)).max(100).nullable().optional(),
+      })
       .passthrough()
       .nullable()
       .optional(),
@@ -142,6 +147,13 @@ function localizedName(
   return locale === 'ar' ? (value.name_ar ?? value.name ?? null) : (value.name ?? null);
 }
 
+function propertyCategory(value: string | null | undefined): BayutPropertyCategory {
+  const normalized = value?.trim().toLowerCase() ?? '';
+  if (normalized.includes('apartment')) return 'APARTMENT';
+  if (normalized.includes('villa')) return 'VILLA';
+  return 'OTHER';
+}
+
 function toCard(raw: unknown, locale: BayutLocale): BayutPropertyCard | null {
   const parsed = propertySchema.safeParse(raw);
   if (!parsed.success) return null;
@@ -153,16 +165,23 @@ function toCard(raw: unknown, locale: BayutLocale): BayutPropertyCard | null {
   const externalUrl =
     allowedHttpsUrl(p.meta?.url, ['bayut.com', 'www.bayut.com']) ??
     `https://www.bayut.com/property/details-${p.id}.html`;
-  const coverUrl = allowedHttpsUrl(p.media?.cover_photo, [
+  const allowedImageHosts = [
     'images.bayut.com',
     'bayut-production.s3.eu-central-1.amazonaws.com',
-  ]);
+  ] as const;
+  const coverUrl =
+    allowedHttpsUrl(p.media?.cover_photo, allowedImageHosts) ??
+    p.media?.photos
+      ?.map((photo) => allowedHttpsUrl(photo, allowedImageHosts))
+      .find((photo): photo is string => photo !== null) ??
+    null;
 
   return {
     source: 'BAYUT_API',
     providerId: String(p.id),
     title: locale === 'ar' ? (p.title_ar ?? p.title) : p.title,
     askingPriceAed: p.price,
+    category: propertyCategory(p.type?.sub),
     propertyType: locale === 'ar' ? (p.type?.sub_ar ?? p.type?.sub ?? null) : (p.type?.sub ?? null),
     emirate: localizedName(p.location?.city, locale),
     community,
@@ -173,6 +192,50 @@ function toCard(raw: unknown, locale: BayutLocale): BayutPropertyCard | null {
     externalUrl,
     verified: p.verification?.is_verified === true,
   };
+}
+
+function normalizedKeyPart(value: string | null) {
+  return value?.trim().toLowerCase().replace(/\s+/g, ' ') ?? '';
+}
+
+function propertySignature(card: BayutPropertyCard) {
+  if (!card.community) return null;
+  if (card.bedrooms === null && card.bathrooms === null && card.sizeSqft === null) return null;
+  return [
+    card.category,
+    normalizedKeyPart(card.community),
+    card.bedrooms ?? '',
+    card.bathrooms ?? '',
+    card.sizeSqft === null ? '' : Math.round(card.sizeSqft),
+  ].join('|');
+}
+
+function selectDiverseCards(cards: BayutPropertyCard[], limit: number) {
+  const unique: BayutPropertyCard[] = [];
+  const seenImages = new Set<string>();
+  const seenSignatures = new Set<string>();
+
+  for (const card of cards) {
+    const signature = propertySignature(card);
+    if (card.coverUrl && seenImages.has(card.coverUrl)) continue;
+    if (signature && seenSignatures.has(signature)) continue;
+    unique.push(card);
+    if (card.coverUrl) seenImages.add(card.coverUrl);
+    if (signature) seenSignatures.add(signature);
+  }
+
+  const buckets = (['APARTMENT', 'VILLA', 'OTHER'] as const).map((category) =>
+    unique.filter((card) => card.category === category),
+  );
+  const selected: BayutPropertyCard[] = [];
+  while (selected.length < limit && buckets.some((bucket) => bucket.length > 0)) {
+    for (const bucket of buckets) {
+      const card = bucket.shift();
+      if (card) selected.push(card);
+      if (selected.length === limit) break;
+    }
+  }
+  return selected;
 }
 
 export async function loadBayutFeaturedProperties({
@@ -213,7 +276,7 @@ export async function loadBayutFeaturedProperties({
       },
       body: JSON.stringify({
         purpose: 'for-sale',
-        categories: ['residential'],
+        categories: ['apartments', 'villas'],
         locations_ids: [2],
         index: 'latest',
       }),
@@ -229,10 +292,10 @@ export async function loadBayutFeaturedProperties({
   const payload: unknown = await response.json().catch(() => null);
   const parsed = responseSchema.safeParse(payload);
   if (!parsed.success) throw new BayutApiError('INVALID_RESPONSE');
-  const items = parsed.data.results
+  const candidates = parsed.data.results
     .map((item) => toCard(item, locale))
-    .filter((item): item is BayutPropertyCard => item !== null)
-    .slice(0, safeLimit);
+    .filter((item): item is BayutPropertyCard => item !== null);
+  const items = selectDiverseCards(candidates, safeLimit);
   cache.set(cacheKey, { expiresAt: now + BAYUT_CACHE_TTL_MS, items });
   return items;
 }
