@@ -95,6 +95,11 @@ this file was committed. `.env` and `.env.local` remain gitignored.
 
 ## Recommended branch and deployment model
 
+Repository-side setup completed on 15 July: CI now runs for both long-lived branches and the
+provider-neutral release process is recorded in `docs/runbooks/deployment.md`. Hosting projects,
+domains, GitHub environment secrets, and production infrastructure still require a provider and
+approved environment to be selected.
+
 Use two protected long-lived branches because the project needs a shared development environment:
 
 | Branch    | Purpose                          | Deployment                               |
@@ -145,7 +150,7 @@ Environment policy:
 
 ### 1. Land today's work
 
-- Push `codex/bayut-marketplace-polish` and open a pull request.
+- Push `codex/bayut-marketplace-polish` and promote the verified commit through `develop` to `main`.
 - Let the complete GitHub Actions workflow run, including Supabase integration and Playwright E2E.
 - Review the Arabic copy; it is currently draft.
 - Merge only after CI and review are green.
