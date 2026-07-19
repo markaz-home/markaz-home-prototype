@@ -94,13 +94,14 @@ passed:
 The branch promotion is complete. If the journey fails again with the explicit timeout, inspect the
 Playwright trace and the relevant tRPC mutation before widening any other timeout.
 
-### Vercel/Supabase prototype deployment started on 19 July
+### Vercel/Supabase prototype deployment completed on 19 July
 
 - Created the personal Vercel Hobby project `markaz-home-web` for `apps/web` with the Next.js
   preset, Node 22, and monorepo-aware install/build settings.
 - Connected `markaz-home/markaz-home-prototype` to Vercel.
-- Deployed `main` to `https://markaz-home-web.vercel.app` and smoke-tested `/`, `/en`, and
-  `/en/sign-in`.
+- Deployed `main` to Vercel and attached the verified GoDaddy domains `https://markazhome.com` and
+  `https://www.markazhome.com`. The root domain is the canonical application URL;
+  `https://markaz-home-web.vercel.app` remains the Vercel fallback alias.
 - Deployed `develop` as a Vercel Preview at
   `https://markaz-home-web-git-develop-tania-goles-projects.vercel.app`. Vercel Authentication
   protects the preview URL.
@@ -108,18 +109,28 @@ Playwright trace and the relevant tRPC mutation before widening any other timeou
   directly in Vercel and were not copied into Git or this document.
 - Applied the canonical Supabase migration history to hosted `markaz-prototype` through migration
   `20260301000817_oauth_identity_email_optional.sql`.
-- Updated the Supabase Auth Site URL to `https://markaz-home-web.vercel.app`.
+- Updated `NEXT_PUBLIC_WEB_URL` to `https://markazhome.com` for Production while keeping the fixed
+  `develop` alias in Preview.
+- Updated the Supabase Auth Site URL to `https://markazhome.com`. The allow-list contains the root
+  and `www` custom domains, the Vercel production fallback, the fixed `develop` preview alias, and
+  both localhost development forms.
 - Registered the UAE PASS staging custom provider against hosted Supabase and confirmed the live
-  sign-in screen shows **Continue with UAE PASS Staging**.
+  sign-in screen shows **Continue with UAE PASS Staging**. Starting the live flow reaches UAE PASS
+  Staging with forced fresh authentication and returns through
+  `https://markazhome.com/auth/callback`; completing the mobile authentication remains a manual
+  tester check.
 - Verified the live marketplace renders one direct MARKAZ listing plus current BayutAPI apartments
   and villas with the external-source disclosure.
+- Redeployed the existing `main` production build after the URL changes and smoke-tested the root,
+  localized homepage, marketplace, sign-in screen, custom-domain SSL, BayutAPI data, and UAE PASS
+  redirect origin successfully.
 
 This is a technical staging/prototype deployment even though Vercel calls the `main` target
 “Production.” It uses one development Supabase tenant and a personal Hobby workspace; it is not an
 approved customer-facing production environment.
 
-Still required for the current web prototype: add the hosted/local redirect URL allow-list in
-Supabase Auth, then test signup verification, recovery, and the full UAE PASS round trip. The
+Still required for the current web prototype: test signup verification, password recovery, and the
+full UAE PASS mobile round trip on the custom domain, then review the Vercel runtime logs. The
 separate `apps/admin` Vercel project has not been created yet.
 
 ## Local environment
@@ -154,9 +165,9 @@ this file was committed. `.env` and `.env.local` remain gitignored.
 
 Repository-side setup completed on 15 July: CI now runs for both long-lived branches and the
 provider-neutral release process is recorded in `docs/runbooks/deployment.md`. The customer-web
-prototype now has temporary Vercel hosting. The admin project, custom domains, isolated production
-Supabase project, approved production region, and production infrastructure still need to be
-established.
+prototype now has temporary Vercel hosting at `https://markazhome.com`. The admin project, isolated
+production Supabase project, approved production region, and production infrastructure still need
+to be established.
 
 Use two protected long-lived branches because the project needs a shared development environment:
 
@@ -208,9 +219,8 @@ Environment policy:
 
 ### 1. Finish the temporary web prototype environment
 
-- In Supabase Authentication → URL Configuration, add the allow-list entries for the canonical web
-  URL, the fixed `develop` preview alias, and localhost/127.0.0.1 development URLs.
-- Test email signup/code verification, password recovery, and UAE PASS staging on the Vercel URL.
+- Test email signup/code verification, password recovery, and the complete UAE PASS staging mobile
+  round trip on `https://markazhome.com`.
 - Confirm the Vercel runtime logs contain no authentication, database, or Bayut errors.
 - Create `markaz-home-admin` as a separate Vercel project rooted at `apps/admin`, then configure the
   admin URL, environment variables, Supabase redirects, and env-driven admin bootstrap.
