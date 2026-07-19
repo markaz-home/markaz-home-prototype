@@ -4,7 +4,8 @@ This is the current starting point for MARKAZ Home. The earlier July 15 review h
 superseded: its CI and self-provisioning work has landed, and today's focus was the UAE PASS
 login POC plus external property data.
 
-Current CI repair branch: `codex/document-main-ci-followup`.
+Current repository state: `main` is at merge commit `7c42059`; `develop` is at `00bb03f` and
+contains the same release content before the `main` merge commit.
 
 ## What we achieved today
 
@@ -81,18 +82,45 @@ passed, as did the database integration suite and the quality/build job. Because
 tree passed the full journey on both `develop` and the release PR, the evidence points to CI
 navigation latency rather than a deterministic application or Bayut regression.
 
-The focused repair is now implemented on `codex/document-main-ci-followup`: every URL assertion in
-the full listing journey remains in place, but navigation gets an explicit shared 20-second timeout
-to accommodate real CI latency without hiding failed saves. Local validation passed:
+The focused repair landed through PR #14 into `develop`, then through PR #15 into `main`. Every URL
+assertion in the full listing journey remains in place, but navigation gets an explicit shared
+20-second timeout to accommodate real CI latency without hiding failed saves. Local validation
+passed:
 
 - Focused Chromium listing journey against the real local Supabase stack: 3 tests passed.
 - `pnpm typecheck && pnpm lint && pnpm test && pnpm build`: passed.
 - Changed-file Prettier check and `git diff --check`: passed.
 
-The remaining action is to promote this repair through a protected pull request into `develop`,
-then a protected release pull request into `main`, and confirm the final post-merge `main` workflow
-is green. If the journey still fails with the explicit timeout, inspect the Playwright trace and the
-relevant tRPC mutation before widening any other timeout.
+The branch promotion is complete. If the journey fails again with the explicit timeout, inspect the
+Playwright trace and the relevant tRPC mutation before widening any other timeout.
+
+### Vercel/Supabase prototype deployment started on 19 July
+
+- Created the personal Vercel Hobby project `markaz-home-web` for `apps/web` with the Next.js
+  preset, Node 22, and monorepo-aware install/build settings.
+- Connected `markaz-home/markaz-home-prototype` to Vercel.
+- Deployed `main` to `https://markaz-home-web.vercel.app` and smoke-tested `/`, `/en`, and
+  `/en/sign-in`.
+- Deployed `develop` as a Vercel Preview at
+  `https://markaz-home-web-git-develop-tania-goles-projects.vercel.app`. Vercel Authentication
+  protects the preview URL.
+- Configured Production and Preview environment-variable scopes in Vercel. Secrets were entered
+  directly in Vercel and were not copied into Git or this document.
+- Applied the canonical Supabase migration history to hosted `markaz-prototype` through migration
+  `20260301000817_oauth_identity_email_optional.sql`.
+- Updated the Supabase Auth Site URL to `https://markaz-home-web.vercel.app`.
+- Registered the UAE PASS staging custom provider against hosted Supabase and confirmed the live
+  sign-in screen shows **Continue with UAE PASS Staging**.
+- Verified the live marketplace renders one direct MARKAZ listing plus current BayutAPI apartments
+  and villas with the external-source disclosure.
+
+This is a technical staging/prototype deployment even though Vercel calls the `main` target
+“Production.” It uses one development Supabase tenant and a personal Hobby workspace; it is not an
+approved customer-facing production environment.
+
+Still required for the current web prototype: add the hosted/local redirect URL allow-list in
+Supabase Auth, then test signup verification, recovery, and the full UAE PASS round trip. The
+separate `apps/admin` Vercel project has not been created yet.
 
 ## Local environment
 
@@ -125,9 +153,10 @@ this file was committed. `.env` and `.env.local` remain gitignored.
 ## Recommended branch and deployment model
 
 Repository-side setup completed on 15 July: CI now runs for both long-lived branches and the
-provider-neutral release process is recorded in `docs/runbooks/deployment.md`. Hosting projects,
-domains, GitHub environment secrets, and production infrastructure still require a provider and
-approved environment to be selected.
+provider-neutral release process is recorded in `docs/runbooks/deployment.md`. The customer-web
+prototype now has temporary Vercel hosting. The admin project, custom domains, isolated production
+Supabase project, approved production region, and production infrastructure still need to be
+established.
 
 Use two protected long-lived branches because the project needs a shared development environment:
 
@@ -177,16 +206,20 @@ Environment policy:
 
 ## Next steps
 
-### 1. Land the CI follow-up
+### 1. Finish the temporary web prototype environment
 
-- Push `codex/document-main-ci-followup` and open a protected pull request into `develop`.
-- Merge only after quality, Supabase integration, web E2E, and admin E2E are green.
-- Open the release pull request from `develop` to `main`, repeat the protected checks, and merge.
-- Confirm the final post-merge `main` workflow is green before starting provider deployment work.
+- In Supabase Authentication → URL Configuration, add the allow-list entries for the canonical web
+  URL, the fixed `develop` preview alias, and localhost/127.0.0.1 development URLs.
+- Test email signup/code verification, password recovery, and UAE PASS staging on the Vercel URL.
+- Confirm the Vercel runtime logs contain no authentication, database, or Bayut errors.
+- Create `markaz-home-admin` as a separate Vercel project rooted at `apps/admin`, then configure the
+  admin URL, environment variables, Supabase redirects, and env-driven admin bootstrap.
 
-### 2. Establish deployment environments
+### 2. Establish approved deployment environments
 
 - Keep the existing protected `develop` and `main` branches aligned through release pull requests.
+- Replace the temporary Hobby deployment with an approved hosting/account arrangement before any
+  customer-facing production use.
 - Create separate dev and production deployments for both the customer and admin apps.
 - Provision separate dev and production Supabase projects in an approved data region.
 - Add environment variables in the hosting dashboards, never in Git.

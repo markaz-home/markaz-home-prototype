@@ -10,6 +10,7 @@ dist
 build
 *.tsbuildinfo
 .turbo
+.vercel
 
 # test / coverage
 coverage
