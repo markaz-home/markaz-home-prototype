@@ -41,9 +41,7 @@ describe('/auth/confirm recovery callback', () => {
   });
 
   it('supports locale-prefixed legacy next values without using them as destinations', async () => {
-    const response = await GET(
-      req('?token_hash=secret&type=recovery&next=%2Far%2Freset-password'),
-    );
+    const response = await GET(req('?token_hash=secret&type=recovery&next=%2Far%2Freset-password'));
     expect(locationOf(response).pathname).toBe('/ar/reset-password');
   });
 

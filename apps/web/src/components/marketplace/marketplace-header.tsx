@@ -48,13 +48,13 @@ export function MarketplaceHeader({
     href === '/properties' ? pathname.startsWith('/properties') : pathname === href;
 
   return (
-    <header className="bg-background/95 sticky top-0 z-40 border-b backdrop-blur">
+    <header className="bg-background/85 sticky top-0 z-40 border-b backdrop-blur-xl">
       <div className="container flex h-16 items-center justify-between gap-4">
         <div className="flex items-center gap-6">
           <Link href={isAuthenticated ? '/dashboard' : '/'} aria-label={t('home')}>
             <BrandLogo />
           </Link>
-          <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
+          <nav className="hidden items-center gap-1 md:flex" aria-label={t('primary')}>
             {links.map((item) => (
               <Link
                 key={item.href + item.key}
@@ -62,8 +62,8 @@ export function MarketplaceHeader({
                 className={cn(
                   'rounded-md px-3 py-2 text-sm font-medium transition-colors',
                   isActive(item.href)
-                    ? 'bg-secondary text-secondary-foreground'
-                    : 'text-muted-foreground hover:text-foreground',
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
                 )}
               >
                 {t(item.key)}
@@ -125,7 +125,7 @@ export function MarketplaceHeader({
       </div>
 
       {open && (
-        <nav className="bg-background border-t md:hidden" aria-label="Primary mobile">
+        <nav className="bg-card border-t md:hidden" aria-label={t('primaryMobile')}>
           <div className="container flex flex-col py-2">
             {links.map((item) => (
               <Link

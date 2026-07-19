@@ -1,5 +1,6 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { MarketplaceHeader } from '@/components/marketplace/marketplace-header';
+import { BodyTheme } from '@/components/theme/body-theme';
 import { getSession } from '@/server/session';
 
 /**
@@ -19,12 +20,13 @@ export default async function PublicLayout({
   const session = await getSession();
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="theme-platform-gold flex min-h-dvh flex-col">
+      <BodyTheme className="theme-platform-gold" />
       <a
         href="#main"
         className="focus:bg-background sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-3"
       >
-        {t('continue')}
+        {t('skipToContent')}
       </a>
       <MarketplaceHeader
         isAuthenticated={!!session}
@@ -33,7 +35,7 @@ export default async function PublicLayout({
       <main id="main" className="flex-1">
         {children}
       </main>
-      <footer className="text-muted-foreground border-t py-6 text-center text-xs">
+      <footer className="bg-card/50 text-muted-foreground border-t py-6 text-center text-xs">
         <div className="container">
           {t('appName')} · {t('demoBadge')}
         </div>

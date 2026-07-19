@@ -88,6 +88,70 @@
     --ring: 208 50% 56%;
   }
 
+  /*
+   * CEO-directed customer-facing theme: "Platform Gold".
+   *
+   * This is intentionally scoped to the public marketplace and customer auth
+   * layouts. The default customer workspace and the admin `.dark` theme keep
+   * the Architectural Blue tokens above. Gold is used for hierarchy and focus;
+   * near-black, warm-neutral surfaces carry the visual weight.
+   */
+  .theme-platform-gold {
+    color-scheme: dark;
+
+    --brand-900: 42 58% 67%;
+    --brand-800: 42 52% 61%;
+    --brand-700: 42 54% 64%;
+    --brand-500: 40 36% 53%;
+    --brand-300: 39 27% 72%;
+    --brand-100: 42 33% 88%;
+
+    --background: 42 14% 6%;
+    --foreground: 42 31% 91%;
+    --card: 40 13% 9%;
+    --card-foreground: 42 31% 91%;
+    --popover: 40 13% 9%;
+    --popover-foreground: 42 31% 91%;
+
+    --primary: 42 54% 64%;
+    --primary-foreground: 40 18% 8%;
+    --secondary: 39 18% 16%;
+    --secondary-foreground: 42 45% 82%;
+    --muted: 39 14% 14%;
+    --muted-foreground: 39 16% 69%;
+    --accent: 40 24% 20%;
+    --accent-foreground: 42 54% 84%;
+
+    --destructive: 4 72% 64%;
+    --destructive-foreground: 40 18% 8%;
+    --success: 145 43% 55%;
+    --success-foreground: 40 18% 8%;
+    --warning: 38 88% 64%;
+    --warning-foreground: 40 18% 8%;
+
+    --border: 39 18% 25%;
+    --input: 39 18% 28%;
+    --ring: 42 54% 64%;
+
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(circle at 16% 4%, hsl(var(--primary) / 0.1), transparent 30rem),
+      radial-gradient(circle at 86% 14%, hsl(var(--primary) / 0.06), transparent 24rem);
+    color: hsl(var(--foreground));
+  }
+
+  .theme-platform-gold [data-brand-logo] {
+    filter: brightness(0) saturate(100%) invert(81%) sepia(27%) saturate(868%) hue-rotate(356deg)
+      brightness(91%) contrast(91%);
+  }
+
+  .theme-platform-gold .platform-gold-hero-art {
+    background-image:
+      linear-gradient(145deg, hsl(var(--primary) / 0.16), transparent 38%),
+      radial-gradient(circle at 78% 20%, hsl(var(--primary) / 0.2), transparent 28%),
+      linear-gradient(180deg, hsl(var(--card) / 0.3), hsl(var(--background) / 0.92));
+  }
+
   * {
     @apply border-border;
   }
@@ -97,6 +161,9 @@
     -webkit-font-smoothing: antialiased;
   }
   [dir='rtl'] body {
+    font-family: var(--font-arabic);
+  }
+  [dir='rtl'] .font-display {
     font-family: var(--font-arabic);
   }
   /* Reduced-motion support (§4.10 / §20) */

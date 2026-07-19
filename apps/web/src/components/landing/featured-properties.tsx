@@ -90,12 +90,15 @@ export function FeaturedProperties() {
     (external.isError || external.data?.enabled === false || external.data?.available === false);
 
   return (
-    <section className="mt-16" aria-labelledby="featured-properties-title">
+    <section
+      className="border-primary/15 mt-4 border-t pt-16"
+      aria-labelledby="featured-properties-title"
+    >
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <h2
             id="featured-properties-title"
-            className="font-display text-brand-900 text-3xl font-medium"
+            className="font-display text-primary text-3xl font-medium"
           >
             {t('featuredTitle')}
           </h2>
@@ -200,11 +203,14 @@ export function FeaturedProperties() {
             );
 
             return (
-              <Card key={`${card.kind}-${card.id}`} className="group flex overflow-hidden">
+              <Card
+                key={`${card.kind}-${card.id}`}
+                className="border-primary/15 bg-card/80 group flex overflow-hidden"
+              >
                 {card.kind === 'internal' ? (
                   <Link
                     href={card.href}
-                    className="flex min-w-0 flex-1 flex-col focus:outline-none"
+                    className="focus-visible:ring-ring flex min-w-0 flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset"
                   >
                     {content}
                   </Link>
@@ -213,7 +219,7 @@ export function FeaturedProperties() {
                     href={card.href}
                     target="_blank"
                     rel="noopener noreferrer nofollow"
-                    className="flex min-w-0 flex-1 flex-col focus:outline-none"
+                    className="focus-visible:ring-ring flex min-w-0 flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset"
                   >
                     {content}
                   </a>

@@ -1,5 +1,5 @@
 'use client';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Languages } from 'lucide-react';
 import { locales, localeLabels, type Locale } from '@markaz/i18n';
 import {
@@ -14,6 +14,7 @@ import { withCurrentSearch } from '@/lib/locale-navigation';
 
 export function LanguageSwitcher() {
   const locale = useLocale();
+  const t = useTranslations('common');
   const pathname = usePathname();
   const router = useRouter();
 
@@ -27,7 +28,7 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" aria-label="Language">
+        <Button variant="ghost" size="sm" aria-label={t('language')}>
           <Languages className="h-4 w-4" aria-hidden />
           <span className="hidden sm:inline">{localeLabels[locale as Locale]}</span>
         </Button>
