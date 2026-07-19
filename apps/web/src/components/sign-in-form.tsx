@@ -13,6 +13,7 @@ import { CustomerSupportPanel } from '@/components/auth/support-panel';
 import { PasswordField } from '@/components/auth/password-field';
 import { ErrorSummary } from '@/components/auth/error-summary';
 import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
+import { resolvePostSignInDestination } from '@/lib/auth-redirect';
 
 export function SignInForm({
   uaePassStaging = false,
@@ -48,11 +49,18 @@ export function SignInForm({
   async function onUaePass() {
     setFormError(null);
     setUaeLoading(true);
+    const postSignInDestination = resolvePostSignInDestination(params.get('next'));
+    const callbackParams = new URLSearchParams({ locale });
+    if (postSignInDestination !== '/dashboard') {
+      callbackParams.set('next', postSignInDestination);
+    }
     const { error } = await supabase.auth.signInWithOAuth({
       // supabase-js 2.47's Provider union predates custom providers; the identifier
       // is the public `custom:<name>` slug, not a secret.
       provider: 'custom:uae-pass' as 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback?locale=${locale}` },
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?${callbackParams.toString()}`,
+      },
     });
     if (error) {
       setFormError(tu('error'));
@@ -92,7 +100,7 @@ export function SignInForm({
       setFormError(key === 'invalid_credentials' ? t('incorrect') : tv(AUTH_ERROR_KEYS[key]));
       return;
     }
-    router.replace('/dashboard');
+    router.replace(resolvePostSignInDestination(params.get('next')));
   }
 
   return (

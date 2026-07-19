@@ -34,7 +34,12 @@
     "featuredSourceBayut": "External via BayutAPI",
     "featuredExternalNotice": "External listings are supplied by an unaffiliated third-party API and open on Bayut.",
     "featuredOpenExternal": "Open external property",
-    "featuredOpenInternal": "View property"
+    "featuredOpenInternal": "View property",
+    "featuredLoading": "Loading featured properties…",
+    "featuredEmptyTitle": "More featured properties are coming soon",
+    "featuredEmptyBody": "Browse all properties or check back shortly for newly published homes.",
+    "featuredUnavailableTitle": "Featured properties are temporarily unavailable",
+    "featuredUnavailableBody": "The rest of MARKAZ Home is available. Browse all properties or try again later."
   },
   "auth": {
     "signIn": "Sign in",

@@ -10,11 +10,19 @@ import {
   DropdownMenuTrigger,
 } from '@markaz/ui';
 import { usePathname, useRouter } from '@/i18n/navigation';
+import { withCurrentSearch } from '@/lib/locale-navigation';
 
 export function LanguageSwitcher() {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
+
+  const switchLocale = (nextLocale: Locale) => {
+    // Read at interaction time: using Next's useSearchParams here would force
+    // every layout containing this switcher behind a Suspense boundary.
+    const searchParams = new URLSearchParams(window.location.search);
+    router.replace(withCurrentSearch(pathname, searchParams), { locale: nextLocale });
+  };
 
   return (
     <DropdownMenu>
@@ -28,7 +36,7 @@ export function LanguageSwitcher() {
         {locales.map((l) => (
           <DropdownMenuItem
             key={l}
-            onClick={() => router.replace(pathname, { locale: l })}
+            onClick={() => switchLocale(l)}
             aria-current={l === locale}
             className={l === locale ? 'font-semibold' : undefined}
           >

@@ -37,7 +37,12 @@
     "featuredSourceBayut": "مصدر خارجي عبر BayutAPI",
     "featuredExternalNotice": "يتم توفير الإعلانات الخارجية عبر واجهة برمجة تطبيقات خارجية غير تابعة لـ MARKAZ، وتُفتح على موقع بيوت.",
     "featuredOpenExternal": "فتح العقار الخارجي",
-    "featuredOpenInternal": "عرض العقار"
+    "featuredOpenInternal": "عرض العقار",
+    "featuredLoading": "جارٍ تحميل العقارات المميزة…",
+    "featuredEmptyTitle": "قريبًا المزيد من العقارات المميزة",
+    "featuredEmptyBody": "تصفّح جميع العقارات أو عُد قريبًا للاطلاع على المنازل المنشورة حديثًا.",
+    "featuredUnavailableTitle": "العقارات المميزة غير متاحة مؤقتًا",
+    "featuredUnavailableBody": "يمكنك استخدام بقية خدمات MARKAZ Home. تصفّح جميع العقارات أو حاول مرة أخرى لاحقًا."
   },
   "auth": {
     "signIn": "تسجيل الدخول",

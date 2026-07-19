@@ -7,6 +7,7 @@ const signInWithPassword = vi.fn();
 const signInWithOAuth = vi.fn();
 const replace = vi.fn();
 const push = vi.fn();
+const getSearchParams = vi.fn(() => new URLSearchParams());
 
 vi.mock('@markaz/auth/browser', () => ({
   createSupabaseBrowserClient: () => ({ auth: { signInWithPassword, signInWithOAuth } }),
@@ -16,7 +17,7 @@ vi.mock('@/i18n/navigation', () => ({
   usePathname: () => '/sign-in',
   Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
 }));
-vi.mock('next/navigation', () => ({ useSearchParams: () => new URLSearchParams() }));
+vi.mock('next/navigation', () => ({ useSearchParams: () => getSearchParams() }));
 
 import { SignInForm } from '@/components/sign-in-form';
 
@@ -25,6 +26,7 @@ beforeEach(() => {
   signInWithOAuth.mockReset().mockResolvedValue({ error: null });
   replace.mockReset();
   push.mockReset();
+  getSearchParams.mockReset().mockReturnValue(new URLSearchParams());
 });
 
 describe('SignInForm', () => {
@@ -65,6 +67,15 @@ describe('SignInForm', () => {
     expect(signInWithPassword).not.toHaveBeenCalled();
   });
 
+  it('preserves an allow-listed destination through UAE PASS', async () => {
+    getSearchParams.mockReturnValue(new URLSearchParams('next=%2Fsell'));
+    const user = userEvent.setup();
+    renderWithIntl(<SignInForm uaePassStaging locale="en" />);
+    await user.click(screen.getByRole('button', { name: /Continue with UAE PASS Staging/i }));
+    const arg = signInWithOAuth.mock.calls[0]![0];
+    expect(arg.options.redirectTo).toContain('next=%2Fsell');
+  });
+
   it('validates an invalid email without calling the provider', async () => {
     const user = userEvent.setup();
     renderWithIntl(<SignInForm />);
@@ -98,6 +109,26 @@ describe('SignInForm', () => {
   });
 
   it('signs in successfully and routes to the dashboard', async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<SignInForm />);
+    await user.type(screen.getByLabelText(/Email address/i), 'customer-a@markaz.demo');
+    await user.type(screen.getByLabelText(/^Password/), 'Aa1!aaaa');
+    await user.click(screen.getByRole('button', { name: 'Sign in' }));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/dashboard'));
+  });
+
+  it('honours the allow-listed post-sign-in destination', async () => {
+    getSearchParams.mockReturnValue(new URLSearchParams('next=%2Fsell'));
+    const user = userEvent.setup();
+    renderWithIntl(<SignInForm />);
+    await user.type(screen.getByLabelText(/Email address/i), 'customer-a@markaz.demo');
+    await user.type(screen.getByLabelText(/^Password/), 'Aa1!aaaa');
+    await user.click(screen.getByRole('button', { name: 'Sign in' }));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/sell'));
+  });
+
+  it('rejects an external post-sign-in destination', async () => {
+    getSearchParams.mockReturnValue(new URLSearchParams('next=https%3A%2F%2Fevil.example'));
     const user = userEvent.setup();
     renderWithIntl(<SignInForm />);
     await user.type(screen.getByLabelText(/Email address/i), 'customer-a@markaz.demo');

@@ -87,13 +87,39 @@ describe('FeaturedProperties', () => {
     expect(screen.getByText(/unaffiliated third-party API/i)).toBeInTheDocument();
   });
 
-  it('fails closed without disrupting the rest of the landing page', () => {
+  it('keeps the section present while one source is still loading', () => {
+    h.Q.internal = { isLoading: false, data: [] };
+    h.Q.external = { isLoading: true, data: undefined };
+
+    const view = renderFeatured();
+
+    expect(screen.getByRole('heading', { name: 'Featured properties' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Loading featured properties');
+    expect(screen.queryByText('More featured properties are coming soon')).not.toBeInTheDocument();
+
+    h.Q.external = { isLoading: false, data: { enabled: true, available: true, items: [] } };
+    view.rerender(
+      <NextIntlClientProvider locale="en" messages={loadMessages('en')}>
+        <FeaturedProperties />
+      </NextIntlClientProvider>,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Featured properties' })).toBeInTheDocument();
+    expect(screen.getByText('More featured properties are coming soon')).toBeInTheDocument();
+  });
+
+  it('shows an intentional unavailable state without disrupting the landing page', () => {
     h.Q.internal = { isLoading: false, isError: true, data: undefined };
-    h.Q.external = { isLoading: false, isError: false, data: { items: [] } };
+    h.Q.external = { isLoading: false, isError: true, data: undefined };
 
     renderFeatured();
 
-    expect(screen.queryByRole('heading', { name: 'Featured properties' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Featured properties' })).toBeInTheDocument();
+    expect(screen.getByText('Featured properties are temporarily unavailable')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'View all properties' })).toHaveAttribute(
+      'href',
+      '/properties',
+    );
   });
 
   it('renders the Arabic source disclosure from the shared message catalogue', () => {

@@ -16,6 +16,11 @@ export function LanguageSwitcher() {
   const pathname = usePathname();
   const router = useRouter();
 
+  const switchLocale = (nextLocale: Locale) => {
+    const query = new URLSearchParams(window.location.search).toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { locale: nextLocale });
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,7 +33,7 @@ export function LanguageSwitcher() {
         {locales.map((l) => (
           <DropdownMenuItem
             key={l}
-            onClick={() => router.replace(pathname, { locale: l })}
+            onClick={() => switchLocale(l)}
             aria-current={l === locale}
             className={l === locale ? 'font-semibold' : undefined}
           >

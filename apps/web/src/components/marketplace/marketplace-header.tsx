@@ -20,7 +20,7 @@ import { LanguageSwitcher } from '@/components/language-switcher';
 const PUBLIC_LINKS = [
   { href: '/properties', key: 'browse' },
   { href: '/', key: 'howItWorks' },
-  { href: '/sell', key: 'forSellers' },
+  { href: '/sign-in?next=/sell', key: 'forSellers' },
 ] as const;
 
 const AUTHED_LINKS = [
@@ -107,7 +107,7 @@ export function MarketplaceHeader({
                 <Link href="/sign-in">{t('signIn')}</Link>
               </Button>
               <Button asChild size="sm" className="hidden sm:inline-flex">
-                <Link href="/sell">{t('listProperty')}</Link>
+                <Link href="/sign-in?next=/sell">{t('listProperty')}</Link>
               </Button>
             </>
           )}
@@ -147,7 +147,7 @@ export function MarketplaceHeader({
               </Link>
             )}
             <Link
-              href="/sell"
+              href={isAuthenticated ? '/sell' : '/sign-in?next=/sell'}
               className="text-foreground rounded-md px-3 py-2 text-sm font-medium"
               onClick={() => setOpen(false)}
             >

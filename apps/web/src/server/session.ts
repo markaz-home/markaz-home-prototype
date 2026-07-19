@@ -48,13 +48,11 @@ export const getSession = cache(async (): Promise<SessionContext | null> => {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  let profile: Profile | null = null;
-  try {
-    const row = await loadOwnProfileRow({ id: user.id, email: user.email ?? undefined });
-    profile = row ? toProfileDto(row) : null;
-  } catch {
-    profile = null;
-  }
+  const row = await loadOwnProfileRow({ id: user.id, email: user.email ?? undefined });
+  // A genuine missing row remains the onboarding fallback. Operational DB/RLS
+  // failures must propagate to the route error boundary instead of masquerading
+  // as a new customer with no profile.
+  const profile = row ? toProfileDto(row) : null;
 
   return {
     userId: user.id,
