@@ -10,6 +10,7 @@ import { createCustomer, createListing, teardown, type Customer } from './helper
 import { signIn } from './helpers/flows';
 
 const skip = !process.env.SUPABASE_SERVICE_ROLE_KEY;
+const WIZARD_NAVIGATION_TIMEOUT_MS = 20_000;
 
 let customer: Customer;
 let wizardCustomer: Customer;
@@ -47,7 +48,9 @@ test.describe('listing journey', () => {
     await signIn(page, wizardCustomer);
     await page.goto('/en/sell');
     await page.getByRole('button', { name: 'Create new listing' }).click();
-    await expect(page).toHaveURL(/\/sell\/listings\/.+\/details/);
+    await expect(page).toHaveURL(/\/sell\/listings\/.+\/details/, {
+      timeout: WIZARD_NAVIGATION_TIMEOUT_MS,
+    });
 
     // Property Details
     await page.getByRole('button', { name: 'Apartment', exact: true }).click();
@@ -62,7 +65,7 @@ test.describe('listing journey', () => {
     await page.locator('#completion').selectOption('READY');
     await page.getByLabel('Property description').fill('A'.repeat(120));
     await page.getByRole('button', { name: 'Save and continue' }).click();
-    await expect(page).toHaveURL(/\/ownership/);
+    await expect(page).toHaveURL(/\/ownership/, { timeout: WIZARD_NAVIGATION_TIMEOUT_MS });
 
     // Ownership document (fictional sample)
     await page.locator('input[type=file]').setInputFiles({
@@ -72,29 +75,31 @@ test.describe('listing journey', () => {
     });
     await expect(page.getByText('Uploaded privately')).toBeVisible({ timeout: 15000 });
     await page.getByRole('button', { name: 'Save and continue' }).click();
-    await expect(page).toHaveURL(/\/verification/);
+    await expect(page).toHaveURL(/\/verification/, { timeout: WIZARD_NAVIGATION_TIMEOUT_MS });
 
     // Simulated ownership verification → verified
     await page.getByRole('button', { name: 'Start simulated check' }).click();
     await page
       .getByRole('button', { name: 'Continue to listing settings' })
       .click({ timeout: 20000 });
-    await expect(page).toHaveURL(/\/settings/);
+    await expect(page).toHaveURL(/\/settings/, { timeout: WIZARD_NAVIGATION_TIMEOUT_MS });
 
     // Settings
     await page.getByLabel('Asking price').fill('2100000');
     await page.getByLabel('Minimum offer notification').fill('1950000');
     await page.getByRole('button', { name: 'Save and continue' }).click();
-    await expect(page).toHaveURL(/\/investment-case/);
+    await expect(page).toHaveURL(/\/investment-case/, {
+      timeout: WIZARD_NAVIGATION_TIMEOUT_MS,
+    });
 
     // Skip the optional Investment Case
     await page.getByRole('button', { name: 'Skip for now' }).first().click();
-    await expect(page).toHaveURL(/\/form-a/);
+    await expect(page).toHaveURL(/\/form-a/, { timeout: WIZARD_NAVIGATION_TIMEOUT_MS });
 
     // Simulated Form A
     await page.getByText('I confirm the demo listing details above.').click();
     await page.getByRole('button', { name: 'Complete simulated Form A' }).click();
-    await expect(page).toHaveURL(/\/photos/, { timeout: 20000 });
+    await expect(page).toHaveURL(/\/photos/, { timeout: WIZARD_NAVIGATION_TIMEOUT_MS });
 
     // Photos
     await page
@@ -102,18 +107,18 @@ test.describe('listing journey', () => {
       .setInputFiles({ name: 'cover.png', mimeType: 'image/png', buffer: PNG_1x1 });
     await expect(page.getByText('· Cover photograph')).toBeVisible({ timeout: 15000 });
     await page.getByRole('button', { name: 'Save and continue' }).click();
-    await expect(page).toHaveURL(/\/trakheesi/);
+    await expect(page).toHaveURL(/\/trakheesi/, { timeout: WIZARD_NAVIGATION_TIMEOUT_MS });
 
     // Simulated Trakheesi → approved
     await page.getByText('I confirm the demo listing information is ready').click();
     await page.getByRole('button', { name: 'Submit simulated application' }).click();
     await page.getByRole('button', { name: 'Review listing' }).click({ timeout: 20000 });
-    await expect(page).toHaveURL(/\/review/);
+    await expect(page).toHaveURL(/\/review/, { timeout: WIZARD_NAVIGATION_TIMEOUT_MS });
 
     // Review → mark ready
     await page.getByText('I have reviewed the listing and understand').click();
     await page.getByRole('button', { name: 'Mark listing ready' }).click();
-    await expect(page).toHaveURL(/\/ready/);
+    await expect(page).toHaveURL(/\/ready/, { timeout: WIZARD_NAVIGATION_TIMEOUT_MS });
     await expect(
       page.getByRole('heading', { name: /Your listing setup is complete/i }),
     ).toBeVisible();

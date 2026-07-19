@@ -4,7 +4,7 @@ This is the current starting point for MARKAZ Home. The earlier July 15 review h
 superseded: its CI and self-provisioning work has landed, and today's focus was the UAE PASS
 login POC plus external property data.
 
-Current work branch: `codex/bayut-marketplace-polish`.
+Current CI repair branch: `codex/document-main-ci-followup`.
 
 ## What we achieved today
 
@@ -61,9 +61,38 @@ exist.
 - Live browser verification — homepage mix, images, browse-page external section, and Villa filter
   passed with no browser errors.
 
-The last local full test command could not reach the local Supabase/Postgres stack, so its
-integration suites self-skipped. The existing GitHub full-stack workflow remains the authoritative
-integration/E2E gate and should run on the pull request.
+On 19 July, the local Supabase/Postgres stack was available and the focused real-stack listing
+journey plus the complete repository verification command both passed. GitHub's protected
+full-stack workflow remains the authoritative remote integration/E2E gate.
+
+### CI follow-up started on 19 July
+
+The repository-side deployment structure was completed and release PR
+[#13](https://github.com/markaz-home/markaz-home-prototype/pull/13) was merged into `main` at
+`ae4d518`. The `develop` push and the protected release pull request both passed quality, build,
+Supabase integration, web E2E, and admin E2E.
+
+The final post-merge `main` run
+([GitHub Actions run 29434433191](https://github.com/markaz-home/markaz-home-prototype/actions/runs/29434433191))
+is red because the existing end-to-end listing-wizard journey timed out twice. Its hard-coded
+five-second URL checks failed at different transitions on each attempt (`/sell` to `/details`,
+`/details` to `/ownership`, and `/ownership` to `/verification`). The remaining 55 web tests
+passed, as did the database integration suite and the quality/build job. Because the same release
+tree passed the full journey on both `develop` and the release PR, the evidence points to CI
+navigation latency rather than a deterministic application or Bayut regression.
+
+The focused repair is now implemented on `codex/document-main-ci-followup`: every URL assertion in
+the full listing journey remains in place, but navigation gets an explicit shared 20-second timeout
+to accommodate real CI latency without hiding failed saves. Local validation passed:
+
+- Focused Chromium listing journey against the real local Supabase stack: 3 tests passed.
+- `pnpm typecheck && pnpm lint && pnpm test && pnpm build`: passed.
+- Changed-file Prettier check and `git diff --check`: passed.
+
+The remaining action is to promote this repair through a protected pull request into `develop`,
+then a protected release pull request into `main`, and confirm the final post-merge `main` workflow
+is green. If the journey still fails with the explicit timeout, inspect the Playwright trace and the
+relevant tRPC mutation before widening any other timeout.
 
 ## Local environment
 
@@ -148,16 +177,16 @@ Environment policy:
 
 ## Next steps
 
-### 1. Land today's work
+### 1. Land the CI follow-up
 
-- Push `codex/bayut-marketplace-polish` and promote the verified commit through `develop` to `main`.
-- Let the complete GitHub Actions workflow run, including Supabase integration and Playwright E2E.
-- Review the Arabic copy; it is currently draft.
-- Merge only after CI and review are green.
+- Push `codex/document-main-ci-followup` and open a protected pull request into `develop`.
+- Merge only after quality, Supabase integration, web E2E, and admin E2E are green.
+- Open the release pull request from `develop` to `main`, repeat the protected checks, and merge.
+- Confirm the final post-merge `main` workflow is green before starting provider deployment work.
 
 ### 2. Establish deployment environments
 
-- Create `develop` from the updated `main` after today's pull request is merged.
+- Keep the existing protected `develop` and `main` branches aligned through release pull requests.
 - Create separate dev and production deployments for both the customer and admin apps.
 - Provision separate dev and production Supabase projects in an approved data region.
 - Add environment variables in the hosting dashboards, never in Git.
