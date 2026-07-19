@@ -14,6 +14,7 @@ export function BrandLogo({ className }: { className?: string }) {
       width={448}
       height={112}
       priority
+      data-brand-logo
       className={cn('h-10 w-auto md:h-12', className)}
     />
   );

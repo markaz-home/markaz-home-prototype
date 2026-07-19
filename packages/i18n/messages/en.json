@@ -8,6 +8,9 @@
     "continue": "Continue",
     "back": "Back",
     "close": "Close",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "skipToContent": "Skip to content",
     "signOut": "Sign out",
     "language": "Language",
     "demoBadge": "Demo",
@@ -15,6 +18,7 @@
     "comingSoon": "This area is part of the next milestone."
   },
   "landing": {
+    "eyebrow": "UAE property, made clearer",
     "title": "A clearer way to buy and sell property in the UAE.",
     "subtitle": "Transparent information. Guided processes. Confidence from listing to handover.",
     "getStarted": "Get started",
@@ -34,7 +38,12 @@
     "featuredSourceBayut": "External via BayutAPI",
     "featuredExternalNotice": "External listings are supplied by an unaffiliated third-party API and open on Bayut.",
     "featuredOpenExternal": "Open external property",
-    "featuredOpenInternal": "View property"
+    "featuredOpenInternal": "View property",
+    "featuredLoading": "Loading featured properties…",
+    "featuredEmptyTitle": "More featured properties are coming soon",
+    "featuredEmptyBody": "Browse all properties or check back shortly for newly published homes.",
+    "featuredUnavailableTitle": "Featured properties are temporarily unavailable",
+    "featuredUnavailableBody": "The rest of MARKAZ Home is available. Browse all properties or try again later."
   },
   "auth": {
     "signIn": "Sign in",
@@ -46,7 +55,11 @@
     "cancel": "Cancel",
     "back": "Back",
     "languageEnglish": "English",
-    "languageArabic": "العربية"
+    "languageArabic": "العربية",
+    "termsOfUse": "Terms of Use",
+    "privacyPolicy": "Privacy Policy",
+    "copyright": "© MARKAZ Home",
+    "reference": "Reference"
   },
   "signup": {
     "title": "Create your MARKAZ account",
@@ -315,7 +328,9 @@
     "forSellers": "For Sellers",
     "signIn": "Sign In",
     "listProperty": "List a Property",
-    "home": "Home"
+    "home": "Home",
+    "primary": "Primary navigation",
+    "primaryMobile": "Primary mobile navigation"
   },
   "placeholders": {
     "browseTitle": "Browse Properties",
@@ -966,6 +981,7 @@
     "point3": "Guided demo identity step"
   },
   "progress": {
+    "label": "Account setup progress",
     "stepAccount": "Account details",
     "stepEmail": "Email verification",
     "stepIdentity": "Demo identity",

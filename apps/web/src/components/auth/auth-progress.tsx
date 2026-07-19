@@ -21,10 +21,7 @@ export function AuthProgress({
 
   return (
     <div>
-      <ol
-        className="hidden items-center gap-2 text-xs font-medium sm:flex"
-        aria-label="Account setup progress"
-      >
+      <ol className="hidden items-center gap-2 text-xs font-medium sm:flex" aria-label={t('label')}>
         {STEPS.map((label, i) => {
           const s = resolved[i];
           return (

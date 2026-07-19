@@ -191,7 +191,7 @@ export function SignUpForm() {
               <input
                 id="acceptTerms"
                 type="checkbox"
-                className="mt-1 h-4 w-4"
+                className="accent-primary focus-visible:ring-ring mt-1 h-4 w-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                 {...register('acceptTerms')}
               />
               <span>{t('terms')}</span>
@@ -205,7 +205,7 @@ export function SignUpForm() {
               <input
                 id="acceptPrivacy"
                 type="checkbox"
-                className="mt-1 h-4 w-4"
+                className="accent-primary focus-visible:ring-ring mt-1 h-4 w-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                 {...register('acceptPrivacy')}
               />
               <span>{t('privacy')}</span>

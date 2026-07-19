@@ -37,8 +37,6 @@ export function FeaturedProperties() {
     { staleTime: 60 * 60 * 1_000 },
   );
 
-  if (internal.isLoading && external.isLoading) return <FeaturedPropertiesSkeleton />;
-
   const internalCards = (internal.data ?? [])
     .flatMap<FeaturedCard>((card) => {
       if (!card.publicId) return [];
@@ -86,18 +84,21 @@ export function FeaturedProperties() {
       coverUrl: card.coverUrl,
     }));
   const cards = [...internalCards, ...externalCards];
-
-  // This is an enhancement to the landing page: if both sources are unavailable,
-  // keep the primary home journey usable instead of showing a blocking error.
-  if (cards.length === 0) return null;
+  const isInitialLoading = internal.isLoading || external.isLoading;
+  const isUnavailable =
+    internal.isError &&
+    (external.isError || external.data?.enabled === false || external.data?.available === false);
 
   return (
-    <section className="mt-16" aria-labelledby="featured-properties-title">
+    <section
+      className="border-primary/15 mt-4 border-t pt-16"
+      aria-labelledby="featured-properties-title"
+    >
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <h2
             id="featured-properties-title"
-            className="font-display text-brand-900 text-3xl font-medium"
+            className="font-display text-primary text-3xl font-medium"
           >
             {t('featuredTitle')}
           </h2>
@@ -108,100 +109,128 @@ export function FeaturedProperties() {
         </Button>
       </div>
 
-      <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {cards.map((card) => {
-          const beds =
-            card.bedrooms === 0
-              ? propertyT('bedsStudio')
-              : card.bedrooms != null
-                ? propertyT('beds', { count: card.bedrooms })
-                : null;
-          const content = (
-            <>
-              <div className="bg-muted relative aspect-[4/3] w-full overflow-hidden">
-                {card.coverUrl ? (
-                  // A plain image avoids copying third-party listing images into Next's
-                  // optimisation cache; the server projection already allowlists hosts.
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={card.coverUrl}
-                    alt={card.title}
-                    loading="lazy"
-                    referrerPolicy={card.kind === 'external' ? 'no-referrer' : undefined}
-                    className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                  />
-                ) : (
-                  <div className="text-muted-foreground flex h-full items-center justify-center p-4 text-center text-sm">
-                    {propertyT('imageUnavailable')}
-                  </div>
-                )}
-                <Badge className="bg-background/95 text-foreground absolute start-3 top-3 shadow-none">
-                  {card.kind === 'internal' ? t('featuredSourceMarkaz') : t('featuredSourceBayut')}
-                </Badge>
-              </div>
-
-              <div className="flex flex-1 flex-col gap-2 p-4">
-                <p className="text-lg font-semibold">{formatAed(card.askingPriceAed, locale)}</p>
-                <p className="text-foreground line-clamp-2 text-sm font-medium">{card.title}</p>
-                <p className="text-muted-foreground text-sm">
-                  {[card.community, card.emirate].filter(Boolean).join(' · ')}
-                </p>
-                {card.propertyType && (
-                  <Badge variant="outline" className="w-fit">
-                    {card.propertyType}
+      {isInitialLoading ? (
+        <div role="status">
+          <span className="sr-only">{t('featuredLoading')}</span>
+          <FeaturedPropertiesSkeleton />
+        </div>
+      ) : cards.length === 0 ? (
+        <Card className="mt-6 border-dashed p-8 text-center">
+          <p className="font-medium">
+            {isUnavailable ? t('featuredUnavailableTitle') : t('featuredEmptyTitle')}
+          </p>
+          <p className="text-muted-foreground mx-auto mt-2 max-w-xl text-sm">
+            {isUnavailable ? t('featuredUnavailableBody') : t('featuredEmptyBody')}
+          </p>
+        </Card>
+      ) : (
+        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {cards.map((card) => {
+            const beds =
+              card.bedrooms === 0
+                ? propertyT('bedsStudio')
+                : card.bedrooms != null
+                  ? propertyT('beds', { count: card.bedrooms })
+                  : null;
+            const content = (
+              <>
+                <div className="bg-muted relative aspect-[4/3] w-full overflow-hidden">
+                  {card.coverUrl ? (
+                    // A plain image avoids copying third-party listing images into Next's
+                    // optimisation cache; the server projection already allowlists hosts.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={card.coverUrl}
+                      alt={card.title}
+                      loading="lazy"
+                      referrerPolicy={card.kind === 'external' ? 'no-referrer' : undefined}
+                      className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                    />
+                  ) : (
+                    <div className="text-muted-foreground flex h-full items-center justify-center p-4 text-center text-sm">
+                      {propertyT('imageUnavailable')}
+                    </div>
+                  )}
+                  <Badge className="bg-background/95 text-foreground absolute start-3 top-3 shadow-none">
+                    {card.kind === 'internal'
+                      ? t('featuredSourceMarkaz')
+                      : t('featuredSourceBayut')}
                   </Badge>
-                )}
-
-                <div className="text-muted-foreground mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-2 text-sm">
-                  {beds && (
-                    <span className="inline-flex items-center gap-1">
-                      <BedDouble className="h-4 w-4" aria-hidden /> {beds}
-                    </span>
-                  )}
-                  {card.bathrooms != null && (
-                    <span className="inline-flex items-center gap-1">
-                      <Bath className="h-4 w-4" aria-hidden />
-                      {propertyT('baths', { count: card.bathrooms })}
-                    </span>
-                  )}
-                  {card.sizeSqft != null && (
-                    <span className="inline-flex items-center gap-1">
-                      <Maximize className="h-4 w-4" aria-hidden />
-                      {propertyT('sqft', { size: formatNumber(card.sizeSqft, locale) })}
-                    </span>
-                  )}
                 </div>
 
-                <span className="text-primary mt-2 inline-flex items-center gap-1 text-sm font-medium">
-                  {card.kind === 'internal' ? t('featuredOpenInternal') : t('featuredOpenExternal')}
-                  {card.kind === 'external' && <ExternalLink className="h-3.5 w-3.5" aria-hidden />}
-                </span>
-              </div>
-            </>
-          );
+                <div className="flex flex-1 flex-col gap-2 p-4">
+                  <p className="text-lg font-semibold">{formatAed(card.askingPriceAed, locale)}</p>
+                  <p className="text-foreground line-clamp-2 text-sm font-medium">{card.title}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {[card.community, card.emirate].filter(Boolean).join(' · ')}
+                  </p>
+                  {card.propertyType && (
+                    <Badge variant="outline" className="w-fit">
+                      {card.propertyType}
+                    </Badge>
+                  )}
 
-          return (
-            <Card key={`${card.kind}-${card.id}`} className="group flex overflow-hidden">
-              {card.kind === 'internal' ? (
-                <Link href={card.href} className="flex min-w-0 flex-1 flex-col focus:outline-none">
-                  {content}
-                </Link>
-              ) : (
-                <a
-                  href={card.href}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="flex min-w-0 flex-1 flex-col focus:outline-none"
-                >
-                  {content}
-                </a>
-              )}
-            </Card>
-          );
-        })}
-      </div>
+                  <div className="text-muted-foreground mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-2 text-sm">
+                    {beds && (
+                      <span className="inline-flex items-center gap-1">
+                        <BedDouble className="h-4 w-4" aria-hidden /> {beds}
+                      </span>
+                    )}
+                    {card.bathrooms != null && (
+                      <span className="inline-flex items-center gap-1">
+                        <Bath className="h-4 w-4" aria-hidden />
+                        {propertyT('baths', { count: card.bathrooms })}
+                      </span>
+                    )}
+                    {card.sizeSqft != null && (
+                      <span className="inline-flex items-center gap-1">
+                        <Maximize className="h-4 w-4" aria-hidden />
+                        {propertyT('sqft', { size: formatNumber(card.sizeSqft, locale) })}
+                      </span>
+                    )}
+                  </div>
 
-      {externalCards.length > 0 && (
+                  <span className="text-primary mt-2 inline-flex items-center gap-1 text-sm font-medium">
+                    {card.kind === 'internal'
+                      ? t('featuredOpenInternal')
+                      : t('featuredOpenExternal')}
+                    {card.kind === 'external' && (
+                      <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+                    )}
+                  </span>
+                </div>
+              </>
+            );
+
+            return (
+              <Card
+                key={`${card.kind}-${card.id}`}
+                className="border-primary/15 bg-card/80 group flex overflow-hidden"
+              >
+                {card.kind === 'internal' ? (
+                  <Link
+                    href={card.href}
+                    className="focus-visible:ring-ring flex min-w-0 flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset"
+                  >
+                    {content}
+                  </Link>
+                ) : (
+                  <a
+                    href={card.href}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="focus-visible:ring-ring flex min-w-0 flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset"
+                  >
+                    {content}
+                  </a>
+                )}
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {!isInitialLoading && externalCards.length > 0 && (
         <p className="text-muted-foreground mt-4 text-xs">{t('featuredExternalNotice')}</p>
       )}
     </section>
@@ -210,14 +239,10 @@ export function FeaturedProperties() {
 
 function FeaturedPropertiesSkeleton() {
   return (
-    <section className="mt-16" aria-hidden>
-      <Skeleton className="h-9 w-64" />
-      <Skeleton className="mt-3 h-5 w-full max-w-lg" />
-      <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 3 }, (_, index) => (
-          <Skeleton key={index} className="aspect-[4/3] w-full rounded-lg" />
-        ))}
-      </div>
-    </section>
+    <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
+      {Array.from({ length: 3 }, (_, index) => (
+        <Skeleton key={index} className="aspect-[4/3] w-full rounded-lg" />
+      ))}
+    </div>
   );
 }

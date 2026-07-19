@@ -11,6 +11,9 @@
     "continue": "متابعة",
     "back": "رجوع",
     "close": "إغلاق",
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
+    "skipToContent": "تخطَّ إلى المحتوى",
     "signOut": "تسجيل الخروج",
     "language": "اللغة",
     "demoBadge": "تجريبي",
@@ -18,6 +21,7 @@
     "comingSoon": "هذا القسم جزء من المرحلة القادمة."
   },
   "landing": {
+    "eyebrow": "تجربة أوضح للعقارات في الإمارات",
     "title": "طريقة أوضح لشراء وبيع العقارات في الإمارات.",
     "subtitle": "معلومات شفافة. عمليات موجَّهة. ثقة من الإدراج حتى التسليم.",
     "getStarted": "ابدأ الآن",
@@ -37,7 +41,12 @@
     "featuredSourceBayut": "مصدر خارجي عبر BayutAPI",
     "featuredExternalNotice": "يتم توفير الإعلانات الخارجية عبر واجهة برمجة تطبيقات خارجية غير تابعة لـ MARKAZ، وتُفتح على موقع بيوت.",
     "featuredOpenExternal": "فتح العقار الخارجي",
-    "featuredOpenInternal": "عرض العقار"
+    "featuredOpenInternal": "عرض العقار",
+    "featuredLoading": "جارٍ تحميل العقارات المميزة…",
+    "featuredEmptyTitle": "قريبًا المزيد من العقارات المميزة",
+    "featuredEmptyBody": "تصفّح جميع العقارات أو عُد قريبًا للاطلاع على المنازل المنشورة حديثًا.",
+    "featuredUnavailableTitle": "العقارات المميزة غير متاحة مؤقتًا",
+    "featuredUnavailableBody": "يمكنك استخدام بقية خدمات MARKAZ Home. تصفّح جميع العقارات أو حاول مرة أخرى لاحقًا."
   },
   "auth": {
     "signIn": "تسجيل الدخول",
@@ -49,7 +58,11 @@
     "cancel": "إلغاء",
     "back": "رجوع",
     "languageEnglish": "English",
-    "languageArabic": "العربية"
+    "languageArabic": "العربية",
+    "termsOfUse": "شروط الاستخدام",
+    "privacyPolicy": "سياسة الخصوصية",
+    "copyright": "© مركز هوم",
+    "reference": "المرجع"
   },
   "signup": {
     "title": "أنشئ حسابك في MARKAZ",
@@ -318,7 +331,9 @@
     "forSellers": "للبائعين",
     "signIn": "تسجيل الدخول",
     "listProperty": "أدرج عقارًا",
-    "home": "الرئيسية"
+    "home": "الرئيسية",
+    "primary": "التنقل الرئيسي",
+    "primaryMobile": "التنقل الرئيسي على الهاتف"
   },
   "placeholders": {
     "browseTitle": "تصفّح العقارات",
@@ -969,6 +984,7 @@
     "point3": "خطوة هوية تجريبية موجَّهة"
   },
   "progress": {
+    "label": "تقدّم إعداد الحساب",
     "stepAccount": "تفاصيل الحساب",
     "stepEmail": "التحقق من البريد",
     "stepIdentity": "الهوية التجريبية",

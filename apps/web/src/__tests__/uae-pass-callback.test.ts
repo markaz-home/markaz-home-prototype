@@ -29,6 +29,16 @@ describe('/auth/callback (OAuth code exchange — UAE PASS staging)', () => {
     expect(locationOf(res).pathname).toBe('/ar/dashboard');
   });
 
+  it('forwards to an allow-listed post-sign-in destination', async () => {
+    const res = await GET(req('?code=abc123&locale=en&next=%2Fsell'));
+    expect(locationOf(res).pathname).toBe('/en/sell');
+  });
+
+  it('rejects an external post-sign-in destination', async () => {
+    const res = await GET(req('?code=abc123&locale=en&next=https%3A%2F%2Fevil.example'));
+    expect(locationOf(res).pathname).toBe('/en/dashboard');
+  });
+
   it('rejects an unknown locale by falling back to the default', async () => {
     const res = await GET(req('?code=abc123&locale=fr'));
     expect(locationOf(res).pathname).toBe('/en/dashboard');

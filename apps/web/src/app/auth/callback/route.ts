@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@markaz/auth/server';
 import { isLocale, defaultLocale } from '@markaz/i18n';
+import { resolvePostSignInDestination } from '@/lib/auth-redirect';
 
 /**
  * OAuth code-exchange callback (PKCE). Used by the UAE PASS Staging login and any
@@ -21,6 +22,7 @@ export async function GET(request: NextRequest) {
   const providerError = searchParams.get('error'); // e.g. access_denied (user cancelled)
   const localeParam = searchParams.get('locale');
   const locale = localeParam && isLocale(localeParam) ? localeParam : defaultLocale;
+  const destination = resolvePostSignInDestination(searchParams.get('next'));
 
   const backToSignIn = (reason: string) =>
     NextResponse.redirect(new URL(`/${locale}/sign-in?error=${reason}`, origin));
@@ -42,5 +44,5 @@ export async function GET(request: NextRequest) {
   }
 
   // Session established. The (app) guard reroutes onboarding as needed.
-  return NextResponse.redirect(new URL(`/${locale}/dashboard`, origin));
+  return NextResponse.redirect(new URL(`/${locale}${destination}`, origin));
 }

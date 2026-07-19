@@ -32,7 +32,7 @@ describe('ForgotPasswordForm (official recovery link)', () => {
     await waitFor(() => expect(resetPasswordForEmail).toHaveBeenCalledTimes(1));
     const [email, opts] = resetPasswordForEmail.mock.calls[0] as [string, { redirectTo: string }];
     expect(email).toBe('customer-b@markaz.demo');
-    expect(opts.redirectTo).toMatch(/\/auth\/confirm$/);
+    expect(opts.redirectTo).toMatch(/\/auth\/confirm\/en$/);
     // Anti-enumeration: always route to the generic "check your email" confirmation.
     expect(push).toHaveBeenCalledWith(expect.stringContaining('/forgot-password/check-email'));
   });
