@@ -8,7 +8,7 @@ import { TRPCProvider } from '@/trpc/react';
 import '@markaz/ui/styles.css';
 
 export const metadata: Metadata = {
-  title: 'MARKAZ Home',
+  title: 'Markaz Home',
   description: 'Buy and sell property in the UAE — one account does both.',
 };
 

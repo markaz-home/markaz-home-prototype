@@ -17,17 +17,23 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { BrandLogo } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
 
+/**
+ * `match` is the path prefix that marks a link as the current section. Links
+ * without one never show as active — the home page is not a destination that
+ * one of these items "is".
+ */
 const PUBLIC_LINKS = [
-  { href: '/properties', key: 'browse' },
+  { href: '/properties', key: 'browse', match: '/properties' },
+  // TODO: needs a real How It Works page — the landing explainer cards were removed.
   { href: '/', key: 'howItWorks' },
   { href: '/sign-in?next=/sell', key: 'forSellers' },
 ] as const;
 
 const AUTHED_LINKS = [
-  { href: '/dashboard', key: 'dashboard' },
-  { href: '/properties', key: 'browse' },
-  { href: '/saved-properties', key: 'saved' },
-  { href: '/sell', key: 'myListings' },
+  { href: '/dashboard', key: 'dashboard', match: '/dashboard' },
+  { href: '/properties', key: 'browse', match: '/properties' },
+  { href: '/saved-properties', key: 'saved', match: '/saved-properties' },
+  { href: '/sell', key: 'myListings', match: '/sell' },
 ] as const;
 
 /** Adaptive marketplace chrome (design spec §11). Public nav for anonymous
@@ -44,35 +50,37 @@ export function MarketplaceHeader({
   const [open, setOpen] = useState(false);
   const links = isAuthenticated ? AUTHED_LINKS : PUBLIC_LINKS;
 
-  const isActive = (href: string) =>
-    href === '/properties' ? pathname.startsWith('/properties') : pathname === href;
+  const isActive = (item: { href: string; match?: string }) =>
+    item.match ? pathname === item.match || pathname.startsWith(`${item.match}/`) : false;
 
   return (
     <header className="bg-background/85 sticky top-0 z-40 border-b backdrop-blur-xl">
-      <div className="container flex h-16 items-center justify-between gap-4">
-        <div className="flex items-center gap-6">
+      <div className="container flex h-16 items-center gap-4">
+        <div className="flex flex-1 items-center justify-start">
           <Link href={isAuthenticated ? '/dashboard' : '/'} aria-label={t('home')}>
             <BrandLogo />
           </Link>
-          <nav className="hidden items-center gap-1 md:flex" aria-label={t('primary')}>
-            {links.map((item) => (
-              <Link
-                key={item.href + item.key}
-                href={item.href}
-                className={cn(
-                  'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  isActive(item.href)
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
-                )}
-              >
-                {t(item.key)}
-              </Link>
-            ))}
-          </nav>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Centred primary nav — brand gold, per the platform direction. */}
+        <nav className="hidden items-center justify-center gap-1 md:flex" aria-label={t('primary')}>
+          {links.map((item) => (
+            <Link
+              key={item.href + item.key}
+              href={item.href}
+              className={cn(
+                'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                isActive(item)
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-primary/85 hover:bg-primary/10 hover:text-primary',
+              )}
+            >
+              {t(item.key)}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex flex-1 items-center justify-end gap-2">
           <LanguageSwitcher />
           {isAuthenticated ? (
             <>
@@ -103,11 +111,11 @@ export function MarketplaceHeader({
             </>
           ) : (
             <>
-              <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-                <Link href="/sign-in">{t('signIn')}</Link>
+              <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
+                <Link href="/sign-in">{t('logIn')}</Link>
               </Button>
               <Button asChild size="sm" className="hidden sm:inline-flex">
-                <Link href="/sign-in?next=/sell">{t('listProperty')}</Link>
+                <Link href="/sign-up">{t('signUp')}</Link>
               </Button>
             </>
           )}
@@ -137,22 +145,32 @@ export function MarketplaceHeader({
                 {t(item.key)}
               </Link>
             ))}
-            {!isAuthenticated && (
+            {isAuthenticated ? (
               <Link
-                href="/sign-in"
+                href="/sell"
                 className="text-foreground rounded-md px-3 py-2 text-sm font-medium"
                 onClick={() => setOpen(false)}
               >
-                {t('signIn')}
+                {t('listProperty')}
               </Link>
+            ) : (
+              <>
+                <Link
+                  href="/sign-in"
+                  className="text-foreground rounded-md px-3 py-2 text-sm font-medium"
+                  onClick={() => setOpen(false)}
+                >
+                  {t('logIn')}
+                </Link>
+                <Link
+                  href="/sign-up"
+                  className="text-primary rounded-md px-3 py-2 text-sm font-semibold"
+                  onClick={() => setOpen(false)}
+                >
+                  {t('signUp')}
+                </Link>
+              </>
             )}
-            <Link
-              href={isAuthenticated ? '/sell' : '/sign-in?next=/sell'}
-              className="text-foreground rounded-md px-3 py-2 text-sm font-medium"
-              onClick={() => setOpen(false)}
-            >
-              {t('listProperty')}
-            </Link>
           </div>
         </nav>
       )}

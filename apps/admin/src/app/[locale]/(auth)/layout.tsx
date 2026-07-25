@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from '@/components/language-switcher';
 
 /**
- * Persistent MARKAZ Operations auth chrome (design spec §18.1): deep-blue band,
+ * Persistent Markaz Operations auth chrome (design spec §18.1): deep-blue band,
  * "Authorised access only", language control. Rendered once around every admin
  * auth screen so it doesn't re-mount between navigations.
  */

@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Bath, BedDouble, ExternalLink, Maximize } from 'lucide-react';
 import { Badge, Button, Card, Skeleton } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
+import { externalHeadline } from '@/lib/external-listing';
 import { formatAed, formatNumber } from '@/lib/format';
 import { trpc } from '@/trpc/react';
 
@@ -11,8 +12,10 @@ interface FeaturedCard {
   kind: 'internal' | 'external';
   id: string;
   href: string;
+  /** Direct listings use the seller's headline; external ones are composed. */
   title: string;
-  propertyType: string | null;
+  /** Category enum — groups the cards into one-type-per-row sections. */
+  category: (typeof CATEGORY_ORDER)[number];
   askingPriceAed: number | null;
   emirate: string | null;
   community: string | null;
@@ -22,8 +25,32 @@ interface FeaturedCard {
   coverUrl: string | null;
 }
 
-const MAX_CARDS = 6;
+/** Display order of the type sections; one row of cards each. */
+const CATEGORY_ORDER = ['APARTMENT', 'VILLA', 'TOWNHOUSE', 'PENTHOUSE', 'OTHER'] as const;
+
+type FeaturedCategory = (typeof CATEGORY_ORDER)[number];
+
+/** Anything the catalogue does not name explicitly groups under "more". */
+function toCategory(value: string | null | undefined): FeaturedCategory {
+  return CATEGORY_ORDER.find((category) => category === value) ?? 'OTHER';
+}
+const CARDS_PER_ROW = 3;
+const MAX_ROWS = 2;
+const MAX_CARDS = CARDS_PER_ROW * MAX_ROWS;
 const MAX_INTERNAL_CARDS = 3;
+
+/**
+ * Group the cards one property type per row so each row reads consistently,
+ * keeping direct MARKAZ listings ahead of external ones inside a group.
+ */
+function groupByCategory(cards: FeaturedCard[]) {
+  return CATEGORY_ORDER.map((category) => ({
+    category,
+    cards: cards.filter((card) => card.category === category).slice(0, CARDS_PER_ROW),
+  }))
+    .filter((group) => group.cards.length > 0)
+    .slice(0, MAX_ROWS);
+}
 
 export function FeaturedProperties() {
   const locale = useLocale();
@@ -46,16 +73,7 @@ export function FeaturedProperties() {
           id: card.publicId,
           href: `/properties/${card.publicId}/${card.slug ?? ''}`,
           title: card.headline,
-          propertyType:
-            card.propertyType === 'APARTMENT'
-              ? filterT('typeApartment')
-              : card.propertyType === 'VILLA'
-                ? filterT('typeVilla')
-                : card.propertyType === 'TOWNHOUSE'
-                  ? filterT('typeTownhouse')
-                  : card.propertyType === 'PENTHOUSE'
-                    ? filterT('typePenthouse')
-                    : card.propertyType,
+          category: toCategory(card.propertyType),
           askingPriceAed: card.askingPriceAed,
           emirate: card.emirate,
           community: card.community,
@@ -73,27 +91,28 @@ export function FeaturedProperties() {
       kind: 'external',
       id: card.providerId,
       href: card.externalUrl,
-      title: card.title,
-      propertyType: card.propertyType,
+      // The provider headline is agent marketing copy; compose our own instead.
+      title: externalHeadline(card, filterT, propertyT),
+      category: toCategory(card.category),
       askingPriceAed: card.askingPriceAed,
       emirate: card.emirate,
-      community: card.community,
+      // Named in the headline above, so it is not repeated on the location line.
+      community: null,
       bedrooms: card.bedrooms,
       bathrooms: card.bathrooms,
       sizeSqft: card.sizeSqft,
       coverUrl: card.coverUrl,
     }));
-  const cards = [...internalCards, ...externalCards];
+  const groups = groupByCategory([...internalCards, ...externalCards]);
+  const cardCount = groups.reduce((total, group) => total + group.cards.length, 0);
   const isInitialLoading = internal.isLoading || external.isLoading;
   const isUnavailable =
     internal.isError &&
     (external.isError || external.data?.enabled === false || external.data?.available === false);
 
+  // No rule above the heading — the hero band already separates the sections.
   return (
-    <section
-      className="border-primary/15 mt-4 border-t pt-16"
-      aria-labelledby="featured-properties-title"
-    >
+    <section className="pt-8" aria-labelledby="featured-properties-title">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <h2
@@ -102,7 +121,6 @@ export function FeaturedProperties() {
           >
             {t('featuredTitle')}
           </h2>
-          <p className="text-muted-foreground mt-2">{t('featuredBody')}</p>
         </div>
         <Button asChild variant="outline">
           <Link href="/properties">{t('featuredViewAll')}</Link>
@@ -114,7 +132,7 @@ export function FeaturedProperties() {
           <span className="sr-only">{t('featuredLoading')}</span>
           <FeaturedPropertiesSkeleton />
         </div>
-      ) : cards.length === 0 ? (
+      ) : cardCount === 0 ? (
         <Card className="mt-6 border-dashed p-8 text-center">
           <p className="font-medium">
             {isUnavailable ? t('featuredUnavailableTitle') : t('featuredEmptyTitle')}
@@ -124,16 +142,42 @@ export function FeaturedProperties() {
           </p>
         </Card>
       ) : (
-        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {cards.map((card) => {
-            const beds =
-              card.bedrooms === 0
-                ? propertyT('bedsStudio')
-                : card.bedrooms != null
-                  ? propertyT('beds', { count: card.bedrooms })
-                  : null;
-            const content = (
-              <>
+        // One property type per row, so each row reads consistently.
+        <div className="mt-8 space-y-10">
+          {groups.map((group) => (
+            <div key={group.category}>
+              <h3 className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.18em]">
+                {t(`featuredGroup${group.category}` as 'featuredGroupAPARTMENT')}
+              </h3>
+              <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {group.cards.map((card) => (
+                  <FeaturedPropertyCard key={`${card.kind}-${card.id}`} card={card} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!isInitialLoading && externalCards.length > 0 && (
+        <p className="text-muted-foreground mt-6 text-xs">{t('featuredExternalNotice')}</p>
+      )}
+    </section>
+  );
+}
+
+function FeaturedPropertyCard({ card }: { card: FeaturedCard }) {
+  const locale = useLocale();
+  const t = useTranslations('landing');
+  const propertyT = useTranslations('property');
+  const beds =
+    card.bedrooms === 0
+      ? propertyT('bedsStudio')
+      : card.bedrooms != null
+        ? propertyT('beds', { count: card.bedrooms })
+        : null;
+  const content = (
+    <>
                 <div className="bg-muted relative aspect-[4/3] w-full overflow-hidden">
                   {card.coverUrl ? (
                     // A plain image avoids copying third-party listing images into Next's
@@ -161,14 +205,10 @@ export function FeaturedProperties() {
                 <div className="flex flex-1 flex-col gap-2 p-4">
                   <p className="text-lg font-semibold">{formatAed(card.askingPriceAed, locale)}</p>
                   <p className="text-foreground line-clamp-2 text-sm font-medium">{card.title}</p>
+                  {/* The row heading names the type; only place is repeated here. */}
                   <p className="text-muted-foreground text-sm">
                     {[card.community, card.emirate].filter(Boolean).join(' · ')}
                   </p>
-                  {card.propertyType && (
-                    <Badge variant="outline" className="w-fit">
-                      {card.propertyType}
-                    </Badge>
-                  )}
 
                   <div className="text-muted-foreground mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-2 text-sm">
                     {beds && (
@@ -198,42 +238,30 @@ export function FeaturedProperties() {
                       <ExternalLink className="h-3.5 w-3.5" aria-hidden />
                     )}
                   </span>
-                </div>
-              </>
-            );
+      </div>
+    </>
+  );
 
-            return (
-              <Card
-                key={`${card.kind}-${card.id}`}
-                className="border-primary/15 bg-card/80 group flex overflow-hidden"
-              >
-                {card.kind === 'internal' ? (
-                  <Link
-                    href={card.href}
-                    className="focus-visible:ring-ring flex min-w-0 flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset"
-                  >
-                    {content}
-                  </Link>
-                ) : (
-                  <a
-                    href={card.href}
-                    target="_blank"
-                    rel="noopener noreferrer nofollow"
-                    className="focus-visible:ring-ring flex min-w-0 flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset"
-                  >
-                    {content}
-                  </a>
-                )}
-              </Card>
-            );
-          })}
-        </div>
+  return (
+    <Card className="border-primary/15 bg-card/80 group flex overflow-hidden">
+      {card.kind === 'internal' ? (
+        <Link
+          href={card.href}
+          className="focus-visible:ring-ring flex min-w-0 flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset"
+        >
+          {content}
+        </Link>
+      ) : (
+        <a
+          href={card.href}
+          target="_blank"
+          rel="noopener noreferrer nofollow"
+          className="focus-visible:ring-ring flex min-w-0 flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset"
+        >
+          {content}
+        </a>
       )}
-
-      {!isInitialLoading && externalCards.length > 0 && (
-        <p className="text-muted-foreground mt-4 text-xs">{t('featuredExternalNotice')}</p>
-      )}
-    </section>
+    </Card>
   );
 }
 

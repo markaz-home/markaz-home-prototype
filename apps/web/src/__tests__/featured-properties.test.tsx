@@ -47,9 +47,11 @@ const internalCard = {
 const externalCard = {
   source: 'BAYUT_API' as const,
   providerId: 'bayut-1',
-  title: 'External villa in Dubai Hills',
+  // Representative provider headline: promo claims, separator spam, ALL CAPS.
+  title: '5BR SINGLE ROW | 4% DLD WAIVER | HIGH ROI',
   askingPriceAed: 5_500_000,
-  propertyType: 'Villa',
+  category: 'VILLA' as const,
+  propertyType: 'Villas',
   emirate: 'Dubai',
   community: 'Dubai Hills Estate',
   bedrooms: 4,
@@ -74,13 +76,17 @@ describe('FeaturedProperties', () => {
 
     renderFeatured();
 
-    expect(screen.getByText('Listed on MARKAZ')).toBeInTheDocument();
+    expect(screen.getByText('Listed on Markaz')).toBeInTheDocument();
     expect(screen.getByText('External via BayutAPI')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Two-bedroom apartment/i })).toHaveAttribute(
       'href',
       '/properties/markaz-1/marina-apartment',
     );
-    const externalLink = screen.getByRole('link', { name: /External villa/i });
+    // External cards show a headline composed from structured fields, never the
+    // provider's marketing copy.
+    expect(screen.getByText('Villa in Dubai Hills Estate')).toBeInTheDocument();
+    expect(screen.queryByText(/DLD WAIVER/i)).not.toBeInTheDocument();
+    const externalLink = screen.getByRole('link', { name: /Villa in Dubai Hills Estate/i });
     expect(externalLink).toHaveAttribute('href', 'https://www.bayut.com/property/details-1.html');
     expect(externalLink).toHaveAttribute('target', '_blank');
     expect(externalLink).toHaveAttribute('rel', expect.stringContaining('nofollow'));
@@ -132,6 +138,6 @@ describe('FeaturedProperties', () => {
     renderFeatured('ar');
 
     expect(screen.getByText('مصدر خارجي عبر BayutAPI')).toBeInTheDocument();
-    expect(screen.getByText(/غير تابعة لـ MARKAZ/)).toBeInTheDocument();
+    expect(screen.getByText(/غير تابعة لـ Markaz/)).toBeInTheDocument();
   });
 });

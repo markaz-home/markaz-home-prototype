@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { Bath, BedDouble, ExternalLink, Maximize } from 'lucide-react';
 import { Badge, Card } from '@markaz/ui';
+import { externalHeadline } from '@/lib/external-listing';
 import { formatAed, formatNumber } from '@/lib/format';
 import type { ExternalBrowseCard } from './external-browse';
 
@@ -17,12 +18,8 @@ export function ExternalPropertyCard({ card }: { card: ExternalBrowseCard }) {
       : card.bedrooms !== null
         ? t('beds', { count: card.bedrooms })
         : null;
-  const typeLabel =
-    card.category === 'APARTMENT'
-      ? filterT('typeApartment')
-      : card.category === 'VILLA'
-        ? filterT('typeVilla')
-        : card.propertyType;
+  // Composed from structured fields — never the provider's marketing headline.
+  const headline = externalHeadline(card, filterT, t);
 
   return (
     <Card className="group flex overflow-hidden">
@@ -39,7 +36,7 @@ export function ExternalPropertyCard({ card }: { card: ExternalBrowseCard }) {
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={card.coverUrl}
-              alt={card.title}
+              alt={headline}
               loading="lazy"
               referrerPolicy="no-referrer"
               className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
@@ -56,15 +53,9 @@ export function ExternalPropertyCard({ card }: { card: ExternalBrowseCard }) {
 
         <div className="flex flex-1 flex-col gap-2 p-4">
           <p className="text-lg font-semibold">{formatAed(card.askingPriceAed, locale)}</p>
-          <p className="text-foreground line-clamp-2 text-sm font-medium">{card.title}</p>
-          <p className="text-muted-foreground text-sm">
-            {[card.community, card.emirate].filter(Boolean).join(' · ')}
-          </p>
-          {typeLabel && (
-            <Badge variant="outline" className="w-fit">
-              {typeLabel}
-            </Badge>
-          )}
+          <p className="text-foreground text-sm font-medium">{headline}</p>
+          {/* The community already sits in the headline, so this stays the emirate. */}
+          {card.emirate && <p className="text-muted-foreground text-sm">{card.emirate}</p>}
 
           <div className="text-muted-foreground mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-2 text-sm">
             {beds && (

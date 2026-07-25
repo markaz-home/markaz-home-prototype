@@ -8,8 +8,8 @@ import { TRPCProvider } from '@/trpc/react';
 import '@markaz/ui/styles.css';
 
 export const metadata: Metadata = {
-  title: 'MARKAZ Admin',
-  description: 'MARKAZ Home operations portal.',
+  title: 'Markaz Admin',
+  description: 'Markaz Home operations portal.',
 };
 
 export function generateStaticParams() {

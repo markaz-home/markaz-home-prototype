@@ -38,7 +38,7 @@ export function CustomerNav({ displayName }: { displayName: string | null }) {
         <div className="flex items-center gap-6">
           <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
             <Home className="text-primary h-5 w-5" aria-hidden />
-            MARKAZ Home
+            Markaz Home
           </Link>
           <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
             {NAV_ITEMS.map((item) => {

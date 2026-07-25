@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const t = await getTranslations({ locale, namespace: 'error' });
   if (!detail) return { title: t('propertyTitle') };
   return {
-    title: `${detail.headline} · MARKAZ Home`,
+    title: `${detail.headline} · Markaz Home`,
     description: detail.description ?? undefined,
   };
 }

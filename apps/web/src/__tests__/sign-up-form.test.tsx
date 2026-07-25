@@ -36,7 +36,7 @@ beforeEach(() => {
 describe('SignUpForm', () => {
   it('renders the spec title + live password checklist', () => {
     renderWithIntl(<SignUpForm />);
-    expect(screen.getByRole('heading', { name: 'Create your MARKAZ account' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Create your Markaz account' })).toBeInTheDocument();
     expect(screen.getByText('At least 8 characters')).toBeInTheDocument();
     expect(screen.getByText('One special character')).toBeInTheDocument();
   });
@@ -88,6 +88,6 @@ describe('SignUpForm', () => {
 
   it('renders Arabic', () => {
     renderWithIntl(<SignUpForm />, 'ar');
-    expect(screen.getByRole('heading', { name: 'أنشئ حسابك في MARKAZ' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'أنشئ حسابك في Markaz' })).toBeInTheDocument();
   });
 });

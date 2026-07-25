@@ -8,7 +8,12 @@ const BAYUT_MAX_FEATURED = 12;
 
 export type BayutApiMode = 'disabled' | 'rapidapi';
 export type BayutLocale = 'en' | 'ar';
-export type BayutPropertyCategory = 'APARTMENT' | 'VILLA' | 'OTHER';
+export type BayutPropertyCategory =
+  | 'APARTMENT'
+  | 'VILLA'
+  | 'TOWNHOUSE'
+  | 'PENTHOUSE'
+  | 'OTHER';
 
 export interface BayutPropertyCard {
   source: 'BAYUT_API';
@@ -147,8 +152,15 @@ function localizedName(
   return locale === 'ar' ? (value.name_ar ?? value.name ?? null) : (value.name ?? null);
 }
 
+/**
+ * Classify the provider's free-text sub-type into a MARKAZ category so the UI can
+ * label it in our own vocabulary (and so browse filters can match it). Order
+ * matters: the more specific dwelling types are checked first.
+ */
 function propertyCategory(value: string | null | undefined): BayutPropertyCategory {
   const normalized = value?.trim().toLowerCase() ?? '';
+  if (normalized.includes('townhouse')) return 'TOWNHOUSE';
+  if (normalized.includes('penthouse')) return 'PENTHOUSE';
   if (normalized.includes('apartment')) return 'APARTMENT';
   if (normalized.includes('villa')) return 'VILLA';
   return 'OTHER';
@@ -224,9 +236,10 @@ function selectDiverseCards(cards: BayutPropertyCard[], limit: number) {
     if (signature) seenSignatures.add(signature);
   }
 
-  const buckets = (['APARTMENT', 'VILLA', 'OTHER'] as const).map((category) =>
-    unique.filter((card) => card.category === category),
-  );
+  // Every category needs a bucket, or cards in a missing one are silently dropped.
+  const buckets = (
+    ['APARTMENT', 'VILLA', 'TOWNHOUSE', 'PENTHOUSE', 'OTHER'] as const satisfies readonly BayutPropertyCategory[]
+  ).map((category) => unique.filter((card) => card.category === category));
   const selected: BayutPropertyCard[] = [];
   while (selected.length < limit && buckets.some((bucket) => bucket.length > 0)) {
     for (const bucket of buckets) {

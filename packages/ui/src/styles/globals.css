@@ -99,39 +99,47 @@
   .theme-platform-gold {
     color-scheme: dark;
 
-    --brand-900: 42 58% 67%;
-    --brand-800: 42 52% 61%;
-    --brand-700: 42 54% 64%;
-    --brand-500: 40 36% 53%;
-    --brand-300: 39 27% 72%;
-    --brand-100: 42 33% 88%;
+    /* Warm copper-gold accent scale (#C8A27A / #B89172 / #C49A6C). */
+    --brand-900: 31 41% 63%;
+    --brand-800: 27 33% 58%;
+    --brand-700: 31 43% 60%;
+    --brand-500: 30 27% 48%;
+    --brand-300: 31 30% 76%;
+    --brand-100: 33 33% 90%;
 
-    --background: 42 14% 6%;
-    --foreground: 42 31% 91%;
-    --card: 40 13% 9%;
-    --card-foreground: 42 31% 91%;
-    --popover: 40 13% 9%;
-    --popover-foreground: 42 31% 91%;
+    /* Neutral near-black canvas (#0C0C0C) — the accent stays the only warmth. */
+    --background: 0 0% 5%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 42 54% 64%;
-    --primary-foreground: 40 18% 8%;
-    --secondary: 39 18% 16%;
-    --secondary-foreground: 42 45% 82%;
-    --muted: 39 14% 14%;
-    --muted-foreground: 39 16% 69%;
-    --accent: 40 24% 20%;
-    --accent-foreground: 42 54% 84%;
+    --primary: 31 41% 63%;
+    --primary-foreground: 24 39% 8%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 92%;
+    --muted: 0 0% 11%;
+    --muted-foreground: 0 0% 62%; /* 7.3:1 on the canvas — clears WCAG AA */
+    --accent: 31 20% 18%;
+    --accent-foreground: 31 45% 82%;
 
     --destructive: 4 72% 64%;
-    --destructive-foreground: 40 18% 8%;
+    --destructive-foreground: 24 39% 8%;
     --success: 145 43% 55%;
-    --success-foreground: 40 18% 8%;
+    --success-foreground: 24 39% 8%;
     --warning: 38 88% 64%;
-    --warning-foreground: 40 18% 8%;
+    --warning-foreground: 24 39% 8%;
 
-    --border: 39 18% 25%;
-    --input: 39 18% 28%;
-    --ring: 42 54% 64%;
+    --border: 0 0% 18%;
+    --input: 0 0% 22%;
+    --ring: 31 41% 63%;
+
+    /* Light "glass" surface — the hero search bar is the one inverted control
+       on this theme, so it stays legible once cover artwork sits behind it. */
+    --hero-search: 0 0% 100%;
+    --hero-search-foreground: 0 0% 9%;
+    --hero-search-muted: 220 6% 35%;
 
     background-color: hsl(var(--background));
     background-image:
@@ -140,16 +148,52 @@
     color: hsl(var(--foreground));
   }
 
-  .theme-platform-gold [data-brand-logo] {
-    filter: brightness(0) saturate(100%) invert(81%) sepia(27%) saturate(868%) hue-rotate(356deg)
-      brightness(91%) contrast(91%);
+  /*
+   * Public hero cover band.
+   *
+   * The cover photograph is NOT yet chosen or licensed, so the band renders as a
+   * blank warm-neutral surface. When approved artwork lands, set
+   * `--hero-cover-image: url('/…')` on the element — no other hero change needed.
+   * Do not reuse imagery from the separate MARKAZ platform implementation
+   * (docs/design/markaz-design-foundation.md §8).
+   */
+  .theme-platform-gold .platform-gold-hero-cover {
+    background-color: hsl(var(--card));
+    background-image:
+      var(--hero-cover-image, none),
+      radial-gradient(circle at 70% 30%, hsl(var(--primary) / 0.07), transparent 55%);
+    background-position: center;
+    background-size: cover;
   }
 
-  .theme-platform-gold .platform-gold-hero-art {
-    background-image:
-      linear-gradient(145deg, hsl(var(--primary) / 0.16), transparent 38%),
-      radial-gradient(circle at 78% 20%, hsl(var(--primary) / 0.2), transparent 28%),
-      linear-gradient(180deg, hsl(var(--card) / 0.3), hsl(var(--background) / 0.92));
+  /*
+   * Legibility scrim over the cover: opaque where the headline and search sit,
+   * clearing toward the far edge so artwork stays visible. Gradients cannot take
+   * logical directions, so the RTL mirror is explicit.
+   */
+  .theme-platform-gold .platform-gold-hero-scrim {
+    background-image: linear-gradient(
+      to right,
+      hsl(var(--background) / 0.96) 0%,
+      hsl(var(--background) / 0.82) 38%,
+      hsl(var(--background) / 0.3) 100%
+    );
+  }
+
+  /* `color-scheme: light` keeps the native select popups light, matching the bar. */
+  .theme-platform-gold .platform-gold-hero-search {
+    color-scheme: light;
+    background-color: hsl(var(--hero-search) / 0.94);
+    color: hsl(var(--hero-search-foreground));
+  }
+
+  [dir='rtl'] .theme-platform-gold .platform-gold-hero-scrim {
+    background-image: linear-gradient(
+      to left,
+      hsl(var(--background) / 0.96) 0%,
+      hsl(var(--background) / 0.82) 38%,
+      hsl(var(--background) / 0.3) 100%
+    );
   }
 
   * {

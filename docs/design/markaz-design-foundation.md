@@ -564,6 +564,35 @@ Implementation rules for the scoped theme:
 - The semantic token contract remains unchanged so the blue app/admin themes
   and the Platform Gold public/auth theme can coexist.
 
+#### Accent and canvas values (July 2026 alignment)
+
+The accent is the warm copper gold `#C8A27A` (`--primary: 31 41% 63%`) on a
+neutral near-black canvas `#0C0C0C` (`--background: 0 0% 5%`). Earlier gold
+tokens were yellower and warm-tinted; they were retuned in one place
+(`packages/ui/src/styles/globals.css`) so the public and auth surfaces read as
+one brand. Muted body text is `0 0% 62%` — 7.3:1 on the canvas.
+
+#### Public landing hero and nav
+
+- The hero is a **full-bleed cover band**: headline, supporting line, then the
+  property search bar. The cover photograph is **not yet chosen or licensed**,
+  so the band renders blank. When approved artwork lands, set
+  `--hero-cover-image` on `.platform-gold-hero-cover`; nothing else changes.
+  Artwork must not be taken from the separate MARKAZ platform implementation.
+- The legibility scrim (`.platform-gold-hero-scrim`) is opaque at the inline
+  start and clears toward the far edge, with an explicit RTL mirror — CSS
+  gradients cannot take logical directions.
+- The hero is deliberately capped in height so featured properties remain
+  visible above the fold on a laptop viewport.
+- The hero search bar is the **one inverted (light) control** on this theme, so
+  it stays legible once artwork sits behind it. Its surface roles are tokens
+  (`--hero-search*`), not one-off colours, and it sets `color-scheme: light` so
+  native select popups match.
+- The public header is three-part: brand at the inline start, the three primary
+  destinations (Browse Properties / How It Works / For Sellers) **centred and in
+  brand gold**, and Login + Sign Up at the inline end. Gold here is hierarchy,
+  not status.
+
 ### 8.1 Direction name
 
 **Architectural Blue — Quiet Editorial Intelligence** (default app/admin theme)
