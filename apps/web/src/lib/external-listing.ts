@@ -16,12 +16,25 @@ interface ExternalCardText {
   community: string | null;
 }
 
+const PROVIDER_LABEL_KEYS = {
+  BAYUT_API: 'featuredSourceBayut',
+} as const;
+
 const CATEGORY_LABEL_KEYS: Record<string, string> = {
   APARTMENT: 'typeApartment',
   VILLA: 'typeVilla',
   TOWNHOUSE: 'typeTownhouse',
   PENTHOUSE: 'typePenthouse',
 };
+
+/** The badge stays provider-aware without coupling card components to one source. */
+export function externalProviderLabelKey(
+  source: string,
+): 'featuredSourceBayut' | 'featuredSourceExternal' {
+  return (
+    PROVIDER_LABEL_KEYS[source as keyof typeof PROVIDER_LABEL_KEYS] ?? 'featuredSourceExternal'
+  );
+}
 
 /** Property type in our own words; unclassified provider types stay generic. */
 export function externalTypeLabel(

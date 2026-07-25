@@ -9,7 +9,6 @@ import { trpc } from '@/trpc/react';
 import { useRouter } from '@/i18n/navigation';
 import { AuthShell, AuthHeading } from '@/components/auth/auth-shell';
 import { AuthProgress, type StepStatus } from '@/components/auth/auth-progress';
-import { ErrorSummary } from '@/components/auth/error-summary';
 import { FIELD_ERROR_KEYS } from '@/components/auth/error-keys';
 
 export function ProfileSetupForm({
@@ -42,9 +41,6 @@ export function ProfileSetupForm({
   });
 
   const fe = (c?: string) => (c ? tv(FIELD_ERROR_KEYS[c] ?? 'unexpectedError') : undefined);
-  const errorList = (['fullName', 'acceptTerms', 'acceptPrivacy'] as const)
-    .filter((k) => errors[k])
-    .map((k) => ({ id: k, message: fe(errors[k]?.message) ?? '' }));
   // Setup-status resume variant (spec §9.7): account details needs attention.
   const statuses: StepStatus[] = ['action', 'complete', 'upcoming'];
 
@@ -56,7 +52,6 @@ export function ProfileSetupForm({
           description={t('descriptionOne')}
           progress={<AuthProgress current={0} statuses={statuses} />}
         />
-        <ErrorSummary errors={errorList} />
         {saveError ? <Alert variant="destructive">{saveError}</Alert> : null}
 
         {email ? (

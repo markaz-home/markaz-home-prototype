@@ -53,7 +53,8 @@
     "featuredGroupOTHER": "عقارات أخرى",
     "featuredSourceMarkaz": "مدرج على Markaz",
     "featuredSourceBayut": "مصدر خارجي عبر BayutAPI",
-    "featuredExternalNotice": "يتم توفير الإعلانات الخارجية عبر واجهة برمجة تطبيقات خارجية غير تابعة لـ Markaz، وتُفتح على موقع بيوت.",
+    "featuredSourceExternal": "إعلان خارجي",
+    "featuredExternalNotice": "يتم توفير الإعلانات الخارجية من جهات خارجية غير تابعة لـ Markaz، وتُفتح على مواقعها المصدرية.",
     "featuredOpenExternal": "فتح العقار الخارجي",
     "featuredOpenInternal": "عرض العقار",
     "featuredLoading": "جارٍ تحميل العقارات المميزة…",
@@ -89,6 +90,7 @@
     "passwordPlaceholder": "أنشئ كلمة مرور",
     "confirmPassword": "تأكيد كلمة المرور",
     "confirmPasswordPlaceholder": "أعد إدخال كلمة المرور",
+    "consent": "أوافق على <terms>الشروط والأحكام</terms> و<privacy>سياسة الخصوصية</privacy>.",
     "terms": "أوافق على شروط الاستخدام.",
     "privacy": "أوافق على سياسة الخصوصية.",
     "submit": "إنشاء حساب",
@@ -190,11 +192,26 @@
     "verifiedEmail": "تم التحقق"
   },
   "identity": {
-    "badge": "محاكاة تجريبية",
-    "disclosureTitle": "محاكاة تجريبية فقط.",
-    "disclosureBody": "هذا النموذج الأولي غير متصل بخدمة UAE PASS الفعلية.",
-    "introTitle": "تحقّق من هويتك لأغراض هذا العرض التجريبي",
-    "introBody": "يتضمن هذا النموذج الأولي خطوة هوية محاكاة لتجربة رحلة الإعداد الكاملة في Markaz.",
+    "badge": "UAE PASS في بيئة الاختبار",
+    "disclosureTitle": "بيئة اختبار للهوية.",
+    "disclosureBody": "بيئة UAE PASS التجريبية هي خدمة اختبار. لا يتم إجراء تحقق إنتاجي للهوية أو ملكية العقار.",
+    "introTitle": "التحقق عبر UAE PASS",
+    "introBody": "استخدم حساب UAE PASS الخاص ببيئة الاختبار لإكمال التحقق من الهوية.",
+    "stagingAction": "المتابعة عبر UAE PASS",
+    "stagingStarting": "جارٍ التحويل إلى UAE PASS…",
+    "stagingEnvironmentNote": "بيئة اختبار — لا يتم إجراء تحقق إنتاجي.",
+    "stagingCancelled": "تم إلغاء UAE PASS في بيئة الاختبار. حاول مجددًا عندما تكون مستعدًا.",
+    "stagingFailure": "تعذّر إكمال UAE PASS في بيئة الاختبار. حاول مجددًا.",
+    "stagingIdentityUnavailable": "لا يمكن ربط هوية UAE PASS هذه بحساب Markaz. تواصل مع دعم Markaz للمساعدة.",
+    "stagingConfigurationError": "ربط هوية UAE PASS غير متاح في هذه البيئة. يُرجى تسجيل الخروج أو التواصل مع دعم Markaz.",
+    "stagingReturnTitle": "جارٍ إكمال فحص هويتك",
+    "stagingReturnBody": "أعادتك بيئة UAE PASS التجريبية إلى Markaz. نسجّل الآن الهوية المرتبطة بأمان في حسابك.",
+    "stagingRecording": "جارٍ تسجيل نتيجة UAE PASS في بيئة الاختبار…",
+    "stagingRecordError": "تم ربط هوية UAE PASS، لكن تعذّر على Markaz تسجيل نتيجة الاختبار. حاول التسجيل مجددًا.",
+    "stagingRetryRecord": "محاولة التسجيل مجددًا",
+    "stagingSuccessTitle": "تم ربط هوية UAE PASS في بيئة الاختبار",
+    "stagingSuccessBody": "تم تسجيل رابط هوية الاختبار. هذه نتيجة اختبار وليست تحققًا إنتاجيًا للهوية.",
+    "stagingSuccessStatus": "مرتبط · بيئة اختبار",
     "start": "بدء التحقق التجريبي",
     "starting": "جارٍ بدء التحقق التجريبي…",
     "pendingTitle": "التحقق التجريبي قيد التنفيذ",
@@ -258,8 +275,8 @@
     "passwordTooLong": "يجب ألا تتجاوز كلمة المرور 128 حرفًا.",
     "confirmEmpty": "أكّد كلمة مرورك.",
     "passwordMismatch": "كلمتا المرور غير متطابقتين.",
-    "termsRequired": "وافق على شروط الاستخدام لإنشاء حساب.",
-    "privacyRequired": "وافق على سياسة الخصوصية لإنشاء حساب.",
+    "termsRequired": "وافق على الشروط والأحكام وسياسة الخصوصية للمتابعة.",
+    "privacyRequired": "وافق على الشروط والأحكام وسياسة الخصوصية للمتابعة.",
     "incorrectCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
     "emailUnverified": "تحقّق من بريدك الإلكتروني للمتابعة.",
     "codeEmpty": "أدخل رمز التحقق المكوّن من ستة أرقام.",
@@ -370,7 +387,10 @@
     "accountTypeLabel": "نوع الحساب",
     "identityLabel": "الهوية",
     "identityDemo": "تم التحقق التجريبي من الهوية",
-    "identityUaePassStaging": "تمت المصادقة عبر UAE PASS (بيئة الاختبار)"
+    "identityUaePassStaging": "تم ربط هوية UAE PASS (بيئة الاختبار)",
+    "identityNotStarted": "لم يبدأ",
+    "identityPending": "الفحص التجريبي قيد الانتظار",
+    "identityFailed": "الفحص التجريبي غير مكتمل"
   },
   "realtimeProof": {
     "title": "إثبات التحديث الفوري",
@@ -514,6 +534,13 @@
       "status": {
         "active": "نشط",
         "restricted": "الإجراءات مقيّدة"
+      },
+      "identityStatus": {
+        "NOT_STARTED": "لم يبدأ",
+        "PENDING": "الفحص التجريبي قيد الانتظار",
+        "VERIFIED_DEMO": "تم التحقق (تجريبي)",
+        "FAILED_DEMO": "الفحص التجريبي غير مكتمل",
+        "VERIFIED_STAGING": "تم ربط هوية UAE PASS (بيئة الاختبار)"
       },
       "filter": {
         "all": "All",
@@ -997,15 +1024,16 @@
     "subtitle": "تصفّح، قدّم العروض، أدرج عقارك، وتابع كل خطوة في مكان واحد.",
     "point1": "إعداد حساب واضح",
     "point2": "تحقق آمن من البريد الإلكتروني",
-    "point3": "خطوة هوية تجريبية موجَّهة"
+    "point3": "التحقق من الهوية عبر UAE PASS"
   },
   "progress": {
     "label": "تقدّم إعداد الحساب",
     "stepAccount": "تفاصيل الحساب",
     "stepEmail": "التحقق من البريد",
-    "stepIdentity": "الهوية التجريبية",
+    "stepIdentity": "الهوية",
     "actionRequired": "إجراء مطلوب",
-    "stepOf": "الخطوة {current} من {total} · {label}"
+    "stepOf": "الخطوة {current} من {total} · {label}",
+    "stepEyebrow": "الخطوة {number} · {label}"
   },
   "listing": {
     "navSell": "البيع",
@@ -1373,7 +1401,7 @@
     "directEmptyTitle": "لا توجد إعلانات Markaz مباشرة مطابقة",
     "directEmptyBody": "تظهر أدناه شقق وفلل خارجية مختارة عند توفرها.",
     "externalTitle": "عقارات خارجية مختارة",
-    "externalBody": "شقق وفلل حديثة في دبي مقدمة عبر BayutAPI. تُطبّق عوامل التصفية المدعومة على هذه المجموعة؛ وتُفتح الإعلانات الخارجية على بيوت ولا يمكن حفظها أو تقديم عروض عليها داخل Markaz."
+    "externalBody": "عقارات مختارة في الإمارات مقدمة من مزودين خارجيين. تُطبّق عوامل التصفية المدعومة على هذه المجموعة؛ وتُفتح الإعلانات الخارجية على مواقع مصادرها ولا يمكن حفظها أو تقديم عروض عليها داخل Markaz."
   },
   "filters": {
     "title": "عوامل التصفية",

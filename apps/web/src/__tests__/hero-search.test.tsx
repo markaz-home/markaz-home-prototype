@@ -10,14 +10,55 @@ vi.mock('@/i18n/navigation', () => ({ useRouter: () => ({ push }) }));
 vi.mock('@/trpc/react', () => ({
   trpc: {
     marketplace: {
-      getFilterOptions: {
-        useQuery: () => ({ data: { emirates: ['Dubai'], communities: ['Dubai Marina'] } }),
+      facets: {
+        useQuery: () => ({
+          data: {
+            propertyTypes: [
+              { value: 'APARTMENT', count: 1 },
+              { value: 'VILLA', count: 1 },
+              { value: 'TOWNHOUSE', count: 0 },
+              { value: 'PENTHOUSE', count: 0 },
+            ],
+            emirates: [{ value: 'Dubai', count: 2 }],
+            communities: [{ value: 'Dubai Marina', count: 1 }],
+            bedrooms: [
+              { value: 'studio', count: 1 },
+              { value: '1', count: 0 },
+              { value: '2', count: 1 },
+              { value: '3', count: 0 },
+              { value: '4', count: 0 },
+              { value: '5', count: 0 },
+            ],
+            baths: [],
+            priceBands: [
+              { value: 'under1m', count: 1 },
+              { value: '1to3m', count: 1 },
+              { value: '3to5m', count: 0 },
+              { value: '5plus', count: 0 },
+            ],
+          },
+        }),
       },
     },
     externalProperties: {
       featured: {
         useQuery: () => ({
-          data: { items: [{ community: 'Dubai Hills Estate' }, { community: 'Palm Jumeirah' }] },
+          data: {
+            items: [
+              {
+                category: 'VILLA',
+                community: 'Dubai Hills Estate',
+                bedrooms: 4,
+                askingPriceAed: 6_000_000,
+              },
+              {
+                category: 'APARTMENT',
+                community: 'Palm Jumeirah',
+                bedrooms: 2,
+                askingPriceAed: 2_500_000,
+              },
+            ],
+          },
         }),
       },
     },
@@ -41,25 +82,52 @@ function renderHero() {
 
 describe('buildPropertySearchQuery', () => {
   it('omits every untouched control', () => {
-    expect(buildPropertySearchQuery({ q: '  ', type: '', price: '', beds: '' })).toBe('');
+    expect(
+      buildPropertySearchQuery({
+        location: '  ',
+        propertyType: '',
+        price: '',
+        bedrooms: '',
+      }),
+    ).toBe('');
   });
 
   it('maps a price band onto the marketplace min/max pair', () => {
-    expect(buildPropertySearchQuery({ q: '', type: '', price: '1to3m', beds: '' })).toBe(
-      'minPrice=1000000&maxPrice=3000000',
-    );
-    expect(buildPropertySearchQuery({ q: '', type: '', price: 'under1m', beds: '' })).toBe(
-      'maxPrice=1000000',
-    );
-    expect(buildPropertySearchQuery({ q: '', type: '', price: '5plus', beds: '' })).toBe(
-      'minPrice=5000000',
-    );
+    expect(
+      buildPropertySearchQuery({
+        location: '',
+        propertyType: '',
+        price: '1to3m',
+        bedrooms: '',
+      }),
+    ).toBe('minPrice=1000000&maxPrice=3000000');
+    expect(
+      buildPropertySearchQuery({
+        location: '',
+        propertyType: '',
+        price: 'under1m',
+        bedrooms: '',
+      }),
+    ).toBe('maxPrice=1000000');
+    expect(
+      buildPropertySearchQuery({
+        location: '',
+        propertyType: '',
+        price: '5plus',
+        bedrooms: '',
+      }),
+    ).toBe('minPrice=5000000');
   });
 
   it('trims the search text and passes the browse filter values through', () => {
     expect(
-      buildPropertySearchQuery({ q: '  Dubai Marina ', type: 'VILLA', price: '', beds: 'studio' }),
-    ).toBe('q=Dubai+Marina&type=VILLA&beds=studio');
+      buildPropertySearchQuery({
+        location: '  Dubai Marina ',
+        propertyType: 'VILLA',
+        price: '',
+        bedrooms: 'studio',
+      }),
+    ).toBe('location=Dubai+Marina&propertyType=VILLA&bedrooms=studio');
   });
 });
 
@@ -95,7 +163,7 @@ describe('HeroSearch', () => {
 
     expect(input).toHaveValue('Dubai Hills Estate');
     await user.click(screen.getByRole('button', { name: 'Search properties' }));
-    expect(push).toHaveBeenCalledWith('/properties?q=Dubai+Hills+Estate');
+    expect(push).toHaveBeenCalledWith('/properties?location=Dubai+Hills+Estate');
   });
 
   it('sends the chosen dropdown filters to the public marketplace', async () => {
@@ -103,12 +171,12 @@ describe('HeroSearch', () => {
     renderHero();
 
     await user.click(screen.getByRole('button', { name: /Property type/ }));
-    await user.click(screen.getByRole('option', { name: 'Villa' }));
+    await user.click(screen.getByRole('option', { name: /Villa/ }));
     await user.click(screen.getByRole('button', { name: /Bedrooms/ }));
-    await user.click(screen.getByRole('option', { name: 'Studio' }));
+    await user.click(screen.getByRole('option', { name: /Studio/ }));
     await user.click(screen.getByRole('button', { name: 'Search properties' }));
 
-    expect(push).toHaveBeenCalledWith('/properties?type=VILLA&beds=studio');
+    expect(push).toHaveBeenCalledWith('/properties?propertyType=VILLA&bedrooms=studio');
   });
 
   it('opens and picks from a dropdown with the keyboard', async () => {

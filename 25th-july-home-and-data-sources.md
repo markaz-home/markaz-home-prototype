@@ -149,3 +149,65 @@ source), and per-source badges instead of the hardcoded "External via BayutAPI".
 
 `POST-WEEK-6-RELEASE-READINESS-AUDIT.md` (dated 19 July) is deliberately left untracked — commit it
 if it should be part of the repo.
+
+---
+
+## Later on 25 July — auth screens + real UAE PASS identity
+
+### Auth screens on the Platform Gold direction
+
+Sign-up, sign-in and the status screens now use the near-black card treatment: centred card
+(`AuthShell` sizes it — 430 narrow / 500 default / 620 wide), uppercase micro-labels, translucent
+fields focusing to gold, gold pill primary action, circular gold checkbox. **All of it is scoped CSS
+under `.platform-gold-auth-card`** in `packages/ui/src/styles/globals.css`, so the shared `Input`
+and `Button` components are untouched and the rest of the app keeps its normal sizing.
+
+Sign-up specifics: single column, sized to fit 1440×900 unscrolled, support panel removed,
+`STEP 01 · ACCOUNT DETAILS` eyebrow over a three-segment progress bar, and **one combined consent
+control** — the UI is a single checkbox but it still writes `acceptTerms` and `acceptPrivacy`
+separately, so the schema and the separate accepted-at timestamps are unchanged.
+
+**The error-summary panel was removed** from all four auth forms (component deleted). Inline field
+errors already carry `role="alert"`, and react-hook-form's `shouldFocusError` now moves focus to the
+first invalid field — the summary was stealing that focus. The consent box is controlled, so it has
+no ref for RHF to focus; `sign-up-form.tsx` focuses it explicitly when it is the only thing left to
+fix. `validation.errorSummaryTitle` stays in the catalogue — the listing wizard still uses it.
+
+Two layout bugs found and fixed by looking at screenshots, worth remembering:
+
+- Nothing above the hero may set `overflow-hidden` — it clipped the search dropdowns.
+- `min-h-full` on the auth shell never resolved, because `main` was `flex-1` with `height: auto` and
+  a percentage min-height needs a definite parent. Short cards hugged the top while the tall sign-up
+  card looked fine. `main` is now a flex column and the shell takes `flex-1`.
+
+### Real UAE PASS Staging identity step
+
+Spec: `docs/integrations/uae-pass-identity-step.md`. The identity step now performs a **real UAE
+PASS Staging round trip** via `supabase.auth.linkIdentity()` — never `signInWithOAuth()`, which
+would start a new session and could silently move the customer into a different account.
+
+**The customer-facing simulation is gone.** Consequence: anyone without the UAE PASS staging mobile
+app and a test account cannot complete onboarding. Fine for device-based demos; reconsider before
+showing this to anyone who does not have it.
+
+Still open, and not Codex's to decide: `enable_manual_linking` on the **hosted** Supabase project
+(it 422s in staging without it), whether a customer can unlink, and what happens if the Emirates ID
+behind a staging account is not theirs.
+
+### Local-stack gotcha that cost an hour
+
+Sign-up hung on "Creating account…" with no response. Root cause was **not** the app: GoTrue blocks
+sending mail when it cannot fetch its templates, logging
+`Get "http://supabase_kong_markaz-home:8088/email/confirmation.html": context deadline exceeded`.
+Kong serves those templates on **port 8088** and that listener had died after ~10 days uptime; the
+container had also wedged so hard that `docker kill -s KILL` returned "did not receive an exit
+event". Fixing it needed a full Docker Desktop restart (`open -a Docker` silently did nothing —
+launching `/Applications/Docker.app` by full path worked), after which Kong and edge-runtime had to
+be started manually. The database volume was untouched.
+
+If sign-up ever hangs again, check `docker logs supabase_auth_markaz-home | tail` first — that
+template line appears immediately.
+
+Verified after all of the above: `pnpm typecheck` 12/12 · `pnpm lint` 0 errors · `pnpm test` 8/8
+packages (53 files) · `pnpm build` web + admin. Plus a live end-to-end sign-up on localhost: account
+created → real six-digit code delivered to Mailpit → verified → `/verify-email/success`.

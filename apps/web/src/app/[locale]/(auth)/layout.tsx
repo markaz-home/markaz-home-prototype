@@ -1,5 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
+import { House } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { BrandLogo } from '@/components/brand-logo';
@@ -29,19 +30,22 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <Link href="/" className="flex items-center" aria-label={common('appName')}>
             <BrandLogo />
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <LanguageSwitcher />
+            {/* Icon-only return home; the label stays as its accessible name. */}
             <Link
               href="/"
-              className="text-muted-foreground hover:text-foreground hidden text-sm sm:inline"
+              aria-label={t('returnHome')}
+              title={t('returnHome')}
+              className="text-primary hover:bg-primary/10 focus-visible:ring-ring inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2"
             >
-              {t('returnHome')}
+              <House className="h-5 w-5" aria-hidden />
             </Link>
           </div>
         </div>
       </header>
 
-      <main id="main" className="flex-1">
+      <main id="main" className="flex flex-1 flex-col">
         {children}
       </main>
 

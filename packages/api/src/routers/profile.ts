@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { profiles, auditEvents, type Tx } from '@markaz/db';
 import {
   profileSetupSchema,
-  identityStatusSchema,
+  simulatedIdentityStatusSchema,
   canTransitionIdentity,
   type IdentityVerificationStatus,
 } from '@markaz/domain';
@@ -65,7 +65,7 @@ export const profileRouter = router({
 
   /** Simulated UAE PASS status change, with transition validation. */
   setIdentityStatus: customerProcedure
-    .input(z.object({ status: identityStatusSchema }))
+    .input(z.object({ status: simulatedIdentityStatusSchema }))
     .mutation(async ({ ctx, input }) => {
       const current = await loadOwnProfile(ctx.tx, ctx.user.id);
       if (!current) throw new TRPCError({ code: 'NOT_FOUND' });
@@ -105,6 +105,25 @@ export const profileRouter = router({
       const row = await loadOwnProfile(ctx.tx, ctx.user.id);
       return toProfileDto(row!);
     }),
+
+  /**
+   * Record a linked UAE PASS Staging identity without accepting a browser claim.
+   * The tRPC context derives providers from Supabase-controlled app_metadata, and
+   * the database function independently checks auth.identities before writing.
+   */
+  syncUaePassIdentity: customerProcedure.mutation(async ({ ctx }) => {
+    if (!ctx.user.authProviders?.includes('custom:uae-pass')) {
+      throw new TRPCError({
+        code: 'PRECONDITION_FAILED',
+        message: 'UAE PASS identity is not linked',
+      });
+    }
+
+    await ctx.tx.execute(sql`select public.sync_uae_pass_staging_identity()`);
+    const row = await loadOwnProfile(ctx.tx, ctx.user.id);
+    if (!row) throw new TRPCError({ code: 'NOT_FOUND', message: 'Profile not found' });
+    return toProfileDto(row);
+  }),
 
   /** Proof helper: confirms account_type cannot be self-promoted server-side. */
   attemptSelfPromote: customerProcedure.mutation(async ({ ctx }) => {

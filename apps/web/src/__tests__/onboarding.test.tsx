@@ -4,7 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { renderWithIntl } from './test-utils';
 
 const completeSetupMutate = vi.fn();
-const setIdentityMutate = vi.fn();
+const syncIdentityMutate = vi.fn();
+const linkIdentity = vi.fn();
 const auditMutateAsync = vi.fn().mockResolvedValue({});
 const signOut = vi.fn().mockResolvedValue({});
 const replace = vi.fn();
@@ -16,7 +17,7 @@ vi.mock('@/i18n/navigation', () => ({
   Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
 }));
 vi.mock('@markaz/auth/browser', () => ({
-  createSupabaseBrowserClient: () => ({ auth: { signOut } }),
+  createSupabaseBrowserClient: () => ({ auth: { signOut, linkIdentity } }),
 }));
 vi.mock('@/trpc/react', () => ({
   trpc: {
@@ -27,7 +28,9 @@ vi.mock('@/trpc/react', () => ({
           return { mutate: completeSetupMutate, isPending: false };
         },
       },
-      setIdentityStatus: { useMutation: () => ({ mutate: setIdentityMutate, isPending: false }) },
+      syncUaePassIdentity: {
+        useMutation: () => ({ mutate: syncIdentityMutate, isPending: false }),
+      },
     },
     audit: { record: { useMutation: () => ({ mutateAsync: auditMutateAsync }) } },
   },
@@ -38,7 +41,8 @@ import { UaePassFlow } from '@/components/uae-pass-flow';
 
 beforeEach(() => {
   completeSetupMutate.mockReset();
-  setIdentityMutate.mockReset();
+  syncIdentityMutate.mockReset();
+  linkIdentity.mockReset().mockResolvedValue({ error: null });
   replace.mockReset();
   completeSetupOnSuccess = undefined;
 });
@@ -74,40 +78,100 @@ describe('ProfileSetupForm', () => {
     expect(replace).toHaveBeenCalledWith('/dashboard');
   });
 
-  it('continues an email/password customer to simulated identity after profile setup', () => {
+  it('continues an email/password customer to identity verification after profile setup', () => {
     renderWithIntl(<ProfileSetupForm />);
     completeSetupOnSuccess?.();
     expect(replace).toHaveBeenCalledWith('/onboarding/uae-pass');
   });
 });
 
-describe('UaePassFlow (simulated UAE PASS, spec §16)', () => {
-  it('shows the demo disclosure and start action when not started', () => {
-    renderWithIntl(<UaePassFlow initialStatus="NOT_STARTED" />);
-    expect(screen.getByText(/Demo simulation only\./)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Start demo verification' })).toBeInTheDocument();
+describe('UaePassFlow (UAE PASS Staging)', () => {
+  it('shows only the UAE PASS staging action when staging is enabled', () => {
+    renderWithIntl(<UaePassFlow initialStatus="NOT_STARTED" uaePassStaging />);
+    expect(screen.getByRole('heading', { name: 'Verify with UAE PASS' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Continue with UAE PASS' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Staging environment — no production verification.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Test identity environment\./)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Start demo verification' }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Demo simulation controls')).not.toBeInTheDocument();
   });
 
-  it('moves to PENDING on start', async () => {
+  it('shows a configuration message without exposing simulation when staging is disabled', () => {
+    renderWithIntl(<UaePassFlow initialStatus="NOT_STARTED" />);
+    expect(
+      screen.queryByRole('button', { name: 'Continue with UAE PASS' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/UAE PASS identity linking is not available in this environment/),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Start demo verification' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('links the provider to the signed-in account with an allow-listed return path', async () => {
     const user = userEvent.setup();
-    renderWithIntl(<UaePassFlow initialStatus="NOT_STARTED" />);
-    await user.click(screen.getByRole('button', { name: 'Start demo verification' }));
-    expect(setIdentityMutate).toHaveBeenCalledWith({ status: 'PENDING' });
+    renderWithIntl(<UaePassFlow initialStatus="NOT_STARTED" uaePassStaging locale="ar" />);
+    await user.click(screen.getByRole('button', { name: 'Continue with UAE PASS' }));
+    expect(linkIdentity).toHaveBeenCalledTimes(1);
+    expect(linkIdentity).toHaveBeenCalledWith({
+      provider: 'custom:uae-pass',
+      options: {
+        redirectTo: 'http://localhost:3000/auth/callback?locale=ar&next=%2Fonboarding%2Fuae-pass',
+      },
+    });
   });
 
-  it('shows approve/reject demo controls while pending', () => {
-    renderWithIntl(<UaePassFlow initialStatus="PENDING" />);
-    expect(screen.getByRole('button', { name: 'Approve demo verification' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Reject' })).toBeInTheDocument();
+  it('shows a safe recovery message when the identity is already linked elsewhere', async () => {
+    linkIdentity.mockResolvedValue({
+      error: { code: 'identity_already_exists', message: 'provider detail' },
+    });
+    const user = userEvent.setup();
+    renderWithIntl(<UaePassFlow initialStatus="NOT_STARTED" uaePassStaging locale="en" />);
+    await user.click(screen.getByRole('button', { name: 'Continue with UAE PASS' }));
+    expect(
+      await screen.findByText(/This UAE PASS identity cannot be linked to this Markaz account/),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Start demo verification' }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('provider detail')).not.toBeInTheDocument();
   });
 
-  it('shows the exact verified success copy', () => {
-    renderWithIntl(<UaePassFlow initialStatus="VERIFIED_DEMO" />);
-    expect(screen.getAllByText('Demo identity verified').length).toBeGreaterThan(0);
+  it('server-syncs a returned provider identity without a client verification claim', () => {
+    renderWithIntl(
+      <UaePassFlow initialStatus="NOT_STARTED" providerLinked uaePassStaging locale="en" />,
+    );
+    expect(syncIdentityMutate).toHaveBeenCalledTimes(1);
+    expect(syncIdentityMutate).toHaveBeenCalledWith();
   });
 
-  it('renders Arabic disclosure', () => {
-    renderWithIntl(<UaePassFlow initialStatus="NOT_STARTED" />, 'ar');
-    expect(screen.getByText(/محاكاة تجريبية فقط\./)).toBeInTheDocument();
+  it('does not expose legacy simulation controls for a pending demo status', () => {
+    renderWithIntl(<UaePassFlow initialStatus="PENDING" uaePassStaging />);
+    expect(
+      screen.getByRole('button', { name: 'Continue with UAE PASS' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Demo simulation controls')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Approve demo verification' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows a distinct UAE PASS Staging success result', () => {
+    renderWithIntl(<UaePassFlow initialStatus="VERIFIED_STAGING" providerLinked />);
+    expect(screen.getAllByText('UAE PASS Staging identity linked').length).toBeGreaterThan(0);
+    expect(screen.getByText('Linked · Staging')).toBeInTheDocument();
+  });
+
+  it('renders compact Arabic staging copy', () => {
+    renderWithIntl(<UaePassFlow initialStatus="NOT_STARTED" uaePassStaging />, 'ar');
+    expect(screen.getByRole('heading', { name: 'التحقق عبر UAE PASS' })).toBeInTheDocument();
+    expect(screen.getByText(/بيئة اختبار — لا يتم إجراء تحقق إنتاجي/)).toBeInTheDocument();
   });
 });

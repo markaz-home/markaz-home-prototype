@@ -4,43 +4,29 @@ import { useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { SlidersHorizontal, X } from 'lucide-react';
+import {
+  BATHS_OPTIONS,
+  BEDS_OPTIONS,
+  COMPLETION_STATUSES,
+  FURNISHING_STATUSES,
+  MARKETPLACE_QUERY_PARAM_KEYS,
+  MARKETPLACE_SORTS,
+  PROPERTY_TYPES,
+  type MarketplaceSort,
+} from '@markaz/domain';
 import { Alert, Button, EmptyState, ErrorState, Skeleton, cn } from '@markaz/ui';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import type { RouterInputs } from '@/trpc/types';
-import { filterExternalBrowseCards } from './external-browse';
 import { ExternalPropertyCard } from './external-property-card';
 import { PropertyCard } from './property-card';
 
-const PARAM_KEYS = [
-  'q',
-  'type',
-  'emirate',
-  'area',
-  'minPrice',
-  'maxPrice',
-  'beds',
-  'baths',
-  'minSize',
-  'maxSize',
-  'furnishing',
-  'completion',
-  'investmentCase',
-  'sort',
-  'page',
-] as const;
-
-const PROPERTY_TYPES = ['APARTMENT', 'VILLA', 'TOWNHOUSE', 'PENTHOUSE'] as const;
-const BEDS = ['studio', '1', '2', '3', '4', '5'] as const;
-const BATHS = ['1', '2', '3', '4'] as const;
-const FURNISHINGS = ['FURNISHED', 'UNFURNISHED', 'PARTLY_FURNISHED'] as const;
-const COMPLETIONS = ['READY', 'OFF_PLAN'] as const;
-const SORTS = [
-  ['NEWEST', 'newest'],
-  ['PRICE_ASC', 'priceLow'],
-  ['PRICE_DESC', 'priceHigh'],
-  ['SIZE_DESC', 'sizeLarge'],
-] as const;
+const SORT_LABEL_KEYS = {
+  NEWEST: 'newest',
+  PRICE_ASC: 'priceLow',
+  PRICE_DESC: 'priceHigh',
+  SIZE_DESC: 'sizeLarge',
+} as const satisfies Record<MarketplaceSort, 'newest' | 'priceLow' | 'priceHigh' | 'sizeLarge'>;
 
 const selectCls = 'h-10 w-full rounded-md border border-input bg-background px-3 text-sm';
 
@@ -64,21 +50,29 @@ export function MarketplaceBrowse({
 
   const query = useMemo(() => {
     const o: Record<string, string> = {};
-    for (const k of PARAM_KEYS) {
+    for (const k of MARKETPLACE_QUERY_PARAM_KEYS) {
       const v = sp.get(k);
       if (v) o[k] = v;
     }
     return o;
   }, [sp]);
 
-  const [searchText, setSearchText] = useState(query.q ?? '');
+  const [searchText, setSearchText] = useState(query.location ?? '');
 
   const search = trpc.marketplace.search.useQuery(query as RouterInputs['marketplace']['search'], {
     staleTime: 0,
     placeholderData: (prev) => prev,
   });
-  const external = trpc.externalProperties.featured.useQuery(
-    { locale: locale === 'ar' ? 'ar' : 'en', limit: 12 },
+  const facets = trpc.marketplace.facets.useQuery(query as RouterInputs['marketplace']['facets'], {
+    staleTime: 30_000,
+    placeholderData: (prev) => prev,
+  });
+  const external = trpc.externalProperties.search.useQuery(
+    {
+      locale: locale === 'ar' ? 'ar' : 'en',
+      limit: 12,
+      query: query as RouterInputs['marketplace']['search'],
+    },
     { staleTime: 60 * 60 * 1_000 },
   );
   const savedIds = trpc.marketplace.saved.publicIds.useQuery(undefined, {
@@ -89,11 +83,20 @@ export function MarketplaceBrowse({
   });
   const savedSet = useMemo(() => new Set(savedIds.data ?? []), [savedIds.data]);
   const ownedSet = useMemo(() => new Set(ownedIds.data ?? []), [ownedIds.data]);
-  const externalCards = useMemo(
-    () => filterExternalBrowseCards(external.data?.items ?? [], query),
-    [external.data?.items, query],
-  );
+  const externalCards = external.data?.items ?? [];
   const externalExpected = external.isLoading || externalCards.length > 0;
+  const propertyTypeCounts = useMemo(
+    () => new Map(facets.data?.propertyTypes.map((item) => [item.value, item.count]) ?? []),
+    [facets.data?.propertyTypes],
+  );
+  const bedCounts = useMemo(
+    () => new Map(facets.data?.bedrooms.map((item) => [item.value, item.count]) ?? []),
+    [facets.data?.bedrooms],
+  );
+  const bathCounts = useMemo(
+    () => new Map(facets.data?.baths.map((item) => [item.value, item.count]) ?? []),
+    [facets.data?.baths],
+  );
 
   function update(patch: Record<string, string | null>, resetPage = true) {
     const params = new URLSearchParams(sp.toString());
@@ -116,12 +119,16 @@ export function MarketplaceBrowse({
 
   // Active filter chips (search excluded — it has its own clear control).
   const chips: Array<{ key: string; label: string }> = [];
-  if (query.type)
-    chips.push({ key: 'type', label: tf(`type${titleCase(query.type)}` as 'typeApartment') });
-  if (query.beds)
+  if (query.propertyType)
     chips.push({
-      key: 'beds',
-      label: query.beds === 'studio' ? tf('studio') : tf('bedsOption', { count: query.beds }),
+      key: 'propertyType',
+      label: tf(`type${titleCase(query.propertyType)}` as 'typeApartment'),
+    });
+  if (query.bedrooms)
+    chips.push({
+      key: 'bedrooms',
+      label:
+        query.bedrooms === 'studio' ? tf('studio') : tf('bedsOption', { count: query.bedrooms }),
     });
   if (query.baths) chips.push({ key: 'baths', label: `${query.baths}+ ${tf('bathrooms')}` });
   if (query.area) chips.push({ key: 'area', label: query.area });
@@ -167,7 +174,7 @@ export function MarketplaceBrowse({
         className="mt-6 flex max-w-3xl items-center gap-2"
         onSubmit={(e) => {
           e.preventDefault();
-          update({ q: searchText.trim() || null });
+          update({ location: searchText.trim() || null });
         }}
       >
         <div className="relative flex-1">
@@ -189,7 +196,7 @@ export function MarketplaceBrowse({
               aria-label={t('clearSearch')}
               onClick={() => {
                 setSearchText('');
-                update({ q: null });
+                update({ location: null });
               }}
               className="text-muted-foreground hover:text-foreground absolute end-2 top-1/2 -translate-y-1/2 rounded p-1"
             >
@@ -205,13 +212,18 @@ export function MarketplaceBrowse({
         <Field label={tf('propertyType')}>
           <select
             className={selectCls}
-            value={query.type ?? ''}
-            onChange={(e) => update({ type: e.target.value || null })}
+            value={query.propertyType ?? ''}
+            onChange={(e) => update({ propertyType: e.target.value || null })}
           >
             <option value="">{tf('any')}</option>
             {PROPERTY_TYPES.map((v) => (
-              <option key={v} value={v}>
+              <option
+                key={v}
+                value={v}
+                disabled={!!facets.data && (propertyTypeCounts.get(v) ?? 0) === 0}
+              >
                 {tf(`type${titleCase(v)}` as 'typeApartment')}
+                {facets.data ? ` (${propertyTypeCounts.get(v) ?? 0})` : ''}
               </option>
             ))}
           </select>
@@ -219,14 +231,18 @@ export function MarketplaceBrowse({
         <Field label={tf('bedrooms')}>
           <select
             className={selectCls}
-            value={query.beds ?? ''}
-            onChange={(e) => update({ beds: e.target.value || null })}
+            value={query.bedrooms ?? ''}
+            onChange={(e) => update({ bedrooms: e.target.value || null })}
           >
             <option value="">{tf('any')}</option>
-            <option value="studio">{tf('studio')}</option>
-            {BEDS.filter((b) => b !== 'studio').map((v) => (
-              <option key={v} value={v}>
+            <option value="studio" disabled={!!facets.data && (bedCounts.get('studio') ?? 0) === 0}>
+              {tf('studio')}
+              {facets.data ? ` (${bedCounts.get('studio') ?? 0})` : ''}
+            </option>
+            {BEDS_OPTIONS.filter((b) => b !== 'studio').map((v) => (
+              <option key={v} value={v} disabled={!!facets.data && (bedCounts.get(v) ?? 0) === 0}>
                 {tf('bedsOption', { count: v })}
+                {facets.data ? ` (${bedCounts.get(v) ?? 0})` : ''}
               </option>
             ))}
           </select>
@@ -254,10 +270,18 @@ export function MarketplaceBrowse({
         <Field label={tf('community')}>
           <input
             className={selectCls}
+            list="marketplace-community-options"
             defaultValue={query.area ?? ''}
             placeholder={tf('communityPlaceholder')}
             onBlur={(e) => update({ area: e.target.value || null })}
           />
+          <datalist id="marketplace-community-options">
+            {facets.data?.communities.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.count}
+              </option>
+            ))}
+          </datalist>
         </Field>
         <Button
           type="button"
@@ -278,9 +302,14 @@ export function MarketplaceBrowse({
               onChange={(e) => update({ baths: e.target.value || null })}
             >
               <option value="">{tf('any')}</option>
-              {BATHS.map((v) => (
-                <option key={v} value={v}>
+              {BATHS_OPTIONS.map((v) => (
+                <option
+                  key={v}
+                  value={v}
+                  disabled={!!facets.data && (bathCounts.get(v) ?? 0) === 0}
+                >
                   {tf('bedsOption', { count: v })}
+                  {facets.data ? ` (${bathCounts.get(v) ?? 0})` : ''}
                 </option>
               ))}
             </select>
@@ -312,7 +341,7 @@ export function MarketplaceBrowse({
               onChange={(e) => update({ furnishing: e.target.value || null })}
             >
               <option value="">{tf('any')}</option>
-              {FURNISHINGS.map((v) => (
+              {FURNISHING_STATUSES.map((v) => (
                 <option key={v} value={v}>
                   {tf(`furnishing${v}` as 'furnishingFURNISHED')}
                 </option>
@@ -326,7 +355,7 @@ export function MarketplaceBrowse({
               onChange={(e) => update({ completion: e.target.value || null })}
             >
               <option value="">{tf('any')}</option>
-              {COMPLETIONS.map((v) => (
+              {COMPLETION_STATUSES.map((v) => (
                 <option key={v} value={v}>
                   {tf(`completion${v}` as 'completionREADY')}
                 </option>
@@ -370,8 +399,8 @@ export function MarketplaceBrowse({
           {fetching
             ? t('updating')
             : data
-              ? query.q
-                ? t('resultsQuery', { count: data.pagination.total, query: query.q })
+              ? query.location
+                ? t('resultsQuery', { count: data.pagination.total, query: query.location })
                 : data.pagination.total === 1
                   ? t('resultsOne')
                   : t('resultsMany', { count: data.pagination.total })
@@ -387,9 +416,9 @@ export function MarketplaceBrowse({
             value={query.sort ?? 'NEWEST'}
             onChange={(e) => update({ sort: e.target.value })}
           >
-            {SORTS.map(([v, k]) => (
-              <option key={v} value={v}>
-                {ts(k)}
+            {MARKETPLACE_SORTS.map((value) => (
+              <option key={value} value={value}>
+                {ts(SORT_LABEL_KEYS[value])}
               </option>
             ))}
           </select>
@@ -419,7 +448,9 @@ export function MarketplaceBrowse({
         ) : data && data.items.length === 0 ? (
           <EmptyState
             title={te('resultsTitle')}
-            description={query.q ? te('queryBody', { query: query.q }) : te('resultsBody')}
+            description={
+              query.location ? te('queryBody', { query: query.location }) : te('resultsBody')
+            }
             action={<Button onClick={clearAll}>{te('clear')}</Button>}
           />
         ) : (

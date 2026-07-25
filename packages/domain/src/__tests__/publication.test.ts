@@ -14,7 +14,7 @@ import {
   marketplaceQuerySchema,
   parseMarketplaceQuery,
   paginate,
-  bedsFilter,
+  bedroomsFilter,
   DEFAULT_SORT,
   MARKETPLACE_PAGE_SIZE,
 } from '../marketplace';
@@ -116,18 +116,18 @@ describe('public slug + id', () => {
 describe('marketplace query schema', () => {
   it('coerces + defaults sort/page', () => {
     const q = marketplaceQuerySchema.parse({
-      type: 'APARTMENT',
+      propertyType: 'APARTMENT',
       minPrice: '1000000',
       maxPrice: '3000000',
-      beds: '2',
+      bedrooms: '2',
       sort: 'PRICE_ASC',
       page: '2',
     });
     expect(q).toMatchObject({
-      type: 'APARTMENT',
+      propertyType: 'APARTMENT',
       minPrice: 1_000_000,
       maxPrice: 3_000_000,
-      beds: '2',
+      bedrooms: '2',
       sort: 'PRICE_ASC',
       page: 2,
     });
@@ -143,19 +143,24 @@ describe('marketplace query schema', () => {
     );
   });
   it('drops individually-invalid fields but keeps valid ones (lenient parse)', () => {
-    const q = parseMarketplaceQuery({ type: 'NOT_A_TYPE', beds: '2', sort: 'bogus', page: 'x' });
-    expect(q.type).toBeUndefined();
-    expect(q.beds).toBe('2');
+    const q = parseMarketplaceQuery({
+      propertyType: 'NOT_A_TYPE',
+      bedrooms: '2',
+      sort: 'bogus',
+      page: 'x',
+    });
+    expect(q.propertyType).toBeUndefined();
+    expect(q.bedrooms).toBe('2');
     expect(q.sort).toBe(DEFAULT_SORT);
     expect(q.page).toBe(1);
   });
   it('rejects an over-long search string', () => {
-    expect(marketplaceQuerySchema.safeParse({ q: 'a'.repeat(101) }).success).toBe(false);
+    expect(marketplaceQuerySchema.safeParse({ location: 'a'.repeat(101) }).success).toBe(false);
   });
   it('translates the beds filter', () => {
-    expect(bedsFilter('studio')).toEqual({ studioOnly: true });
-    expect(bedsFilter('3')).toEqual({ min: 3 });
-    expect(bedsFilter(undefined)).toBeNull();
+    expect(bedroomsFilter('studio')).toEqual({ studioOnly: true });
+    expect(bedroomsFilter('3')).toEqual({ min: 3 });
+    expect(bedroomsFilter(undefined)).toBeNull();
   });
   it('paginates with clamping', () => {
     const p = paginate(50, 3, MARKETPLACE_PAGE_SIZE);

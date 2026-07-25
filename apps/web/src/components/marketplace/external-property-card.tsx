@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { Bath, BedDouble, ExternalLink, Maximize } from 'lucide-react';
 import { Badge, Card } from '@markaz/ui';
-import { externalHeadline } from '@/lib/external-listing';
+import { externalHeadline, externalProviderLabelKey } from '@/lib/external-listing';
 import { formatAed, formatNumber } from '@/lib/format';
 import type { ExternalBrowseCard } from './external-browse';
 
@@ -47,7 +47,7 @@ export function ExternalPropertyCard({ card }: { card: ExternalBrowseCard }) {
             </div>
           )}
           <Badge className="bg-background/95 text-foreground absolute start-3 top-3 shadow-none">
-            {landingT('featuredSourceBayut')}
+            {landingT(externalProviderLabelKey(card.source))}
           </Badge>
         </div>
 

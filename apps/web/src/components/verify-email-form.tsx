@@ -86,7 +86,7 @@ export function VerifyEmailForm() {
 
   return (
     <AuthShell narrow>
-      <div className="space-y-6">
+      <div className="space-y-5">
         <AuthHeading
           title={t('title')}
           description={t('description', { email: maskEmail(email) })}
@@ -113,18 +113,20 @@ export function VerifyEmailForm() {
           </Button>
         </form>
 
-        <div className="flex items-center justify-between text-sm">
-          <Link href="/sign-up" className="text-muted-foreground hover:text-foreground">
-            {t('changeEmail')}
-          </Link>
-          <button
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Button asChild variant="outline" size="sm" className="rounded-full">
+            <Link href="/sign-up">{t('changeEmail')}</Link>
+          </Button>
+          <Button
             type="button"
-            className="text-primary disabled:text-muted-foreground"
+            variant="outline"
+            size="sm"
+            className="rounded-full"
             disabled={resendIn > 0 || busy}
             onClick={resend}
           >
             {resendIn > 0 ? t('resendIn', { time: mmss(resendIn) }) : t('resend')}
-          </button>
+          </Button>
         </div>
         <p className="text-muted-foreground text-xs">{t('help')}</p>
       </div>

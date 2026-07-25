@@ -3,39 +3,31 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Check, ChevronDown, Search } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import {
+  BEDS_OPTIONS,
+  MARKETPLACE_PRICE_BANDS,
+  PROPERTY_TYPES,
+  type MarketplacePriceBand,
+} from '@markaz/domain';
 import { cn } from '@markaz/ui';
 import { useRouter } from '@/i18n/navigation';
-import { dubaiCommunityNames } from '@/lib/dubai-communities';
 import { trpc } from '@/trpc/react';
 
-/**
- * Price bands offered on the hero. Each maps to the `minPrice`/`maxPrice` pair
- * the marketplace browse page already reads from the query string, so the hero
- * search is a real filter entry point and not a decorative control.
- */
-const PRICE_BANDS = {
-  under1m: { maxPrice: '1000000' },
-  '1to3m': { minPrice: '1000000', maxPrice: '3000000' },
-  '3to5m': { minPrice: '3000000', maxPrice: '5000000' },
-  '5plus': { minPrice: '5000000' },
-} as const;
-
-type PriceBand = keyof typeof PRICE_BANDS;
-
-const PROPERTY_TYPES = ['APARTMENT', 'VILLA', 'TOWNHOUSE', 'PENTHOUSE'] as const;
-const BEDS = ['studio', '1', '2', '3', '4', '5'] as const;
 const MAX_SUGGESTIONS = 6;
+const EXTERNAL_FEATURED_LIMIT = 6;
 
 export interface HeroSearchValues {
-  q: string;
-  type: string;
+  location: string;
+  propertyType: string;
   price: string;
-  beds: string;
+  bedrooms: string;
 }
 
 interface Option {
   value: string;
   label: string;
+  count?: number;
+  disabled?: boolean;
 }
 
 /**
@@ -44,15 +36,15 @@ interface Option {
  */
 export function buildPropertySearchQuery(values: HeroSearchValues): string {
   const params = new URLSearchParams();
-  const q = values.q.trim();
-  if (q) params.set('q', q);
-  if (values.type) params.set('type', values.type);
-  if (values.beds) params.set('beds', values.beds);
+  const location = values.location.trim();
+  if (location) params.set('location', location);
+  if (values.propertyType) params.set('propertyType', values.propertyType);
+  if (values.bedrooms) params.set('bedrooms', values.bedrooms);
 
-  const band = PRICE_BANDS[values.price as PriceBand];
+  const band = MARKETPLACE_PRICE_BANDS[values.price as MarketplacePriceBand];
   if (band) {
-    if ('minPrice' in band && band.minPrice) params.set('minPrice', band.minPrice);
-    if ('maxPrice' in band && band.maxPrice) params.set('maxPrice', band.maxPrice);
+    if (band.minPrice !== null) params.set('minPrice', String(band.minPrice));
+    if (band.maxPrice !== null) params.set('maxPrice', String(band.maxPrice));
   }
   return params.toString();
 }
@@ -86,25 +78,68 @@ export function HeroSearch() {
   const locale = useLocale();
   const router = useRouter();
   const [values, setValues] = useState<HeroSearchValues>({
-    q: '',
-    type: '',
+    location: '',
+    propertyType: '',
     price: '',
-    beds: '',
+    bedrooms: '',
   });
 
-  // Suggestions merge the searchable Dubai areas with the communities that
-  // actually appear on MARKAZ inventory. Deliberately no external-provider
-  // query here: it would be a second upstream call (a different `limit` key
-  // from the featured section) on every page load, for tower names only.
-  const filterOptions = trpc.marketplace.getFilterOptions.useQuery(undefined, {
-    staleTime: 5 * 60 * 1_000,
-  });
+  const facets = trpc.marketplace.facets.useQuery(
+    {},
+    {
+      staleTime: 5 * 60 * 1_000,
+    },
+  );
+  // This is deliberately the exact same query key as FeaturedProperties, so
+  // React Query shares one provider request across the homepage.
+  const external = trpc.externalProperties.featured.useQuery(
+    { locale: locale === 'ar' ? 'ar' : 'en', limit: EXTERNAL_FEATURED_LIMIT },
+    { staleTime: 60 * 60 * 1_000 },
+  );
   const places = useMemo(() => {
-    const all = [...dubaiCommunityNames(locale), ...(filterOptions.data?.communities ?? [])].filter(
-      (place): place is string => !!place?.trim(),
-    );
+    const all = [
+      ...(facets.data?.communities.map((item) => item.value) ?? []),
+      ...(external.data?.items.map((item) => item.community) ?? []),
+    ].filter((place): place is string => !!place?.trim());
     return [...new Set(all)].sort();
-  }, [locale, filterOptions.data?.communities]);
+  }, [facets.data?.communities, external.data?.items]);
+
+  const inventoryReady = !!facets.data && !!external.data;
+  const typeCounts = useMemo(() => {
+    const counts = new Map(
+      facets.data?.propertyTypes.map((item) => [item.value, item.count]) ?? [],
+    );
+    for (const card of external.data?.items ?? []) {
+      if (card.category !== 'OTHER') {
+        counts.set(card.category, (counts.get(card.category) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }, [facets.data?.propertyTypes, external.data?.items]);
+  const bedCounts = useMemo(() => {
+    const counts = new Map(facets.data?.bedrooms.map((item) => [item.value, item.count]) ?? []);
+    for (const card of external.data?.items ?? []) {
+      if (card.bedrooms === null) continue;
+      const value =
+        card.bedrooms === 0 ? 'studio' : card.bedrooms >= 5 ? '5' : String(card.bedrooms);
+      if (BEDS_OPTIONS.includes(value as (typeof BEDS_OPTIONS)[number])) {
+        counts.set(value, (counts.get(value) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }, [facets.data?.bedrooms, external.data?.items]);
+  const priceCounts = useMemo(() => {
+    const counts = new Map(facets.data?.priceBands.map((item) => [item.value, item.count]) ?? []);
+    for (const card of external.data?.items ?? []) {
+      const match = Object.entries(MARKETPLACE_PRICE_BANDS).find(([, band]) => {
+        const aboveMinimum = band.minPrice === null || card.askingPriceAed >= band.minPrice;
+        const belowMaximum = band.maxPrice === null || card.askingPriceAed < band.maxPrice;
+        return aboveMinimum && belowMaximum;
+      });
+      if (match) counts.set(match[0], (counts.get(match[0]) ?? 0) + 1);
+    }
+    return counts;
+  }, [facets.data?.priceBands, external.data?.items]);
 
   const set = (key: keyof HeroSearchValues) => (value: string) =>
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -114,20 +149,44 @@ export function HeroSearch() {
     ...PROPERTY_TYPES.map((type) => ({
       value: type,
       label: tf(`type${type.charAt(0)}${type.slice(1).toLowerCase()}` as 'typeApartment'),
+      count: inventoryReady ? (typeCounts.get(type) ?? 0) : undefined,
+      disabled: inventoryReady && (typeCounts.get(type) ?? 0) === 0,
     })),
   ];
   const priceOptions: Option[] = [
     { value: '', label: t('searchPriceAny') },
-    { value: 'under1m', label: t('searchPriceUnder1m') },
-    { value: '1to3m', label: t('searchPrice1to3m') },
-    { value: '3to5m', label: t('searchPrice3to5m') },
-    { value: '5plus', label: t('searchPrice5plus') },
+    {
+      value: 'under1m',
+      label: t('searchPriceUnder1m'),
+      count: inventoryReady ? (priceCounts.get('under1m') ?? 0) : undefined,
+      disabled: inventoryReady && (priceCounts.get('under1m') ?? 0) === 0,
+    },
+    {
+      value: '1to3m',
+      label: t('searchPrice1to3m'),
+      count: inventoryReady ? (priceCounts.get('1to3m') ?? 0) : undefined,
+      disabled: inventoryReady && (priceCounts.get('1to3m') ?? 0) === 0,
+    },
+    {
+      value: '3to5m',
+      label: t('searchPrice3to5m'),
+      count: inventoryReady ? (priceCounts.get('3to5m') ?? 0) : undefined,
+      disabled: inventoryReady && (priceCounts.get('3to5m') ?? 0) === 0,
+    },
+    {
+      value: '5plus',
+      label: t('searchPrice5plus'),
+      count: inventoryReady ? (priceCounts.get('5plus') ?? 0) : undefined,
+      disabled: inventoryReady && (priceCounts.get('5plus') ?? 0) === 0,
+    },
   ];
   const bedOptions: Option[] = [
     { value: '', label: tf('any') },
-    ...BEDS.map((bed) => ({
+    ...BEDS_OPTIONS.map((bed) => ({
       value: bed,
       label: bed === 'studio' ? tf('studio') : tf('bedsOption', { count: bed }),
+      count: inventoryReady ? (bedCounts.get(bed) ?? 0) : undefined,
+      disabled: inventoryReady && (bedCounts.get(bed) ?? 0) === 0,
     })),
   ];
 
@@ -149,15 +208,15 @@ export function HeroSearch() {
         <PlaceField
           label={t('searchLocation')}
           placeholder={t('searchLocationPlaceholder')}
-          value={values.q}
-          onChange={set('q')}
+          value={values.location}
+          onChange={set('location')}
           places={places}
         />
         <HeroSelect
           label={tf('propertyType')}
           options={typeOptions}
-          value={values.type}
-          onChange={set('type')}
+          value={values.propertyType}
+          onChange={set('propertyType')}
         />
         <HeroSelect
           label={tf('priceRange')}
@@ -168,8 +227,8 @@ export function HeroSearch() {
         <HeroSelect
           label={tf('bedrooms')}
           options={bedOptions}
-          value={values.beds}
-          onChange={set('beds')}
+          value={values.bedrooms}
+          onChange={set('bedrooms')}
           last
         />
 
@@ -364,8 +423,16 @@ function HeroSelect({
 
   function commit(index: number) {
     const option = options[index];
-    if (option) onChange(option.value);
+    if (option && !option.disabled) onChange(option.value);
     setOpen(false);
+  }
+
+  function moveActive(start: number, direction: 1 | -1) {
+    for (let offset = 1; offset <= options.length; offset += 1) {
+      const index = (start + direction * offset + options.length) % options.length;
+      if (!options[index]?.disabled) return index;
+    }
+    return start;
   }
 
   return (
@@ -390,10 +457,7 @@ function HeroSelect({
                 setOpen(true);
                 return;
               }
-              setActive((prev) => {
-                const next = event.key === 'ArrowDown' ? prev + 1 : prev - 1;
-                return (next + options.length) % options.length;
-              });
+              setActive((prev) => moveActive(prev, event.key === 'ArrowDown' ? 1 : -1));
             } else if (open && (event.key === 'Enter' || event.key === ' ')) {
               event.preventDefault();
               commit(active);
@@ -425,19 +489,28 @@ function HeroSelect({
                 id={`${listboxId}-${index}`}
                 role="option"
                 aria-selected={option.value === value}
-                onMouseEnter={() => setActive(index)}
+                aria-disabled={option.disabled || undefined}
+                onMouseEnter={() => {
+                  if (!option.disabled) setActive(index);
+                }}
                 onMouseDown={(event) => {
                   event.preventDefault();
-                  commit(index);
+                  if (!option.disabled) commit(index);
                 }}
                 className={cn(
                   optionCls,
                   index === active && 'bg-[hsl(var(--hero-search-foreground)/0.06)]',
                   option.value === value && 'font-semibold',
+                  option.disabled && 'cursor-not-allowed opacity-45',
                 )}
               >
                 <span className="truncate">{option.label}</span>
-                {option.value === value && <Check className="h-3.5 w-3.5 shrink-0" aria-hidden />}
+                <span className="flex shrink-0 items-center gap-2">
+                  {option.count !== undefined && (
+                    <span className="text-xs tabular-nums">{option.count}</span>
+                  )}
+                  {option.value === value && <Check className="h-3.5 w-3.5" aria-hidden />}
+                </span>
               </li>
             ))}
           </ul>

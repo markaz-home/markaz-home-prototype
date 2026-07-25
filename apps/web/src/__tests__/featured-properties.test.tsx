@@ -90,7 +90,7 @@ describe('FeaturedProperties', () => {
     expect(externalLink).toHaveAttribute('href', 'https://www.bayut.com/property/details-1.html');
     expect(externalLink).toHaveAttribute('target', '_blank');
     expect(externalLink).toHaveAttribute('rel', expect.stringContaining('nofollow'));
-    expect(screen.getByText(/unaffiliated third-party API/i)).toBeInTheDocument();
+    expect(screen.getByText(/unaffiliated third-party providers/i)).toBeInTheDocument();
   });
 
   it('keeps the section present while one source is still loading', () => {

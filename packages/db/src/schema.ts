@@ -36,6 +36,7 @@ export const identityVerificationStatus = pgEnum('identity_verification_status',
   'PENDING',
   'VERIFIED_DEMO',
   'FAILED_DEMO',
+  'VERIFIED_STAGING',
 ]);
 export const listingState = pgEnum('listing_state', [
   'DRAFT',

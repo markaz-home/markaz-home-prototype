@@ -143,8 +143,8 @@ Use this order of precedence:
 - Phone-number capture
 - Emirates ID capture
 - Passport capture
-- Real UAE PASS
-- Real identity verification
+- Production/live UAE PASS
+- Production identity verification
 - Biometric authentication
 - Passkeys
 - Multi-factor authentication beyond email verification
@@ -404,11 +404,12 @@ Required profile data complete?
    ├── No → Complete Profile
    └── Yes
         ↓
-Demo identity status
+Identity status
    ├── NOT_STARTED → UAE PASS Introduction
    ├── PENDING → Pending State
    ├── FAILED_DEMO → Failure and Retry
-   └── VERIFIED_DEMO → Restore destination / Dashboard
+   ├── VERIFIED_DEMO → Restore destination / Dashboard
+   └── VERIFIED_STAGING → Restore destination / Dashboard
 ```
 
 ## 6.2 Sign In
@@ -431,7 +432,7 @@ Resolve server-side account state
         ├── UAE PASS NOT_STARTED → UAE PASS Introduction
         ├── UAE PASS PENDING → Pending State
         ├── UAE PASS FAILED_DEMO → Failure and Retry
-        └── UAE PASS VERIFIED_DEMO
+        └── UAE PASS VERIFIED_DEMO / VERIFIED_STAGING
               ↓
         Safe intended destination or Dashboard
 ```
@@ -477,7 +478,7 @@ Resolve first unmet requirement
   ├── Identity NOT_STARTED → UAE PASS Introduction
   ├── Identity PENDING → UAE PASS Pending
   ├── Identity FAILED_DEMO → UAE PASS Failure
-  └── Identity VERIFIED_DEMO → Dashboard / safe destination
+  └── Identity VERIFIED_DEMO / VERIFIED_STAGING → Dashboard / safe destination
 ```
 
 ---
@@ -1531,67 +1532,50 @@ Do not allow email editing from Profile Completion. Email change is an Account-s
 
 ---
 
-# 16. Simulated UAE PASS Specification
+# 16. UAE PASS Staging
 
 ## 16.1 Product purpose
 
-Demonstrate the future identity-verification position in the onboarding journey without connecting to or impersonating the live UAE PASS service.
+UAE PASS Staging links a test-provider identity to an already signed-in customer when `UAE_PASS_MODE=staging`. Customer-facing simulated verification has been removed. UAE PASS Staging is not production identity verification and does not verify property ownership.
 
-## 16.2 Required persistent disclosure
+This staging extension supersedes the earlier simulation-only wording in this section. It does not authorize production UAE PASS credentials, production claims, or official/legal verification language.
 
-Use a small pale-blue information panel near the top of every UAE PASS state:
+## 16.2 Required staging disclosure
 
-**Badge:**
+Keep the disclosure compact and place it directly below the primary action:
 
-> Demo simulation
+> Staging environment — no production verification.
 
-**Disclosure — required:**
-
-> Demo simulation only.  
-> This prototype is not connected to the live UAE PASS service.
-
-The disclosure remains visible but should not dominate the page:
-
-- Pale blue surface
-- Information icon
-- 14 px body text
-- No warning-red styling
-- No government crest, UAE PASS logo, or official colours
+Use muted 12 px text. Do not add a separate information panel, government crest, UAE PASS logo, or
+official colours.
 
 ## 16.3 State model
 
-| Status          | Meaning                                       | User destination    |
-| --------------- | --------------------------------------------- | ------------------- |
-| `NOT_STARTED`   | User has not started the demo step            | Introduction        |
-| `PENDING`       | Demo check started and awaits selected result | Pending             |
-| `VERIFIED_DEMO` | Demo outcome approved                         | Success / Dashboard |
-| `FAILED_DEMO`   | Demo outcome rejected                         | Failure / Retry     |
+| Status             | Meaning                                         | User destination    |
+| ------------------ | ----------------------------------------------- | ------------------- |
+| `NOT_STARTED`      | User has not started UAE PASS Staging           | Introduction        |
+| `PENDING`          | Legacy internal simulation status               | UAE PASS / Sign Out |
+| `VERIFIED_DEMO`    | Legacy completed simulation status              | Dashboard           |
+| `FAILED_DEMO`      | Legacy failed simulation status                 | UAE PASS / Sign Out |
+| `VERIFIED_STAGING` | A linked UAE PASS Staging identity was recorded | Success / Dashboard |
 
 ## 16.4 Introduction
 
 **Progress:**
 
-> Step 3 of 3 · Demo identity
+> Step 03 · Identity
 
 **Title:**
 
-> Verify your identity for this demo
+> Verify with UAE PASS
 
 **Description:**
 
-> This prototype includes a simulated identity step so you can experience the complete MARKAZ onboarding journey.
-
-**What happens panel:**
-
-> In this demo, we will:
->
-> - Start a simulated identity check
-> - Show a pending state
-> - Record a demo result
+> Use your UAE PASS staging account to complete identity verification.
 
 **Primary button:**
 
-> Start demo verification
+> Continue with UAE PASS
 
 **Secondary action:**
 
@@ -1599,41 +1583,11 @@ The disclosure remains visible but should not dominate the page:
 
 Do not request Emirates ID, passport, camera, selfie, biometric, date of birth, or nationality.
 
-## 16.5 Pending
+## 16.5 Legacy simulation states
 
-**Title:**
-
-> Demo verification in progress
-
-**Description:**
-
-> Your demo identity check has started. Use the simulation controls below to choose the result.
-
-**Status chip:**
-
-> Pending · Demo
-
-### Demo simulation controls
-
-Place in a distinct, dashed or pale-blue panel below the status content.
-
-**Panel title:**
-
-> Demo simulation controls
-
-**Panel description:**
-
-> These controls are available only in the prototype and do not connect to UAE PASS.
-
-**Primary button:**
-
-> Approve demo verification
-
-**Secondary button:**
-
-> Reject
-
-The two actions may be visually distinct because they control the demo outcome:
+`PENDING` and `FAILED_DEMO` may still exist on legacy records. Do not expose simulation controls.
+Render the normal UAE PASS Staging action, or configuration-unavailable copy plus Sign Out when
+staging is disabled. `VERIFIED_DEMO` routes directly to Dashboard.
 
 - Approve: primary blue
 - Reject: neutral outline, not destructive red
@@ -2828,33 +2782,30 @@ This section is the master English copy reference. Screen sections remain author
 | `profile.reassurance`     | We only ask for information needed to set up your MARKAZ account.         |
 | `profile.verifiedEmail`   | Verified                                                                  |
 
-## 25.8 Simulated UAE PASS
+## 25.8 UAE PASS Staging
 
-| Key                        | English                                                                                                         |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `identity.badge`           | Demo simulation                                                                                                 |
-| `identity.disclosureTitle` | Demo simulation only.                                                                                           |
-| `identity.disclosureBody`  | This prototype is not connected to the live UAE PASS service.                                                   |
-| `identity.introTitle`      | Verify your identity for this demo                                                                              |
-| `identity.introBody`       | This prototype includes a simulated identity step so you can experience the complete MARKAZ onboarding journey. |
-| `identity.start`           | Start demo verification                                                                                         |
-| `identity.starting`        | Starting demo verification…                                                                                     |
-| `identity.pendingTitle`    | Demo verification in progress                                                                                   |
-| `identity.pendingBody`     | Your demo identity check has started. Use the simulation controls below to choose the result.                   |
-| `identity.pendingStatus`   | Pending · Demo                                                                                                  |
-| `identity.controlsTitle`   | Demo simulation controls                                                                                        |
-| `identity.controlsBody`    | These controls are available only in the prototype and do not connect to UAE PASS.                              |
-| `identity.approve`         | Approve demo verification                                                                                       |
-| `identity.reject`          | Reject                                                                                                          |
-| `identity.saving`          | Saving demo result…                                                                                             |
-| `identity.successTitle`    | Demo identity verified                                                                                          |
-| `identity.successBody`     | Your account setup is complete. You can now browse properties, make offers, and list a property.                |
-| `identity.successStatus`   | Verified · Demo                                                                                                 |
-| `identity.dashboard`       | Go to dashboard                                                                                                 |
-| `identity.failureTitle`    | Demo verification was not completed                                                                             |
-| `identity.failureBody`     | No official identity check was performed. Try the simulation again to continue.                                 |
-| `identity.failureStatus`   | Unsuccessful · Demo                                                                                             |
-| `identity.retry`           | Try again                                                                                                       |
+| Key                                  | English                                                                                                           |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `identity.badge`                     | UAE PASS Staging                                                                                                  |
+| `identity.disclosureTitle`           | Test identity environment.                                                                                        |
+| `identity.disclosureBody`            | UAE PASS Staging is a test service. No production identity or property-ownership verification is performed.       |
+| `identity.introTitle`                | Verify with UAE PASS                                                                                              |
+| `identity.introBody`                 | Use your UAE PASS staging account to complete identity verification.                                              |
+| `identity.stagingAction`             | Continue with UAE PASS                                                                                            |
+| `identity.stagingStarting`           | Redirecting to UAE PASS…                                                                                          |
+| `identity.stagingEnvironmentNote`    | Staging environment — no production verification.                                                                |
+| `identity.stagingCancelled`          | UAE PASS Staging was cancelled. Try again when you are ready.                                                     |
+| `identity.stagingFailure`            | UAE PASS Staging could not be completed. Try again.                                                               |
+| `identity.stagingIdentityUnavailable` | This UAE PASS identity cannot be linked to this MARKAZ account. Contact MARKAZ support for help.                 |
+| `identity.stagingConfigurationError` | UAE PASS identity linking is not available in this environment. Please sign out or contact MARKAZ support.        |
+| `identity.stagingReturnTitle`        | Finishing your identity check                                                                                     |
+| `identity.stagingRecording`          | Recording the UAE PASS Staging result…                                                                            |
+| `identity.stagingSuccessTitle`       | UAE PASS Staging identity linked                                                                                  |
+| `identity.stagingSuccessStatus`      | Linked · Staging                                                                                                  |
+| `identity.dashboard`                 | Go to dashboard                                                                                                   |
+
+Legacy simulation strings may remain in the message catalog for compatibility, but customer-facing
+onboarding must not render them.
 
 ## 25.9 Sessions and errors
 

@@ -10,7 +10,6 @@ import { useRouter } from '@/i18n/navigation';
 import { AuthShell, AuthHeading } from '@/components/auth/auth-shell';
 import { PasswordField } from '@/components/auth/password-field';
 import { PasswordChecklist } from '@/components/auth/password-checklist';
-import { ErrorSummary } from '@/components/auth/error-summary';
 import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
 import { trpc } from '@/trpc/react';
 
@@ -40,9 +39,6 @@ export function ResetPasswordForm() {
   // checklist already covers min-length + policy. Never a silent truncation.
   const passwordFieldError =
     errors.password?.message === 'password_too_long' ? fe('password_too_long') : undefined;
-  const errorList = (['password', 'confirmPassword'] as const)
-    .filter((k) => errors[k])
-    .map((k) => ({ id: k, message: fe(errors[k]?.message) ?? '' }));
 
   async function onSubmit(data: ResetPasswordInput) {
     setError(null);
@@ -61,7 +57,6 @@ export function ResetPasswordForm() {
     <AuthShell narrow>
       <div className="space-y-6">
         <AuthHeading title={t('title')} description={t('description')} />
-        <ErrorSummary errors={errorList} />
         {error ? <Alert variant="destructive">{error}</Alert> : null}
         <form
           onSubmit={handleSubmit(onSubmit, () => setSubmitted(true))}

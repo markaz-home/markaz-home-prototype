@@ -180,6 +180,70 @@
     );
   }
 
+  /*
+   * Auth card: near-black panel over the cover band, with a hairline top
+   * highlight. Inputs inside it sit on a translucent white wash and focus to
+   * gold. The `input` element selector deliberately outweighs the Tailwind
+   * utilities on the shared Input component, so no field markup changes.
+   */
+  .theme-platform-gold .platform-gold-auth-card {
+    background-color: hsl(0 0% 0% / 0.82);
+    border-color: hsl(0 0% 100% / 0.1);
+    box-shadow:
+      0 32px 80px hsl(0 0% 0% / 0.55),
+      inset 0 1px 0 hsl(0 0% 100% / 0.06);
+    backdrop-filter: blur(6px);
+  }
+
+  .theme-platform-gold .platform-gold-auth-card input:not([type='checkbox']) {
+    height: 2rem;
+    font-size: 0.8125rem;
+    background-color: hsl(0 0% 100% / 0.055);
+    border-color: hsl(0 0% 100% / 0.16);
+  }
+
+  .theme-platform-gold .platform-gold-auth-card input:not([type='checkbox']):focus-visible {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.14);
+  }
+
+  /*
+   * Field micro-labels. `label[for]` hits only FormField's control labels — the
+   * consent checkboxes use a wrapping label with no `for`, so their sentence-case
+   * copy is left alone.
+   */
+  .theme-platform-gold .platform-gold-auth-card label[for] {
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Primary action reads as a pill, matching the platform direction. */
+  .theme-platform-gold .platform-gold-auth-card button[type='submit'] {
+    height: 2.125rem;
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+  }
+
+  .theme-platform-gold .platform-gold-auth-card input[type='checkbox'] {
+    appearance: none;
+    border: 1px solid hsl(0 0% 100% / 0.24);
+    border-radius: 9999px;
+    background-color: hsl(0 0% 100% / 0.055);
+  }
+
+  .theme-platform-gold .platform-gold-auth-card input[type='checkbox']:checked {
+    border-color: hsl(var(--primary));
+    background-color: hsl(var(--primary));
+    /* Check mark in the gold-ink foreground, so it reads on the gold fill. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231b120c' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5 9-11'/%3E%3C/svg%3E");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 76%;
+  }
+
   /* `color-scheme: light` keeps the native select popups light, matching the bar. */
   .theme-platform-gold .platform-gold-hero-search {
     color-scheme: light;

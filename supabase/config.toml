@@ -55,6 +55,9 @@ enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
 enable_signup = true
 enable_anonymous_sign_ins = false
+# Required by supabase.auth.linkIdentity() for the signed-in onboarding flow.
+# The hosted Supabase project must enable the equivalent Auth setting separately.
+enable_manual_linking = true
 
 # Email + password is the normal sign-in method (Week 1.5, ADR-0009).
 # Email codes are used only for new-account verification and password recovery.

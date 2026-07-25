@@ -4,12 +4,13 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Bath, BedDouble, ExternalLink, Maximize } from 'lucide-react';
 import { Badge, Button, Card, Skeleton } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
-import { externalHeadline } from '@/lib/external-listing';
+import { externalHeadline, externalProviderLabelKey } from '@/lib/external-listing';
 import { formatAed, formatNumber } from '@/lib/format';
 import { trpc } from '@/trpc/react';
 
 interface FeaturedCard {
   kind: 'internal' | 'external';
+  source: string | null;
   id: string;
   href: string;
   /** Direct listings use the seller's headline; external ones are composed. */
@@ -70,6 +71,7 @@ export function FeaturedProperties() {
       return [
         {
           kind: 'internal',
+          source: null,
           id: card.publicId,
           href: `/properties/${card.publicId}/${card.slug ?? ''}`,
           title: card.headline,
@@ -89,6 +91,7 @@ export function FeaturedProperties() {
     .slice(0, MAX_CARDS - internalCards.length)
     .map((card) => ({
       kind: 'external',
+      source: card.source,
       id: card.providerId,
       href: card.externalUrl,
       // The provider headline is agent marketing copy; compose our own instead.
@@ -178,66 +181,62 @@ function FeaturedPropertyCard({ card }: { card: FeaturedCard }) {
         : null;
   const content = (
     <>
-                <div className="bg-muted relative aspect-[4/3] w-full overflow-hidden">
-                  {card.coverUrl ? (
-                    // A plain image avoids copying third-party listing images into Next's
-                    // optimisation cache; the server projection already allowlists hosts.
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={card.coverUrl}
-                      alt={card.title}
-                      loading="lazy"
-                      referrerPolicy={card.kind === 'external' ? 'no-referrer' : undefined}
-                      className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                    />
-                  ) : (
-                    <div className="text-muted-foreground flex h-full items-center justify-center p-4 text-center text-sm">
-                      {propertyT('imageUnavailable')}
-                    </div>
-                  )}
-                  <Badge className="bg-background/95 text-foreground absolute start-3 top-3 shadow-none">
-                    {card.kind === 'internal'
-                      ? t('featuredSourceMarkaz')
-                      : t('featuredSourceBayut')}
-                  </Badge>
-                </div>
+      <div className="bg-muted relative aspect-[4/3] w-full overflow-hidden">
+        {card.coverUrl ? (
+          // A plain image avoids copying third-party listing images into Next's
+          // optimisation cache; the server projection already allowlists hosts.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={card.coverUrl}
+            alt={card.title}
+            loading="lazy"
+            referrerPolicy={card.kind === 'external' ? 'no-referrer' : undefined}
+            className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          />
+        ) : (
+          <div className="text-muted-foreground flex h-full items-center justify-center p-4 text-center text-sm">
+            {propertyT('imageUnavailable')}
+          </div>
+        )}
+        <Badge className="bg-background/95 text-foreground absolute start-3 top-3 shadow-none">
+          {card.kind === 'internal'
+            ? t('featuredSourceMarkaz')
+            : t(externalProviderLabelKey(card.source ?? ''))}
+        </Badge>
+      </div>
 
-                <div className="flex flex-1 flex-col gap-2 p-4">
-                  <p className="text-lg font-semibold">{formatAed(card.askingPriceAed, locale)}</p>
-                  <p className="text-foreground line-clamp-2 text-sm font-medium">{card.title}</p>
-                  {/* The row heading names the type; only place is repeated here. */}
-                  <p className="text-muted-foreground text-sm">
-                    {[card.community, card.emirate].filter(Boolean).join(' · ')}
-                  </p>
+      <div className="flex flex-1 flex-col gap-2 p-4">
+        <p className="text-lg font-semibold">{formatAed(card.askingPriceAed, locale)}</p>
+        <p className="text-foreground line-clamp-2 text-sm font-medium">{card.title}</p>
+        {/* The row heading names the type; only place is repeated here. */}
+        <p className="text-muted-foreground text-sm">
+          {[card.community, card.emirate].filter(Boolean).join(' · ')}
+        </p>
 
-                  <div className="text-muted-foreground mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-2 text-sm">
-                    {beds && (
-                      <span className="inline-flex items-center gap-1">
-                        <BedDouble className="h-4 w-4" aria-hidden /> {beds}
-                      </span>
-                    )}
-                    {card.bathrooms != null && (
-                      <span className="inline-flex items-center gap-1">
-                        <Bath className="h-4 w-4" aria-hidden />
-                        {propertyT('baths', { count: card.bathrooms })}
-                      </span>
-                    )}
-                    {card.sizeSqft != null && (
-                      <span className="inline-flex items-center gap-1">
-                        <Maximize className="h-4 w-4" aria-hidden />
-                        {propertyT('sqft', { size: formatNumber(card.sizeSqft, locale) })}
-                      </span>
-                    )}
-                  </div>
+        <div className="text-muted-foreground mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-2 text-sm">
+          {beds && (
+            <span className="inline-flex items-center gap-1">
+              <BedDouble className="h-4 w-4" aria-hidden /> {beds}
+            </span>
+          )}
+          {card.bathrooms != null && (
+            <span className="inline-flex items-center gap-1">
+              <Bath className="h-4 w-4" aria-hidden />
+              {propertyT('baths', { count: card.bathrooms })}
+            </span>
+          )}
+          {card.sizeSqft != null && (
+            <span className="inline-flex items-center gap-1">
+              <Maximize className="h-4 w-4" aria-hidden />
+              {propertyT('sqft', { size: formatNumber(card.sizeSqft, locale) })}
+            </span>
+          )}
+        </div>
 
-                  <span className="text-primary mt-2 inline-flex items-center gap-1 text-sm font-medium">
-                    {card.kind === 'internal'
-                      ? t('featuredOpenInternal')
-                      : t('featuredOpenExternal')}
-                    {card.kind === 'external' && (
-                      <ExternalLink className="h-3.5 w-3.5" aria-hidden />
-                    )}
-                  </span>
+        <span className="text-primary mt-2 inline-flex items-center gap-1 text-sm font-medium">
+          {card.kind === 'internal' ? t('featuredOpenInternal') : t('featuredOpenExternal')}
+          {card.kind === 'external' && <ExternalLink className="h-3.5 w-3.5" aria-hidden />}
+        </span>
       </div>
     </>
   );

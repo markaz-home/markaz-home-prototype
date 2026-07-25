@@ -50,7 +50,8 @@
     "featuredGroupOTHER": "More properties",
     "featuredSourceMarkaz": "Listed on Markaz",
     "featuredSourceBayut": "External via BayutAPI",
-    "featuredExternalNotice": "External listings are supplied by an unaffiliated third-party API and open on Bayut.",
+    "featuredSourceExternal": "External listing",
+    "featuredExternalNotice": "External listings are supplied by unaffiliated third-party providers and open on their source websites.",
     "featuredOpenExternal": "Open external property",
     "featuredOpenInternal": "View property",
     "featuredLoading": "Loading featured properties…",
@@ -86,6 +87,7 @@
     "passwordPlaceholder": "Create a password",
     "confirmPassword": "Confirm password",
     "confirmPasswordPlaceholder": "Re-enter your password",
+    "consent": "I agree to the <terms>Terms & Conditions</terms> and <privacy>Privacy Policy</privacy>.",
     "terms": "I agree to the Terms of Use.",
     "privacy": "I agree to the Privacy Policy.",
     "submit": "Create account",
@@ -187,11 +189,26 @@
     "verifiedEmail": "Verified"
   },
   "identity": {
-    "badge": "Demo simulation",
-    "disclosureTitle": "Demo simulation only.",
-    "disclosureBody": "This prototype is not connected to the live UAE PASS service.",
-    "introTitle": "Verify your identity for this demo",
-    "introBody": "This prototype includes a simulated identity step so you can experience the complete Markaz onboarding journey.",
+    "badge": "UAE PASS Staging",
+    "disclosureTitle": "Test identity environment.",
+    "disclosureBody": "UAE PASS Staging is a test service. No production identity or property-ownership verification is performed.",
+    "introTitle": "Verify with UAE PASS",
+    "introBody": "Use your UAE PASS staging account to complete identity verification.",
+    "stagingAction": "Continue with UAE PASS",
+    "stagingStarting": "Redirecting to UAE PASS…",
+    "stagingEnvironmentNote": "Staging environment — no production verification.",
+    "stagingCancelled": "UAE PASS Staging was cancelled. Try again when you are ready.",
+    "stagingFailure": "UAE PASS Staging could not be completed. Try again.",
+    "stagingIdentityUnavailable": "This UAE PASS identity cannot be linked to this Markaz account. Contact Markaz support for help.",
+    "stagingConfigurationError": "UAE PASS identity linking is not available in this environment. Please sign out or contact Markaz support.",
+    "stagingReturnTitle": "Finishing your identity check",
+    "stagingReturnBody": "UAE PASS Staging has returned you to Markaz. We are securely recording the linked identity on your account.",
+    "stagingRecording": "Recording the UAE PASS Staging result…",
+    "stagingRecordError": "Your UAE PASS identity is linked, but Markaz could not record the staging result. Try recording it again.",
+    "stagingRetryRecord": "Try recording again",
+    "stagingSuccessTitle": "UAE PASS Staging identity linked",
+    "stagingSuccessBody": "Your staging identity link has been recorded. This is a test result and is not production identity verification.",
+    "stagingSuccessStatus": "Linked · Staging",
     "start": "Start demo verification",
     "starting": "Starting demo verification…",
     "pendingTitle": "Demo verification in progress",
@@ -255,8 +272,8 @@
     "passwordTooLong": "Password must be 128 characters or fewer.",
     "confirmEmpty": "Confirm your password.",
     "passwordMismatch": "Passwords do not match.",
-    "termsRequired": "Accept the Terms of Use to create an account.",
-    "privacyRequired": "Accept the Privacy Policy to create an account.",
+    "termsRequired": "Accept the Terms & Conditions and Privacy Policy to continue.",
+    "privacyRequired": "Accept the Terms & Conditions and Privacy Policy to continue.",
     "incorrectCredentials": "The email or password is incorrect.",
     "emailUnverified": "Verify your email to continue.",
     "codeEmpty": "Enter the six-digit verification code.",
@@ -367,7 +384,10 @@
     "accountTypeLabel": "Account type",
     "identityLabel": "Identity",
     "identityDemo": "Demo identity verified",
-    "identityUaePassStaging": "Authenticated with UAE PASS Staging"
+    "identityUaePassStaging": "UAE PASS Staging identity linked",
+    "identityNotStarted": "Not started",
+    "identityPending": "Demo check pending",
+    "identityFailed": "Demo check incomplete"
   },
   "realtimeProof": {
     "title": "Realtime proof",
@@ -511,6 +531,13 @@
       "status": {
         "active": "Active",
         "restricted": "Actions restricted"
+      },
+      "identityStatus": {
+        "NOT_STARTED": "Not started",
+        "PENDING": "Demo check pending",
+        "VERIFIED_DEMO": "Verified (demo)",
+        "FAILED_DEMO": "Demo check incomplete",
+        "VERIFIED_STAGING": "UAE PASS Staging identity linked"
       },
       "filter": {
         "all": "All",
@@ -994,15 +1021,16 @@
     "subtitle": "Browse, make offers, list your property, and follow each step in one place.",
     "point1": "Clear account setup",
     "point2": "Secure email verification",
-    "point3": "Guided demo identity step"
+    "point3": "UAE PASS identity verification"
   },
   "progress": {
     "label": "Account setup progress",
     "stepAccount": "Account details",
     "stepEmail": "Email verification",
-    "stepIdentity": "Demo identity",
+    "stepIdentity": "Identity",
     "actionRequired": "Action required",
-    "stepOf": "Step {current} of {total} · {label}"
+    "stepOf": "Step {current} of {total} · {label}",
+    "stepEyebrow": "Step {number} · {label}"
   },
   "listing": {
     "navSell": "Sell",
@@ -1370,7 +1398,7 @@
     "directEmptyTitle": "No direct Markaz listings match",
     "directEmptyBody": "Selected external apartments and villas are shown below when available.",
     "externalTitle": "Selected external properties",
-    "externalBody": "Recent Dubai apartments and villas supplied by BayutAPI. Supported filters are applied to this selection; external listings open on Bayut and cannot be saved or offered on in Markaz."
+    "externalBody": "Selected UAE properties supplied by external providers. Supported filters are applied to this selection; external listings open on their source websites and cannot be saved or offered on in Markaz."
   },
   "filters": {
     "title": "Filters",

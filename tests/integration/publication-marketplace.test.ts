@@ -176,11 +176,26 @@ d('publication → marketplace', () => {
 
   it('search filters + sort work over the public view', async () => {
     const anon = anonCaller();
-    const apts = await anon.marketplace.search({ type: 'APARTMENT', sort: 'PRICE_ASC' });
+    const apts = await anon.marketplace.search({
+      propertyType: 'APARTMENT',
+      sort: 'PRICE_ASC',
+    });
     expect(apts.items.every((i) => i.propertyType === 'APARTMENT')).toBe(true);
     const none = await anon.marketplace.search({ minPrice: 999_000_000 });
     expect(none.items.length).toBe(0);
-    const opts = await anon.marketplace.getFilterOptions();
-    expect(Array.isArray(opts.propertyTypes)).toBe(true);
+    const facets = await anon.marketplace.facets({});
+    expect(facets.propertyTypes.every((facet) => typeof facet.count === 'number')).toBe(true);
+    expect(facets.communities.every((facet) => facet.count > 0)).toBe(true);
+    const twoPlusBedrooms = await anon.marketplace.search({ bedrooms: '2' });
+    expect(facets.bedrooms.find((facet) => facet.value === '2')?.count).toBe(
+      twoPlusBedrooms.pagination.total,
+    );
+    const oneToThreeMillion = await anon.marketplace.search({
+      minPrice: 1_000_000,
+      maxPrice: 3_000_000,
+    });
+    expect(facets.priceBands.find((facet) => facet.value === '1to3m')?.count).toBe(
+      oneToThreeMillion.pagination.total,
+    );
   });
 });
