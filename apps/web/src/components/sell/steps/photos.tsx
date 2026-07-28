@@ -47,8 +47,19 @@ export function PhotosStep({ listingId }: { listingId: string }) {
     setError(null);
     setBusy(true);
     try {
+      const client = supabase();
+      const {
+        data: { user },
+        error: userError,
+      } = await client.auth.getUser();
+      if (userError || !user) throw userError ?? new Error('Authenticated customer required.');
       for (const file of Array.from(files)) {
-        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+        const contentType = file.type;
+        if (
+          contentType !== 'image/jpeg' &&
+          contentType !== 'image/png' &&
+          contentType !== 'image/webp'
+        ) {
           setError(t('errUnsupported'));
           continue;
         }
@@ -56,13 +67,13 @@ export function PhotosStep({ listingId }: { listingId: string }) {
           setError(t('errTooLarge'));
           continue;
         }
-        const path = buildObjectPath(listingId, 'photo', file.name);
-        await uploadObject(supabase(), DRAFT_PHOTO_BUCKET, path, file);
+        const path = buildObjectPath(user.id, listingId, file.name);
+        await uploadObject(client, DRAFT_PHOTO_BUCKET, path, file);
         await register.mutateAsync({
           listingId,
           storagePath: path,
           originalName: file.name,
-          contentType: file.type,
+          contentType,
           sizeBytes: file.size,
         });
       }

@@ -1,6 +1,13 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { type SupabaseClient } from '@supabase/supabase-js';
-import { anonClient, serviceClient, storageEnv, storageReachable } from './helpers/storage';
+import { asService, cleanup, closePool, createAuthedPrincipal } from './helpers/db';
+import {
+  anonClient,
+  serviceClient,
+  signedInClient,
+  storageEnv,
+  storageReachable,
+} from './helpers/storage';
 
 /**
  * Storage boundary proof (Step 16) via the Supabase Storage API (the supported
@@ -25,17 +32,28 @@ if (!reachable) {
   console.warn('[storage] skipped — local Supabase Storage not reachable');
 }
 
-const PRIVATE_PATH = 'integration/title-deed-sample.txt';
-const PRIVATE_SCOPE_PATH = 'integration/title-deed-other.txt';
-const PUBLIC_PATH = 'integration/listing-cover.txt';
+const PRIVATE_PATH = 'integration/title-deed-sample.pdf';
+const PRIVATE_SCOPE_PATH = 'integration/title-deed-other.pdf';
+const PUBLIC_PATH = 'integration/listing-cover.png';
+const PDF = new Blob(['%PDF-1.4\n% fictional integration document\n'], {
+  type: 'application/pdf',
+});
+const PNG = new Blob(['fictional image bytes'], { type: 'image/png' });
 
 d('storage boundary (Storage API)', () => {
   let service: SupabaseClient;
   let anon: SupabaseClient;
+  let signedInAdmin: SupabaseClient;
 
   beforeAll(async () => {
     service = serviceClient(env!);
     anon = anonClient(env!);
+    const adminPrincipal = await createAuthedPrincipal('storage_admin');
+    if (!adminPrincipal) throw new Error('Local Auth/Storage environment is unavailable.');
+    await asService(
+      (tx) => tx`update public.profiles set account_type = 'ADMIN' where id = ${adminPrincipal.id}`,
+    );
+    signedInAdmin = await signedInClient(env!, adminPrincipal.email, adminPrincipal.password);
     await service.storage.from('ownership-documents').remove([PRIVATE_PATH, PRIVATE_SCOPE_PATH]);
     await service.storage.from('listing-photos').remove([PUBLIC_PATH]);
   });
@@ -43,12 +61,14 @@ d('storage boundary (Storage API)', () => {
   afterAll(async () => {
     await service.storage.from('ownership-documents').remove([PRIVATE_PATH, PRIVATE_SCOPE_PATH]);
     await service.storage.from('listing-photos').remove([PUBLIC_PATH]);
+    await cleanup();
+    await closePool();
   });
 
   it('public listing photos are world-readable', async () => {
     const up = await service.storage
       .from('listing-photos')
-      .upload(PUBLIC_PATH, new Blob(['demo cover']), { upsert: true, contentType: 'text/plain' });
+      .upload(PUBLIC_PATH, PNG, { upsert: true, contentType: 'image/png' });
     expect(up.error).toBeNull();
 
     const { data } = service.storage.from('listing-photos').getPublicUrl(PUBLIC_PATH);
@@ -57,12 +77,10 @@ d('storage boundary (Storage API)', () => {
   });
 
   it('private ownership doc is not publicly accessible but is via a signed URL', async () => {
-    const up = await service.storage
-      .from('ownership-documents')
-      .upload(PRIVATE_PATH, new Blob(['fictional title deed']), {
-        upsert: true,
-        contentType: 'text/plain',
-      });
+    const up = await service.storage.from('ownership-documents').upload(PRIVATE_PATH, PDF, {
+      upsert: true,
+      contentType: 'application/pdf',
+    });
     expect(up.error).toBeNull();
 
     // A public URL must NOT serve a private object.
@@ -86,18 +104,14 @@ d('storage boundary (Storage API)', () => {
 
   it('signed URLs are object-scoped and expire', async () => {
     const uploads = await Promise.all([
-      service.storage
-        .from('ownership-documents')
-        .upload(PRIVATE_PATH, new Blob(['fictional title deed']), {
-          upsert: true,
-          contentType: 'text/plain',
-        }),
-      service.storage
-        .from('ownership-documents')
-        .upload(PRIVATE_SCOPE_PATH, new Blob(['different fictional document']), {
-          upsert: true,
-          contentType: 'text/plain',
-        }),
+      service.storage.from('ownership-documents').upload(PRIVATE_PATH, PDF, {
+        upsert: true,
+        contentType: 'application/pdf',
+      }),
+      service.storage.from('ownership-documents').upload(PRIVATE_SCOPE_PATH, PDF, {
+        upsert: true,
+        contentType: 'application/pdf',
+      }),
     ]);
     expect(uploads.every(({ error }) => error === null)).toBe(true);
 
@@ -116,10 +130,55 @@ d('storage boundary (Storage API)', () => {
     expect((await fetch(url)).status).not.toBe(200);
   });
 
-  it('bucket visibility flags are correct', async () => {
+  it('a signed-in Admin cannot bypass the audited private-document access path', async () => {
+    const up = await service.storage
+      .from('ownership-documents')
+      .upload(PRIVATE_PATH, PDF, { upsert: true, contentType: 'application/pdf' });
+    expect(up.error).toBeNull();
+
+    const download = await signedInAdmin.storage.from('ownership-documents').download(PRIVATE_PATH);
+    expect(download.error).toBeTruthy();
+    expect(download.data).toBeNull();
+
+    const directSignedUrl = await signedInAdmin.storage
+      .from('ownership-documents')
+      .createSignedUrl(PRIVATE_PATH, 60);
+    expect(directSignedUrl.error).toBeTruthy();
+
+    const auditedServerCapability = await service.storage
+      .from('ownership-documents')
+      .createSignedUrl(PRIVATE_PATH, 60);
+    expect(auditedServerCapability.error).toBeNull();
+  });
+
+  it('bucket visibility, MIME allow-lists, and file-size limits are correct', async () => {
+    type BucketWithLimits = {
+      public: boolean;
+      file_size_limit?: number | null;
+      allowed_mime_types?: string[] | null;
+    };
     const priv = await service.storage.getBucket('ownership-documents');
-    expect(priv.data?.public).toBe(false);
+    const ownership = priv.data as BucketWithLimits | null;
+    expect(ownership?.public).toBe(false);
+    expect(ownership?.file_size_limit).toBe(10 * 1024 * 1024);
+    expect(ownership?.allowed_mime_types).toEqual(['application/pdf', 'image/jpeg', 'image/png']);
+
+    const draftResult = await service.storage.getBucket('listing-photos-draft');
+    const draft = draftResult.data as BucketWithLimits | null;
+    expect(draft?.public).toBe(false);
+    expect(draft?.file_size_limit).toBe(12 * 1024 * 1024);
+    expect(draft?.allowed_mime_types).toEqual(['image/jpeg', 'image/png', 'image/webp']);
+
     const pub = await service.storage.getBucket('listing-photos');
-    expect(pub.data?.public).toBe(true);
+    const published = pub.data as BucketWithLimits | null;
+    expect(published?.public).toBe(true);
+    expect(published?.file_size_limit).toBe(12 * 1024 * 1024);
+    expect(published?.allowed_mime_types).toEqual(['image/jpeg', 'image/png', 'image/webp']);
+
+    const transactionResult = await service.storage.getBucket('transaction-documents');
+    const transaction = transactionResult.data as BucketWithLimits | null;
+    expect(transaction?.public).toBe(false);
+    expect(transaction?.file_size_limit).toBe(10 * 1024 * 1024);
+    expect(transaction?.allowed_mime_types).toEqual(['application/pdf', 'image/jpeg', 'image/png']);
   });
 });

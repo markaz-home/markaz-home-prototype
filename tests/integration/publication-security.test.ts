@@ -50,24 +50,29 @@ d('public photo Storage boundary (migration 08.3)', () => {
     if (!principal) throw new Error('expected an authed principal in a reachable stack');
     authed = await signedInClient(env!, principal.email, principal.password);
     prefix = `itest-${principal.id.replace(/-/g, '').slice(0, 8)}`;
-    publicPath = `${prefix}/published-cover.txt`;
-    await service.storage.from('listing-photos').upload(publicPath, new Blob(['published cover']), {
-      upsert: true,
-      contentType: 'text/plain',
-    });
+    publicPath = `${prefix}/published-cover.png`;
+    await service.storage
+      .from('listing-photos')
+      .upload(publicPath, new Blob(['published cover'], { type: 'image/png' }), {
+        upsert: true,
+        contentType: 'image/png',
+      });
   });
   afterAll(async () => {
     await service.storage
       .from('listing-photos')
-      .remove([publicPath, `${prefix}/customer-write.txt`, `${prefix}/service-copy.txt`]);
+      .remove([publicPath, `${prefix}/customer-write.png`, `${prefix}/service-copy.png`]);
     await cleanup();
   });
 
   it('the publication service (service-role) can copy and clean up public photos', async () => {
-    const tmp = `${prefix}/service-copy.txt`;
+    const tmp = `${prefix}/service-copy.png`;
     const up = await service.storage
       .from('listing-photos')
-      .upload(tmp, new Blob(['svc']), { upsert: true });
+      .upload(tmp, new Blob(['svc'], { type: 'image/png' }), {
+        upsert: true,
+        contentType: 'image/png',
+      });
     expect(up.error).toBeNull();
     const rm = await service.storage.from('listing-photos').remove([tmp]);
     expect(rm.error).toBeNull();
@@ -85,14 +90,20 @@ d('public photo Storage boundary (migration 08.3)', () => {
   it('an authenticated customer CANNOT insert into the public bucket', async () => {
     const up = await authed.storage
       .from('listing-photos')
-      .upload(`${prefix}/customer-write.txt`, new Blob(['nope']), { upsert: false });
+      .upload(`${prefix}/customer-write.png`, new Blob(['nope'], { type: 'image/png' }), {
+        upsert: false,
+        contentType: 'image/png',
+      });
     expect(up.error).not.toBeNull();
   });
 
   it('an authenticated customer CANNOT overwrite or delete a public object', async () => {
     const over = await authed.storage
       .from('listing-photos')
-      .upload(publicPath, new Blob(['hacked']), { upsert: true });
+      .upload(publicPath, new Blob(['hacked'], { type: 'image/png' }), {
+        upsert: true,
+        contentType: 'image/png',
+      });
     expect(over.error).not.toBeNull();
     // Delete attempt — object must survive (RLS filters the delete to nothing).
     await authed.storage.from('listing-photos').remove([publicPath]);

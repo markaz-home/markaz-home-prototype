@@ -56,3 +56,18 @@ their exact disposition is recorded in `WEEK-7.md` and `RELEASE-CANDIDATE.md`.
   from the linked project. Deployment-boundary parity is Week 8 work.
 - Playwright/Next emits `NO_COLOR`/`FORCE_COLOR`, large-cache-string, and occasional
   listener-count warnings. The final suites and builds pass.
+
+## Week 8 readiness hardening
+
+| ID          | Severity | Area         | Resolution / disposition                                                                                                     |
+| ----------- | -------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| W8-SEC-001  | S1       | API          | State-changing tRPC requests now require the exact app origin; foreign/missing origins fail closed                           |
+| W8-SEC-002  | S1       | Storage      | Customer/listing path ownership enforced; bucket MIME/size limits added; direct Admin private reads removed                  |
+| W8-SEC-003  | S2       | Errors       | Unexpected production tRPC messages/stacks redacted; safe error code logging retained                                        |
+| W8-SEC-004  | S2       | Browser      | CSP/framing/nosniff/referrer/permissions/CORP and production HSTS implemented                                                |
+| W8-CONF-001 | S1       | Environment  | Startup/build validation rejects missing/unsafe URLs, secrets, flags, and provider modes                                     |
+| W8-OPS-001  | Evidence | Dependencies | Audit not completed: registry unavailable and external dependency-graph request not authorized; production gate remains open |
+
+The unresolved dependency evidence, provider/topology, email, monitoring, secrets,
+production backup/restore, Arabic/legal review, UAT-67–70, and sign-offs are readiness
+limitations rather than known product defects. Public production remains no-go.

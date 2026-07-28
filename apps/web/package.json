@@ -4,9 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --port 3000",
-    "build": "next build",
-    "start": "next start --port 3000",
+    "config:check": "node --env-file-if-exists=../../.env --env-file-if-exists=../../.env.local ../../packages/config/environment-cli.mjs web",
+    "dev": "pnpm run config:check && next dev --port 3000",
+    "build": "pnpm run config:check && next build",
+    "start": "pnpm run config:check && next start --port 3000",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

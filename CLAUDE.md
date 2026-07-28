@@ -6,10 +6,10 @@ Guidance for Claude Code working in this repo. Read before making changes.
 
 UAE (Dubai-first) property marketplace prototype. Real engineering; only the
 regulated integrations (UAE PASS, DLD, Trakheesi, payment) are **simulated** —
-behind named interfaces, with persisted outcomes. Weeks 1–7 are implemented and the
+behind named interfaces, with persisted outcomes. Weeks 1–8 are implemented and the
 immutable internal prototype baseline is tagged **`rc-week-7`**. Week 8 production
-readiness is a separate milestone; do not begin deployment or add product features unless
-asked.
+readiness is forward preparation from that tag; its decision is **no-go for public
+production**. Do not deploy or add product features unless explicitly asked.
 
 Monorepo root is `markaz-home-prototype/`. Run all commands from there.
 
@@ -128,6 +128,7 @@ Path alias `@/*` → `src/*` in each app. Internal deps use `workspace:*`.
 
 ```
 pnpm dev | build | lint | typecheck | test | test:e2e
+pnpm config:check | security:secrets | security:audit
 pnpm db:generate | db:migrate | db:seed | db:setup
 pnpm supabase:start | supabase:stop | supabase:reset | supabase:status
 ```
@@ -331,7 +332,23 @@ cross-functional sign-offs are Pending. The bounded decision is **Go with docume
 limitations** for Week 8 readiness work, not production deployment. See `WEEK-7.md`,
 `RELEASE-CANDIDATE.md`, and `DEFECT-LOG.md`.
 
-## Out of scope (next milestone+)
+## Week 8 production-readiness baseline — prepared, not deployed
+
+Week 8 adds no product features. Runtime configuration now fails fast through
+`pnpm config:check`; web/Admin emit a provider-neutral security-header set; state-changing
+tRPC requests enforce exact same-origin; unexpected production API errors are redacted.
+Migration `…0821` sets bucket MIME/size constraints and removes direct signed-in Admin
+access to private Storage, preserving the audited server document path. Listing document/
+photo registration also enforces customer/listing-owned object keys.
+
+The canonical history replays through `0821`; private/public bucket controls and an isolated
+local logical backup/restore were proven. Deployment remains provider-neutral. Production
+email, monitoring/error tracking, secrets management, backup/PITR/Storage recovery, an
+approved dependency audit, Arabic/legal review, topology/data residency, UAT-67–70, and
+named sign-offs remain open. See `WEEK-8.md`, `PRODUCTION-READINESS.md`,
+`ENVIRONMENT-VARIABLES.md`, `SECURITY-READINESS.md`, `HANDOVER.md`, and the runbooks.
+
+## Out of scope / external readiness gates
 
 Durable jobs, any AWS provisioning,
 real DLD/Trakheesi/Madmoun/payment integrations, free-form messaging/chat, contact

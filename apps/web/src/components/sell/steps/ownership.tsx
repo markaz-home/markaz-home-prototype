@@ -31,19 +31,30 @@ function OwnershipInner({ listingId, data }: { listingId: string; data: GetData 
 
   async function onFile(file: File) {
     setError(null);
-    if (!['application/pdf', 'image/jpeg', 'image/png'].includes(file.type))
+    const contentType = file.type;
+    if (
+      contentType !== 'application/pdf' &&
+      contentType !== 'image/jpeg' &&
+      contentType !== 'image/png'
+    )
       return setError(t('errUnsupported'));
     if (file.size > 10 * 1024 * 1024) return setError(t('errTooLarge'));
     setBusy(true);
     try {
-      const path = buildObjectPath(listingId, 'doc', file.name);
-      await uploadObject(supabase(), OWNERSHIP_BUCKET, path, file);
+      const client = supabase();
+      const {
+        data: { user },
+        error: userError,
+      } = await client.auth.getUser();
+      if (userError || !user) throw userError ?? new Error('Authenticated customer required.');
+      const path = buildObjectPath(user.id, listingId, file.name);
+      await uploadObject(client, OWNERSHIP_BUCKET, path, file);
       await register.mutateAsync({
         listingId,
         documentType: docType,
         storagePath: path,
         originalName: file.name,
-        contentType: file.type,
+        contentType,
         sizeBytes: file.size,
       });
       await utils.listing.get.invalidate({ listingId });

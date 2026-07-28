@@ -112,3 +112,15 @@ deterministic command needed to resolve it.
 
 This decision authorizes Week 8 readiness work only. It certifies neither production
 readiness nor any real regulated integration.
+
+## Week 8 forward-preparation note
+
+The `rc-week-7` tag remains unchanged at
+`9e9bfa7c76acd33efb8b449ee5d38018f0b85ba5`. Week 8 work does not rewrite or move that
+baseline. It adds configuration/security/Storage hardening and operational documentation
+on the branch after the tag.
+
+UAT-67–70 and all named sign-offs remain Pending/partial; no additional approval is
+invented. The updated deployment decision is **NO-GO for public production** and
+conditional for controlled staging until the external gates in `PRODUCTION-READINESS.md`
+are satisfied.
