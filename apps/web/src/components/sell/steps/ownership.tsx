@@ -62,9 +62,6 @@ function OwnershipInner({ listingId, data }: { listingId: string; data: GetData 
     >
       <div className="space-y-6">
         <StepHeader ns="ownership" />
-        <Alert variant="warning" title={t('safetyTitle')}>
-          {t('safetyBody')}
-        </Alert>
         <FormField id="docType" label={t('titleDeed') + ' / ' + t('oqood')}>
           <div className="grid gap-2 sm:grid-cols-2">
             {(['TITLE_DEED', 'OQOOD'] as const).map((d) => (
@@ -75,11 +72,16 @@ function OwnershipInner({ listingId, data }: { listingId: string; data: GetData 
                 aria-pressed={docType === d}
                 className={cn(
                   'rounded-md border p-3 text-start text-sm',
-                  docType === d ? 'border-primary bg-brand-100' : 'border-input',
+                  docType === d ? 'border-primary bg-primary/15' : 'border-input',
                 )}
               >
                 <span className="font-medium">{t(d === 'TITLE_DEED' ? 'titleDeed' : 'oqood')}</span>
-                <span className="text-muted-foreground mt-0.5 block text-xs">
+                <span
+                  className={cn(
+                    'mt-0.5 block text-xs',
+                    docType === d ? 'text-foreground' : 'text-muted-foreground',
+                  )}
+                >
                   {t(d === 'TITLE_DEED' ? 'titleDeedHelp' : 'oqoodHelp')}
                 </span>
               </button>

@@ -308,24 +308,36 @@ d('transaction RLS (live DB)', () => {
     expect(other.length).toBe(0);
   });
   it('blocks a customer from forging transaction status directly', async () => {
+    const before = await txRow(txId);
     await expectError(
       () =>
         asUser(
           buyer,
-          (tx) => tx`update public.transactions set status = 'COMPLETED_DEMO' where id = ${txId}`,
+          (tx) =>
+            tx`update public.transactions
+               set status = 'COMPLETED_DEMO'
+               where id = ${txId}
+               returning id`,
         ),
-      /permission denied|immutable|only by the server/i,
+      /permission denied|row-level security/i,
     );
+    expect((await txRow(txId)).status).toBe(before.status);
   });
   it('blocks a customer from changing the accepted amount', async () => {
+    const before = await txRow(txId);
     await expectError(
       () =>
         asUser(
           buyer,
-          (tx) => tx`update public.transactions set accepted_amount_aed = 1 where id = ${txId}`,
+          (tx) =>
+            tx`update public.transactions
+               set accepted_amount_aed = 1
+               where id = ${txId}
+               returning id`,
         ),
-      /permission denied|immutable/i,
+      /permission denied|row-level security/i,
     );
+    expect((await txRow(txId)).accepted_amount_aed).toBe(before.accepted_amount_aed);
   });
   it('blocks a customer from acting as the other participant', async () => {
     const t = await txRow(txId);

@@ -2,8 +2,9 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
-import { Alert, Badge, Button, cn } from '@markaz/ui';
+import { Alert, Badge, Button } from '@markaz/ui';
 import { trpc } from '@/trpc/react';
+import { PermitQr } from '../permit-qr';
 import { useRouter } from '@/i18n/navigation';
 import {
   WizardShell,
@@ -37,6 +38,7 @@ export function TrakheesiStep({ listingId }: { listingId: string }) {
   if (get.error) return <ListingUnavailable />;
   if (!get.data) return <WizardLoading />;
   const st = status.data?.status ?? 'NOT_STARTED';
+  const permitNumber = status.data?.permitNumber ?? null;
 
   return (
     <WizardShell listing={get.data as unknown as WizardListing} current="trakheesi">
@@ -45,7 +47,7 @@ export function TrakheesiStep({ listingId }: { listingId: string }) {
         {st === 'NOT_STARTED' ? (
           <>
             <div>
-              <h1 className="font-display text-brand-900 text-2xl font-medium">
+              <h1 className="font-display text-foreground text-2xl font-medium">
                 {t('prepareTitle')}
               </h1>
               <p className="text-muted-foreground mt-1">{t('prepareBody')}</p>
@@ -75,7 +77,7 @@ export function TrakheesiStep({ listingId }: { listingId: string }) {
         ) : st === 'PENDING' ? (
           <>
             <div className="flex items-center justify-between">
-              <h1 className="font-display text-brand-900 text-2xl font-medium">
+              <h1 className="font-display text-foreground text-2xl font-medium">
                 {t('pendingTitle')}
               </h1>
               <Badge>{t('pendingStatus')}</Badge>
@@ -93,35 +95,38 @@ export function TrakheesiStep({ listingId }: { listingId: string }) {
         ) : st === 'VERIFIED_DEMO' ? (
           <>
             <div className="flex items-center justify-between">
-              <h1 className="font-display text-brand-900 text-2xl font-medium">
+              <h1 className="font-display text-foreground text-2xl font-medium">
                 {t('approvedTitle')}
               </h1>
-              <Badge variant="success">{t('approvedStatus')}</Badge>
+              <Badge>{t('approvedStatus')}</Badge>
             </div>
-            <Alert variant="success">{t('approvedBody')}</Alert>
-            <div className="inline-flex flex-col items-center rounded-lg border p-4">
-              <div className="grid h-24 w-24 grid-cols-5 grid-rows-5 gap-0.5" aria-hidden>
-                {Array.from({ length: 25 }).map((_, i) => (
-                  <span
-                    key={i}
-                    className={cn(
-                      'rounded-[1px]',
-                      (i * 7) % 3 === 0 ? 'bg-brand-900' : 'bg-transparent',
-                    )}
-                  />
-                ))}
+            <Alert variant="info">{t('approvedBody')}</Alert>
+            {/* Permit card: the code sits on a light tile because that is how a
+                real permit QR is printed, with the disclosure beside it. */}
+            <div className="border-border/70 bg-card/40 flex flex-col gap-4 rounded-lg border p-5 sm:flex-row sm:items-center">
+              {permitNumber ? <PermitQr permitNumber={permitNumber} /> : null}
+              <div className="min-w-0">
+                <p className="text-sm font-medium">{t('qrLabel')}</p>
+                <p className="text-muted-foreground mt-1 text-xs">{t('qrHelp')}</p>
+                {permitNumber ? (
+                  <p className="text-muted-foreground mt-2 text-xs">
+                    {t('permitNumberLabel')} <span className="text-foreground">{permitNumber}</span>
+                  </p>
+                ) : null}
               </div>
-              <p className="mt-2 text-xs font-medium">{t('qrLabel')}</p>
-              <p className="text-muted-foreground text-[11px]">{t('qrHelp')}</p>
             </div>
-            <Button onClick={() => router.push(`/sell/listings/${listingId}/review`)}>
-              {t('reviewListing')}
-            </Button>
+            <div className="flex justify-end border-t pt-4">
+              <Button onClick={() => router.push(`/sell/listings/${listingId}/review`)}>
+                {t('reviewListing')}
+              </Button>
+            </div>
           </>
         ) : (
           <>
             <div className="flex items-center justify-between">
-              <h1 className="font-display text-brand-900 text-2xl font-medium">{t('failTitle')}</h1>
+              <h1 className="font-display text-foreground text-2xl font-medium">
+                {t('failTitle')}
+              </h1>
               <Badge variant="destructive">{tlf('sectionFailed')}</Badge>
             </div>
             <Alert variant="destructive">{t('failBody')}</Alert>

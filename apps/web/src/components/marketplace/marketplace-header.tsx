@@ -16,6 +16,7 @@ import {
 import { Link, usePathname } from '@/i18n/navigation';
 import { BrandLogo } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { SignOutButton } from '@/components/sign-out-button';
 
 /**
  * `match` is the path prefix that marks a link as the current section. Links
@@ -24,8 +25,7 @@ import { LanguageSwitcher } from '@/components/language-switcher';
  */
 const PUBLIC_LINKS = [
   { href: '/properties', key: 'browse', match: '/properties' },
-  // TODO: needs a real How It Works page — the landing explainer cards were removed.
-  { href: '/', key: 'howItWorks' },
+  { href: '/how-it-works', key: 'howItWorks', match: '/how-it-works' },
   { href: '/sign-in?next=/sell', key: 'forSellers' },
 ] as const;
 
@@ -106,6 +106,10 @@ export function MarketplaceHeader({
                   <DropdownMenuItem asChild>
                     <Link href="/sell">{t('myListings')}</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <SignOutButton asMenuItem />
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
@@ -146,13 +150,18 @@ export function MarketplaceHeader({
               </Link>
             ))}
             {isAuthenticated ? (
-              <Link
-                href="/sell"
-                className="text-foreground rounded-md px-3 py-2 text-sm font-medium"
-                onClick={() => setOpen(false)}
-              >
-                {t('listProperty')}
-              </Link>
+              <>
+                <Link
+                  href="/sell"
+                  className="text-foreground rounded-md px-3 py-2 text-sm font-medium"
+                  onClick={() => setOpen(false)}
+                >
+                  {t('listProperty')}
+                </Link>
+                <div className="px-3 py-2">
+                  <SignOutButton />
+                </div>
+              </>
             ) : (
               <>
                 <Link

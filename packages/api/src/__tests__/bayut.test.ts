@@ -7,6 +7,7 @@ import {
   clearBayutCacheForTests,
   loadBayutFeaturedProperties,
 } from '../integrations/bayut';
+import { clearLocationCacheForTests, searchBayutLocations } from '../integrations/bayut-locations';
 
 const enabledEnv = {
   BAYUT_API_MODE: 'rapidapi',
@@ -48,7 +49,10 @@ function responseFetch(payload: unknown, status = 200) {
   );
 }
 
-beforeEach(() => clearBayutCacheForTests());
+beforeEach(() => {
+  clearBayutCacheForTests();
+  clearLocationCacheForTests();
+});
 
 describe('BayutAPI featured-property adapter', () => {
   it('is disabled by default and makes no network request', async () => {
@@ -247,5 +251,80 @@ describe('BayutAPI featured-property adapter', () => {
         fetchImpl: fetchMock as unknown as typeof fetch,
       }),
     ).rejects.toMatchObject({ code: 'UPSTREAM_ERROR' });
+  });
+});
+
+describe('BayutAPI location adapter', () => {
+  it('keeps the key server-side and returns only Dubai area suggestions', async () => {
+    const fetchMock = responseFetch({
+      results: [
+        {
+          id: 1,
+          name: 'Dubai Marina',
+          level: 'community',
+          full: {
+            city: { id: 2, name: 'Dubai', name_ar: 'دبي' },
+            community: { id: 10, name: 'Dubai Marina', name_ar: 'دبي مارينا' },
+          },
+        },
+        {
+          id: 2,
+          name: 'Al Reem Island',
+          level: 'community',
+          full: {
+            city: { id: 1, name: 'Abu Dhabi', name_ar: 'أبو ظبي' },
+            community: { id: 11, name: 'Al Reem Island', name_ar: 'جزيرة الريم' },
+          },
+        },
+        {
+          id: 3,
+          name: 'Marina Gate',
+          level: 'building',
+          full: {
+            city: { id: 2, name: 'Dubai', name_ar: 'دبي' },
+            community: { id: 10, name: 'Dubai Marina', name_ar: 'دبي مارينا' },
+            building: { id: 12, name: 'Marina Gate', name_ar: 'مارينا غيت' },
+          },
+        },
+      ],
+    });
+
+    const result = await searchBayutLocations({
+      query: 'Marina',
+      locale: 'en',
+      kind: 'AREA',
+      env: enabledEnv,
+      fetchImpl: fetchMock as unknown as typeof fetch,
+    });
+
+    expect(result).toEqual([
+      {
+        id: '1',
+        name: 'Dubai Marina',
+        level: 'community',
+        context: 'Dubai',
+      },
+    ]);
+    const [rawUrl, init] = fetchMock.mock.calls[0]!;
+    const url = new URL(String(rawUrl));
+    const headers = new Headers(init?.headers);
+    expect(url.hostname).toBe(BAYUT_API_HOST);
+    expect(url.pathname).toBe('/locations_search');
+    expect(url.searchParams.get('query')).toBe('Marina');
+    expect(headers.get('X-RapidAPI-Key')).toBe('test-secret');
+  });
+
+  it('makes no request when the provider is disabled', async () => {
+    const fetchMock = responseFetch({ results: [] });
+
+    await expect(
+      searchBayutLocations({
+        query: 'Dubai',
+        locale: 'en',
+        env: {} as NodeJS.ProcessEnv,
+        fetchImpl: fetchMock as unknown as typeof fetch,
+      }),
+    ).resolves.toEqual([]);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

@@ -147,11 +147,7 @@ export function UaePassFlow({
                 <AuthHeading title={t('introTitle')} description={t('introBody')} />
                 {uaePassStaging ? (
                   <>
-                    <Button
-                      className="w-full"
-                      loading={linkLoading}
-                      onClick={linkUaePassIdentity}
-                    >
+                    <Button className="w-full" loading={linkLoading} onClick={linkUaePassIdentity}>
                       {linkLoading ? t('stagingStarting') : t('stagingAction')}
                     </Button>
                     <p className="text-muted-foreground text-center text-xs">
@@ -180,10 +176,7 @@ export function UaePassFlow({
                     {t('stagingSuccessTitle')}
                   </span>
                 </Alert>
-                <Button
-                  className="w-full"
-                  onClick={() => router.replace('/dashboard')}
-                >
+                <Button className="w-full" onClick={() => router.replace('/dashboard')}>
                   {t('dashboard')}
                 </Button>
               </>

@@ -1,5 +1,6 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { MarketplaceHeader } from '@/components/marketplace/marketplace-header';
+import { PublicFooter } from '@/components/marketplace/public-footer';
 import { BodyTheme } from '@/components/theme/body-theme';
 import { getSession } from '@/server/session';
 
@@ -28,18 +29,16 @@ export default async function PublicLayout({
       >
         {t('skipToContent')}
       </a>
+      {/* Operations accounts are signed in but are not customers, so they get
+          the anonymous chrome rather than customer navigation. */}
       <MarketplaceHeader
-        isAuthenticated={!!session}
+        isAuthenticated={!!session && session.profile?.accountType !== 'ADMIN'}
         displayName={session?.profile?.fullName ?? null}
       />
       <main id="main" className="flex-1">
         {children}
       </main>
-      <footer className="bg-card/50 text-muted-foreground border-t py-6 text-center text-xs">
-        <div className="container">
-          {t('appName')} · {t('demoBadge')}
-        </div>
-      </footer>
+      <PublicFooter isAuthenticated={!!session && session.profile?.accountType !== 'ADMIN'} />
     </div>
   );
 }

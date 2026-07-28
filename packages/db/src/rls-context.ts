@@ -28,6 +28,13 @@ type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 async function applyClaims(tx: Tx, role: 'authenticated' | 'anon', claims: object): Promise<void> {
   // Set claims first (custom GUC), then drop into the restricted role.
   await tx.execute(sql`select set_config('request.jwt.claims', ${JSON.stringify(claims)}, true)`);
+  if (role === 'authenticated') {
+    // Database policies use this transaction-local marker to distinguish the
+    // verified MARKAZ API path from a browser calling Supabase REST directly.
+    // It is set on the server connection before SET LOCAL ROLE and disappears
+    // automatically at commit/rollback.
+    await tx.execute(sql`select set_config('markaz.trusted_api', 'true', true)`);
+  }
   await tx.execute(sql`select set_config('role', ${role}, true)`);
 }
 

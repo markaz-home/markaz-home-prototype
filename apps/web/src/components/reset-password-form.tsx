@@ -11,7 +11,6 @@ import { AuthShell, AuthHeading } from '@/components/auth/auth-shell';
 import { PasswordField } from '@/components/auth/password-field';
 import { PasswordChecklist } from '@/components/auth/password-checklist';
 import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
-import { trpc } from '@/trpc/react';
 
 /** Reached only with a valid recovery session (established by /auth/confirm). */
 export function ResetPasswordForm() {
@@ -19,7 +18,6 @@ export function ResetPasswordForm() {
   const tv = useTranslations('validation');
   const router = useRouter();
   const [supabase] = useState(() => createSupabaseBrowserClient());
-  const audit = trpc.audit.record.useMutation();
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -47,9 +45,12 @@ export function ResetPasswordForm() {
       setError(tv(AUTH_ERROR_KEYS[mapAuthError(err)]));
       return;
     }
-    await audit.mutateAsync({ action: 'PASSWORD_RESET_COMPLETED' }).catch(() => {});
     // Spec §14.4: end the recovery session; require a fresh sign-in.
-    await supabase.auth.signOut();
+    const { error: signOutError } = await supabase.auth.signOut();
+    if (signOutError) {
+      setError(t('signOutError'));
+      return;
+    }
     router.replace('/reset-password/success');
   }
 

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { setRequestLocale } from 'next-intl/server';
 import { getTranslations } from 'next-intl/server';
 import { FeaturedProperties } from '@/components/landing/featured-properties';
@@ -14,13 +15,22 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
     <div>
       {/*
        * Hero: full-bleed cover band behind the headline and search. The cover
-       * photograph is not yet approved, so the band renders blank — see
-       * `--hero-cover-image` in packages/ui/src/styles/globals.css. Sized so the
-       * featured properties below stay visible above the fold.
+       * photograph is rendered through Next Image so responsive formats and
+       * sizes are generated instead of sending the original asset to everyone.
+       * Sized so the featured properties below stay visible above the fold.
        */}
-      <section className="relative isolate flex min-h-[420px] items-center md:min-h-[max(460px,calc(64svh-4rem))] md:max-h-[640px]">
+      <section className="relative isolate flex min-h-[420px] items-center md:max-h-[640px] md:min-h-[max(460px,calc(64svh-4rem))]">
         {/* -z-10 keeps the band behind the content without clipping the section. */}
-        <div aria-hidden className="platform-gold-hero-cover absolute inset-0 -z-10" />
+        <div aria-hidden className="platform-gold-hero-cover absolute inset-0 -z-10">
+          <Image
+            src="/images/hero-dubai-balcony.png"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-[68%_center] sm:object-center"
+          />
+        </div>
         <div aria-hidden className="platform-gold-hero-scrim absolute inset-0 -z-10" />
 
         <div className="container relative py-12 md:py-14">

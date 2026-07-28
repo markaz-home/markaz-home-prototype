@@ -23,9 +23,9 @@ export const BATHS_OPTIONS = ['1', '2', '3', '4'] as const;
  * Keeping the thresholds in the domain avoids separate homepage/browse copies.
  */
 export const MARKETPLACE_PRICE_BANDS = {
-  under1m: { minPrice: null, maxPrice: 1_000_000 },
-  '1to3m': { minPrice: 1_000_000, maxPrice: 3_000_000 },
-  '3to5m': { minPrice: 3_000_000, maxPrice: 5_000_000 },
+  under1m: { minPrice: null, maxPrice: 999_999 },
+  '1to3m': { minPrice: 1_000_000, maxPrice: 2_999_999 },
+  '3to5m': { minPrice: 3_000_000, maxPrice: 4_999_999 },
   '5plus': { minPrice: 5_000_000, maxPrice: null },
 } as const;
 export type MarketplacePriceBand = keyof typeof MARKETPLACE_PRICE_BANDS;

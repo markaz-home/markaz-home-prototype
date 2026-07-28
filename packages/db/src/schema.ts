@@ -13,6 +13,7 @@ import {
   uniqueIndex,
   index,
 } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
 /**
  * Typed mirror of the canonical SQL in supabase/migrations (§6A.4).
@@ -304,20 +305,28 @@ export const formARecords = pgTable('form_a_records', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const permitRecords = pgTable('permit_records', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  listingId: uuid('listing_id')
-    .notNull()
-    .references(() => listings.id, { onDelete: 'cascade' }),
-  permitType: text('permit_type').notNull().default('TRAKHEESI'),
-  permitNumber: text('permit_number'),
-  status: verificationStatus('status').notNull().default('PENDING'),
-  approvedAt: timestamp('approved_at', { withTimezone: true }),
-  failureReason: text('failure_reason'),
-  supersededAt: timestamp('superseded_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-});
+export const permitRecords = pgTable(
+  'permit_records',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    listingId: uuid('listing_id')
+      .notNull()
+      .references(() => listings.id, { onDelete: 'cascade' }),
+    permitType: text('permit_type').notNull().default('TRAKHEESI'),
+    permitNumber: text('permit_number'),
+    status: verificationStatus('status').notNull().default('PENDING'),
+    approvedAt: timestamp('approved_at', { withTimezone: true }),
+    failureReason: text('failure_reason'),
+    supersededAt: timestamp('superseded_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    activeNumberKey: uniqueIndex('permit_active_number_uidx')
+      .on(sql`upper(btrim(${t.permitNumber}))`)
+      .where(sql`${t.permitNumber} is not null and ${t.supersededAt} is null`),
+  }),
+);
 
 export const propertyPhotos = pgTable(
   'property_photos',

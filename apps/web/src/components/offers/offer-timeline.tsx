@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { formatAed } from '@/lib/format';
+import { formatAed, formatDateTime } from '@/lib/format';
 
 interface TimelineEvent {
   id: string;
@@ -62,28 +62,39 @@ export function OfferTimeline({
     }
   }
 
+  // Filled = seller, ringed = buyer, faint = system. Shape carries the meaning,
+  // never colour alone (§36.6).
   function markerClass(e: TimelineEvent): string {
-    if (e.actorSide === 'SELLER') return 'bg-brand-900'; // deep-blue filled (seller)
-    if (e.actorSide === 'BUYER') return 'border-2 border-primary bg-background'; // outlined (buyer)
-    return 'bg-muted-foreground/40'; // neutral (system)
+    if (e.actorSide === 'SELLER') return 'bg-primary border-primary';
+    if (e.actorSide === 'BUYER') return 'bg-background border-primary';
+    return 'bg-muted-foreground/40 border-muted-foreground/40';
   }
 
   if (events.length === 0) return null;
 
   return (
-    <ol className="mt-3 space-y-4 border-s ps-6">
-      {events.map((e) => (
-        <li key={e.id} className="relative">
-          <span
-            className={`absolute -start-[1.7rem] mt-1 h-3 w-3 rounded-full ${markerClass(e)}`}
-            aria-hidden
-          />
-          <p className="text-sm" dir="auto">
-            {copyFor(e)}
-          </p>
-          <time dateTime={e.createdAt} className="text-muted-foreground text-xs" dir="ltr">
-            {new Date(e.createdAt).toLocaleString(locale)}
-          </time>
+    <ol className="mt-4 space-y-5">
+      {events.map((e, index) => (
+        <li key={e.id} className="relative flex gap-4">
+          {/* The rail is drawn per row and stops at the last one, so no stub
+              hangs below the final event. */}
+          <div className="flex flex-col items-center">
+            <span
+              className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full border-2 ${markerClass(e)}`}
+              aria-hidden
+            />
+            {index < events.length - 1 ? (
+              <span className="bg-border mt-1 w-px flex-1" aria-hidden />
+            ) : null}
+          </div>
+          <div className="min-w-0 pb-1">
+            <p className="text-sm" dir="auto">
+              {copyFor(e)}
+            </p>
+            <time dateTime={e.createdAt} className="text-muted-foreground mt-0.5 block text-xs">
+              {formatDateTime(e.createdAt, locale)}
+            </time>
+          </div>
         </li>
       ))}
     </ol>

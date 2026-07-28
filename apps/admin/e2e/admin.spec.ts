@@ -36,7 +36,7 @@ test.describe('Admin portal — access control', () => {
   test('an ADMIN signs in and sees the eight operations areas', async ({ page }) => {
     await adminSignIn(page, adminUser);
     // Scope to the sidebar nav landmark — "Customers" etc. also appear as dashboard metric links.
-    const nav = page.getByRole('navigation', { name: 'Admin' });
+    const nav = page.getByRole('navigation', { name: 'Operations navigation' });
     for (const area of [
       'Overview',
       'Customers',
@@ -268,5 +268,95 @@ test.describe('Audit log', () => {
     await page.goto('/en/audit');
     await expect(page.getByRole('columnheader', { name: /Action/i })).toBeVisible();
     await expect(page.getByRole('columnheader', { name: /Actor/i })).toBeVisible();
+    await expect(page.getByLabel('Action', { exact: true })).toBeVisible();
+    await expect(page.getByRole('combobox', { name: 'Entity type', exact: true })).toBeVisible();
+  });
+
+  test('applies and clears visible audit filters', async ({ page }) => {
+    await adminSignIn(page, adminUser);
+    await page.goto('/en/audit');
+    await page.getByLabel('Action', { exact: true }).fill('ADMIN_CUSTOMER_ACTIONS_RESTRICTED');
+    await page.getByRole('combobox', { name: 'Entity type', exact: true }).selectOption('customer');
+    await page.getByRole('button', { name: 'Apply filters' }).click();
+    await expect(page).toHaveURL(/action=ADMIN_CUSTOMER_ACTIONS_RESTRICTED/);
+    await expect(page).toHaveURL(/entityType=customer/);
+    await page.getByRole('link', { name: 'Clear filters' }).click();
+    await expect(page).toHaveURL(/\/en\/audit$/);
+  });
+});
+
+test.describe('Responsive, RTL, and keyboard operations', () => {
+  test('Arabic operations overview uses RTL and the localized navigation', async ({ page }) => {
+    await adminSignIn(page, adminUser);
+    await page.goto('/ar/overview');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    await expect(page.getByRole('navigation', { name: 'التنقل في بوابة العمليات' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'نظرة عامة', exact: true })).toBeVisible();
+    await expect(page.getByText('العملاء النشطون', { exact: true })).toBeVisible();
+  });
+
+  test('mobile publication review uses the compact menu and has no page overflow', async ({
+    page,
+  }) => {
+    const seller = await createCustomer('mobile-pub-seller');
+    const { requestId } = await createPendingPublication(seller.id);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await adminSignIn(page, adminUser);
+    await gotoDetail(page, 'publication', requestId);
+
+    await expect(page.getByRole('button', { name: 'Open menu' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Approve & publish/i })).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1),
+    ).toBe(true);
+  });
+
+  test('admin can complete a reason-coded restriction with the keyboard only', async ({ page }) => {
+    const customer = await createCustomer('keyboard-restrict-target');
+    await adminSignIn(page, adminUser);
+    await gotoDetail(page, 'customers', customer.id);
+
+    const trigger = page.getByRole('button', { name: /Restrict actions/i }).first();
+    await trigger.focus();
+    await page.keyboard.press('Enter');
+    const dialog = page.getByRole('dialog');
+    const reason = dialog.getByLabel('Reason');
+    await reason.focus();
+    await expect(reason).toBeFocused();
+    await page.keyboard.type('Account under review');
+    await expect(reason).toHaveValue('ACCOUNT_REVIEW');
+
+    const submit = dialog.getByRole('button', { name: /Restrict actions/i });
+    await submit.focus();
+    await page.keyboard.press('Enter');
+    await expect(dialog).toBeHidden({ timeout: 15_000 });
+    await expect(page.getByText(/Actions restricted/i).first()).toBeVisible();
+  });
+
+  test('global search supports arrows, Enter, Escape, and clear', async ({ page }) => {
+    const customer = await createCustomer('global-search-keyboard');
+    await adminSignIn(page, adminUser);
+    await page.goto('/en/overview');
+
+    const search = page.getByRole('combobox', {
+      name: 'Search customers, listings, transactions…',
+    });
+    await search.fill('global-search-keyboard');
+    await expect(page.getByRole('option', { name: 'E2E global-search-keyboard' })).toBeVisible();
+    await search.press('ArrowDown');
+    await search.press('Enter');
+    await expect(page).toHaveURL(new RegExp(`/en/customers/${customer.id}$`));
+
+    await page.goto('/en/overview');
+    const nextSearch = page.getByRole('combobox', {
+      name: 'Search customers, listings, transactions…',
+    });
+    await nextSearch.fill('global-search-keyboard');
+    await expect(page.getByRole('option', { name: 'E2E global-search-keyboard' })).toBeVisible();
+    await nextSearch.press('Escape');
+    await expect(page.getByRole('option', { name: 'E2E global-search-keyboard' })).toHaveCount(0);
+    await nextSearch.fill('global-search-keyboard');
+    await page.getByRole('button', { name: 'Clear search' }).click();
+    await expect(nextSearch).toHaveValue('');
   });
 });

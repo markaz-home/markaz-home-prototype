@@ -37,9 +37,9 @@ export function DataSection({
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
           {visibility === 'private' ? (
-            <Lock className="h-4 w-4 text-amber-700" aria-hidden />
+            <Lock className="text-warning h-4 w-4" aria-hidden />
           ) : visibility === 'public' ? (
-            <Globe className="text-brand-600 h-4 w-4" aria-hidden />
+            <Globe className="text-primary h-4 w-4" aria-hidden />
           ) : null}
           {title}
         </CardTitle>

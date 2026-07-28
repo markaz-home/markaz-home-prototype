@@ -192,7 +192,7 @@ d('publication → marketplace', () => {
     );
     const oneToThreeMillion = await anon.marketplace.search({
       minPrice: 1_000_000,
-      maxPrice: 3_000_000,
+      maxPrice: 2_999_999,
     });
     expect(facets.priceBands.find((facet) => facet.value === '1to3m')?.count).toBe(
       oneToThreeMillion.pagination.total,

@@ -49,8 +49,7 @@ describe('SignInForm', () => {
     expect(
       screen.getByRole('button', { name: /Continue with UAE PASS Staging/i }),
     ).toBeInTheDocument();
-    // Still a test-environment disclaimer + email/password kept.
-    expect(screen.getByText(/Test environment/i)).toBeInTheDocument();
+    // Email/password stays available alongside it.
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
   });
 

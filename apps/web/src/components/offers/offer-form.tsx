@@ -1,7 +1,9 @@
+/* eslint-disable @next/next/no-img-element -- Listing covers can be runtime marketplace URLs and are intentionally rendered without the Next Image proxy. */
 'use client';
 
 import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { ArrowLeft } from 'lucide-react';
 import { Alert, Button, Card, CardContent, EmptyState, Label, Skeleton } from '@markaz/ui';
 import {
   normalizeAmountInput,
@@ -15,8 +17,13 @@ import {
 } from '@markaz/domain';
 import { useRouter, Link } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
-import { formatAed } from '@/lib/format';
+import { formatAed, formatDateTime } from '@/lib/format';
 import { AmountComparison, NonBindingDisclosure, useOfferErrorMessage } from './shared';
+import { ListboxSelect } from '@/components/ui/listbox-select';
+
+/** Dialog-sized trigger: matches the 44px inputs used inside these dialogs. */
+const TALL_TRIGGER =
+  'border-input bg-background hover:border-primary/50 flex h-11 w-full items-center justify-between gap-2 rounded-md border px-3 text-start text-sm outline-none focus-visible:ring-ring focus-visible:ring-2';
 
 type Step = 'form' | 'review';
 
@@ -108,11 +115,18 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
 
   return (
     <div className="container max-w-[1180px] py-8">
-      <nav aria-label="Breadcrumb" className="text-muted-foreground mb-4 text-sm">
-        <Link href={`/properties/${publicId}/${slug}`} className="hover:text-foreground">
+      <nav
+        aria-label="Breadcrumb"
+        className="text-muted-foreground mb-4 flex flex-wrap items-center gap-1.5 text-sm"
+      >
+        <Link
+          href={`/properties/${publicId}/${slug}`}
+          className="hover:text-foreground inline-flex items-center gap-1.5"
+        >
+          <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden />
           {property?.headline ?? '—'}
         </Link>
-        <span> · {step === 'review' ? t('review.title') : t('form.title')}</span>
+        <span>· {step === 'review' ? t('review.title') : t('form.title')}</span>
       </nav>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
@@ -185,24 +199,22 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
 
               <fieldset className="space-y-2">
                 <Label htmlFor="offer-expiry">{t('form.expiry')}</Label>
-                <select
+                <ListboxSelect
                   id="offer-expiry"
                   value={expiry}
-                  onChange={(e) => setExpiry(e.target.value as ExpiryOption)}
-                  className="bg-background h-11 w-full rounded-md border px-3"
-                >
-                  {EXPIRY_OPTIONS.map((o) => (
-                    <option key={o} value={o}>
-                      {t(
-                        `expiry.${o === '48h' ? 'h48' : o === '3d' ? 'd3' : o === '7d' ? 'd7' : 'none'}` as 'expiry.d7',
-                      )}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(v) => setExpiry(v as ExpiryOption)}
+                  classNames={{ button: TALL_TRIGGER }}
+                  options={EXPIRY_OPTIONS.map((o) => ({
+                    value: o,
+                    label: t(
+                      `expiry.${o === '48h' ? 'h48' : o === '3d' ? 'd3' : o === '7d' ? 'd7' : 'none'}` as 'expiry.d7',
+                    ),
+                  }))}
+                />
                 <p className="text-muted-foreground text-sm">
                   {t('form.expiryHelp')}
                   {expiresPreview ? (
-                    <> · {t('form.validUntil', { date: expiresPreview.toLocaleString(locale) })}</>
+                    <> · {t('form.validUntil', { date: formatDateTime(expiresPreview, locale) })}</>
                   ) : null}
                 </p>
               </fieldset>
@@ -235,7 +247,7 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
                   <Row
                     label={t('form.expiry')}
                     value={
-                      expiresPreview ? expiresPreview.toLocaleString(locale) : t('form.noExpiry')
+                      expiresPreview ? formatDateTime(expiresPreview, locale) : t('form.noExpiry')
                     }
                   />
                 </CardContent>

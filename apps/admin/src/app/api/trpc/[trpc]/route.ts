@@ -1,12 +1,12 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
-import { appRouter, createTRPCContext } from '@markaz/api';
+import { adminAppRouter, createTRPCContext } from '@markaz/api';
 import { getAuthProviderIds, getAuthUser } from '@markaz/auth/server';
 
 const handler = (req: Request) =>
   fetchRequestHandler({
     endpoint: '/api/trpc',
     req,
-    router: appRouter,
+    router: adminAppRouter,
     createContext: async () => {
       const user = await getAuthUser();
       return createTRPCContext({

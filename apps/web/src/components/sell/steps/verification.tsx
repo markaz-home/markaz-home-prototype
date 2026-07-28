@@ -42,7 +42,7 @@ export function VerificationStep({ listingId }: { listingId: string }) {
         {st === 'NOT_STARTED' || st === undefined ? (
           <>
             <div>
-              <h1 className="font-display text-brand-900 text-2xl font-medium">
+              <h1 className="font-display text-foreground text-2xl font-medium">
                 {t('startTitle')}
               </h1>
               <p className="text-muted-foreground mt-1">{t('startBody')}</p>
@@ -55,7 +55,7 @@ export function VerificationStep({ listingId }: { listingId: string }) {
         ) : st === 'PENDING' ? (
           <>
             <div className="flex items-center justify-between">
-              <h1 className="font-display text-brand-900 text-2xl font-medium">
+              <h1 className="font-display text-foreground text-2xl font-medium">
                 {t('pendingTitle')}
               </h1>
               <Badge variant="default">{t('pendingStatus')}</Badge>
@@ -73,7 +73,7 @@ export function VerificationStep({ listingId }: { listingId: string }) {
         ) : st === 'VERIFIED_DEMO' ? (
           <>
             <div className="flex items-center justify-between">
-              <h1 className="font-display text-brand-900 text-2xl font-medium">
+              <h1 className="font-display text-foreground text-2xl font-medium">
                 {t('successTitle')}
               </h1>
               <Badge variant="success">{t('successStatus')}</Badge>
@@ -91,7 +91,9 @@ export function VerificationStep({ listingId }: { listingId: string }) {
         ) : (
           <>
             <div className="flex items-center justify-between">
-              <h1 className="font-display text-brand-900 text-2xl font-medium">{t('failTitle')}</h1>
+              <h1 className="font-display text-foreground text-2xl font-medium">
+                {t('failTitle')}
+              </h1>
               <Badge variant="destructive">{tl('sectionFailed')}</Badge>
             </div>
             <Alert variant="destructive">

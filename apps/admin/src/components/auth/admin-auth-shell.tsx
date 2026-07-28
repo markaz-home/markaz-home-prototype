@@ -15,7 +15,7 @@ export function AdminAuthShell({ children }: { children: React.ReactNode }) {
 export function AdminHeading({ title, description }: { title: string; description?: string }) {
   return (
     <div className="space-y-2">
-      <h1 className="font-display text-brand-900 text-2xl font-medium tracking-tight">{title}</h1>
+      <h1 className="font-display text-primary text-2xl font-medium tracking-tight">{title}</h1>
       {description ? <p className="text-muted-foreground text-sm">{description}</p> : null}
     </div>
   );

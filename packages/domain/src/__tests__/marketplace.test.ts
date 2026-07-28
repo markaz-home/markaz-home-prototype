@@ -6,6 +6,7 @@ import {
   paginate,
   DEFAULT_SORT,
   MARKETPLACE_PAGE_SIZE,
+  MARKETPLACE_PRICE_BANDS,
 } from '../marketplace';
 
 describe('marketplaceQuerySchema', () => {
@@ -74,6 +75,19 @@ describe('bedroomsFilter', () => {
   });
   it('returns null for an absent value', () => {
     expect(bedroomsFilter(undefined)).toBeNull();
+  });
+});
+
+describe('marketplace price bands', () => {
+  it('uses non-overlapping integer AED boundaries', () => {
+    const bands = Object.values(MARKETPLACE_PRICE_BANDS);
+    for (let index = 1; index < bands.length; index += 1) {
+      const previous = bands[index - 1]!;
+      const current = bands[index]!;
+      expect(previous.maxPrice).not.toBeNull();
+      expect(current.minPrice).not.toBeNull();
+      expect(previous.maxPrice! + 1).toBe(current.minPrice);
+    }
   });
 });
 

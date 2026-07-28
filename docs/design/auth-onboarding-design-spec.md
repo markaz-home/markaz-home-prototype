@@ -2784,25 +2784,25 @@ This section is the master English copy reference. Screen sections remain author
 
 ## 25.8 UAE PASS Staging
 
-| Key                                  | English                                                                                                           |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `identity.badge`                     | UAE PASS Staging                                                                                                  |
-| `identity.disclosureTitle`           | Test identity environment.                                                                                        |
-| `identity.disclosureBody`            | UAE PASS Staging is a test service. No production identity or property-ownership verification is performed.       |
-| `identity.introTitle`                | Verify with UAE PASS                                                                                              |
-| `identity.introBody`                 | Use your UAE PASS staging account to complete identity verification.                                              |
-| `identity.stagingAction`             | Continue with UAE PASS                                                                                            |
-| `identity.stagingStarting`           | Redirecting to UAE PASS…                                                                                          |
-| `identity.stagingEnvironmentNote`    | Staging environment — no production verification.                                                                |
-| `identity.stagingCancelled`          | UAE PASS Staging was cancelled. Try again when you are ready.                                                     |
-| `identity.stagingFailure`            | UAE PASS Staging could not be completed. Try again.                                                               |
-| `identity.stagingIdentityUnavailable` | This UAE PASS identity cannot be linked to this MARKAZ account. Contact MARKAZ support for help.                 |
-| `identity.stagingConfigurationError` | UAE PASS identity linking is not available in this environment. Please sign out or contact MARKAZ support.        |
-| `identity.stagingReturnTitle`        | Finishing your identity check                                                                                     |
-| `identity.stagingRecording`          | Recording the UAE PASS Staging result…                                                                            |
-| `identity.stagingSuccessTitle`       | UAE PASS Staging identity linked                                                                                  |
-| `identity.stagingSuccessStatus`      | Linked · Staging                                                                                                  |
-| `identity.dashboard`                 | Go to dashboard                                                                                                   |
+| Key                                   | English                                                                                                     |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `identity.badge`                      | UAE PASS Staging                                                                                            |
+| `identity.disclosureTitle`            | Test identity environment.                                                                                  |
+| `identity.disclosureBody`             | UAE PASS Staging is a test service. No production identity or property-ownership verification is performed. |
+| `identity.introTitle`                 | Verify with UAE PASS                                                                                        |
+| `identity.introBody`                  | Use your UAE PASS staging account to complete identity verification.                                        |
+| `identity.stagingAction`              | Continue with UAE PASS                                                                                      |
+| `identity.stagingStarting`            | Redirecting to UAE PASS…                                                                                    |
+| `identity.stagingEnvironmentNote`     | Staging environment — no production verification.                                                           |
+| `identity.stagingCancelled`           | UAE PASS Staging was cancelled. Try again when you are ready.                                               |
+| `identity.stagingFailure`             | UAE PASS Staging could not be completed. Try again.                                                         |
+| `identity.stagingIdentityUnavailable` | This UAE PASS identity cannot be linked to this MARKAZ account. Contact MARKAZ support for help.            |
+| `identity.stagingConfigurationError`  | UAE PASS identity linking is not available in this environment. Please sign out or contact MARKAZ support.  |
+| `identity.stagingReturnTitle`         | Finishing your identity check                                                                               |
+| `identity.stagingRecording`           | Recording the UAE PASS Staging result…                                                                      |
+| `identity.stagingSuccessTitle`        | UAE PASS Staging identity linked                                                                            |
+| `identity.stagingSuccessStatus`       | Linked · Staging                                                                                            |
+| `identity.dashboard`                  | Go to dashboard                                                                                             |
 
 Legacy simulation strings may remain in the message catalog for compatibility, but customer-facing
 onboarding must not render them.

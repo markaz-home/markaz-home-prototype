@@ -1,6 +1,6 @@
 # UAE PASS identity step — real staging round trip
 
-**Task spec for Codex.** Read `CLAUDE.md` first; its hard product rules are not negotiable.
+**Implemented integration note.** Read `AGENTS.md` first; its hard product rules are not negotiable.
 
 ## 1. What we are building
 
@@ -16,9 +16,9 @@ is **already signed in** with an email/password account: press the button → go
 Staging → authenticate on the UAE PASS staging mobile app → return to MARKAZ → the step is
 satisfied because Supabase now holds a `custom:uae-pass` identity for that user.
 
-The customer onboarding page exposes **only UAE PASS Staging**. The legacy simulation mutation may
-remain temporarily for internal compatibility and automated tests, but no simulated verification
-action or outcome control is rendered to customers.
+The customer onboarding page exposes **only UAE PASS Staging**. The legacy customer-callable
+simulation mutation has been removed; test fixtures may still create historical `VERIFIED_DEMO`
+rows only through the privileged local test setup.
 
 ## 2. The one correctness decision that matters
 
@@ -38,18 +38,18 @@ Do not work around a link failure by falling back to `signInWithOAuth`.
 
 ## 3. Current state — files you will touch
 
-| File                                                            | Today                                                                                                                                        |
-| --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apps/web/src/components/uae-pass-flow.tsx`                     | Simulated flow: `NOT_STARTED → PENDING → VERIFIED_DEMO / FAILED_DEMO` via `trpc.profile.setIdentityStatus`. No awareness of `UAE_PASS_MODE`. |
-| `apps/web/src/app/[locale]/(auth)/onboarding/uae-pass/page.tsx` | Server page; `requireCustomerStep(locale, ['uae-pass'])`, passes `initialStatus`.                                                            |
-| `apps/web/src/app/[locale]/(auth)/sign-in/page.tsx`             | Reference pattern: `isUaePassStagingEnabled()` from `@markaz/auth/uae-pass/server` gates the option server-side.                             |
-| `apps/web/src/components/sign-in-form.tsx`                      | Reference pattern for the provider call + `redirectTo`.                                                                                      |
-| `apps/web/src/app/auth/callback/route.ts`                       | PKCE callback; exchanges `?code=`, honours `?locale=` and `?next=`.                                                                          |
-| `apps/web/src/lib/auth-redirect.ts`                             | `ALLOWED_POST_SIGN_IN_DESTINATIONS` currently allows **only** `/sell`.                                                                       |
-| `packages/auth/src/server.ts`                                   | `getAuthProviderIds(user)` — reads `app_metadata.provider` + `.providers`.                                                                   |
-| `packages/domain/src/identity.ts`                               | `IDENTITY_STATUSES` + guarded `IDENTITY_TRANSITIONS`.                                                                                        |
-| `packages/domain/src/routing.ts`                                | Already skips this step when `identityAuthenticatedByProvider` is true.                                                                      |
-| `supabase/config.toml`                                          | `[auth]` block has **no** `enable_manual_linking`.                                                                                           |
+| File                                                            | Today                                                                                                            |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `apps/web/src/components/uae-pass-flow.tsx`                     | UAE PASS Staging link flow through `linkIdentity`; no customer simulation controls.                              |
+| `apps/web/src/app/[locale]/(auth)/onboarding/uae-pass/page.tsx` | Server page; `requireCustomerStep(locale, ['uae-pass'])`, passes `initialStatus`.                                |
+| `apps/web/src/app/[locale]/(auth)/sign-in/page.tsx`             | Reference pattern: `isUaePassStagingEnabled()` from `@markaz/auth/uae-pass/server` gates the option server-side. |
+| `apps/web/src/components/sign-in-form.tsx`                      | Reference pattern for the provider call + `redirectTo`.                                                          |
+| `apps/web/src/app/auth/callback/route.ts`                       | PKCE callback; exchanges `?code=`, honours `?locale=` and `?next=`.                                              |
+| `apps/web/src/lib/auth-redirect.ts`                             | `ALLOWED_POST_SIGN_IN_DESTINATIONS` currently allows **only** `/sell`.                                           |
+| `packages/auth/src/server.ts`                                   | `getAuthProviderIds(user)` — reads `app_metadata.provider` + `.providers`.                                       |
+| `packages/domain/src/identity.ts`                               | `IDENTITY_STATUSES` + guarded `IDENTITY_TRANSITIONS`.                                                            |
+| `packages/domain/src/routing.ts`                                | Already skips this step when `identityAuthenticatedByProvider` is true.                                          |
+| `supabase/config.toml`                                          | `[auth]` block has **no** `enable_manual_linking`.                                                               |
 
 ## 4. Work items
 
@@ -102,7 +102,7 @@ const { error } = await supabase.auth.linkIdentity({
 });
 ```
 
-Keep the existing simulated button as a clearly secondary action (§7).
+Do not expose a simulated identity button or fallback mutation.
 
 ### 4.5 Record the outcome — server-side only
 
@@ -124,7 +124,8 @@ Add a distinct **`VERIFIED_STAGING`**:
 - Update `isIdentityVerified()` and every place that maps a status to a label/tone.
 - The write must happen server-side (a tRPC mutation that re-derives the provider list from the
   session user), not from the browser.
-- Keep the simulation mutation on a separate input schema that cannot parse `VERIFIED_STAGING`.
+- Do not add a customer-callable simulation mutation; historical `VERIFIED_DEMO` remains a
+  persisted prototype value only.
 - Defence in depth: direct `authenticated` updates cannot set or remove `VERIFIED_STAGING`. The
   tRPC mutation calls an idempotent `SECURITY DEFINER` function through `ctx.tx`; that function
   derives `auth.uid()`, confirms `auth.identities.provider = 'custom:uae-pass'`, updates the profile,
@@ -147,13 +148,13 @@ Do not remove the provider-based gate.
 
 ## 6. Error paths
 
-| Case                                              | Handling                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Customer cancels at UAE PASS (`access_denied`)    | Return to the step with a neutral message and allow another UAE PASS attempt. Not an error state.                                                                                                                                                                                                                                                                          |
-| Provider/exchange error                           | Generic safe copy. No provider detail surfaced.                                                                                                                                                                                                                                                                                                                           |
-| Identity already linked to another MARKAZ account | Supabase refuses. Show a distinct, non-enumerating message: the identity cannot be linked, contact support. **Do not** reveal which account holds it.                                                                                                                                                                                                                     |
-| `enable_manual_linking` disabled                  | Show a safe configuration-unavailable message. If the callback reports the stable error code, log a constant server-side warning naming `auth.enable_manual_linking`; an immediate browser-side failure contains no server request and must not send raw provider detail to a logging endpoint. Verify the hosted toggle during deployment.                                  |
-| Staging unreachable / mode off                    | Do not render a verification action. Show safe configuration-unavailable copy plus Sign Out.                                                                                                                                                                                                                                                                              |
+| Case                                              | Handling                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Customer cancels at UAE PASS (`access_denied`)    | Return to the step with a neutral message and allow another UAE PASS attempt. Not an error state.                                                                                                                                                                                                                                           |
+| Provider/exchange error                           | Generic safe copy. No provider detail surfaced.                                                                                                                                                                                                                                                                                             |
+| Identity already linked to another MARKAZ account | Supabase refuses. Show a distinct, non-enumerating message: the identity cannot be linked, contact support. **Do not** reveal which account holds it.                                                                                                                                                                                       |
+| `enable_manual_linking` disabled                  | Show a safe configuration-unavailable message. If the callback reports the stable error code, log a constant server-side warning naming `auth.enable_manual_linking`; an immediate browser-side failure contains no server request and must not send raw provider detail to a logging endpoint. Verify the hosted toggle during deployment. |
+| Staging unreachable / mode off                    | Do not render a verification action. Show safe configuration-unavailable copy plus Sign Out.                                                                                                                                                                                                                                                |
 
 Every failure leaves the customer able to retry UAE PASS where appropriate or sign out.
 

@@ -3,13 +3,33 @@ import { cn } from '@markaz/ui';
 
 export type StatusTone = 'neutral' | 'info' | 'attention' | 'failed' | 'complete' | 'paused';
 
-const TONE: Record<StatusTone, { cls: string; Icon: typeof Circle }> = {
-  neutral: { cls: 'bg-muted text-muted-foreground', Icon: Circle },
-  info: { cls: 'bg-brand-100 text-brand-800', Icon: Circle },
-  attention: { cls: 'bg-amber-100 text-amber-900', Icon: AlertTriangle },
-  failed: { cls: 'bg-red-100 text-red-900', Icon: XCircle },
-  complete: { cls: 'bg-emerald-100 text-emerald-900', Icon: CheckCircle2 },
-  paused: { cls: 'bg-slate-200 text-slate-800', Icon: PauseCircle },
+// Semantic tones as translucent tints on the theme's own colours: the previous
+// fixed light-palette chips (amber-100/red-100/emerald-100) were built for a
+// white canvas and glare on the near-black one. Icon + label still carry the
+// meaning, so colour is never the only signal (§37, §41).
+const TONE: Record<StatusTone, { cls: string; iconCls: string; Icon: typeof Circle }> = {
+  neutral: { cls: 'bg-muted text-foreground', iconCls: 'text-muted-foreground', Icon: Circle },
+  info: { cls: 'bg-primary/15 text-foreground', iconCls: 'text-primary', Icon: Circle },
+  attention: {
+    cls: 'bg-warning/15 text-foreground',
+    iconCls: 'text-warning',
+    Icon: AlertTriangle,
+  },
+  failed: {
+    cls: 'bg-destructive/15 text-foreground',
+    iconCls: 'text-destructive',
+    Icon: XCircle,
+  },
+  complete: {
+    cls: 'bg-success/15 text-foreground',
+    iconCls: 'text-success',
+    Icon: CheckCircle2,
+  },
+  paused: {
+    cls: 'bg-foreground/10 text-foreground',
+    iconCls: 'text-muted-foreground',
+    Icon: PauseCircle,
+  },
 };
 
 /**
@@ -25,7 +45,7 @@ export function StatusBadge({
   label: string;
   className?: string;
 }) {
-  const { cls, Icon } = TONE[tone];
+  const { cls, iconCls, Icon } = TONE[tone];
   return (
     <span
       className={cn(
@@ -34,7 +54,7 @@ export function StatusBadge({
         className,
       )}
     >
-      <Icon className="h-3.5 w-3.5" aria-hidden />
+      <Icon className={cn('h-3.5 w-3.5', iconCls)} aria-hidden />
       {label}
     </span>
   );

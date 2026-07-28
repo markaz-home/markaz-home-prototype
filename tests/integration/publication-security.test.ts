@@ -126,14 +126,22 @@ d('public_path is server-only (guard_public_photo_path trigger)', () => {
   });
 
   it('an authenticated customer CANNOT set public_path on their own photo', async () => {
-    await expectError(
-      () =>
-        asUser(
-          customerA,
-          (tx) =>
-            tx`update public.property_photos set public_path = 'hack/cover.jpg' where listing_id = ${ready}`,
-        ),
-      /publication service|permission denied|check/i,
+    const changed = await asUser(
+      customerA,
+      (tx) =>
+        tx`update public.property_photos
+           set public_path = 'hack/cover.jpg'
+           where listing_id = ${ready}
+           returning id`,
+    );
+    expect(changed).toHaveLength(0);
+    const rows = await asService(
+      (tx) =>
+        tx`select public_path from public.property_photos
+           where listing_id = ${ready}`,
+    );
+    expect(rows.every((row) => (row as { public_path: string | null }).public_path === null)).toBe(
+      true,
     );
   });
 

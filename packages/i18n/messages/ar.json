@@ -15,10 +15,14 @@
     "hidePassword": "إخفاء كلمة المرور",
     "skipToContent": "تخطَّ إلى المحتوى",
     "signOut": "تسجيل الخروج",
+    "signOutError": "تعذّر تسجيل خروجك. حاول مجددًا.",
     "language": "اللغة",
     "demoBadge": "تجريبي",
     "demoSimulationOnly": "محاكاة تجريبية فقط.",
-    "comingSoon": "هذا القسم جزء من المرحلة القادمة."
+    "comingSoon": "هذا القسم جزء من المرحلة القادمة.",
+    "noMatches": "لا توجد نتائج. يمكنك كتابة اسمك الخاص.",
+    "searching": "جارٍ البحث…",
+    "suggestionsUnavailable": "الاقتراحات غير متاحة مؤقتًا. لا يزال بإمكانك كتابة اسمك."
   },
   "landing": {
     "eyebrow": "أهلًا بك",
@@ -29,7 +33,7 @@
     "searchLocationPlaceholder": "الموقع أو المجتمع السكني",
     "searchSubmit": "ابحث عن العقارات",
     "searchPriceAny": "أي سعر",
-    "searchPriceUnder1m": "حتى مليون درهم",
+    "searchPriceUnder1m": "أقل من مليون درهم",
     "searchPrice1to3m": "1 – 3 مليون درهم",
     "searchPrice3to5m": "3 – 5 مليون درهم",
     "searchPrice5plus": "أكثر من 5 مليون درهم",
@@ -62,6 +66,24 @@
     "featuredEmptyBody": "تصفّح جميع العقارات أو عُد قريبًا للاطلاع على المنازل المنشورة حديثًا.",
     "featuredUnavailableTitle": "العقارات المميزة غير متاحة مؤقتًا",
     "featuredUnavailableBody": "يمكنك استخدام بقية خدمات Markaz Home. تصفّح جميع العقارات أو حاول مرة أخرى لاحقًا."
+  },
+  "footer": {
+    "home": "مركز هوم",
+    "tagline": "طريقة أوضح لشراء العقارات وبيعها وإدارتها في جميع أنحاء الإمارات.",
+    "location": "دبي، الإمارات العربية المتحدة",
+    "navigationLabel": "روابط التذييل",
+    "quickLinks": "روابط سريعة",
+    "browseProperties": "تصفّح العقارات",
+    "howItWorks": "كيف يعمل",
+    "listProperty": "أدرج عقارك",
+    "signIn": "تسجيل الدخول",
+    "dashboard": "لوحة التحكم",
+    "contact": "تواصل معنا",
+    "support": "المساعدة والدعم",
+    "contactBody": "اعثر في مركز الدعم على إرشادات لمشكلات الحساب والإعلانات والمعاملات التجريبية.",
+    "supportCentre": "فتح مركز الدعم",
+    "copyright": "© {year} مركز هوم. جميع الحقوق محفوظة.",
+    "demoNotice": "بيئة نموذج أولي"
   },
   "auth": {
     "signIn": "تسجيل الدخول",
@@ -138,8 +160,9 @@
     "help": "قد يستغرق وصول الرموز بضع دقائق. تحقّق من مجلد البريد العشوائي أو غير الهام.",
     "resent": "تم إرسال رمز تحقق جديد.",
     "successTitle": "تم التحقق من البريد الإلكتروني",
-    "successBody": "تم تأكيد بريدك الإلكتروني. التالي، أكمل خطوة الهوية التجريبية.",
-    "continueIdentity": "المتابعة إلى الهوية التجريبية",
+    "successBody": "تم تأكيد بريدك الإلكتروني. تابع الآن للتحقق من الهوية عبر UAE PASS.",
+    "profileSuccessBody": "تم تأكيد بريدك الإلكتروني. أضف بيانات الحساب المتبقية، ثم تابع إلى التحقق من الهوية.",
+    "continueIdentity": "المتابعة إلى التحقق من الهوية",
     "completeProfile": "إكمال الملف الشخصي"
   },
   "signin": {
@@ -180,7 +203,8 @@
     "invalidBody": "قد يكون الرابط منتهي الصلاحية أو تم استخدامه بالفعل. اطلب رسالة استعادة جديدة للمتابعة.",
     "requestNew": "طلب رابط جديد",
     "successTitle": "تم تحديث كلمة المرور",
-    "successBody": "تم تغيير كلمة مرورك. سجّل الدخول بكلمة مرورك الجديدة."
+    "successBody": "تم تغيير كلمة مرورك. سجّل الدخول بكلمة مرورك الجديدة.",
+    "signOutError": "تم تحديث كلمة المرور، لكن تعذّر إنهاء جلسة الاستعادة. حاول مجددًا قبل مغادرة الصفحة."
   },
   "profile": {
     "title": "أكمل ملفك الشخصي",
@@ -265,7 +289,7 @@
     "fullNameTooLong": "يجب ألا يتجاوز الاسم الكامل 100 حرف.",
     "emailEmpty": "أدخل عنوان بريدك الإلكتروني.",
     "emailInvalid": "أدخل عنوان بريد إلكتروني صالحًا.",
-    "existingAccount": "تعذّر علينا إنشاء حساب جديد بهذه التفاصيل. قد يكون لديك حساب بالفعل. حاول تسجيل الدخول أو إعادة تعيين كلمة المرور.",
+    "existingAccount": "تعذّر علينا إنشاء حساب جديد بهذه التفاصيل.",
     "passwordEmpty": "أدخل كلمة مرور.",
     "passwordTooShort": "استخدم 8 أحرف على الأقل.",
     "uppercaseMissing": "أضف حرفًا إنجليزيًا كبيرًا واحدًا على الأقل.",
@@ -294,7 +318,8 @@
     "adminAccessDenied": "لا يملك هذا الحساب صلاحية الوصول إلى بوابة عمليات Markaz.",
     "unexpectedError": "تعذّر علينا إكمال هذا الطلب. حاول مرة أخرى.",
     "passwordPolicy": "كلمة المرور لا تستوفي جميع المتطلبات.",
-    "errorSummaryTitle": "يرجى تصحيح ما يلي:"
+    "errorSummaryTitle": "يرجى تصحيح ما يلي:",
+    "existingAccountBody": "قد يكون لديك حساب بالفعل. سجّل الدخول، أو أعد تعيين كلمة المرور إذا نسيتها."
   },
   "uaePass": {
     "title": "تحقّق من هويتك",
@@ -314,34 +339,32 @@
     "or": "أو",
     "button": "المتابعة عبر UAE PASS (بيئة اختبار)",
     "starting": "جارٍ التحويل إلى UAE PASS…",
-    "testEnvNote": "بيئة اختبار — لم يُجرَ أي تحقق هوية إنتاجي. تؤكّد UAE PASS الهوية فقط ولا تتحقق من ملكية العقار.",
     "error": "تعذّر إكمال مصادقة UAE PASS (بيئة الاختبار). حاول مرة أخرى أو سجّل الدخول عبر البريد وكلمة المرور.",
     "cancelled": "تم إلغاء مصادقة UAE PASS (بيئة الاختبار). يمكنك المحاولة مجددًا أو تسجيل الدخول عبر البريد وكلمة المرور."
   },
   "dashboard": {
-    "welcome": "مرحبًا، {name}",
-    "welcomeNoName": "مرحبًا",
-    "subtitle": "تصفّح العقارات أو أدرج عقارك — حسابك يقوم بالأمرين.",
-    "browseTitle": "تصفّح العقارات",
-    "browseBody": "ابحث في العقارات وقارن بيانات الاستثمار المتاحة واحفظ الإعلانات وقدّم العروض وتابع شراءك.",
+    "eyebrow": "اللوحة",
+    "welcome": "مرحبًا بعودتك، {name}",
+    "welcomeNoName": "مرحبًا بعودتك",
     "browseCta": "تصفّح العقارات",
-    "listTitle": "أدرج عقارك",
-    "listBody": "أنشئ إعلان عقار وأكمل خطوات التحقق التجريبية المطلوبة وانشره وأدر العروض.",
     "listCta": "أدرج عقارك",
-    "summaryTitle": "نشاطك",
     "savedProperties": "العقارات المحفوظة",
+    "activeOffers": "العروض النشطة",
+    "activeTransactions": "المعاملات النشطة",
     "myListings": "إعلاناتي",
-    "offersMade": "العروض المقدّمة",
-    "offersReceived": "العروض المستلمة",
-    "transactions": "المعاملات",
-    "notifications": "الإشعارات",
-    "emptySaved": "لم تحفظ أي عقارات بعد.",
-    "emptyListings": "ليس لديك أي إعلانات بعد.",
-    "emptyOffersMade": "لم تقدّم أي عروض بعد.",
-    "emptyOffersReceived": "لم تستلم أي عروض بعد.",
-    "emptyTransactions": "لا توجد معاملات جارية.",
-    "emptyNotifications": "لا جديد لديك.",
-    "loadingSummaries": "جارٍ تحميل نشاطك…",
+    "freshTitle": "ابدأ ببناء قائمتك المختصرة.",
+    "freshBody": "تصفّح إعلانات دبي الموثّقة، وقارن بيانات الاستثمار المتاحة، واحفظ المفضّلة لديك، وقدّم عرضًا غير ملزم عندما تجد العقار المناسب.",
+    "continueListingTitle": "أكمل إعلانك",
+    "continueListingCta": "متابعة",
+    "untitledListing": "إعلان بلا عنوان",
+    "listingProgress": "اكتملت {completed} من {total} خطوات مطلوبة",
+    "activeTransactionTitle": "المعاملة النشطة",
+    "latestOfferTitle": "أحدث عرض",
+    "offerMadeBy": "قدّمت عرضًا بقيمة {amount}",
+    "offerReceivedOn": "عرض مستلم — {amount}",
+    "recommendedTitle": "مقترحة لك",
+    "viewAll": "عرض الكل",
+    "seeAll": "عرض الكل",
     "summariesPartialError": "تعذّر تحميل بعض النشاط. نعرض المتاح."
   },
   "nav": {
@@ -356,6 +379,7 @@
     "notifications": "الإشعارات",
     "help": "المساعدة",
     "signOut": "تسجيل الخروج",
+    "signOutError": "تعذّر تسجيل خروجك. حاول مجددًا.",
     "openMenu": "افتح القائمة",
     "closeMenu": "أغلق القائمة",
     "howItWorks": "كيف يعمل",
@@ -366,7 +390,54 @@
     "listProperty": "أدرج عقارًا",
     "home": "الرئيسية",
     "primary": "التنقل الرئيسي",
-    "primaryMobile": "التنقل الرئيسي على الهاتف"
+    "primaryMobile": "التنقل الرئيسي على الهاتف",
+    "workspace": "مساحة العمل",
+    "signedIn": "مسجّل الدخول",
+    "portfolio": "المحفظة"
+  },
+  "howItWorks": {
+    "eyebrow": "رحلة واحدة مترابطة",
+    "title": "كيف يعمل Markaz Home",
+    "description": "اكتشف العقارات وأنشئ إعلانًا وتفاوض على عرض غير ملزم وتابع مراحل المعاملة التجريبية في مكان واحد.",
+    "buyer": {
+      "title": "شراء عقار",
+      "searchTitle": "ابحث في الإعلانات المتحققة",
+      "searchBody": "تصفّح إعلانات Markaz المنشورة والعقارات الخارجية المعلّمة بوضوح باستخدام فلاتر الموقع والسعر ونوع العقار.",
+      "offerTitle": "قدّم عرضًا غير ملزم",
+      "offerBody": "قدّم عرضًا وراجع العروض المضادة واقبل أو ارفض من دون تبادل بيانات التواصل الخاصة.",
+      "trackTitle": "تابع كل مرحلة",
+      "trackBody": "بعد قبول العرض، يرى الطرفان قائمة المعاملة التجريبية نفسها وحالتها."
+    },
+    "seller": {
+      "title": "بيع عقار",
+      "listTitle": "أنشئ إعلانك",
+      "listBody": "أضف تفاصيل العقار ومستندات الملكية والصور وتفضيلات الإعلان ضمن خطوات إرشادية قابلة للاستكمال.",
+      "reviewTitle": "أكمل الفحوصات التجريبية",
+      "reviewBody": "نتائج الملكية ونموذج A والتصريح والنشر هي عمليات محاكاة محفوظة لهذا النموذج الأولي.",
+      "manageTitle": "أدر العروض والتقدّم",
+      "manageBody": "أوقف الإعلان المنشور أو استأنفه، ورد على العروض، ثم انتقل إلى مساحة المعاملة المشتركة."
+    },
+    "simulationTitle": "نموذج أولي واضح",
+    "simulationBody": "UAE PASS في بيئة الاختبار خدمة هوية تجريبية. خطوات DLD وTrakheesi والعقود والعربون والنقل محاكاة ولا تنفّذ معاملة قانونية أو مالية.",
+    "browseAction": "تصفّح العقارات",
+    "accountAction": "إنشاء حساب"
+  },
+  "support": {
+    "eyebrow": "مركز الدعم",
+    "title": "كيف يمكننا مساعدتك؟",
+    "description": "استخدم هذه الإرشادات لحل المشكلات الشائعة أثناء اختبار Markaz Home.",
+    "demoNotice": "هذا مركز دعم لنموذج أولي، ولا يرسل حاليًا رسالة إلى فريق دعم مباشر.",
+    "accountTitle": "الحساب والهوية",
+    "accountBody": "لمشكلات تسجيل الدخول أو رمز التحقق أو UAE PASS في بيئة الاختبار، أعد الخطوة الأخيرة واحتفظ برسالة الخطأ الآمنة الظاهرة.",
+    "transactionTitle": "الإعلانات والمعاملات",
+    "transactionBody": "افتح الإعلان أو العرض أو مساحة المعاملة المعنية، ثم راجع الإجراء الحالي وإرشادات الاستعادة.",
+    "technicalTitle": "المشكلات التقنية",
+    "technicalBody": "حدّث الصفحة مرة واحدة، وتأكد من استخدام حساب الاختبار المقصود، وسجّل الصفحة والوقت إذا استمرت المشكلة.",
+    "beforeContactTitle": "قبل طلب المساعدة",
+    "beforeContactOne": "لا تشارك كلمات المرور أو رموز التحقق أو الرموز السرية أو روابط المستندات الخاصة.",
+    "beforeContactTwo": "اذكر اسم الصفحة والمرجع الآمن المعروض في Markaz.",
+    "beforeContactThree": "اذكر ما إذا حدثت المشكلة بالعربية أو الإنجليزية وعلى الكمبيوتر أو الهاتف.",
+    "contactAvailability": "ستُضاف إمكانية التواصل المباشر قبل بدء تجربة خارجية."
   },
   "placeholders": {
     "browseTitle": "تصفّح العقارات",
@@ -454,7 +525,7 @@
     "signedOutBody": "انتهت جلسة المشرف الخاصة بك.",
     "return": "العودة إلى تسجيل دخول المشرف",
     "refresh": "تحديث",
-    "updated": "Updated",
+    "updated": "تم التحديث",
     "loading": "جارٍ التحميل…",
     "retry": "إعادة المحاولة",
     "cancel": "إلغاء",
@@ -464,19 +535,19 @@
     "viewDetail": "عرض التفاصيل",
     "none": "لا شيء",
     "na": "—",
-    "actorYou": "You",
-    "required": "Required",
-    "optional": "Optional",
+    "actorYou": "أنت",
+    "required": "مطلوب",
+    "optional": "اختياري",
     "reasonLabel": "السبب",
     "reasonRequired": "اختر سببًا للمتابعة.",
-    "noteOptional": "Internal note (optional)",
+    "noteOptional": "ملاحظة داخلية (اختيارية)",
     "charCount": "{count}/{max}",
     "paginationRange": "{from}–{to}",
-    "prev": "Previous",
-    "next": "Next",
-    "page": "Page {n}",
+    "prev": "السابق",
+    "next": "التالي",
+    "page": "الصفحة {n}",
     "simulated": "محاكاة",
-    "simulatedHint": "Regulated integrations are simulated in this environment.",
+    "simulatedHint": "عمليات التكامل الخاضعة للتنظيم محاكاة في هذه البيئة.",
     "nav": {
       "overview": "نظرة عامة",
       "customers": "العملاء",
@@ -491,46 +562,47 @@
       "title": "نظرة عامة تشغيلية",
       "description": "مقاييس وقوائم تشغيلية تحتاج إلى اهتمام.",
       "partialError": "تعذّر تحميل بعض المعلومات التشغيلية.",
-      "recentActions": "Recent admin actions",
-      "recentActionsEmpty": "No recent admin actions.",
+      "recentActions": "إجراءات الإدارة الأخيرة",
+      "recentActionsEmpty": "لا توجد إجراءات إدارية حديثة.",
       "metric": {
-        "activeCustomers": "Active customers",
-        "restrictedCustomers": "Restricted customers",
-        "liveListings": "Live listings",
-        "pausedListings": "Paused listings",
-        "soldListings": "Sold (demo) listings",
-        "activeThreads": "Active offer threads",
-        "acceptedOffers": "Accepted offers",
-        "activeTransactions": "Active transactions",
-        "failedTransactions": "Failed transactions",
-        "completedTransactions": "Completed (demo) transactions",
-        "publicationPending": "Publication reviews pending",
-        "publicationFailed": "Publication failures"
+        "activeCustomers": "العملاء النشطون",
+        "restrictedCustomers": "العملاء المقيّدة إجراءاتهم",
+        "liveListings": "الإعلانات المنشورة",
+        "pausedListings": "الإعلانات المتوقفة",
+        "soldListings": "الإعلانات المباعة (تجريبيًا)",
+        "activeThreads": "سلاسل العروض النشطة",
+        "acceptedOffers": "العروض المقبولة",
+        "activeTransactions": "المعاملات النشطة",
+        "failedTransactions": "المعاملات المتعثرة",
+        "completedTransactions": "المعاملات المكتملة (تجريبيًا)",
+        "publicationPending": "مراجعات النشر المعلّقة",
+        "publicationFailed": "إخفاقات النشر"
       },
       "queue": {
-        "title": "Needs attention",
-        "publication": "Publication reviews pending",
-        "publicationFailed": "Publication failures to investigate",
-        "transactions": "Transactions paused or failed",
-        "verifications": "Verification failures",
-        "pausedListings": "Paused listings",
-        "empty": "Nothing needs attention right now."
+        "title": "تحتاج إلى متابعة",
+        "publication": "مراجعات النشر المعلّقة",
+        "publicationFailed": "إخفاقات نشر تحتاج إلى تحقيق",
+        "transactions": "معاملات متوقفة أو متعثرة",
+        "verifications": "إخفاقات التحقق",
+        "pausedListings": "الإعلانات المتوقفة",
+        "empty": "لا توجد عناصر تحتاج إلى متابعة الآن."
       }
     },
     "search": {
-      "placeholder": "Search customers, listings, transactions…",
-      "title": "Search results",
-      "hint": "Type at least 2 characters.",
-      "empty": "No matching records.",
-      "groupCustomers": "Customers",
-      "groupListings": "Listings",
-      "groupTransactions": "Transactions"
+      "placeholder": "ابحث في العملاء والإعلانات والمعاملات…",
+      "title": "نتائج البحث",
+      "hint": "اكتب حرفين على الأقل.",
+      "empty": "لا توجد سجلات مطابقة.",
+      "groupCustomers": "العملاء",
+      "groupListings": "الإعلانات",
+      "groupTransactions": "المعاملات",
+      "clear": "مسح البحث"
     },
     "customers": {
       "title": "العملاء",
-      "description": "Every customer account. Emails are partially masked.",
-      "empty": "No customers match these filters.",
-      "unavailable": "This customer record is not available.",
+      "description": "جميع حسابات العملاء. عناوين البريد الإلكتروني محجوبة جزئيًا.",
+      "empty": "لا يوجد عملاء يطابقون هذه الفلاتر.",
+      "unavailable": "سجل العميل هذا غير متاح.",
       "status": {
         "active": "نشط",
         "restricted": "الإجراءات مقيّدة"
@@ -543,249 +615,249 @@
         "VERIFIED_STAGING": "تم ربط هوية UAE PASS (بيئة الاختبار)"
       },
       "filter": {
-        "all": "All",
-        "active": "Active",
-        "restricted": "Restricted",
-        "onboarding": "Onboarding"
+        "all": "الكل",
+        "active": "نشط",
+        "restricted": "مقيّد",
+        "onboarding": "إعداد الحساب"
       },
       "col": {
-        "name": "Customer",
-        "email": "Email",
-        "status": "Status",
-        "listings": "Listings",
-        "offers": "Active offers",
-        "transactions": "Active transactions",
-        "activity": "Last activity"
+        "name": "العميل",
+        "email": "البريد الإلكتروني",
+        "status": "الحالة",
+        "listings": "الإعلانات",
+        "offers": "العروض النشطة",
+        "transactions": "المعاملات النشطة",
+        "activity": "آخر نشاط"
       },
-      "identity": "Identity",
-      "joined": "Joined",
-      "onboarded": "Onboarded",
-      "notOnboarded": "Onboarding incomplete",
-      "attention": "Restricted while holding an active transaction.",
-      "restrictedSince": "Restricted since",
-      "restrictionReason": "Restriction reason"
+      "identity": "الهوية",
+      "joined": "تاريخ الانضمام",
+      "onboarded": "اكتمل الإعداد",
+      "notOnboarded": "إعداد الحساب غير مكتمل",
+      "attention": "الإجراءات مقيّدة مع وجود معاملة نشطة.",
+      "restrictedSince": "مقيّد منذ",
+      "restrictionReason": "سبب التقييد"
     },
     "customer": {
-      "restrictAction": "Restrict actions",
-      "restoreAction": "Restore actions",
+      "restrictAction": "تقييد الإجراءات",
+      "restoreAction": "استعادة الإجراءات",
       "restrict": {
-        "title": "Restrict customer actions",
-        "body": "The customer can still sign in and browse, but cannot create offers, listings, or publish while restricted. This is recorded in the audit log.",
-        "submit": "Restrict actions",
+        "title": "تقييد إجراءات العميل",
+        "body": "يمكن للعميل تسجيل الدخول والتصفح، لكنه لا يستطيع إنشاء عروض أو إعلانات أو نشرها أثناء التقييد. يُسجّل ذلك في سجل التدقيق.",
+        "submit": "تقييد الإجراءات",
         "reason": {
-          "ACCOUNT_REVIEW": "Account under review",
-          "LISTING_INVESTIGATION": "Listing investigation",
-          "OFFER_INVESTIGATION": "Offer investigation",
-          "TRANSACTION_ISSUE": "Transaction issue",
-          "VERIFICATION_ISSUE": "Verification issue",
-          "OPERATIONAL_FOLLOW_UP": "Operational follow-up",
-          "OTHER": "Other"
+          "ACCOUNT_REVIEW": "الحساب قيد المراجعة",
+          "LISTING_INVESTIGATION": "تحقيق متعلق بإعلان",
+          "OFFER_INVESTIGATION": "تحقيق متعلق بعرض",
+          "TRANSACTION_ISSUE": "مشكلة في المعاملة",
+          "VERIFICATION_ISSUE": "مشكلة في التحقق",
+          "OPERATIONAL_FOLLOW_UP": "متابعة تشغيلية",
+          "OTHER": "أخرى"
         }
       },
       "restore": {
-        "title": "Restore customer actions",
-        "body": "The customer regains the ability to create offers, listings, and publish. This is recorded in the audit log.",
-        "submit": "Restore actions",
+        "title": "استعادة إجراءات العميل",
+        "body": "يستعيد العميل إمكانية إنشاء العروض والإعلانات ونشرها. يُسجّل ذلك في سجل التدقيق.",
+        "submit": "استعادة الإجراءات",
         "reason": {
-          "REVIEW_COMPLETED": "Review completed",
-          "ISSUE_RESOLVED": "Issue resolved",
-          "APPLIED_IN_ERROR": "Restriction applied in error",
-          "OTHER": "Other"
+          "REVIEW_COMPLETED": "اكتملت المراجعة",
+          "ISSUE_RESOLVED": "تم حل المشكلة",
+          "APPLIED_IN_ERROR": "تم تطبيق التقييد بالخطأ",
+          "OTHER": "أخرى"
         }
       }
     },
     "note": {
-      "title": "Admin notes",
-      "subtitle": "Internal only. Never visible to customers.",
-      "add": "Add note",
-      "empty": "No notes yet.",
-      "bodyLabel": "Note",
-      "bodyPlaceholder": "Context for other admins…",
-      "followUpLabel": "Follow-up date (optional)",
-      "categoryLabel": "Category",
-      "submit": "Save note",
-      "privacyWarning": "Notes are internal operational records — do not paste customer secrets or document contents.",
-      "supersedes": "Correction of an earlier note",
+      "title": "ملاحظات الإدارة",
+      "subtitle": "داخلية فقط ولا تظهر للعملاء.",
+      "add": "إضافة ملاحظة",
+      "empty": "لا توجد ملاحظات بعد.",
+      "bodyLabel": "ملاحظة",
+      "bodyPlaceholder": "سياق لموظفي الإدارة الآخرين…",
+      "followUpLabel": "تاريخ المتابعة (اختياري)",
+      "categoryLabel": "الفئة",
+      "submit": "حفظ الملاحظة",
+      "privacyWarning": "الملاحظات سجلات تشغيلية داخلية — لا تلصق بيانات العملاء السرية أو محتويات المستندات.",
+      "supersedes": "تصحيح ملاحظة سابقة",
       "category": {
-        "REVIEW": "Review",
-        "CUSTOMER_SUPPORT": "Customer support",
-        "LISTING_INVESTIGATION": "Listing investigation",
-        "OFFER_INVESTIGATION": "Offer investigation",
-        "TRANSACTION_ISSUE": "Transaction issue",
-        "VERIFICATION_ISSUE": "Verification issue",
-        "FOLLOW_UP": "Follow-up",
-        "CORRECTION": "Correction"
+        "REVIEW": "مراجعة",
+        "CUSTOMER_SUPPORT": "دعم العملاء",
+        "LISTING_INVESTIGATION": "تحقيق متعلق بإعلان",
+        "OFFER_INVESTIGATION": "تحقيق متعلق بعرض",
+        "TRANSACTION_ISSUE": "مشكلة في المعاملة",
+        "VERIFICATION_ISSUE": "مشكلة في التحقق",
+        "FOLLOW_UP": "متابعة",
+        "CORRECTION": "تصحيح"
       }
     },
     "listings": {
-      "title": "Listings",
-      "description": "Every listing across all states.",
-      "empty": "No listings match these filters.",
-      "unavailable": "This listing is not available.",
-      "searchPlaceholder": "Search by reference or title…",
+      "title": "الإعلانات",
+      "description": "جميع الإعلانات بمختلف حالاتها.",
+      "empty": "لا توجد إعلانات تطابق هذه الفلاتر.",
+      "unavailable": "هذا الإعلان غير متاح.",
+      "searchPlaceholder": "ابحث بالمرجع أو العنوان…",
       "col": {
-        "title": "Listing",
-        "reference": "Reference",
-        "state": "State",
-        "location": "Location",
-        "activity": "Updated"
+        "title": "الإعلان",
+        "reference": "المرجع",
+        "state": "الحالة",
+        "location": "الموقع",
+        "activity": "تم التحديث"
       },
       "state": {
-        "DRAFT": "Draft",
-        "READY_TO_PUBLISH": "Ready to publish",
-        "LIVE": "Live",
-        "PAUSED": "Paused",
-        "UNDER_OFFER": "Under offer",
-        "SOLD_DEMO": "Sold (demo)",
-        "ARCHIVED": "Archived",
-        "DETAILS_COMPLETE": "Details complete",
-        "DOCUMENT_UPLOADED": "Document uploaded",
-        "OWNERSHIP_REVIEW": "Ownership review",
-        "OWNERSHIP_VERIFIED": "Ownership verified",
-        "FORM_A_COMPLETE": "Form A complete",
-        "PHOTOS_COMPLETE": "Photos complete",
-        "PERMIT_PENDING": "Permit pending",
-        "REJECTED": "Returned"
+        "DRAFT": "مسودة",
+        "READY_TO_PUBLISH": "جاهز للنشر",
+        "LIVE": "منشور",
+        "PAUSED": "متوقف",
+        "UNDER_OFFER": "تحت العرض",
+        "SOLD_DEMO": "مباع (تجريبيًا)",
+        "ARCHIVED": "مؤرشف",
+        "DETAILS_COMPLETE": "التفاصيل مكتملة",
+        "DOCUMENT_UPLOADED": "تم رفع المستند",
+        "OWNERSHIP_REVIEW": "مراجعة الملكية",
+        "OWNERSHIP_VERIFIED": "تم التحقق من الملكية",
+        "FORM_A_COMPLETE": "نموذج A مكتمل",
+        "PHOTOS_COMPLETE": "الصور مكتملة",
+        "PERMIT_PENDING": "التصريح قيد الانتظار",
+        "REJECTED": "مُعاد للتعديل"
       }
     },
     "listing": {
-      "publicSection": "Public information",
-      "privateSection": "Owner-only information",
-      "askingPrice": "Asking price",
-      "owner": "Owner",
-      "publication": "Publication",
-      "pausedSince": "Paused since",
+      "publicSection": "المعلومات العامة",
+      "privateSection": "معلومات خاصة بالمالك",
+      "askingPrice": "السعر المطلوب",
+      "owner": "المالك",
+      "publication": "النشر",
+      "pausedSince": "متوقف منذ",
       "field": {
-        "propertyType": "Property type",
-        "community": "Community",
-        "emirate": "Emirate",
-        "buildingOrProject": "Building / project",
-        "bedrooms": "Bedrooms",
-        "bathrooms": "Bathrooms",
-        "unitIdentifier": "Unit identifier",
-        "occupancyStatus": "Occupancy"
+        "propertyType": "نوع العقار",
+        "community": "المنطقة",
+        "emirate": "الإمارة",
+        "buildingOrProject": "المبنى / المشروع",
+        "bedrooms": "غرف النوم",
+        "bathrooms": "الحمّامات",
+        "unitIdentifier": "معرّف الوحدة",
+        "occupancyStatus": "الإشغال"
       },
-      "pauseAction": "Pause listing",
-      "resumeAction": "Resume listing",
+      "pauseAction": "إيقاف الإعلان",
+      "resumeAction": "استئناف الإعلان",
       "pause": {
-        "title": "Pause listing availability",
-        "body": "The listing is removed from the public marketplace and the owner is notified. This is recorded in the audit log.",
-        "submit": "Pause listing",
+        "title": "إيقاف إتاحة الإعلان",
+        "body": "يُزال الإعلان من السوق العام ويُبلّغ المالك. يُسجّل ذلك في سجل التدقيق.",
+        "submit": "إيقاف الإعلان",
         "reason": {
-          "CUSTOMER_REQUEST": "Customer request",
-          "INFORMATION_UNDER_REVIEW": "Information under review",
-          "VERIFICATION_ISSUE": "Verification issue",
-          "PUBLICATION_ISSUE": "Publication issue",
-          "OFFER_OR_TRANSACTION_ISSUE": "Offer or transaction issue",
-          "OPERATIONAL_SAFETY": "Operational safety"
+          "CUSTOMER_REQUEST": "طلب العميل",
+          "INFORMATION_UNDER_REVIEW": "المعلومات قيد المراجعة",
+          "VERIFICATION_ISSUE": "مشكلة في التحقق",
+          "PUBLICATION_ISSUE": "مشكلة في النشر",
+          "OFFER_OR_TRANSACTION_ISSUE": "مشكلة في عرض أو معاملة",
+          "OPERATIONAL_SAFETY": "السلامة التشغيلية"
         }
       },
       "resume": {
-        "title": "Resume listing availability",
-        "body": "The listing returns to the public marketplace if it remains eligible. This is recorded in the audit log.",
-        "submit": "Resume listing",
-        "reasonPlaceholder": "Reason (recorded in audit log)"
+        "title": "استئناف إتاحة الإعلان",
+        "body": "يعود الإعلان إلى السوق العام إذا ظل مؤهلًا. يُسجّل ذلك في سجل التدقيق.",
+        "submit": "استئناف الإعلان",
+        "reasonPlaceholder": "السبب (يُسجّل في سجل التدقيق)"
       }
     },
     "publication": {
-      "title": "Publication review",
-      "description": "Listings awaiting a publish decision.",
-      "empty": "No publication reviews in this queue.",
-      "unavailable": "This publication review is not available.",
-      "conflict": "Publication review already completed.",
+      "title": "مراجعة النشر",
+      "description": "إعلانات تنتظر قرار النشر.",
+      "empty": "لا توجد مراجعات نشر في هذه القائمة.",
+      "unavailable": "مراجعة النشر هذه غير متاحة.",
+      "conflict": "اكتملت مراجعة النشر بالفعل.",
       "filter": {
-        "pending": "Pending",
-        "returned": "Returned",
-        "all": "All"
+        "pending": "قيد الانتظار",
+        "returned": "مُعاد للتعديل",
+        "all": "الكل"
       },
       "col": {
-        "title": "Listing",
-        "reference": "Reference",
-        "status": "Status",
-        "submitted": "Submitted"
+        "title": "الإعلان",
+        "reference": "المرجع",
+        "status": "الحالة",
+        "submitted": "تم الإرسال"
       },
       "checklist": {
-        "title": "Eligibility checklist",
-        "readyToPublish": "Listing is ready to publish",
-        "hasProperty": "Property details present",
-        "pass": "Pass",
-        "fail": "Fail"
+        "title": "قائمة التحقق من الأهلية",
+        "readyToPublish": "الإعلان جاهز للنشر",
+        "hasProperty": "تفاصيل العقار موجودة",
+        "pass": "مستوفى",
+        "fail": "غير مستوفى"
       },
-      "approveAction": "Approve & publish",
-      "returnAction": "Return for changes",
+      "approveAction": "الموافقة والنشر",
+      "returnAction": "إعادة للتعديل",
       "approve": {
-        "title": "Approve publication",
-        "body": "The listing is published to the public marketplace using the standard compensated workflow. This is recorded in the audit log.",
-        "submit": "Approve & publish"
+        "title": "الموافقة على النشر",
+        "body": "يُنشر الإعلان في السوق العام باستخدام مسار النشر القياسي القابل للتعويض. يُسجّل ذلك في سجل التدقيق.",
+        "submit": "الموافقة والنشر"
       },
       "return": {
-        "title": "Return for changes",
-        "body": "The request is returned to the owner with the selected reason. The owner is notified and can resubmit.",
-        "submit": "Return for changes",
+        "title": "إعادة للتعديل",
+        "body": "يُعاد الطلب إلى المالك مع السبب المحدد. يُبلّغ المالك ويمكنه إعادة الإرسال.",
+        "submit": "إعادة للتعديل",
         "reason": {
-          "PROPERTY_INFO_INCOMPLETE": "Property information incomplete",
-          "PHOTOS_NEED_CHANGES": "Photos need changes",
-          "VERIFICATION_CORRECTION": "Verification correction needed",
-          "ASKING_PRICE_REVIEW": "Asking price needs review",
-          "PUBLIC_PRIVATE_FIELD_ISSUE": "Public/private field issue",
-          "OTHER": "Other"
+          "PROPERTY_INFO_INCOMPLETE": "معلومات العقار غير مكتملة",
+          "PHOTOS_NEED_CHANGES": "الصور تحتاج إلى تعديل",
+          "VERIFICATION_CORRECTION": "يلزم تصحيح التحقق",
+          "ASKING_PRICE_REVIEW": "السعر المطلوب يحتاج إلى مراجعة",
+          "PUBLIC_PRIVATE_FIELD_ISSUE": "مشكلة في حقل عام أو خاص",
+          "OTHER": "أخرى"
         }
       },
       "status": {
-        "PENDING": "Pending",
-        "APPROVED_DEMO": "Approved (demo)",
-        "REJECTED_DEMO": "Returned",
-        "NOT_SUBMITTED": "Not submitted"
+        "PENDING": "قيد الانتظار",
+        "APPROVED_DEMO": "تمت الموافقة (تجريبيًا)",
+        "REJECTED_DEMO": "مُعاد للتعديل",
+        "NOT_SUBMITTED": "لم يُرسل"
       }
     },
     "verifications": {
-      "title": "Verifications",
-      "description": "Simulated verification outcomes.",
-      "empty": "No verifications to show.",
-      "unavailable": "This verification is not available.",
+      "title": "عمليات التحقق",
+      "description": "نتائج تحقق محاكاة.",
+      "empty": "لا توجد عمليات تحقق لعرضها.",
+      "unavailable": "عملية التحقق هذه غير متاحة.",
       "col": {
-        "kind": "Type",
-        "status": "Outcome",
-        "listing": "Listing",
-        "attempts": "State",
-        "created": "Created"
+        "kind": "النوع",
+        "status": "النتيجة",
+        "listing": "الإعلان",
+        "attempts": "الحالة",
+        "created": "تاريخ الإنشاء"
       },
       "kind": {
-        "OWNERSHIP": "Ownership",
-        "IDENTITY": "Identity",
-        "PERMIT": "Permit",
-        "TITLE_DEED": "Title deed"
+        "OWNERSHIP": "الملكية",
+        "IDENTITY": "الهوية",
+        "PERMIT": "التصريح",
+        "TITLE_DEED": "سند الملكية"
       },
       "status": {
-        "PENDING": "Pending",
-        "VERIFIED_DEMO": "Verified (demo)",
-        "FAILED_DEMO": "Failed (demo)",
-        "PROCESSING": "Processing"
+        "PENDING": "قيد الانتظار",
+        "VERIFIED_DEMO": "تم التحقق (تجريبيًا)",
+        "FAILED_DEMO": "فشل (تجريبيًا)",
+        "PROCESSING": "قيد المعالجة"
       },
-      "superseded": "Superseded",
-      "failureReason": "Failure reason",
-      "retryAction": "Retry verification",
+      "superseded": "تم استبداله",
+      "failureReason": "سبب الإخفاق",
+      "retryAction": "إعادة محاولة التحقق",
       "retry": {
-        "title": "Retry verification",
-        "body": "A new simulated verification attempt is created. The previous attempt is preserved. This is recorded in the audit log.",
-        "submit": "Retry verification",
-        "reasonPlaceholder": "Reason (recorded in audit log)"
+        "title": "إعادة محاولة التحقق",
+        "body": "تُنشأ محاولة تحقق محاكاة جديدة مع الاحتفاظ بالمحاولة السابقة. يُسجّل ذلك في سجل التدقيق.",
+        "submit": "إعادة محاولة التحقق",
+        "reasonPlaceholder": "السبب (يُسجّل في سجل التدقيق)"
       }
     },
     "adminOffers": {
-      "title": "Offers",
-      "description": "Offer threads across the marketplace. Read-only history.",
-      "empty": "No offer threads to show.",
-      "unavailable": "This offer is not available.",
+      "title": "العروض",
+      "description": "سلاسل العروض في السوق. سجل للقراءة فقط.",
+      "empty": "لا توجد سلاسل عروض لعرضها.",
+      "unavailable": "هذا العرض غير متاح.",
       "col": {
-        "reference": "Thread",
-        "status": "Status",
-        "nextActor": "Next actor",
-        "activity": "Last activity"
+        "reference": "السلسلة",
+        "status": "الحالة",
+        "nextActor": "صاحب الإجراء التالي",
+        "activity": "آخر نشاط"
       },
-      "proposals": "Proposal history",
-      "proposalsHint": "Immutable. Admins cannot alter proposal amounts.",
-      "closedReason": "Closed reason",
+      "proposals": "سجل المقترحات",
+      "proposalsHint": "غير قابل للتعديل. لا يمكن للإدارة تغيير مبالغ المقترحات.",
+      "closedReason": "سبب الإغلاق",
       "side": {
         "BUYER": "المشتري",
         "SELLER": "البائع",
@@ -794,220 +866,236 @@
         "NONE": "—"
       },
       "nextActorValue": {
-        "BUYER": "Buyer",
-        "SELLER": "Seller",
+        "BUYER": "المشتري",
+        "SELLER": "البائع",
         "NONE": "—"
       },
       "status": {
-        "OPEN": "Open",
-        "COUNTERED": "Countered",
-        "ACCEPTED": "Accepted",
-        "REJECTED": "Rejected",
-        "WITHDRAWN": "Withdrawn",
-        "EXPIRED": "Expired",
-        "CLOSED_OTHER_ACCEPTED": "Closed (other accepted)",
-        "CLOSED_LISTING_UNAVAILABLE": "Closed (listing unavailable)",
-        "DRAFT": "Draft",
-        "AWAITING_SELLER": "Awaiting seller",
-        "AWAITING_BUYER": "Awaiting buyer"
+        "OPEN": "مفتوح",
+        "COUNTERED": "تم تقديم عرض مضاد",
+        "ACCEPTED": "مقبول",
+        "REJECTED": "مرفوض",
+        "WITHDRAWN": "مسحوب",
+        "EXPIRED": "منتهي الصلاحية",
+        "CLOSED_OTHER_ACCEPTED": "مغلق (تم قبول عرض آخر)",
+        "CLOSED_LISTING_UNAVAILABLE": "مغلق (الإعلان غير متاح)",
+        "DRAFT": "مسودة",
+        "AWAITING_SELLER": "بانتظار البائع",
+        "AWAITING_BUYER": "بانتظار المشتري"
       },
       "proposalStatus": {
-        "PENDING": "Pending",
-        "COUNTERED": "Countered",
-        "ACCEPTED": "Accepted",
-        "REJECTED": "Rejected",
-        "WITHDRAWN": "Withdrawn",
-        "EXPIRED": "Expired",
-        "SUPERSEDED": "Superseded",
-        "CURRENT": "Current",
-        "CLOSED": "Closed"
+        "PENDING": "قيد الانتظار",
+        "COUNTERED": "تم تقديم عرض مضاد",
+        "ACCEPTED": "مقبول",
+        "REJECTED": "مرفوض",
+        "WITHDRAWN": "مسحوب",
+        "EXPIRED": "منتهي الصلاحية",
+        "SUPERSEDED": "تم استبداله",
+        "CURRENT": "الحالي",
+        "CLOSED": "مغلق"
       },
-      "closeAction": "Close thread",
+      "closeAction": "إغلاق السلسلة",
       "close": {
-        "title": "Close offer thread",
-        "body": "Closing an invalid thread is an operational data-repair action. It does not change any proposal amounts or the accepted offer. This is recorded in the audit log.",
-        "submit": "Close thread",
+        "title": "إغلاق سلسلة العرض",
+        "body": "إغلاق سلسلة غير صالحة إجراء تشغيلي لإصلاح البيانات. لا يغيّر مبالغ المقترحات أو العرض المقبول. يُسجّل ذلك في سجل التدقيق.",
+        "submit": "إغلاق السلسلة",
         "reason": {
-          "LISTING_UNAVAILABLE": "Listing unavailable",
-          "PARTICIPANT_MISMATCH": "Participant mismatch",
-          "DUPLICATE_ACTIVE_THREAD": "Duplicate active thread",
-          "INVALID_PROPOSAL_STATE": "Invalid proposal state",
-          "OPERATIONAL_DATA_REPAIR": "Operational data repair"
+          "LISTING_UNAVAILABLE": "الإعلان غير متاح",
+          "PARTICIPANT_MISMATCH": "عدم تطابق المشاركين",
+          "DUPLICATE_ACTIVE_THREAD": "سلسلة نشطة مكررة",
+          "INVALID_PROPOSAL_STATE": "حالة مقترح غير صالحة",
+          "OPERATIONAL_DATA_REPAIR": "إصلاح تشغيلي للبيانات"
         }
       }
     },
     "adminTransactions": {
-      "title": "Transactions",
-      "description": "Simulated transaction workspaces. Recovery actions only.",
-      "empty": "No transactions to show.",
-      "unavailable": "This transaction is not available.",
-      "searchPlaceholder": "Search by reference…",
+      "title": "المعاملات",
+      "description": "مساحات معاملات محاكاة. إجراءات الاستعادة فقط.",
+      "empty": "لا توجد معاملات لعرضها.",
+      "unavailable": "هذه المعاملة غير متاحة.",
+      "searchPlaceholder": "ابحث بالمرجع…",
       "col": {
-        "reference": "Reference",
-        "status": "Status",
-        "nextActor": "Next actor",
-        "amount": "Amount",
-        "activity": "Updated"
+        "reference": "المرجع",
+        "status": "الحالة",
+        "nextActor": "صاحب الإجراء التالي",
+        "amount": "المبلغ",
+        "activity": "تم التحديث"
       },
-      "acceptedAmount": "Accepted amount",
-      "route": "Purchase route",
-      "version": "Version",
-      "paused": "Paused",
-      "pauseReason": "Pause reason",
-      "failureCategory": "Failure category",
+      "acceptedAmount": "المبلغ المقبول",
+      "route": "مسار الشراء",
+      "version": "الإصدار",
+      "paused": "متوقف",
+      "pauseReason": "سبب الإيقاف",
+      "failureCategory": "فئة الإخفاق",
       "routeValue": {
-        "CASH": "Cash",
-        "MORTGAGE": "Mortgage",
-        "UNSET": "Not selected"
+        "CASH": "نقدًا",
+        "MORTGAGE": "تمويل عقاري",
+        "UNSET": "لم يُحدد"
       },
       "status": {
-        "INITIATED": "Initiated",
-        "CONFIRMATION": "Confirmation",
-        "DEPOSIT": "Deposit",
-        "DOCUMENTS": "Documents",
-        "DUE_DILIGENCE": "Due diligence",
-        "TRANSFER": "Transfer",
-        "COMPLETION": "Completion",
-        "COMPLETED_DEMO": "Completed (demo)",
-        "CANCELLATION_PENDING": "Cancellation pending",
-        "CANCELLED": "Cancelled",
-        "FAILED": "Failed"
+        "INITIATED": "بدأت",
+        "CONFIRMATION": "التأكيد",
+        "DEPOSIT": "العربون",
+        "DOCUMENTS": "المستندات",
+        "DUE_DILIGENCE": "العناية الواجبة",
+        "TRANSFER": "النقل",
+        "COMPLETION": "الإكمال",
+        "COMPLETED_DEMO": "مكتملة (تجريبيًا)",
+        "CANCELLATION_PENDING": "الإلغاء قيد الانتظار",
+        "CANCELLED": "ملغاة",
+        "FAILED": "متعذرة"
       },
-      "pauseAction": "Pause progression",
-      "resumeAction": "Resume progression",
-      "retryAction": "Retry step",
-      "markFailedAction": "Mark failed",
-      "resolveAction": "Resolve cancellation",
+      "pauseAction": "إيقاف التقدّم",
+      "resumeAction": "استئناف التقدّم",
+      "retryAction": "إعادة محاولة الخطوة",
+      "markFailedAction": "تحديد كمتعذرة",
+      "resolveAction": "معالجة الإلغاء",
       "pause": {
-        "title": "Pause transaction progression",
-        "body": "Both participants keep read access, but no milestone can advance while paused. This is recorded in the audit log.",
-        "submit": "Pause progression",
-        "reasonPlaceholder": "Reason (recorded in audit log)"
+        "title": "إيقاف تقدّم المعاملة",
+        "body": "يحتفظ الطرفان بصلاحية القراءة، لكن لا يمكن التقدّم في أي مرحلة أثناء الإيقاف. يُسجّل ذلك في سجل التدقيق.",
+        "submit": "إيقاف التقدّم",
+        "reasonPlaceholder": "السبب (يُسجّل في سجل التدقيق)"
       },
       "resume": {
-        "title": "Resume transaction progression",
-        "body": "Milestones can advance again. This is recorded in the audit log.",
-        "submit": "Resume progression",
-        "reasonPlaceholder": "Reason (recorded in audit log)"
+        "title": "استئناف تقدّم المعاملة",
+        "body": "يمكن متابعة المراحل مجددًا. يُسجّل ذلك في سجل التدقيق.",
+        "submit": "استئناف التقدّم",
+        "reasonPlaceholder": "السبب (يُسجّل في سجل التدقيق)"
       },
       "retryStep": {
-        "title": "Retry system step",
-        "body": "Re-runs a retry-safe simulated step. Only steps that failed due to a transient simulated error can be retried.",
-        "submit": "Retry step",
-        "codeLabel": "Step code",
-        "reasonPlaceholder": "Reason (recorded in audit log)"
+        "title": "إعادة محاولة خطوة النظام",
+        "body": "يعيد تشغيل خطوة محاكاة آمنة للتكرار. لا يمكن إعادة المحاولة إلا للخطوات التي فشلت بسبب خطأ محاكاة مؤقت.",
+        "submit": "إعادة محاولة الخطوة",
+        "codeLabel": "رمز الخطوة",
+        "reasonPlaceholder": "السبب (يُسجّل في سجل التدقيق)"
       },
       "markFailed": {
-        "title": "Mark transaction failed",
-        "body": "This is irreversible. Use only when the transaction cannot recover. Both participants are notified. This is recorded in the audit log.",
-        "submit": "Mark failed",
+        "title": "تحديد المعاملة كمتعذرة",
+        "body": "هذا الإجراء غير قابل للتراجع. استخدمه فقط عندما يتعذر استعادة المعاملة. يُبلّغ الطرفان ويُسجّل الإجراء في سجل التدقيق.",
+        "submit": "تحديد كمتعذرة",
         "reason": {
-          "UNRECOVERABLE_DATA_INCONSISTENCY": "Unrecoverable data inconsistency",
-          "REPEATED_SYSTEM_FAILURE": "Repeated system failure",
-          "INVALID_TRANSACTION_RELATIONSHIP": "Invalid transaction relationship",
-          "COMPLETION_CONFLICT": "Completion conflict",
-          "OTHER_TECHNICAL": "Other technical reason"
+          "UNRECOVERABLE_DATA_INCONSISTENCY": "تعارض بيانات غير قابل للاستعادة",
+          "REPEATED_SYSTEM_FAILURE": "إخفاق متكرر في النظام",
+          "INVALID_TRANSACTION_RELATIONSHIP": "علاقة معاملة غير صالحة",
+          "COMPLETION_CONFLICT": "تعارض في الإكمال",
+          "OTHER_TECHNICAL": "سبب تقني آخر"
         }
       },
       "resolveCancellation": {
-        "title": "Resolve cancellation request",
-        "body": "Choose how to resolve the pending cancellation. This is recorded in the audit log.",
-        "submit": "Resolve",
-        "actionLabel": "Resolution",
+        "title": "معالجة طلب الإلغاء",
+        "body": "اختر كيفية معالجة الإلغاء المعلّق. يُسجّل ذلك في سجل التدقيق.",
+        "submit": "معالجة",
+        "actionLabel": "القرار",
         "action": {
-          "CONFIRM": "Confirm cancellation",
-          "DECLINE": "Decline cancellation",
-          "FAIL": "Fail transaction"
+          "CONFIRM": "تأكيد الإلغاء",
+          "DECLINE": "رفض الإلغاء",
+          "FAIL": "تحديد المعاملة كمتعذرة"
         }
       }
     },
     "document": {
-      "title": "Private documents",
-      "subtitle": "Metadata only. Opening a document is audited.",
-      "empty": "No documents on this transaction.",
+      "title": "المستندات الخاصة",
+      "subtitle": "تظهر البيانات الوصفية فقط. يُسجّل فتح المستند في سجل التدقيق.",
+      "empty": "لا توجد مستندات لهذه المعاملة.",
       "col": {
-        "name": "File",
-        "type": "Type",
-        "status": "Status",
-        "size": "Size",
-        "visibility": "Visibility",
-        "uploaded": "Uploaded"
+        "name": "الملف",
+        "type": "النوع",
+        "status": "الحالة",
+        "size": "الحجم",
+        "visibility": "نطاق الظهور",
+        "uploaded": "تاريخ الرفع"
       },
       "visibility": {
-        "PRIVATE_TO_UPLOADER": "Private to uploader",
-        "SHARED_WITH_PARTICIPANTS": "Shared with participants",
-        "ADMIN_ONLY_FUTURE": "Admin only"
+        "PRIVATE_TO_UPLOADER": "خاص بمن رفعه",
+        "SHARED_WITH_PARTICIPANTS": "مشترك مع المشاركين",
+        "ADMIN_ONLY_FUTURE": "للإدارة فقط"
       },
-      "accessAction": "Open securely",
-      "preparing": "Preparing secure document view…",
-      "linkFailed": "The secure document link could not be prepared. Try again.",
+      "accessAction": "فتح آمن",
+      "preparing": "جارٍ تجهيز العرض الآمن للمستند…",
+      "linkFailed": "تعذّر تجهيز رابط المستند الآمن. حاول مجددًا.",
       "access": {
-        "title": "Open private document",
-        "body": "You are about to open a private customer document. Access is recorded in the audit log with your reason. Do not download or share the contents.",
-        "confirmLabel": "I am accessing this for a legitimate operational reason.",
-        "submit": "Open document",
-        "opened": "Document opened in a new tab. The secure link expires in {seconds} seconds.",
+        "title": "فتح مستند خاص",
+        "body": "أنت على وشك فتح مستند خاص بعميل. يُسجّل الوصول وسببه في سجل التدقيق. لا تنزّل المحتوى أو تشاركه.",
+        "confirmLabel": "أصل إلى هذا المستند لسبب تشغيلي مشروع.",
+        "submit": "فتح المستند",
+        "opened": "فُتح المستند في علامة تبويب جديدة. تنتهي صلاحية الرابط الآمن خلال {seconds} ثانية.",
         "reason": {
-          "VERIFICATION_REVIEW": "Verification review",
-          "LISTING_INVESTIGATION": "Listing investigation",
-          "TRANSACTION_ISSUE": "Transaction issue",
-          "DOCUMENT_PROCESSING_ISSUE": "Document processing issue",
-          "CUSTOMER_SUPPORT_REQUEST": "Customer support request"
+          "VERIFICATION_REVIEW": "مراجعة التحقق",
+          "LISTING_INVESTIGATION": "تحقيق متعلق بإعلان",
+          "TRANSACTION_ISSUE": "مشكلة في المعاملة",
+          "DOCUMENT_PROCESSING_ISSUE": "مشكلة في معالجة المستند",
+          "CUSTOMER_SUPPORT_REQUEST": "طلب دعم عميل"
         }
       }
     },
     "audit": {
-      "title": "Audit log",
-      "description": "Immutable record of admin and system actions.",
-      "empty": "No audit events match these filters.",
-      "unavailable": "This audit event is not available.",
+      "title": "سجل التدقيق",
+      "description": "سجل ثابت لإجراءات الإدارة والنظام.",
+      "empty": "لا توجد أحداث تدقيق تطابق هذه الفلاتر.",
+      "unavailable": "حدث التدقيق هذا غير متاح.",
       "col": {
-        "time": "Time",
-        "actor": "Actor",
-        "action": "Action",
-        "entity": "Entity",
-        "result": "Result"
+        "time": "الوقت",
+        "actor": "الجهة المنفذة",
+        "action": "الإجراء",
+        "entity": "السجل",
+        "result": "النتيجة"
       },
       "actor": {
-        "ADMIN": "Admin",
-        "CUSTOMER": "Customer",
-        "SYSTEM": "System"
+        "ADMIN": "الإدارة",
+        "CUSTOMER": "العميل",
+        "SYSTEM": "النظام"
       },
-      "metadata": "Details",
-      "filterAction": "Action",
-      "filterEntity": "Entity type",
-      "clearFilters": "Clear filters"
+      "metadata": "التفاصيل",
+      "filterAction": "الإجراء",
+      "filterEntity": "نوع السجل",
+      "clearFilters": "مسح الفلاتر",
+      "applyFilters": "تطبيق الفلاتر",
+      "actionPlaceholder": "اسم الإجراء المطابق",
+      "allEntities": "جميع أنواع السجلات",
+      "entity": {
+        "auth": "المصادقة",
+        "profile": "الملف الشخصي",
+        "customer": "العميل",
+        "listing": "الإعلان",
+        "verification": "التحقق",
+        "offer_thread": "سلسلة العرض",
+        "transaction": "المعاملة"
+      }
     },
     "realtime": {
-      "reconnecting": "Reconnecting…",
-      "stale": "This view may be out of date.",
-      "recovered": "Up to date.",
-      "refresh": "Refresh"
+      "reconnecting": "جارٍ إعادة الاتصال…",
+      "stale": "قد لا يكون هذا العرض محدّثًا.",
+      "recovered": "محدّث.",
+      "refresh": "تحديث"
     },
     "result": {
-      "pending": "Working…",
-      "success": "Done. This action was recorded in the audit log.",
-      "partial": "Completed with a secondary issue.",
-      "failure": "That action could not be completed."
+      "pending": "جارٍ التنفيذ…",
+      "success": "تم. سُجّل هذا الإجراء في سجل التدقيق.",
+      "partial": "اكتمل مع وجود مشكلة ثانوية.",
+      "failure": "تعذّر إكمال هذا الإجراء."
     },
     "error": {
-      "generic": "Something went wrong. Please try again.",
-      "notAvailable": "This record is not available.",
-      "stale": "This record changed before your action completed. Refresh and try again.",
-      "permission": "You do not have permission for this action.",
-      "alreadyRestricted": "This customer is already restricted.",
-      "notRestricted": "This customer is not restricted."
+      "generic": "حدث خطأ. حاول مجددًا.",
+      "notAvailable": "هذا السجل غير متاح.",
+      "stale": "تغيّر هذا السجل قبل اكتمال الإجراء. حدّث الصفحة وحاول مجددًا.",
+      "permission": "ليست لديك صلاحية تنفيذ هذا الإجراء.",
+      "alreadyRestricted": "إجراءات هذا العميل مقيّدة بالفعل.",
+      "notRestricted": "إجراءات هذا العميل غير مقيّدة."
     },
     "permission": {
-      "title": "Not permitted",
-      "body": "Your admin account does not include the capability required for this area."
+      "title": "غير مسموح",
+      "body": "لا يتضمن حساب الإدارة الخاص بك الصلاحية المطلوبة لهذا القسم."
     },
     "accessDenied": {
       "title": "تم رفض الوصول",
       "body": "هذه البوابة مخصّصة لموظفي العمليات المصرّح لهم فقط."
     },
     "yes": "نعم",
-    "no": "لا"
+    "no": "لا",
+    "operationsLabel": "العمليات",
+    "signedInAs": "مسجّل الدخول باسم",
+    "navigationLabel": "التنقل في بوابة العمليات",
+    "paginationLabel": "التنقل بين الصفحات"
   },
   "states": {
     "loading": "جارٍ التحميل…",
@@ -1040,8 +1128,6 @@
     "myTitle": "إعلاناتي",
     "myDescription": "أنشئ وأدر العقارات التي تريد إدراجها على مركز.",
     "emptyTitle": "أدرج عقارك الأول",
-    "emptyBody": "أضف تفاصيل العقار وأكمل خطوات التحقق التجريبية وارفع الصور وجهّز إعلانك للنشر.",
-    "emptySupporting": "يمكنك حفظ تقدّمك والعودة في أي وقت.",
     "createNew": "إنشاء إعلان جديد",
     "continue": "متابعة الإعلان",
     "previewDraft": "معاينة المسودة",
@@ -1052,7 +1138,7 @@
     "savedAt": "تم الحفظ {time}",
     "newPropertyListing": "إعلان عقار جديد",
     "deleteTitle": "حذف مسودة الإعلان هذه؟",
-    "deleteBody": "سيؤدي هذا إلى إزالة المسودة ومستند الملكية التجريبي والصور المرفوعة ومعلومات الإعلان المحفوظة نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+    "deleteBody": "سيؤدي هذا إلى إزالة المسودة ومستند الملكية والصور المرفوعة ومعلومات الإعلان المحفوظة نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
     "deleteConfirm": "حذف المسودة",
     "deleteCancel": "الاحتفاظ بالمسودة",
     "resumeTitle": "متابعة إعلانك الأخير؟",
@@ -1099,8 +1185,11 @@
       "PERMIT_PENDING": "تصريح تجريبي قيد التنفيذ",
       "READY_TO_PUBLISH": "جاهز للنشر",
       "LIVE": "منشور",
-      "PAUSED": "متوقف مؤقتًا"
-    }
+      "PAUSED": "متوقف مؤقتًا",
+      "SOLD_DEMO": "مُباع في العرض التجريبي",
+      "REJECTED": "أُعيد للتعديل"
+    },
+    "soldNote": "بيع هذا العقار في المعاملة التجريبية."
   },
   "details": {
     "stepLabel": "الخطوة 1 من 9 · تفاصيل العقار",
@@ -1112,7 +1201,6 @@
     "typeTownhouse": "تاون هاوس",
     "typePenthouse": "بنتهاوس",
     "emirate": "الإمارة",
-    "emirateHelp": "يدعم هذا النموذج حاليًا إدراج العقارات السكنية في دبي.",
     "community": "المنطقة أو المجتمع",
     "communityPlaceholder": "ابحث عن منطقة، مثل دبي مارينا",
     "communityHelp": "اختر المجتمع الأكثر شهرة لدى المشترين.",
@@ -1121,14 +1209,13 @@
     "buildingHelpOptional": "اختياري إذا كان العقار معرّفًا بمجتمعه ورقم الفيلا.",
     "unit": "معرّف الوحدة أو العقار",
     "unitPlaceholder": "مثال: وحدة 2205 أو فيلا 27",
-    "unitHelp": "يبقى خاصًا. يساعد على ربط مستندك التجريبي بالإعلان.",
     "bedrooms": "غرف النوم",
     "studio": "استوديو",
     "bathrooms": "الحمّامات",
     "size": "مساحة العقار",
     "sizeSuffix": "قدم مربع",
     "sizePlaceholder": "1,250",
-    "sizeHelp": "أدخل المساحة الداخلية للعقار كما في مستندك التجريبي.",
+    "sizeHelp": "أدخل المساحة الداخلية للعقار كما في مستند الملكية.",
     "furnishing": "حالة التأثيث",
     "furnishingUnfurnished": "غير مؤثث",
     "furnishingPartly": "مؤثث جزئيًا",
@@ -1171,24 +1258,22 @@
   },
   "ownership": {
     "stepLabel": "الخطوة 2 من 9 · مستند الملكية",
-    "title": "أضف مستند ملكية تجريبيًا",
-    "description": "اختر نوع المستند وارفع ملفًا تجريبيًا واحدًا لفحص الملكية المحاكى.",
-    "safetyTitle": "استخدم مستندًا تجريبيًا فقط",
-    "safetyBody": "لهذا النموذج، استخدم مستندًا تجريبيًا فقط. لا ترفع سند ملكية حقيقيًا أو عقدًا (أوقود) أو هوية إماراتية أو جواز سفر أو أي مستند حساس آخر.",
+    "title": "أضف مستند الملكية",
+    "description": "اختر نوع المستند وارفع ملفًا واحدًا لفحص الملكية.",
     "titleDeed": "سند الملكية",
-    "titleDeedHelp": "لعقار مكتمل بمستند ملكية تجريبي.",
+    "titleDeedHelp": "لعقار مكتمل مسجّل بسند ملكية.",
     "oqood": "أوقود",
-    "oqoodHelp": "لعقار على الخارطة بمستند تسجيل تجريبي.",
+    "oqoodHelp": "لعقار على الخارطة مسجّل بعقد أوقود.",
     "privateTitle": "مستند خاص",
     "privateBody": "هذا الملف مرئي لك ولمستخدمي عمليات مركز المصرّح لهم فقط. لن يظهر على الإعلان العام أو معاينة الإعلان. الفحص محاكى ولا يتصل بسجلات رسمية أو حكومية.",
-    "uploadCta": "اسحب ملفًا تجريبيًا هنا، أو اختر ملفًا",
+    "uploadCta": "اسحب ملفًا هنا، أو اختر ملفًا",
     "uploadHint": "PDF أو JPG أو PNG · بحد أقصى 10 ميغابايت",
     "uploading": "جارٍ الرفع…",
     "uploaded": "تم الرفع بشكل خاص",
     "replace": "استبدال الملف",
     "remove": "إزالة الملف",
     "removeTitle": "إزالة هذا المستند؟",
-    "removeBody": "لا يمكن متابعة الإعلان بدون مستند ملكية. سيُعاد ضبط أي نتيجة تحقق محاكاة أيضًا.",
+    "removeBody": "لا يمكن متابعة الإعلان بدون مستند ملكية. سيُعاد ضبط أي نتيجة تحقق أيضًا.",
     "removeConfirm": "إزالة المستند",
     "errUnsupported": "نوع الملف غير مدعوم. ارفع ملف PDF أو JPG أو PNG.",
     "errTooLarge": "حجم الملف أكبر من 10 ميغابايت. اختر ملفًا أصغر.",
@@ -1199,19 +1284,19 @@
     "disclosureTitle": "التحقق من الملكية محاكى",
     "disclosureBody": "لا يتصل هذا النموذج بسجلات عقارية أو حكومية رسمية.",
     "startTitle": "ابدأ فحص الملكية المحاكى",
-    "startBody": "سنقارن المستند التجريبي بمعلومات العقار الخاصة في هذا الإعلان.",
+    "startBody": "سنقارن مستندك بمعلومات العقار الخاصة في هذا الإعلان.",
     "start": "بدء الفحص المحاكى",
     "startHelp": "يمكنك المغادرة بأمان بعد البدء. ستبقى النتيجة متاحة عند عودتك.",
     "pendingTitle": "فحص الملكية قيد التنفيذ",
-    "pendingBody": "يراجع الفحص المحاكى المستند التجريبي وتفاصيل الإعلان. يمكنك مغادرة الصفحة والعودة لاحقًا.",
+    "pendingBody": "يراجع الفحص مستندك وتفاصيل الإعلان. يمكنك مغادرة الصفحة والعودة لاحقًا.",
     "pendingStatus": "قيد التنفيذ · تجريبي",
     "refresh": "تحديث الحالة",
     "successTitle": "تم التحقق من الملكية (محاكاة)",
-    "successBody": "تطابق المستند التجريبي وتفاصيل الإعلان في هذا العرض.",
+    "successBody": "تطابق مستندك مع تفاصيل الإعلان.",
     "successStatus": "تم التحقق · تجريبي",
     "continue": "المتابعة إلى إعدادات الإعلان",
     "failTitle": "لم تتطابق التفاصيل التجريبية",
-    "failBody": "لم يتطابق معرّف العقار أو الموقع في المستند التجريبي مع معلومات الإعلان.",
+    "failBody": "لم يتطابق معرّف العقار أو الموقع في مستندك مع معلومات الإعلان.",
     "retry": "أعد محاولة الفحص",
     "replaceDoc": "استبدال المستند"
   },
@@ -1220,12 +1305,10 @@
     "title": "حدّد سعرك وتفضيل العروض",
     "description": "اختر السعر المطلوب وأقل مبلغ عرض تريد أن تُخطر به.",
     "askingPrice": "السعر المطلوب",
-    "askingHelp": "سيكون هذا هو السعر المعلن عند نشر الإعلان في خطوة لاحقة.",
     "askingPlaceholder": "2,100,000",
     "minNotification": "الحد الأدنى للإشعار بالعروض",
     "minPlaceholder": "1,950,000",
-    "minExplanation": "اختر أقل مبلغ عرض تريد أن تُخطر به. قد تظهر العروض الأقل في سجل عروضك، لكنك لن تتلقى إشعارًا فوريًا.",
-    "demoNote": "ستتم محاكاة إشعارات العروض في مرحلة لاحقة.",
+    "minExplanation": "تظل العروض الأقل من هذا المبلغ ظاهرة في سجل عروضك، دون إشعار.",
     "visibilityTitle": "الظهور الحالي: مسودة خاصة",
     "visibilityBody": "لن يظهر الإعلان علنًا خلال هذه المرحلة.",
     "saving": "جارٍ حفظ إعدادات الإعلان…",
@@ -1243,7 +1326,7 @@
     "add": "إضافة دراسة استثمار",
     "skip": "التخطّي الآن",
     "originalPrice": "سعر الشراء الأصلي",
-    "originalHelp": "أدخل سعر الشراء التجريبي المستخدم لهذا النموذج.",
+    "originalHelp": "أدخل سعر الشراء الأصلي.",
     "purchaseDate": "تاريخ الشراء",
     "purchaseDateHelp": "يُستخدم لتقدير العائد السنوي.",
     "renovation": "إنفاق التجديد أو التحسين",
@@ -1274,7 +1357,7 @@
     "customer": "العميل",
     "property": "العقار",
     "listing": "الإعلان",
-    "demoStatement": "أؤكد أن المعلومات التجريبية في هذا الإعلان النموذجي دقيقة لأغراض العرض، وأنني أفهم أنه لن يتم إنشاء أي اتفاق قانوني.",
+    "demoStatement": "أؤكد أن معلومات الإعلان أعلاه صحيحة، وأفهم أن هذه الخطوة لا تنشئ اتفاقًا قانونيًا.",
     "confirm": "أؤكد تفاصيل الإعلان التجريبي أعلاه.",
     "complete": "إكمال نموذج A التجريبي",
     "completing": "جارٍ إكمال نموذج A التجريبي…",
@@ -1334,7 +1417,8 @@
     "retry": "حاول مرة أخرى",
     "qrLabel": "رمز مدمون التجريبي · للعرض فقط",
     "qrHelp": "هذا الرمز أصل تجريبي غير وظيفي وغير متصل بأي تصريح رسمي.",
-    "errConfirm": "أكّد معلومات الإعلان التجريبي للمتابعة."
+    "errConfirm": "أكّد معلومات الإعلان التجريبي للمتابعة.",
+    "permitNumberLabel": "رقم التصريح"
   },
   "review": {
     "stepLabel": "الخطوة 9 من 9 · المراجعة",
@@ -1401,7 +1485,12 @@
     "directEmptyTitle": "لا توجد إعلانات Markaz مباشرة مطابقة",
     "directEmptyBody": "تظهر أدناه شقق وفلل خارجية مختارة عند توفرها.",
     "externalTitle": "عقارات خارجية مختارة",
-    "externalBody": "عقارات مختارة في الإمارات مقدمة من مزودين خارجيين. تُطبّق عوامل التصفية المدعومة على هذه المجموعة؛ وتُفتح الإعلانات الخارجية على مواقع مصادرها ولا يمكن حفظها أو تقديم عروض عليها داخل Markaz."
+    "directTitle": "إعلانات Markaz الموثّقة",
+    "groupAPARTMENT": "شقق",
+    "groupVILLA": "فلل",
+    "groupTOWNHOUSE": "تاون هاوس",
+    "groupPENTHOUSE": "بنتهاوس",
+    "groupOTHER": "عقارات أخرى"
   },
   "filters": {
     "title": "عوامل التصفية",
@@ -1740,7 +1829,8 @@
       "withdrawn": "تم سحب العرض",
       "expired": "انتهت صلاحية العرض",
       "unavailable": "الإعلان غير متاح",
-      "otherAccepted": "العقار قيد التفاوض على عرض"
+      "otherAccepted": "العقار قيد التفاوض على عرض",
+      "waitingHelp": "لا يلزم منك شيء الآن. سنُعلمك عند وصول رد."
     },
     "context": {
       "otherOffers": "قد يكون البائع بصدد مراجعة عروض أخرى."
@@ -1847,7 +1937,8 @@
       "counter": "تقديم عرض مقابل",
       "reject": "رفض العرض",
       "withdraw": "سحب العرض",
-      "more": "المزيد"
+      "more": "المزيد",
+      "title": "خياراتك"
     },
     "listingView": {
       "threshold": "حد الإشعار",
@@ -2072,7 +2163,7 @@
     },
     "documents": {
       "title": "المستندات",
-      "notice": "استخدم ملفات عينة وهمية فقط",
+      "notice": "استخدم ملفات عيّنة فقط",
       "noticeBody": "لا ترفع هوية إماراتية أو جواز سفر أو كشف حساب بنكي أو موافقة رهن أو سند ملكية أو عقود أو أي مستند حساس حقيقي.",
       "yours": "قائمة مستنداتك",
       "other": "قائمة الطرف الآخر",
@@ -2085,11 +2176,13 @@
       "upload": "رفع ملف",
       "remove": "إزالة",
       "accepted": "مقبول في الوضع التجريبي",
+      "errUnsupported": "نوع الملف غير مدعوم. حمّل ملف PDF أو JPG أو PNG.",
+      "errSize": "يجب ألا يتجاوز حجم الملف 10 ميغابايت.",
       "type": {
-        "BUYER_IDENTITY": "عينة هوية المشتري (وهمية)",
+        "BUYER_IDENTITY": "مستند هوية المشتري",
         "BUYER_TRANSACTION_FILE": "ملف معاملة المشتري (اختياري)",
-        "BUYER_FINANCING": "تأكيد التمويل (وهمي)",
-        "SELLER_IDENTITY": "عينة هوية البائع (وهمية)",
+        "BUYER_FINANCING": "تأكيد التمويل",
+        "SELLER_IDENTITY": "مستند هوية البائع",
         "SELLER_TRANSACTION_FILE": "ملف معاملة البائع (اختياري)"
       }
     },
@@ -2182,6 +2275,89 @@
       "reconnecting": "إعادة الاتصال — قد تتأخر التحديثات.",
       "refresh": "تحديث"
     },
-    "goToAction": "انتقل إلى إجرائك"
+    "goToAction": "انتقل إلى إجرائك",
+    "checklistTitle": "جميع الخطوات",
+    "stageDone": "مكتملة",
+    "stageCurrent": "قيد التنفيذ",
+    "stageTodo": "لم تبدأ",
+    "stageCount": "{completed}/{total}",
+    "whoYou": "أنت",
+    "whoBuyer": "المشتري",
+    "whoSeller": "البائع",
+    "whoSystem": "النظام",
+    "whoBoth": "الطرفان",
+    "summary": {
+      "heading": "ما تم الاتفاق عليه",
+      "property": "العقار",
+      "side": "دورك",
+      "amount": "المبلغ المتفق عليه",
+      "route": "طريقة الشراء",
+      "deposit": "الدفعة التجريبية",
+      "appointment": "موعد النقل",
+      "reference": "الرقم المرجعي",
+      "confirmations": "التأكيدات",
+      "buyerConfirmed": "أكّد المشتري",
+      "sellerConfirmed": "أكّد البائع",
+      "completedOn": "اكتملت",
+      "documents": "المستندات المتبادلة",
+      "documentsCount": "{count, plural, =1 {مستند واحد} other {# مستندات}}",
+      "backToTransactions": "العودة إلى المعاملات"
+    }
+  },
+  "amenities": {
+    "BALCONY": "شرفة",
+    "PRIVATE_GARDEN": "حديقة خاصة",
+    "PRIVATE_POOL": "مسبح خاص",
+    "SHARED_POOL": "مسبح مشترك",
+    "GYM": "صالة رياضية",
+    "CONCIERGE": "خدمة الكونسيرج",
+    "SECURITY": "أمن",
+    "COVERED_PARKING": "موقف مغطّى",
+    "BUILT_IN_WARDROBES": "خزائن مدمجة",
+    "WALK_IN_WARDROBE": "غرفة ملابس",
+    "STUDY": "غرفة مكتب",
+    "MAIDS_ROOM": "غرفة خادمة",
+    "STORAGE_ROOM": "غرفة تخزين",
+    "SEA_VIEW": "إطلالة على البحر",
+    "MARINA_VIEW": "إطلالة على المارينا",
+    "CITY_VIEW": "إطلالة على المدينة",
+    "COMMUNITY_VIEW": "إطلالة على المجمّع",
+    "NEAR_PUBLIC_TRANSPORT": "قريب من المواصلات العامة",
+    "PET_FRIENDLY": "يسمح بالحيوانات الأليفة"
+  },
+  "permitCheck": {
+    "title": "التحقق من التصريح",
+    "validTitle": "تصريح الإعلان هذا ساري",
+    "statusApproved": "معتمد",
+    "fieldPermit": "رقم التصريح",
+    "fieldIssued": "تاريخ الإصدار",
+    "fieldProperty": "العقار",
+    "fieldBuilding": "المبنى أو المشروع",
+    "fieldLocation": "الموقع",
+    "viewListing": "عرض الإعلان",
+    "notPublished": "إعلان هذا التصريح غير منشور حاليًا.",
+    "notFoundTitle": "لم يُعثر على تصريح",
+    "notFoundBody": "تعذّر العثور على تصريح معتمد بالرقم {reference}.",
+    "simTitle": "تصريح محاكى",
+    "simBody": "هذا النموذج لا يصدر تصاريح تراخيص وغير متصل بخدمات مضمون أو دائرة الأراضي والأملاك في دبي."
+  },
+  "permitQr": {
+    "generating": "جارٍ إنشاء الرمز…",
+    "unavailable": "الرمز غير متاح",
+    "localOnly": "لا يمكن مسح هذا الرمز من جهاز آخر أثناء استخدام التطبيق للمضيف المحلي. افتح التطبيق عبر عنوان شبكة الكمبيوتر لاختبار المسح.",
+    "openLink": "فتح صفحة التحقق"
+  },
+  "portfolio": {
+    "title": "المحفظة",
+    "subtitle": "العقارات التي اشتريتها وبعتها عبر Markaz.",
+    "bought": "مُشترى",
+    "sold": "مُباع",
+    "emptyTitle": "لا توجد معاملات مكتملة بعد",
+    "emptyBody": "تظهر العقارات هنا بعد اكتمال المعاملة — سواء اشتريت أو بعت.",
+    "browse": "تصفّح العقارات"
+  },
+  "customerAccessDenied": {
+    "title": "لا يمكن لهذا الحساب استخدام مساحة عمل العملاء",
+    "body": "سجّل الخروج وتابع باستخدام حساب عميل."
   }
 }

@@ -159,7 +159,6 @@ export function SignInForm({
               {ta('createAccount')}
             </Link>
           </p>
-          <p className="text-muted-foreground text-center text-xs">{t('security')}</p>
         </form>
 
         {uaePassStaging ? (
@@ -178,7 +177,6 @@ export function SignInForm({
             >
               {uaeLoading ? tu('starting') : tu('button')}
             </Button>
-            <p className="text-muted-foreground text-center text-xs">{tu('testEnvNote')}</p>
           </div>
         ) : null}
       </div>

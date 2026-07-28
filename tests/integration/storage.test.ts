@@ -26,6 +26,7 @@ if (!reachable) {
 }
 
 const PRIVATE_PATH = 'integration/title-deed-sample.txt';
+const PRIVATE_SCOPE_PATH = 'integration/title-deed-other.txt';
 const PUBLIC_PATH = 'integration/listing-cover.txt';
 
 d('storage boundary (Storage API)', () => {
@@ -35,12 +36,12 @@ d('storage boundary (Storage API)', () => {
   beforeAll(async () => {
     service = serviceClient(env!);
     anon = anonClient(env!);
-    await service.storage.from('ownership-documents').remove([PRIVATE_PATH]);
+    await service.storage.from('ownership-documents').remove([PRIVATE_PATH, PRIVATE_SCOPE_PATH]);
     await service.storage.from('listing-photos').remove([PUBLIC_PATH]);
   });
 
   afterAll(async () => {
-    await service.storage.from('ownership-documents').remove([PRIVATE_PATH]);
+    await service.storage.from('ownership-documents').remove([PRIVATE_PATH, PRIVATE_SCOPE_PATH]);
     await service.storage.from('listing-photos').remove([PUBLIC_PATH]);
   });
 
@@ -81,6 +82,38 @@ d('storage boundary (Storage API)', () => {
     expect(signed.error).toBeNull();
     const signedRes = await fetch(signed.data!.signedUrl);
     expect(signedRes.status).toBe(200);
+  });
+
+  it('signed URLs are object-scoped and expire', async () => {
+    const uploads = await Promise.all([
+      service.storage
+        .from('ownership-documents')
+        .upload(PRIVATE_PATH, new Blob(['fictional title deed']), {
+          upsert: true,
+          contentType: 'text/plain',
+        }),
+      service.storage
+        .from('ownership-documents')
+        .upload(PRIVATE_SCOPE_PATH, new Blob(['different fictional document']), {
+          upsert: true,
+          contentType: 'text/plain',
+        }),
+    ]);
+    expect(uploads.every(({ error }) => error === null)).toBe(true);
+
+    const signed = await service.storage
+      .from('ownership-documents')
+      .createSignedUrl(PRIVATE_PATH, 1);
+    expect(signed.error).toBeNull();
+    const url = new URL(signed.data!.signedUrl);
+    expect((await fetch(url)).status).toBe(200);
+
+    const wrongObjectUrl = new URL(url);
+    wrongObjectUrl.pathname = wrongObjectUrl.pathname.replace(PRIVATE_PATH, PRIVATE_SCOPE_PATH);
+    expect((await fetch(wrongObjectUrl)).status).not.toBe(200);
+
+    await new Promise((resolve) => setTimeout(resolve, 2_100));
+    expect((await fetch(url)).status).not.toBe(200);
   });
 
   it('bucket visibility flags are correct', async () => {

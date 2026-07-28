@@ -7,14 +7,18 @@ import { defineConfig, devices } from '@playwright/test';
  * CI uses the local Supabase OTP flow via Mailpit — never a real inbox.
  */
 const WEB = process.env.NEXT_PUBLIC_WEB_URL ?? 'http://localhost:3000';
+const ADMIN = process.env.NEXT_PUBLIC_ADMIN_URL ?? 'http://localhost:3001';
 
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: true,
+  // A cold Next dev compiler can corrupt its incremental cache when several
+  // Playwright workers request uncompiled route groups simultaneously. Keep the
+  // release command serial so a fresh checkout is as reliable as a warm one.
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   // The self-provisioning suites share one local Auth/DB stack. Their setup and
   // teardown are isolated by data, but not by Supabase service rate limits.
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   retries: process.env.CI ? 1 : 0,
   reporter: 'list',
   use: {
@@ -24,10 +28,18 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: process.env.PLAYWRIGHT_NO_SERVER
     ? undefined
-    : {
-        command: 'pnpm --filter @markaz/web dev',
-        url: WEB,
-        reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
-      },
+    : [
+        {
+          command: 'pnpm --filter @markaz/web dev',
+          url: WEB,
+          reuseExistingServer: !process.env.CI,
+          timeout: 120_000,
+        },
+        {
+          command: 'pnpm --filter @markaz/admin dev',
+          url: ADMIN,
+          reuseExistingServer: !process.env.CI,
+          timeout: 120_000,
+        },
+      ],
 });

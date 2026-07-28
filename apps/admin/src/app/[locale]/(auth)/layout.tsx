@@ -21,7 +21,8 @@ export default function AdminAuthLayout({ children }: { children: React.ReactNod
       <aside className="bg-brand-900 text-brand-100 flex flex-col justify-between p-8 lg:w-2/5 lg:p-12">
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-2 font-semibold text-white">
-            <ShieldCheck className="text-brand-300 h-5 w-5" aria-hidden /> {t('brand')}
+            <ShieldCheck className="text-brand-300 h-5 w-5" aria-hidden />
+            {t('brand')}
           </span>
           <LanguageSwitcher />
         </div>

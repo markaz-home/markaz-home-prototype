@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { NextIntlClientProvider } from 'next-intl';
 import { loadMessages } from '@markaz/i18n';
 
@@ -8,6 +9,7 @@ vi.mock('@/i18n/navigation', () => ({
     <a href={href}>{children}</a>
   ),
   usePathname: () => '/',
+  useRouter: () => ({ replace: vi.fn() }),
 }));
 
 vi.mock('@/components/language-switcher', () => ({
@@ -37,7 +39,10 @@ describe('MarketplaceHeader', () => {
       'href',
       '/properties',
     );
-    expect(screen.getByRole('link', { name: 'How It Works' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'How It Works' })).toHaveAttribute(
+      'href',
+      '/how-it-works',
+    );
     // Sellers still land on sign-in with the listing journey preserved.
     expect(screen.getByRole('link', { name: 'For Sellers' })).toHaveAttribute(
       'href',
@@ -47,12 +52,15 @@ describe('MarketplaceHeader', () => {
     expect(screen.getByRole('link', { name: 'Sign Up' })).toHaveAttribute('href', '/sign-up');
   });
 
-  it('shows customer navigation and sends signed-in visitors directly to listings', () => {
+  it('shows customer navigation and sends signed-in visitors directly to listings', async () => {
+    const user = userEvent.setup();
     renderHeader(true);
 
     expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/dashboard');
     expect(screen.getByRole('link', { name: 'List a Property' })).toHaveAttribute('href', '/sell');
     expect(screen.queryByRole('link', { name: 'Login' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Sign Up' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /Tania Gole/i }));
+    expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument();
   });
 });

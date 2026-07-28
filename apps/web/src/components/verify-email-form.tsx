@@ -11,7 +11,6 @@ import { AuthProgress } from '@/components/auth/auth-progress';
 import { OtpInput } from '@/components/auth/otp-input';
 import { maskEmail } from '@/components/auth/util';
 import { AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
-import { trpc } from '@/trpc/react';
 
 const RESEND_SECONDS = 60;
 const mmss = (s: number) =>
@@ -25,7 +24,6 @@ export function VerifyEmailForm() {
   const email = params.get('email') ?? '';
   const [supabase] = useState(() => createSupabaseBrowserClient());
   const ta = useTranslations('auth');
-  const audit = trpc.audit.record.useMutation();
 
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -66,7 +64,6 @@ export function VerifyEmailForm() {
       setCode('');
       return;
     }
-    await audit.mutateAsync({ action: 'EMAIL_VERIFIED' }).catch(() => {});
     router.replace('/verify-email/success');
   }
 

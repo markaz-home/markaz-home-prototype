@@ -101,16 +101,17 @@ export function SignUpForm() {
       <div className="space-y-3">
         <AuthHeading title={t('title')} progress={<AuthProgress current={0} />} />
 
-
         {existing ? (
           <Alert variant="warning" title={tv('existingAccount')}>
-            <div className="mt-2 flex gap-4 text-sm font-medium">
-              <Link href="/sign-in" className="text-primary underline-offset-4 hover:underline">
-                {ta('signIn')}
-              </Link>
+            <p className="text-muted-foreground mt-1 text-sm">{tv('existingAccountBody')}</p>
+            {/* The way out is an action, not two look-alike links. */}
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <Button asChild size="sm" variant="outline">
+                <Link href="/sign-in">{ta('signIn')}</Link>
+              </Button>
               <Link
                 href="/forgot-password"
-                className="text-primary underline-offset-4 hover:underline"
+                className="text-muted-foreground hover:text-foreground text-sm underline-offset-4 hover:underline"
               >
                 {tsi('forgot')}
               </Link>

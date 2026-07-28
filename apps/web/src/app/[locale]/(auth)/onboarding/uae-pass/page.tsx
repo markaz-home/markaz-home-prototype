@@ -20,10 +20,7 @@ export default async function UaePassPage({
   // persist the display/audit status before the customer continues.
   const session = await requireCustomerStep(locale, ['uae-pass', 'dashboard']);
   const status = session.profile?.identityVerificationStatus ?? 'NOT_STARTED';
-  if (
-    status === 'VERIFIED_DEMO' ||
-    (!session.uaePassAuthenticated && isIdentityVerified(status))
-  ) {
+  if (status === 'VERIFIED_DEMO' || (!session.uaePassAuthenticated && isIdentityVerified(status))) {
     redirect(`/${locale}/dashboard`);
   }
 

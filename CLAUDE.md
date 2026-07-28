@@ -6,9 +6,10 @@ Guidance for Claude Code working in this repo. Read before making changes.
 
 UAE (Dubai-first) property marketplace prototype. Real engineering; only the
 regulated integrations (UAE PASS, DLD, Trakheesi, payment) are **simulated** —
-behind named interfaces, with persisted outcomes. This repo is the **Week 1
-application foundation**. The full listing wizard, marketplace, offers, and
-transactions are **later milestones — do not build them unless asked.**
+behind named interfaces, with persisted outcomes. Weeks 1–7 are implemented and the
+immutable internal prototype baseline is tagged **`rc-week-7`**. Week 8 production
+readiness is a separate milestone; do not begin deployment or add product features unless
+asked.
 
 Monorepo root is `markaz-home-prototype/`. Run all commands from there.
 
@@ -257,8 +258,9 @@ realtime channel (authoritative refetch). Raw enums never shown — mapped to i1
 (`transactions.*`, EN/AR parity; **Arabic is draft**). Approved simulation wording only — never
 "payment received"/"escrow"/"ownership transferred"/"legally completed". UI: `(app)/transactions`
 (My Transactions) + `(app)/transactions/[transactionId]` (shared perspective-aware workspace);
-"Continue to transaction" handoff on the accepted offer. **Known gaps**: document file-upload
-API/control, Playwright E2E, axe. See `WEEK-5.md`, `docs/design/transaction-tracker-design-spec.md`,
+"Continue to transaction" handoff on the accepted offer. Transaction document upload/privacy,
+Playwright E2E, and axe coverage are implemented and verified in the Week 7 baseline. See
+`WEEK-5.md`, `WEEK-7.md`, `docs/design/transaction-tracker-design-spec.md`,
 `docs/architecture/transactions.md`, ADR-0019…0023.
 
 ## Admin portal & operational controls (Week 6 — built)
@@ -299,6 +301,35 @@ i18n coverage; disabled-pagination contrast). Local notes: `supabase db reset` h
 DATABASE` (use a fresh `supabase start` on a discarded volume); run root `test:e2e` **serially** on a
 low-RAM Docker. See `WEEK-6.md`, `docs/design/admin-portal-design-spec.md`,
 `docs/architecture/admin-portal.md`, ADR-0024…0029.
+
+## Week 7 release-candidate baseline — frozen
+
+The internal prototype hardening baseline is identified by tag **`rc-week-7`**. Resolve
+its immutable commit with `git rev-parse rc-week-7^{commit}`; the concrete SHA is also
+recorded in the RC freeze handoff. The canonical migration chain replays through
+`20260301000820_security_boundary_hardening.sql`.
+
+Final validation on a fresh local reset:
+
+- format and diff whitespace: pass
+- lint: 11 workspaces, zero warnings
+- typecheck: 12 workspaces
+- unit/component/domain/API/Auth/i18n: 303 passed
+- live integration/RLS/Storage/Realtime: 118 passed, zero skipped
+- customer Playwright: 60 passed
+- Admin Playwright: 20 passed
+- builds: customer 71 pages; Admin 36 pages
+
+The root E2E command is deliberately serial. Multiple customer workers corrupted a cold
+Next incremental cache; one worker passed all 80 browser tests from clean caches.
+
+UAT-67–70 remain explicitly `PARTIAL`, non-blocking internal-RC evidence gaps. Complete
+Arabic customer/Admin journeys, the full mobile device matrices, professional Arabic/legal
+review, real provider credentials/approvals, deployment topology, monitoring, backup/
+restore, incident response, and secrets management move to Week 8. All named
+cross-functional sign-offs are Pending. The bounded decision is **Go with documented
+limitations** for Week 8 readiness work, not production deployment. See `WEEK-7.md`,
+`RELEASE-CANDIDATE.md`, and `DEFECT-LOG.md`.
 
 ## Out of scope (next milestone+)
 

@@ -1,8 +1,8 @@
 import 'server-only';
-import { appRouter, createTRPCContext, createCallerFactory } from '@markaz/api';
+import { webRouter, createTRPCContext, createCallerFactory } from '@markaz/api';
 import { getAuthProviderIds, getAuthUser } from '@markaz/auth/server';
 
-const createCaller = createCallerFactory(appRouter);
+const createCaller = createCallerFactory(webRouter);
 
 /** Server-side tRPC caller bound to the current request's authenticated user. */
 export async function getServerApi() {

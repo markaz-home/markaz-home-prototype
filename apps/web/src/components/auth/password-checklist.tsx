@@ -81,10 +81,7 @@ export function PasswordChecklist({
                 <X className="h-3.5 w-3.5 shrink-0" aria-hidden />
               ) : (
                 // Plain bullet until the rule is met or the form is submitted.
-                <span
-                  className="flex h-3.5 w-3.5 shrink-0 items-center justify-center"
-                  aria-hidden
-                >
+                <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center" aria-hidden>
                   <span className="h-1 w-1 rounded-full bg-current" />
                 </span>
               )}

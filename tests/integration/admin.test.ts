@@ -169,14 +169,19 @@ d('customer restriction (live DB)', () => {
         ),
       /FORBIDDEN|permission denied/i,
     );
-    await expectError(
-      () =>
-        asUser(
-          buyer,
-          (tx) => tx`update public.profiles set restricted_at = now() where id = ${buyer}`,
-        ),
-      /MARKAZ Operations|permission denied|only by/i,
+    const changed = await asUser(
+      buyer,
+      (tx) =>
+        tx`update public.profiles
+           set restricted_at = now()
+           where id = ${buyer}
+           returning id`,
     );
+    expect(changed).toHaveLength(0);
+    const [profile] = await asService(
+      (tx) => tx`select restricted_at from public.profiles where id = ${buyer}`,
+    );
+    expect((profile as { restricted_at: Date | null }).restricted_at).toBeNull();
   });
 });
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { Check, ChevronDown, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   BEDS_OPTIONS,
@@ -12,6 +12,7 @@ import {
 import { cn } from '@markaz/ui';
 import { useRouter } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
+import { ListboxSelect } from '@/components/ui/listbox-select';
 
 const MAX_SUGGESTIONS = 6;
 const EXTERNAL_FEATURED_LIMIT = 6;
@@ -133,7 +134,7 @@ export function HeroSearch() {
     for (const card of external.data?.items ?? []) {
       const match = Object.entries(MARKETPLACE_PRICE_BANDS).find(([, band]) => {
         const aboveMinimum = band.minPrice === null || card.askingPriceAed >= band.minPrice;
-        const belowMaximum = band.maxPrice === null || card.askingPriceAed < band.maxPrice;
+        const belowMaximum = band.maxPrice === null || card.askingPriceAed <= band.maxPrice;
         return aboveMinimum && belowMaximum;
       });
       if (match) counts.set(match[0], (counts.get(match[0]) ?? 0) + 1);
@@ -395,8 +396,9 @@ function PlaceField({
 }
 
 /**
- * Listbox select styled to the hero bar — native `<select>` popups cannot be
- * themed and rendered as a system menu against the light card.
+ * The shared listbox, dressed for the hero's light "glass" bar: transparent
+ * trigger, no border, hero-search palette. Behaviour and ARIA come from
+ * `ListboxSelect`, so the hero and the marketplace filters cannot drift apart.
  */
 function HeroSelect({
   label,
@@ -412,110 +414,24 @@ function HeroSelect({
   last?: boolean;
 }) {
   const id = useId();
-  const listboxId = `${id}-listbox`;
-  const [open, setOpen] = useState(false);
-  const selectedIndex = Math.max(
-    options.findIndex((option) => option.value === value),
-    0,
-  );
-  const [active, setActive] = useState(selectedIndex);
-  const wrapperRef = useDismiss(open, () => setOpen(false));
-
-  function commit(index: number) {
-    const option = options[index];
-    if (option && !option.disabled) onChange(option.value);
-    setOpen(false);
-  }
-
-  function moveActive(start: number, direction: 1 | -1) {
-    for (let offset = 1; offset <= options.length; offset += 1) {
-      const index = (start + direction * offset + options.length) % options.length;
-      if (!options[index]?.disabled) return index;
-    }
-    return start;
-  }
-
   return (
-    <div ref={wrapperRef} className="contents">
-      <Field id={id} label={label} last={last}>
-        <button
-          type="button"
-          id={id}
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          aria-controls={open ? listboxId : undefined}
-          aria-labelledby={`${id}-label ${id}`}
-          onClick={() => {
-            setActive(selectedIndex);
-            setOpen((prev) => !prev);
-          }}
-          onKeyDown={(event) => {
-            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-              event.preventDefault();
-              if (!open) {
-                setActive(selectedIndex);
-                setOpen(true);
-                return;
-              }
-              setActive((prev) => moveActive(prev, event.key === 'ArrowDown' ? 1 : -1));
-            } else if (open && (event.key === 'Enter' || event.key === ' ')) {
-              event.preventDefault();
-              commit(active);
-            } else if (open && event.key === 'Escape') {
-              event.preventDefault();
-              setOpen(false);
-            }
-          }}
-          className="flex w-full items-center justify-between gap-2 bg-transparent text-start text-sm font-semibold outline-none"
-        >
-          <span className="truncate">{options[selectedIndex]?.label}</span>
-          <ChevronDown
-            className={cn('h-3.5 w-3.5 shrink-0 transition-transform', open && 'rotate-180')}
-            aria-hidden
-          />
-        </button>
-
-        {open && (
-          <ul
-            id={listboxId}
-            role="listbox"
-            aria-labelledby={`${id}-label`}
-            aria-activedescendant={`${listboxId}-${active}`}
-            className={panelCls}
-          >
-            {options.map((option, index) => (
-              <li
-                key={option.value || 'any'}
-                id={`${listboxId}-${index}`}
-                role="option"
-                aria-selected={option.value === value}
-                aria-disabled={option.disabled || undefined}
-                onMouseEnter={() => {
-                  if (!option.disabled) setActive(index);
-                }}
-                onMouseDown={(event) => {
-                  event.preventDefault();
-                  if (!option.disabled) commit(index);
-                }}
-                className={cn(
-                  optionCls,
-                  index === active && 'bg-[hsl(var(--hero-search-foreground)/0.06)]',
-                  option.value === value && 'font-semibold',
-                  option.disabled && 'cursor-not-allowed opacity-45',
-                )}
-              >
-                <span className="truncate">{option.label}</span>
-                <span className="flex shrink-0 items-center gap-2">
-                  {option.count !== undefined && (
-                    <span className="text-xs tabular-nums">{option.count}</span>
-                  )}
-                  {option.value === value && <Check className="h-3.5 w-3.5" aria-hidden />}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Field>
-    </div>
+    <Field id={id} label={label} last={last}>
+      <ListboxSelect
+        id={id}
+        labelledBy={`${id}-label`}
+        value={value}
+        options={options}
+        onChange={onChange}
+        // The hero's own Field is the positioned ancestor, so the panel spans it.
+        wrapperClassName="contents"
+        classNames={{
+          button:
+            'flex w-full items-center justify-between gap-2 bg-transparent text-start text-sm font-semibold outline-none',
+          panel: panelCls,
+          option: optionCls,
+          optionActive: 'bg-[hsl(var(--hero-search-foreground)/0.06)]',
+        }}
+      />
+    </Field>
   );
 }

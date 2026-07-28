@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { EyeOff } from 'lucide-react';
 import { listingSettingsSchema } from '@markaz/domain';
 import { Alert, Button, FormField, Input } from '@markaz/ui';
 import { trpc } from '@/trpc/react';
@@ -91,7 +92,6 @@ function SettingsInner({ listingId, data }: { listingId: string; data: GetData }
               placeholder={t('askingPlaceholder')}
             />
           </div>
-          <p className="text-muted-foreground mt-1 text-xs">{t('askingHelp')}</p>
         </FormField>
         <FormField id="minNotif" label={t('minNotification')} required>
           <div className="flex items-center gap-2">
@@ -106,11 +106,15 @@ function SettingsInner({ listingId, data }: { listingId: string; data: GetData }
             />
           </div>
           <p className="text-muted-foreground mt-1 text-xs">{t('minExplanation')}</p>
-          <p className="text-muted-foreground mt-1 text-xs">{t('demoNote')}</p>
         </FormField>
-        <div className="bg-muted/40 rounded-md border p-3 text-sm">
-          <p className="font-medium">{t('visibilityTitle')}</p>
-          <p className="text-muted-foreground">{t('visibilityBody')}</p>
+        {/* Status note, not a form control — the gold accent lifts it off the
+            panel, which `bg-muted` could not on the near-black surface. */}
+        <div className="border-primary/25 bg-primary/5 flex items-start gap-3 rounded-lg border p-4 text-sm">
+          <EyeOff className="text-primary mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          <div>
+            <p className="font-medium">{t('visibilityTitle')}</p>
+            <p className="text-muted-foreground mt-0.5">{t('visibilityBody')}</p>
+          </div>
         </div>
         <div className="flex justify-end border-t pt-4">
           <Button type="submit" loading={save.isPending}>

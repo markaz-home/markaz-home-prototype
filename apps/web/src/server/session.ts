@@ -75,6 +75,10 @@ export async function requireCustomerStep(
 ): Promise<SessionContext> {
   const session = await getSession();
   if (!session) redirect(`/${locale}/sign-in`);
+  // Keep the customer/admin application boundary explicit. The customer app does
+  // not expose an Operations route or link; it only provides a neutral denial
+  // screen from which the incompatible session can be signed out.
+  if (session.profile?.accountType === 'ADMIN') redirect(`/${locale}/access-denied`);
   const destination = resolvePostAuthDestination({
     emailVerified: session.emailVerified,
     identityAuthenticatedByProvider: session.uaePassAuthenticated,

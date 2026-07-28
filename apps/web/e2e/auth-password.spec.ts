@@ -71,17 +71,14 @@ test.describe('email/password authentication', () => {
     test.skip(!(await mailpitReachable()), 'Local Supabase/Mailpit not running');
   });
 
-  test('new customer: sign up → check email → verify → demo identity → dashboard', async ({
-    page,
-  }) => {
+  test('new customer: sign up → check email → verify → UAE PASS checkpoint', async ({ page }) => {
     const email = `e2e-signup-${Date.now()}@markaz.test`;
     await page.goto('/en/sign-up');
     await page.getByLabel(/Full name/i).fill('Test Customer');
     await page.getByLabel(/Email address/i).fill(email);
     await page.getByLabel(/^Password/).fill(STRONG_PASSWORD);
     await page.getByLabel(/^Confirm password/).fill(STRONG_PASSWORD);
-    await page.getByText('I agree to the Terms of Use.').click();
-    await page.getByText('I agree to the Privacy Policy.').click();
+    await page.getByRole('checkbox', { name: /Terms & Conditions.*Privacy Policy/i }).click();
     await page.getByRole('button', { name: 'Create account' }).click();
 
     await expect(page).toHaveURL(/\/en\/sign-up\/check-email/);
@@ -93,14 +90,15 @@ test.describe('email/password authentication', () => {
     await page.getByRole('button', { name: 'Verify email' }).click();
 
     await expect(page).toHaveURL(/\/en\/verify-email\/success/, { timeout: 15_000 });
-    await page.getByRole('link', { name: /Continue to demo identity/i }).click();
+    await page.getByRole('link', { name: /Continue to identity verification/i }).click();
     await expect(page).toHaveURL(/\/en\/onboarding\/uae-pass/);
-    await page.getByRole('button', { name: 'Start demo verification' }).click();
-    await page.getByRole('button', { name: 'Approve demo verification' }).click();
-    // The success screen does not auto-redirect (design spec §16.6); the customer
-    // confirms with "Go to dashboard".
-    await page.getByRole('button', { name: 'Go to dashboard' }).click();
-    await expect(page).toHaveURL(/\/en\/dashboard/);
+    await expect(page.getByRole('heading', { name: 'Verify with UAE PASS' })).toBeVisible();
+    await expect(
+      page
+        .getByRole('button', { name: 'Continue with UAE PASS' })
+        .or(page.getByText(/UAE PASS identity linking is not available in this environment/i)),
+    ).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Start demo verification' })).toHaveCount(0);
   });
 
   test('returning customer signs in and reaches the dashboard', async ({ page }) => {
@@ -119,8 +117,7 @@ test.describe('email/password authentication', () => {
     await page.getByLabel(/Email address/i).fill(signInCustomer.email);
     await page.getByLabel(/^Password/).fill(STRONG_PASSWORD);
     await page.getByLabel(/^Confirm password/).fill(STRONG_PASSWORD);
-    await page.getByText('I agree to the Terms of Use.').click();
-    await page.getByText('I agree to the Privacy Policy.').click();
+    await page.getByRole('checkbox', { name: /Terms & Conditions.*Privacy Policy/i }).click();
     await page.getByRole('button', { name: 'Create account' }).click();
     await expect(page.getByText(/We could not create a new account/)).toBeVisible();
   });
@@ -157,14 +154,12 @@ test.describe('email/password authentication', () => {
     await expect(page).toHaveURL(/\/en\/dashboard/);
   });
 
-  // The admin app (port 3001) is not started by the web webServer, so this cross-app
-  // negative check cannot be exercised reliably from this project's Playwright config.
-  // Admin access control is covered by the admin app's own E2E suite.
-  test.skip('a customer cannot reach the admin application', async ({ page }) => {
+  test('a customer cannot reach the admin application', async ({ page }) => {
     await signIn(page, signInCustomer.email, DEFAULT_PASSWORD);
     await expect(page).toHaveURL(/\/en\/dashboard/);
     const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL ?? 'http://localhost:3001';
     await page.goto(`${adminUrl}/en/overview`);
-    await expect(page).not.toHaveURL(/\/overview$/);
+    await expect(page).toHaveURL(/\/en\/access-denied$/);
+    await expect(page.getByRole('heading', { name: 'Access denied' })).toBeVisible();
   });
 });

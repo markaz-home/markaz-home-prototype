@@ -1,6 +1,8 @@
+/* eslint-disable @next/next/no-img-element -- Listing covers can be runtime marketplace URLs and are intentionally rendered without the Next Image proxy. */
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
+import { ArrowLeft } from 'lucide-react';
 import { Alert, Button, Card, CardContent, EmptyState, ErrorState, Skeleton } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
@@ -32,7 +34,8 @@ export function ListingOffers({ listingId }: { listingId: string }) {
   return (
     <div className="space-y-6">
       <nav aria-label="Breadcrumb" className="text-muted-foreground text-sm">
-        <Link href="/sell" className="hover:text-foreground">
+        <Link href="/sell" className="hover:text-foreground inline-flex items-center gap-1.5">
+          <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden />
           {listing.headline}
         </Link>
       </nav>

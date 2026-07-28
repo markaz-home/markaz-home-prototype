@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- Listing covers can be runtime marketplace URLs and are intentionally rendered without the Next Image proxy. */
 'use client';
 
 import { useState } from 'react';

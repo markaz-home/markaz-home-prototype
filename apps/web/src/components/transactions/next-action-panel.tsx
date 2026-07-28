@@ -182,20 +182,24 @@ export function NextActionPanel({ d, refresh }: { d: Detail; refresh: () => void
     controls.push(
       <ActionCard key="date" title={t('transfer.proposeDate')}>
         <p className="text-muted-foreground text-sm">{t('transfer.proposeHelp')}</p>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="h-11 rounded-md border px-3"
-          aria-label={t('transfer.proposeDate')}
-        />
-        <Button
-          disabled={!date}
-          loading={proposeDate.isPending}
-          onClick={() => proposeDate.mutate({ transactionId: d.id, expectedVersion: v, date })}
-        >
-          {t('transfer.propose')}
-        </Button>
+        {/* The card's `space-y` cannot separate these: both are inline-level, so
+            they need an explicit flex row with a gap. */}
+        <div className="flex flex-wrap items-center gap-3">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="border-input bg-background text-foreground h-11 rounded-md border px-3 text-sm"
+            aria-label={t('transfer.proposeDate')}
+          />
+          <Button
+            disabled={!date}
+            loading={proposeDate.isPending}
+            onClick={() => proposeDate.mutate({ transactionId: d.id, expectedVersion: v, date })}
+          >
+            {t('transfer.propose')}
+          </Button>
+        </div>
       </ActionCard>,
     );
   }

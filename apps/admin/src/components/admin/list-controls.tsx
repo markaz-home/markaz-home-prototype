@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
 
@@ -43,7 +44,9 @@ export function FilterTabs({
             aria-selected={isActive}
             className={cn(
               'rounded-full border px-3 py-1 text-sm transition-colors',
-              isActive ? 'border-brand-600 bg-brand-600 text-white' : 'border-input hover:bg-muted',
+              isActive
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-input hover:bg-muted',
             )}
           >
             {o.label}
@@ -71,13 +74,14 @@ export function ListPagination({
   count: number;
   labels: { prev: string; next: string; range: string };
 }) {
+  const t = useTranslations('admin');
   const hasPrev = offset > 0;
   const hasNext = count === limit;
   if (!hasPrev && !hasNext) return null;
   return (
     <nav
       className="flex items-center justify-between border-t pt-3 text-sm"
-      aria-label="pagination"
+      aria-label={t('paginationLabel')}
     >
       <span className="text-muted-foreground">{labels.range}</span>
       <div className="flex gap-2">

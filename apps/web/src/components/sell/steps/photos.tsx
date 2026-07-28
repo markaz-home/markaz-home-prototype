@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- Draft listing photos use short-lived owner-scoped signed URLs that must not be proxied by Next Image. */
 'use client';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';

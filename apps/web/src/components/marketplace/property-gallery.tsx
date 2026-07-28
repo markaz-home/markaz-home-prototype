@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- Gallery photos can be runtime provider URLs and are not guaranteed to satisfy Next Image host configuration. */
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';

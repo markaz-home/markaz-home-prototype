@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { ArrowLeft } from 'lucide-react';
 import {
   Alert,
   Badge,
@@ -86,7 +87,8 @@ export function ManageListing({ listingId }: { listingId: string }) {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <nav aria-label="Breadcrumb" className="text-muted-foreground text-sm">
-        <Link href="/sell" className="hover:text-foreground">
+        <Link href="/sell" className="hover:text-foreground inline-flex items-center gap-1.5">
+          <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden />
           {t('returnToListings')}
         </Link>
       </nav>

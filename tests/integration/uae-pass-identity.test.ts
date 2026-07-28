@@ -56,15 +56,22 @@ d('UAE PASS Staging identity synchronization', () => {
   });
 
   it('blocks a direct authenticated write to VERIFIED_STAGING', async () => {
-    await expect(
-      asUser(
-        userId,
-        (tx) =>
-          tx`update public.profiles
-             set identity_verification_status = 'VERIFIED_STAGING'
-             where id = ${userId}`,
-      ),
-    ).rejects.toThrow(/verified identity workflow/i);
+    const changed = await asUser(
+      userId,
+      (tx) =>
+        tx`update public.profiles
+           set identity_verification_status = 'VERIFIED_STAGING'
+           where id = ${userId}
+           returning id`,
+    );
+    expect(changed).toHaveLength(0);
+    const [profile] = await asService(
+      (tx) =>
+        tx`select identity_verification_status::text as status
+           from public.profiles
+           where id = ${userId}`,
+    );
+    expect((profile as { status: string }).status).toBe('NOT_STARTED');
   });
 
   it('confirms auth.identities and records the staging result exactly once', async () => {

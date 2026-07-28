@@ -1,8 +1,8 @@
 import 'server-only';
-import { appRouter, createTRPCContext, createCallerFactory } from '@markaz/api';
+import { adminAppRouter, createTRPCContext, createCallerFactory } from '@markaz/api';
 import { getAuthProviderIds, getAuthUser } from '@markaz/auth/server';
 
-const createCaller = createCallerFactory(appRouter);
+const createCaller = createCallerFactory(adminAppRouter);
 
 /** Server-side tRPC caller bound to the current request's authenticated user. */
 export async function getServerApi() {
@@ -19,4 +19,4 @@ export async function getServerApi() {
   return createCaller(ctx);
 }
 
-export { type AppRouter } from '@markaz/api';
+export { type AdminAppRouter } from '@markaz/api';

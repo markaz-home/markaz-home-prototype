@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { SlidersHorizontal, X } from 'lucide-react';
@@ -14,12 +14,13 @@ import {
   PROPERTY_TYPES,
   type MarketplaceSort,
 } from '@markaz/domain';
-import { Alert, Button, EmptyState, ErrorState, Skeleton, cn } from '@markaz/ui';
+import { Button, EmptyState, ErrorState, Skeleton, cn } from '@markaz/ui';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import type { RouterInputs } from '@/trpc/types';
 import { ExternalPropertyCard } from './external-property-card';
 import { PropertyCard } from './property-card';
+import { ListboxSelect } from '@/components/ui/listbox-select';
 
 const SORT_LABEL_KEYS = {
   NEWEST: 'newest',
@@ -58,6 +59,12 @@ export function MarketplaceBrowse({
   }, [sp]);
 
   const [searchText, setSearchText] = useState(query.location ?? '');
+
+  // URL state is authoritative. Keep local typing state in sync when the user
+  // navigates with Back/Forward or opens a saved filtered URL.
+  useEffect(() => {
+    setSearchText(query.location ?? '');
+  }, [query.location]);
 
   const search = trpc.marketplace.search.useQuery(query as RouterInputs['marketplace']['search'], {
     staleTime: 0,
@@ -162,13 +169,6 @@ export function MarketplaceBrowse({
       <h1 className="font-display text-3xl font-semibold">
         {scope === 'dubai' ? t('titleDubai') : t('titleUae')}
       </h1>
-      <p className="text-muted-foreground mt-2 max-w-2xl">{t('description')}</p>
-
-      <Alert className="mt-4">
-        <p className="font-medium">{t('prototypeTitle')}</p>
-        <p className="text-muted-foreground text-sm">{t('prototypeBody')}</p>
-      </Alert>
-
       {/* Search */}
       <form
         className="mt-6 flex max-w-3xl items-center gap-2"
@@ -210,45 +210,44 @@ export function MarketplaceBrowse({
       {/* Primary filters */}
       <div className="mt-4 flex flex-wrap items-end gap-3">
         <Field label={tf('propertyType')}>
-          <select
-            className={selectCls}
-            value={query.propertyType ?? ''}
-            onChange={(e) => update({ propertyType: e.target.value || null })}
-          >
-            <option value="">{tf('any')}</option>
-            {PROPERTY_TYPES.map((v) => (
-              <option
-                key={v}
-                value={v}
-                disabled={!!facets.data && (propertyTypeCounts.get(v) ?? 0) === 0}
-              >
-                {tf(`type${titleCase(v)}` as 'typeApartment')}
-                {facets.data ? ` (${propertyTypeCounts.get(v) ?? 0})` : ''}
-              </option>
-            ))}
-          </select>
+          {(labelId) => (
+            <ListboxSelect
+              labelledBy={labelId}
+              value={query.propertyType ?? ''}
+              onChange={(v) => update({ propertyType: v || null })}
+              options={[
+                { value: '', label: tf('any') },
+                ...PROPERTY_TYPES.map((v) => ({
+                  value: v,
+                  label: tf(`type${titleCase(v)}` as 'typeApartment'),
+                  count: facets.data ? (propertyTypeCounts.get(v) ?? 0) : undefined,
+                  disabled: !!facets.data && (propertyTypeCounts.get(v) ?? 0) === 0,
+                })),
+              ]}
+            />
+          )}
         </Field>
         <Field label={tf('bedrooms')}>
-          <select
-            className={selectCls}
-            value={query.bedrooms ?? ''}
-            onChange={(e) => update({ bedrooms: e.target.value || null })}
-          >
-            <option value="">{tf('any')}</option>
-            <option value="studio" disabled={!!facets.data && (bedCounts.get('studio') ?? 0) === 0}>
-              {tf('studio')}
-              {facets.data ? ` (${bedCounts.get('studio') ?? 0})` : ''}
-            </option>
-            {BEDS_OPTIONS.filter((b) => b !== 'studio').map((v) => (
-              <option key={v} value={v} disabled={!!facets.data && (bedCounts.get(v) ?? 0) === 0}>
-                {tf('bedsOption', { count: v })}
-                {facets.data ? ` (${bedCounts.get(v) ?? 0})` : ''}
-              </option>
-            ))}
-          </select>
+          {(labelId) => (
+            <ListboxSelect
+              labelledBy={labelId}
+              value={query.bedrooms ?? ''}
+              onChange={(v) => update({ bedrooms: v || null })}
+              options={[
+                { value: '', label: tf('any') },
+                ...BEDS_OPTIONS.map((v) => ({
+                  value: v,
+                  label: v === 'studio' ? tf('studio') : tf('bedsOption', { count: v }),
+                  count: facets.data ? (bedCounts.get(v) ?? 0) : undefined,
+                  disabled: !!facets.data && (bedCounts.get(v) ?? 0) === 0,
+                })),
+              ]}
+            />
+          )}
         </Field>
         <Field label={tf('minimumPrice')}>
           <input
+            key={`min-price-${query.minPrice ?? ''}`}
             type="number"
             inputMode="numeric"
             min={0}
@@ -259,6 +258,7 @@ export function MarketplaceBrowse({
         </Field>
         <Field label={tf('maximumPrice')}>
           <input
+            key={`max-price-${query.maxPrice ?? ''}`}
             type="number"
             inputMode="numeric"
             min={0}
@@ -267,22 +267,9 @@ export function MarketplaceBrowse({
             onBlur={(e) => update({ maxPrice: e.target.value || null })}
           />
         </Field>
-        <Field label={tf('community')}>
-          <input
-            className={selectCls}
-            list="marketplace-community-options"
-            defaultValue={query.area ?? ''}
-            placeholder={tf('communityPlaceholder')}
-            onBlur={(e) => update({ area: e.target.value || null })}
-          />
-          <datalist id="marketplace-community-options">
-            {facets.data?.communities.map((item) => (
-              <option key={item.value} value={item.value}>
-                {item.count}
-              </option>
-            ))}
-          </datalist>
-        </Field>
+        {/* No "community or area" field: the search bar above already matches
+            community, emirate, building and property type (marketplace.ts §buildConditions),
+            so it was a strict subset of the same query. `?area=` links still filter. */}
         <Button
           type="button"
           variant="outline"
@@ -296,26 +283,26 @@ export function MarketplaceBrowse({
       {moreOpen && (
         <div className="bg-card mt-4 grid gap-3 rounded-md border p-4 sm:grid-cols-2 lg:grid-cols-3">
           <Field label={tf('bathrooms')}>
-            <select
-              className={selectCls}
-              value={query.baths ?? ''}
-              onChange={(e) => update({ baths: e.target.value || null })}
-            >
-              <option value="">{tf('any')}</option>
-              {BATHS_OPTIONS.map((v) => (
-                <option
-                  key={v}
-                  value={v}
-                  disabled={!!facets.data && (bathCounts.get(v) ?? 0) === 0}
-                >
-                  {tf('bedsOption', { count: v })}
-                  {facets.data ? ` (${bathCounts.get(v) ?? 0})` : ''}
-                </option>
-              ))}
-            </select>
+            {(labelId) => (
+              <ListboxSelect
+                labelledBy={labelId}
+                value={query.baths ?? ''}
+                onChange={(v) => update({ baths: v || null })}
+                options={[
+                  { value: '', label: tf('any') },
+                  ...BATHS_OPTIONS.map((v) => ({
+                    value: v,
+                    label: tf('bedsOption', { count: v }),
+                    count: facets.data ? (bathCounts.get(v) ?? 0) : undefined,
+                    disabled: !!facets.data && (bathCounts.get(v) ?? 0) === 0,
+                  })),
+                ]}
+              />
+            )}
           </Field>
           <Field label={tf('minimumSize')}>
             <input
+              key={`min-size-${query.minSize ?? ''}`}
               type="number"
               inputMode="numeric"
               min={0}
@@ -326,6 +313,7 @@ export function MarketplaceBrowse({
           </Field>
           <Field label={tf('maximumSize')}>
             <input
+              key={`max-size-${query.maxSize ?? ''}`}
               type="number"
               inputMode="numeric"
               min={0}
@@ -335,32 +323,36 @@ export function MarketplaceBrowse({
             />
           </Field>
           <Field label={tf('furnishing')}>
-            <select
-              className={selectCls}
-              value={query.furnishing ?? ''}
-              onChange={(e) => update({ furnishing: e.target.value || null })}
-            >
-              <option value="">{tf('any')}</option>
-              {FURNISHING_STATUSES.map((v) => (
-                <option key={v} value={v}>
-                  {tf(`furnishing${v}` as 'furnishingFURNISHED')}
-                </option>
-              ))}
-            </select>
+            {(labelId) => (
+              <ListboxSelect
+                labelledBy={labelId}
+                value={query.furnishing ?? ''}
+                onChange={(v) => update({ furnishing: v || null })}
+                options={[
+                  { value: '', label: tf('any') },
+                  ...FURNISHING_STATUSES.map((v) => ({
+                    value: v,
+                    label: tf(`furnishing${v}` as 'furnishingFURNISHED'),
+                  })),
+                ]}
+              />
+            )}
           </Field>
           <Field label={tf('completion')}>
-            <select
-              className={selectCls}
-              value={query.completion ?? ''}
-              onChange={(e) => update({ completion: e.target.value || null })}
-            >
-              <option value="">{tf('any')}</option>
-              {COMPLETION_STATUSES.map((v) => (
-                <option key={v} value={v}>
-                  {tf(`completion${v}` as 'completionREADY')}
-                </option>
-              ))}
-            </select>
+            {(labelId) => (
+              <ListboxSelect
+                labelledBy={labelId}
+                value={query.completion ?? ''}
+                onChange={(v) => update({ completion: v || null })}
+                options={[
+                  { value: '', label: tf('any') },
+                  ...COMPLETION_STATUSES.map((v) => ({
+                    value: v,
+                    label: tf(`completion${v}` as 'completionREADY'),
+                  })),
+                ]}
+              />
+            )}
           </Field>
           <label className="flex items-center gap-2 pt-6 text-sm">
             <input
@@ -393,35 +385,40 @@ export function MarketplaceBrowse({
         </div>
       )}
 
-      {/* Count + sort */}
-      <div className="mt-6 flex items-center justify-between gap-4">
-        <p className="text-muted-foreground text-sm" aria-live="polite">
-          {fetching
-            ? t('updating')
-            : data
-              ? query.location
-                ? t('resultsQuery', { count: data.pagination.total, query: query.location })
-                : data.pagination.total === 1
-                  ? t('resultsOne')
-                  : t('resultsMany', { count: data.pagination.total })
-              : ''}
-        </p>
-        <div className="flex items-center gap-2">
-          <label htmlFor="mkt-sort" className="text-muted-foreground text-sm">
+      {/* Section title + sort. The result count is announced, not shown. */}
+      <div className="mt-10 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 id="direct-listings-title" className="font-display text-2xl font-semibold">
+            {t('directTitle')}
+          </h2>
+          <p className="sr-only" aria-live="polite">
+            {fetching
+              ? t('updating')
+              : data
+                ? query.location
+                  ? t('resultsQuery', { count: data.pagination.total, query: query.location })
+                  : data.pagination.total === 1
+                    ? t('resultsOne')
+                    : t('resultsMany', { count: data.pagination.total })
+                : ''}
+          </p>
+        </div>
+        <div className="relative flex items-center gap-2">
+          <span id="mkt-sort-label" className="text-muted-foreground text-sm">
             {ts('label')}
-          </label>
-          <select
-            id="mkt-sort"
-            className="border-input bg-background h-10 rounded-md border px-3 text-sm"
-            value={query.sort ?? 'NEWEST'}
-            onChange={(e) => update({ sort: e.target.value })}
-          >
-            {MARKETPLACE_SORTS.map((value) => (
-              <option key={value} value={value}>
-                {ts(SORT_LABEL_KEYS[value])}
-              </option>
-            ))}
-          </select>
+          </span>
+          <div className="relative w-44">
+            <ListboxSelect
+              id="mkt-sort"
+              labelledBy="mkt-sort-label"
+              value={query.sort ?? 'NEWEST'}
+              onChange={(v) => update({ sort: v })}
+              options={MARKETPLACE_SORTS.map((value) => ({
+                value,
+                label: ts(SORT_LABEL_KEYS[value]),
+              }))}
+            />
+          </div>
         </div>
       </div>
 
@@ -454,19 +451,17 @@ export function MarketplaceBrowse({
             action={<Button onClick={clearAll}>{te('clear')}</Button>}
           />
         ) : (
-          <div className={cn(fetching && 'opacity-60 transition-opacity')}>
-            <Grid>
-              {data?.items.map((card) => (
-                <PropertyCard
-                  key={card.publicId}
-                  card={card}
-                  isAuthenticated={isAuthenticated}
-                  saved={card.publicId ? savedSet.has(card.publicId) : false}
-                  owned={card.publicId ? ownedSet.has(card.publicId) : false}
-                />
-              ))}
-            </Grid>
-          </div>
+          <Grid className={cn(fetching && 'opacity-60 transition-opacity')}>
+            {(data?.items ?? []).map((card) => (
+              <PropertyCard
+                key={card.publicId}
+                card={card}
+                isAuthenticated={isAuthenticated}
+                saved={card.publicId ? savedSet.has(card.publicId) : false}
+                owned={card.publicId ? ownedSet.has(card.publicId) : false}
+              />
+            ))}
+          </Grid>
         )}
       </div>
 
@@ -498,17 +493,20 @@ export function MarketplaceBrowse({
           <h2 id="external-properties-title" className="font-display text-2xl font-semibold">
             {t('externalTitle')}
           </h2>
-          <p className="text-muted-foreground mt-2 max-w-3xl text-sm">{t('externalBody')}</p>
           <div className="mt-5">
-            <Grid>
-              {external.isLoading
-                ? Array.from({ length: 6 }).map((_, index) => (
-                    <Skeleton key={index} className="aspect-[4/3] w-full rounded-lg" />
-                  ))
-                : externalCards.map((card) => (
-                    <ExternalPropertyCard key={card.providerId} card={card} />
-                  ))}
-            </Grid>
+            {external.isLoading ? (
+              <Grid>
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <Skeleton key={index} className="aspect-[4/3] w-full rounded-lg" />
+                ))}
+              </Grid>
+            ) : (
+              <Grid>
+                {externalCards.map((card) => (
+                  <ExternalPropertyCard key={card.providerId} card={card} />
+                ))}
+              </Grid>
+            )}
           </div>
         </section>
       )}
@@ -516,7 +514,28 @@ export function MarketplaceBrowse({
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+/**
+ * Filter field. Native controls get a wrapping `<label>`; the listbox (a button,
+ * not a labelable control) takes a render prop and is associated by id instead.
+ */
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode | ((labelId: string) => React.ReactNode);
+}) {
+  const labelId = useId();
+  if (typeof children === 'function') {
+    return (
+      <div className="relative flex w-full flex-col gap-1 text-sm sm:w-40">
+        <span id={labelId} className="text-muted-foreground font-medium">
+          {label}
+        </span>
+        {children(labelId)}
+      </div>
+    );
+  }
   return (
     <label className="flex w-full flex-col gap-1 text-sm sm:w-40">
       <span className="text-muted-foreground font-medium">{label}</span>
@@ -525,8 +544,12 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">{children}</div>;
+function Grid({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={cn('grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3', className)}>
+      {children}
+    </div>
+  );
 }
 
 function titleCase(s: string): string {

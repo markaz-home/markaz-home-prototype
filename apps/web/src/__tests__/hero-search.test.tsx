@@ -100,7 +100,7 @@ describe('buildPropertySearchQuery', () => {
         price: '1to3m',
         bedrooms: '',
       }),
-    ).toBe('minPrice=1000000&maxPrice=3000000');
+    ).toBe('minPrice=1000000&maxPrice=2999999');
     expect(
       buildPropertySearchQuery({
         location: '',
@@ -108,7 +108,7 @@ describe('buildPropertySearchQuery', () => {
         price: 'under1m',
         bedrooms: '',
       }),
-    ).toBe('maxPrice=1000000');
+    ).toBe('maxPrice=999999');
     expect(
       buildPropertySearchQuery({
         location: '',
@@ -187,8 +187,8 @@ describe('HeroSearch', () => {
     trigger.focus();
     await user.keyboard('{ArrowDown}{ArrowDown}{Enter}');
 
-    expect(trigger).toHaveTextContent('Up to AED 1M');
+    expect(trigger).toHaveTextContent('Under AED 1M');
     await user.click(screen.getByRole('button', { name: 'Search properties' }));
-    expect(push).toHaveBeenCalledWith('/properties?maxPrice=1000000');
+    expect(push).toHaveBeenCalledWith('/properties?maxPrice=999999');
   });
 });

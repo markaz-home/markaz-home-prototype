@@ -76,6 +76,17 @@ export function asUser<T>(userId: string, fn: (tx: Sql) => Promise<T>): Promise<
   }) as Promise<T>;
 }
 
+/** Run through the trusted server mutation context (mirrors withUserContext). */
+export function asTrustedUser<T>(userId: string, fn: (tx: Sql) => Promise<T>): Promise<T> {
+  return sql.begin(async (tx) => {
+    const claims = JSON.stringify({ sub: userId, role: 'authenticated', account_type: 'CUSTOMER' });
+    await tx`select set_config('request.jwt.claims', ${claims}, true)`;
+    await tx`select set_config('markaz.trusted_api', 'true', true)`;
+    await tx`select set_config('role', 'authenticated', true)`;
+    return fn(tx as unknown as Sql);
+  }) as Promise<T>;
+}
+
 /** Run work as an anonymous visitor (mirrors withAnonContext). */
 export function asAnon<T>(fn: (tx: Sql) => Promise<T>): Promise<T> {
   return sql.begin(async (tx) => {

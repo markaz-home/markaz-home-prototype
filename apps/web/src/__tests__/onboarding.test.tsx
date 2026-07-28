@@ -89,9 +89,7 @@ describe('UaePassFlow (UAE PASS Staging)', () => {
   it('shows only the UAE PASS staging action when staging is enabled', () => {
     renderWithIntl(<UaePassFlow initialStatus="NOT_STARTED" uaePassStaging />);
     expect(screen.getByRole('heading', { name: 'Verify with UAE PASS' })).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Continue with UAE PASS' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Continue with UAE PASS' })).toBeInTheDocument();
     expect(
       screen.getByText('Staging environment — no production verification.'),
     ).toBeInTheDocument();
@@ -154,9 +152,7 @@ describe('UaePassFlow (UAE PASS Staging)', () => {
 
   it('does not expose legacy simulation controls for a pending demo status', () => {
     renderWithIntl(<UaePassFlow initialStatus="PENDING" uaePassStaging />);
-    expect(
-      screen.getByRole('button', { name: 'Continue with UAE PASS' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Continue with UAE PASS' })).toBeInTheDocument();
     expect(screen.queryByText('Demo simulation controls')).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Approve demo verification' }),

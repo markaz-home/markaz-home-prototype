@@ -839,24 +839,40 @@ const auditRouter = router({
       if (input.entityId) conds.push(eq(auditEvents.entityId, input.entityId));
       if (input.action) conds.push(eq(auditEvents.action, input.action));
       const rows = await ctx.tx
-        .select()
+        .select({
+          event: auditEvents,
+          actorAccountType: profiles.accountType,
+        })
         .from(auditEvents)
+        .leftJoin(profiles, eq(profiles.id, auditEvents.actorId))
         .where(conds.length ? and(...conds) : undefined)
         .orderBy(desc(auditEvents.createdAt))
         .limit(input.limit)
         .offset(input.offset);
-      return rows.map((r) => toAuditEvent(r as unknown as AuditRow));
+      return rows.map((r) =>
+        toAuditEvent({
+          ...(r.event as unknown as AuditRow),
+          actorAccountType: r.actorAccountType,
+        }),
+      );
     }),
   get: adminCapabilityProcedure('VIEW_AUDIT_LOGS')
     .input(idInput)
     .query(async ({ ctx, input }) => {
       const [r] = await ctx.tx
-        .select()
+        .select({
+          event: auditEvents,
+          actorAccountType: profiles.accountType,
+        })
         .from(auditEvents)
+        .leftJoin(profiles, eq(profiles.id, auditEvents.actorId))
         .where(eq(auditEvents.id, input.id))
         .limit(1);
       if (!r) throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_AVAILABLE' });
-      return toAuditEvent(r as unknown as AuditRow);
+      return toAuditEvent({
+        ...(r.event as unknown as AuditRow),
+        actorAccountType: r.actorAccountType,
+      });
     }),
 });
 

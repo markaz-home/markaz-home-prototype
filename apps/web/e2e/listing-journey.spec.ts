@@ -5,7 +5,7 @@
  * check), and a fresh customer for the end-to-end wizard. Sims default to SUCCESS.
  * Requires the full local stack (SUPABASE_SERVICE_ROLE_KEY set) + the web app running.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { createCustomer, createListing, teardown, type Customer } from './helpers/provision';
 import { signIn } from './helpers/flows';
 
@@ -35,6 +35,11 @@ const PNG_1x1 = Buffer.from(
   'base64',
 );
 
+async function chooseListbox(page: Page, id: string, optionName: string) {
+  await page.locator(`#${id}`).click();
+  await page.getByRole('option', { name: optionName, exact: true }).click();
+}
+
 test.describe('listing journey', () => {
   test('My Listings shows a ready-to-publish listing for the customer', async ({ page }) => {
     await signIn(page, customer);
@@ -57,12 +62,12 @@ test.describe('listing journey', () => {
     await page.getByLabel('Area or community').fill('Dubai Marina');
     await page.getByLabel('Building or project').fill('Marina Gate 2');
     await page.getByLabel(/Unit or property identifier/).fill('Unit 3010');
-    await page.locator('#bedrooms').selectOption('2');
-    await page.locator('#bathrooms').selectOption('2');
+    await chooseListbox(page, 'bedrooms', '2');
+    await chooseListbox(page, 'bathrooms', '2');
     await page.getByLabel('Property size').fill('1200');
-    await page.locator('#furnishing').selectOption('FURNISHED');
-    await page.locator('#occupancy').selectOption('VACANT');
-    await page.locator('#completion').selectOption('READY');
+    await chooseListbox(page, 'furnishing', 'Furnished');
+    await chooseListbox(page, 'occupancy', 'Vacant');
+    await chooseListbox(page, 'completion', 'Ready');
     await page.getByLabel('Property description').fill('A'.repeat(120));
     await page.getByRole('button', { name: 'Save and continue' }).click();
     await expect(page).toHaveURL(/\/ownership/, { timeout: WIZARD_NAVIGATION_TIMEOUT_MS });
