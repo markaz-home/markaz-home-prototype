@@ -1,6 +1,7 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
-import { Alert, EmptyState } from '@markaz/ui';
+import { Alert, Button, EmptyState } from '@markaz/ui';
 import { getServerApi } from '@/server/api';
+import { Link } from '@/i18n/navigation';
 import { PageHeader, PageShell } from '@/components/admin/page-header';
 import { DataTable, type Column } from '@/components/admin/data-table';
 import { StatusBadge } from '@/components/admin/status-badge';
@@ -75,6 +76,52 @@ export default async function AuditPage({
   return (
     <PageShell maxWidth={1600}>
       <PageHeader title={t('audit.title')} description={t('audit.description')} />
+      <form
+        method="get"
+        className="bg-card mb-5 grid gap-3 rounded-lg border p-4 sm:grid-cols-[minmax(12rem,1fr)_minmax(12rem,1fr)_auto] sm:items-end"
+      >
+        <label className="space-y-1.5 text-sm font-medium">
+          <span>{t('audit.filterAction')}</span>
+          <input
+            name="action"
+            defaultValue={action}
+            maxLength={60}
+            placeholder={t('audit.actionPlaceholder')}
+            className="border-input bg-background h-10 w-full rounded-md border px-3 font-mono text-sm"
+          />
+        </label>
+        <label className="space-y-1.5 text-sm font-medium">
+          <span>{t('audit.filterEntity')}</span>
+          <select
+            name="entityType"
+            defaultValue={entityType ?? ''}
+            className="border-input bg-background h-10 w-full rounded-md border px-3 text-sm"
+          >
+            <option value="">{t('audit.allEntities')}</option>
+            {[
+              'auth',
+              'profile',
+              'customer',
+              'listing',
+              'verification',
+              'offer_thread',
+              'transaction',
+            ].map((value) => (
+              <option key={value} value={value}>
+                {t(`audit.entity.${value}`)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="flex flex-wrap gap-2">
+          <Button type="submit">{t('audit.applyFilters')}</Button>
+          {action || entityType ? (
+            <Button asChild type="button" variant="outline">
+              <Link href="/audit">{t('audit.clearFilters')}</Link>
+            </Button>
+          ) : null}
+        </div>
+      </form>
       {failed ? (
         <Alert variant="warning" className="mb-4">
           {t('overview.partialError')}

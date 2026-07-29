@@ -18,9 +18,9 @@ export function AuthCard({
       <Card className="w-full max-w-md">
         <CardHeader>
           <span className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
-            <Home className="text-primary h-4 w-4" aria-hidden /> MARKAZ Home
+            <Home className="text-primary h-4 w-4" aria-hidden /> Markaz Home
           </span>
-          <CardTitle className="font-display text-brand-900 text-2xl">{title}</CardTitle>
+          <CardTitle className="font-display text-primary text-2xl">{title}</CardTitle>
           {description ? <CardDescription>{description}</CardDescription> : null}
         </CardHeader>
         <CardContent className="space-y-4">{children}</CardContent>

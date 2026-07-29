@@ -18,6 +18,18 @@ export const SEARCH_MAX = 100;
 export const BEDS_OPTIONS = ['studio', '1', '2', '3', '4', '5'] as const;
 export const BATHS_OPTIONS = ['1', '2', '3', '4'] as const;
 
+/**
+ * Explicit demo configuration until DLD transaction percentiles are ingested.
+ * Keeping the thresholds in the domain avoids separate homepage/browse copies.
+ */
+export const MARKETPLACE_PRICE_BANDS = {
+  under1m: { minPrice: null, maxPrice: 999_999 },
+  '1to3m': { minPrice: 1_000_000, maxPrice: 2_999_999 },
+  '3to5m': { minPrice: 3_000_000, maxPrice: 4_999_999 },
+  '5plus': { minPrice: 5_000_000, maxPrice: null },
+} as const;
+export type MarketplacePriceBand = keyof typeof MARKETPLACE_PRICE_BANDS;
+
 const optionalInt = z.preprocess(
   (v) => (v === '' || v === null || v === undefined ? undefined : v),
   z.coerce.number().int().min(0).max(999_999_999).optional(),
@@ -26,16 +38,16 @@ const optionalInt = z.preprocess(
 /** The full marketplace query. Coerces from string query params; invalid → omitted. */
 export const marketplaceQuerySchema = z
   .object({
-    q: z.preprocess(
+    location: z.preprocess(
       (v) => (typeof v === 'string' ? v.trim() : v),
       z.string().max(SEARCH_MAX, 'search_too_long').optional(),
     ),
-    type: z.enum(PROPERTY_TYPES).optional(),
+    propertyType: z.enum(PROPERTY_TYPES).optional(),
     emirate: z.string().trim().max(60).optional(),
     area: z.string().trim().max(120).optional(),
     minPrice: optionalInt,
     maxPrice: optionalInt,
-    beds: z.enum(BEDS_OPTIONS).optional(),
+    bedrooms: z.enum(BEDS_OPTIONS).optional(),
     baths: z.enum(BATHS_OPTIONS).optional(),
     minSize: optionalInt,
     maxSize: optionalInt,
@@ -58,6 +70,28 @@ export const marketplaceQuerySchema = z
   });
 
 export type MarketplaceQuery = z.infer<typeof marketplaceQuerySchema>;
+
+/**
+ * Canonical URL/query boundary. Keeping this next to the schema makes a schema
+ * rename a compile-time change in every URL-state consumer.
+ */
+export const MARKETPLACE_QUERY_PARAM_KEYS = [
+  'location',
+  'propertyType',
+  'emirate',
+  'area',
+  'minPrice',
+  'maxPrice',
+  'bedrooms',
+  'baths',
+  'minSize',
+  'maxSize',
+  'furnishing',
+  'completion',
+  'investmentCase',
+  'sort',
+  'page',
+] as const satisfies readonly (keyof MarketplaceQuery)[];
 
 /**
  * Lenient parse for URL params: drop individually-invalid fields rather than
@@ -83,11 +117,11 @@ export function parseMarketplaceQuery(raw: Record<string, string | undefined>): 
   return second.success ? second.data : { sort: DEFAULT_SORT, page: 1 };
 }
 
-/** Translate the `beds` filter to a SQL predicate intent. */
-export function bedsFilter(beds?: string): { studioOnly?: boolean; min?: number } | null {
-  if (!beds) return null;
-  if (beds === 'studio') return { studioOnly: true };
-  const n = Number(beds);
+/** Translate the `bedrooms` filter to a SQL predicate intent. */
+export function bedroomsFilter(bedrooms?: string): { studioOnly?: boolean; min?: number } | null {
+  if (!bedrooms) return null;
+  if (bedrooms === 'studio') return { studioOnly: true };
+  const n = Number(bedrooms);
   return Number.isFinite(n) ? { min: n } : null;
 }
 

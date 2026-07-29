@@ -1,13 +1,7 @@
 import { eq, sql } from 'drizzle-orm';
 import { TRPCError } from '@trpc/server';
-import { z } from 'zod';
 import { profiles, auditEvents, type Tx } from '@markaz/db';
-import {
-  profileSetupSchema,
-  identityStatusSchema,
-  canTransitionIdentity,
-  type IdentityVerificationStatus,
-} from '@markaz/domain';
+import { profileSetupSchema } from '@markaz/domain';
 import { router, protectedProcedure, customerProcedure } from '../trpc';
 
 function toProfileDto(row: typeof profiles.$inferSelect) {
@@ -63,59 +57,22 @@ export const profileRouter = router({
     return toProfileDto(row!);
   }),
 
-  /** Simulated UAE PASS status change, with transition validation. */
-  setIdentityStatus: customerProcedure
-    .input(z.object({ status: identityStatusSchema }))
-    .mutation(async ({ ctx, input }) => {
-      const current = await loadOwnProfile(ctx.tx, ctx.user.id);
-      if (!current) throw new TRPCError({ code: 'NOT_FOUND' });
-      const from = current.identityVerificationStatus as IdentityVerificationStatus;
-      if (from !== input.status && !canTransitionIdentity(from, input.status)) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: `Invalid identity transition ${from} -> ${input.status}`,
-        });
-      }
-      const verified = input.status === 'VERIFIED_DEMO';
-      await ctx.tx
-        .update(profiles)
-        .set({
-          identityVerificationStatus: input.status,
-          ...(verified ? { onboardingCompletedAt: new Date() } : {}),
-        })
-        .where(eq(profiles.id, ctx.user.id));
-
-      const action =
-        input.status === 'PENDING'
-          ? 'DEMO_IDENTITY_STARTED'
-          : input.status === 'VERIFIED_DEMO'
-            ? 'DEMO_IDENTITY_VERIFIED'
-            : input.status === 'FAILED_DEMO'
-              ? 'DEMO_IDENTITY_FAILED'
-              : null;
-      if (action) {
-        await ctx.tx.insert(auditEvents).values({
-          actorId: ctx.user.id,
-          action,
-          entityType: 'profile',
-          entityId: ctx.user.id,
-          metadata: {},
-        });
-      }
-      const row = await loadOwnProfile(ctx.tx, ctx.user.id);
-      return toProfileDto(row!);
-    }),
-
-  /** Proof helper: confirms account_type cannot be self-promoted server-side. */
-  attemptSelfPromote: customerProcedure.mutation(async ({ ctx }) => {
-    // The DB trigger prevent_account_type_escalation rejects this for non-privileged roles.
-    try {
-      await ctx.tx.execute(
-        sql`update public.profiles set account_type = 'ADMIN' where id = ${ctx.user.id}`,
-      );
-      return { promoted: true };
-    } catch {
-      return { promoted: false };
+  /**
+   * Record a linked UAE PASS Staging identity without accepting a browser claim.
+   * The tRPC context derives providers from Supabase-controlled app_metadata, and
+   * the database function independently checks auth.identities before writing.
+   */
+  syncUaePassIdentity: customerProcedure.mutation(async ({ ctx }) => {
+    if (!ctx.user.authProviders?.includes('custom:uae-pass')) {
+      throw new TRPCError({
+        code: 'PRECONDITION_FAILED',
+        message: 'UAE PASS identity is not linked',
+      });
     }
+
+    await ctx.tx.execute(sql`select public.sync_uae_pass_staging_identity()`);
+    const row = await loadOwnProfile(ctx.tx, ctx.user.id);
+    if (!row) throw new TRPCError({ code: 'NOT_FOUND', message: 'Profile not found' });
+    return toProfileDto(row);
   }),
 });

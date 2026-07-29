@@ -226,8 +226,9 @@ export async function makePublishable(
     insert into public.form_a_records (id, listing_id, status)
     values (gen_random_uuid(), ${listingId}, 'VERIFIED_DEMO')`;
   await sql`
-    insert into public.permit_records (id, listing_id, permit_type, status)
-    values (gen_random_uuid(), ${listingId}, 'TRAKHEESI', 'VERIFIED_DEMO')`;
+    insert into public.permit_records (id, listing_id, permit_type, status, permit_number, approved_at)
+    values (gen_random_uuid(), ${listingId}, 'TRAKHEESI', 'VERIFIED_DEMO',
+            ${`DEMO-TRK-${listingId.slice(0, 8).toUpperCase()}`}, now())`;
   const ids: string[] = [];
   for (let i = 0; i < photos; i++) {
     const path = `${listingId}/draft-${i}.png`;
@@ -416,6 +417,47 @@ export async function driveToCompletion(
     (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'SELLER_CONFIRM_READINESS', ${v})`,
   );
   await step(buyerId, (tx, v) => tx`select public.tx_create_appointment(${txId}::uuid, ${v})`);
+}
+
+/**
+ * Drive to the TRANSFER stage, leaving the seller's propose-date task open —
+ * the state where the date control is the live action.
+ */
+export async function driveToTransfer(
+  txId: string,
+  buyerId: string,
+  sellerId: string,
+): Promise<void> {
+  const step = (userId: string, run: (tx: typeof sql, v: number) => Promise<unknown>) =>
+    stepTx(txId, userId, run);
+  await driveToDocuments(txId, buyerId, sellerId);
+  await asRole(
+    buyerId,
+    (tx) =>
+      tx`select id from public.tx_register_document(${txId}::uuid, 'BUYER_IDENTITY', ${`${txId}/${buyerId}/id.pdf`}, 'id.pdf', 'application/pdf', 1000)`,
+  );
+  await asRole(
+    sellerId,
+    (tx) =>
+      tx`select id from public.tx_register_document(${txId}::uuid, 'SELLER_IDENTITY', ${`${txId}/${sellerId}/id.pdf`}, 'id.pdf', 'application/pdf', 1000)`,
+  );
+  await step(
+    buyerId,
+    (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'BUYER_DOCUMENTS', ${v})`,
+  );
+  await step(
+    sellerId,
+    (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'SELLER_DOCUMENTS', ${v})`,
+  );
+  await step(
+    buyerId,
+    (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'BUYER_REVIEW_SUMMARY', ${v})`,
+  );
+  await step(
+    sellerId,
+    (tx, v) => tx`select public.tx_complete_task(${txId}::uuid, 'SELLER_REVIEW_SUMMARY', ${v})`,
+  );
+  await step(buyerId, (tx, v) => tx`select public.tx_run_due_diligence(${txId}::uuid, ${v})`);
 }
 
 /**

@@ -1,6 +1,7 @@
 import { config as loadEnv } from 'dotenv';
 import createNextIntlPlugin from 'next-intl/plugin';
 import withBundleAnalyzerFactory from '@next/bundle-analyzer';
+import { securityHeaders } from '@markaz/config/security-headers';
 
 // Env precedence: .env.local (gitignored, local-dev overrides) wins over the shared
 // monorepo-root .env (hosted/deploy contract). dotenv keeps the first value per key, so
@@ -18,6 +19,10 @@ const withBundleAnalyzer = withBundleAnalyzerFactory({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: '/:path*', headers: securityHeaders(process.env, 'admin') }];
+  },
   // ESLint runs as its own `pnpm lint` step and in CI (with @next/eslint-plugin-next);
   // Next's build-time lint is redundant and warns spuriously under flat config.
   eslint: { ignoreDuringBuilds: true },

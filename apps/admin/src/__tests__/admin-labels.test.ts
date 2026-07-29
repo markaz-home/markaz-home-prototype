@@ -6,6 +6,7 @@ import {
   offerStatusLabel,
   transactionStatusLabel,
   customerStatusLabel,
+  customerIdentityStatusLabel,
   actorTypeTone,
   formatAed,
   formatWhen,
@@ -46,6 +47,13 @@ describe('admin label maps (spec §35 — no raw enums in UI)', () => {
     expect(customerStatusLabel('ACTIVE')).toEqual({
       tone: 'complete',
       key: 'customers.status.active',
+    });
+  });
+
+  it('maps the persisted UAE PASS Staging identity result without exposing the raw enum', () => {
+    expect(customerIdentityStatusLabel('VERIFIED_STAGING')).toEqual({
+      tone: 'complete',
+      key: 'customers.identityStatus.VERIFIED_STAGING',
     });
   });
 

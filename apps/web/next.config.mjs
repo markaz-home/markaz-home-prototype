@@ -1,6 +1,7 @@
 import { config as loadEnv } from 'dotenv';
 import createNextIntlPlugin from 'next-intl/plugin';
 import withBundleAnalyzerFactory from '@next/bundle-analyzer';
+import { securityHeaders } from '@markaz/config/security-headers';
 
 // Env precedence (Next convention): .env.local (gitignored, local-dev overrides) wins,
 // then the shared monorepo-root .env (the hosted/deploy contract). dotenv keeps the FIRST
@@ -20,6 +21,10 @@ const withBundleAnalyzer = withBundleAnalyzerFactory({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: '/:path*', headers: securityHeaders(process.env, 'web') }];
+  },
   // ESLint (incl. the @next/eslint-plugin-next rules) runs as its own `pnpm lint`
   // step and in CI; Next's build-time lint is redundant here and, with flat config,
   // emits a spurious "plugin not detected" warning. Lint is NOT skipped overall.

@@ -8,6 +8,7 @@ import {
   createCustomer,
   createLiveListing,
   acceptedTransaction,
+  driveToDocuments,
   driveToCompletion,
   teardown,
   type Customer,
@@ -43,6 +44,79 @@ test('buyer confirms transaction details from the workspace', async ({ page }) =
   await page.getByRole('button', { name: 'Confirm transaction details' }).click();
   // The confirm-details control disappears once the task is complete.
   await expect(page.getByRole('button', { name: 'Confirm transaction details' })).toHaveCount(0);
+});
+
+test('transaction document uploads stay private to each uploader and can be removed', async ({
+  browser,
+}) => {
+  test.skip(skip, 'full stack required');
+  const listingId = (await createLiveListing(seller.id, { askingPrice: 2_000_000 })).id;
+  const txId = await acceptedTransaction(buyer.id, seller.id, listingId);
+  await driveToDocuments(txId, buyer.id, seller.id);
+
+  const buyerContext = await browser.newContext();
+  const buyerPage = await buyerContext.newPage();
+  await signIn(buyerPage, buyer);
+  await buyerPage.goto(`/en/transactions/${txId}`);
+  await buyerPage.getByLabel('Buyer identity document').setInputFiles({
+    name: 'fictional-buyer-id.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from('%PDF-1.4\n% MARKAZ fictional UAT file\n'),
+  });
+  await expect(buyerPage.getByText('fictional-buyer-id.pdf')).toBeVisible();
+  await expect(buyerPage.getByText('Accepted in demo')).toBeVisible();
+
+  const sellerContext = await browser.newContext();
+  const sellerPage = await sellerContext.newPage();
+  await signIn(sellerPage, seller);
+  await sellerPage.goto(`/en/transactions/${txId}`);
+  await expect(sellerPage.getByText('fictional-buyer-id.pdf')).toHaveCount(0);
+  await sellerPage.getByLabel('Seller identity document').setInputFiles({
+    name: 'fictional-seller-id.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from('%PDF-1.4\n% MARKAZ fictional seller UAT file\n'),
+  });
+  await expect(sellerPage.getByText('fictional-seller-id.pdf')).toBeVisible();
+  await expect(buyerPage.getByText('fictional-seller-id.pdf')).toHaveCount(0);
+
+  await buyerPage.getByRole('button', { name: 'Remove' }).click();
+  await expect(buyerPage.getByText('fictional-buyer-id.pdf')).toHaveCount(0);
+  await sellerPage.getByRole('button', { name: 'Remove' }).click();
+  await expect(sellerPage.getByText('fictional-seller-id.pdf')).toHaveCount(0);
+
+  await sellerContext.close();
+  await buyerContext.close();
+});
+
+test('mobile Arabic transaction document flow remains usable without page overflow', async ({
+  page,
+}) => {
+  test.skip(skip, 'full stack required');
+  await page.setViewportSize({ width: 390, height: 844 });
+  const listingId = (await createLiveListing(seller.id, { askingPrice: 2_000_000 })).id;
+  const txId = await acceptedTransaction(buyer.id, seller.id, listingId);
+  await driveToDocuments(txId, buyer.id, seller.id);
+  await signIn(page, buyer);
+  await page.goto(`/ar/transactions/${txId}`);
+
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(page.getByRole('main')).toBeVisible();
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1),
+  ).toBe(true);
+
+  await page.getByLabel('مستند هوية المشتري').setInputFiles({
+    name: 'fictional-mobile-id.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from('%PDF-1.4\n% MARKAZ fictional mobile UAT file\n'),
+  });
+  await expect(page.getByText('fictional-mobile-id.pdf')).toBeVisible();
+
+  await page.setViewportSize({ width: 844, height: 390 });
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1),
+  ).toBe(true);
+  await page.getByRole('button', { name: 'إزالة' }).click();
 });
 
 test('both participants confirm completion → Transaction completed in demo', async ({

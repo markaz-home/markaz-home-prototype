@@ -37,6 +37,7 @@ describe('admin projection privacy (§35, §42.1)', () => {
     const ev = toAuditEvent({
       id: 'a1',
       actorId: 'adm1',
+      actorAccountType: 'ADMIN',
       action: 'ADMIN_PRIVATE_DOCUMENT_ACCESSED',
       entityType: 'transaction',
       entityId: 't1',
@@ -64,9 +65,22 @@ describe('admin projection privacy (§35, §42.1)', () => {
       toAuditEvent({
         id: 'a',
         actorId: 'u',
+        actorAccountType: 'CUSTOMER',
         action: 'OFFER_ACCEPTED',
         entityType: 'offer_thread',
         entityId: 'x',
+        metadata: {},
+        createdAt: new Date(),
+      }).actorType,
+    ).toBe('CUSTOMER');
+    expect(
+      toAuditEvent({
+        id: 'forged',
+        actorId: 'u',
+        actorAccountType: 'CUSTOMER',
+        action: 'ADMIN_ACCESS_DENIED',
+        entityType: 'auth',
+        entityId: null,
         metadata: {},
         createdAt: new Date(),
       }).actorType,

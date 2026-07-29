@@ -26,3 +26,21 @@ export function formatPct(value: number | null | undefined, locale = 'en'): stri
     maximumFractionDigits: 1,
   }).format(value)}%`;
 }
+
+/**
+ * "26 Jul 2026, 18:30" — a readable stamp for timelines and expiry lines.
+ * Seconds are noise in a negotiation history, and the numeric US default
+ * ("7/26/2026, 6:30:36 PM") reads badly in a UAE product.
+ */
+export function formatDateTime(value: string | Date | null | undefined, locale = 'en'): string {
+  if (!value) return '—';
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+  return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-AE' : 'en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+}

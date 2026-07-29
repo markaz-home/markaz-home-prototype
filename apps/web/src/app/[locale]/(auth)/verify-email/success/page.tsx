@@ -23,10 +23,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
         ? '/dashboard'
         : '/onboarding/uae-pass';
   const label = dest === 'profile-setup' ? t('completeProfile') : t('continueIdentity');
-  const body =
-    dest === 'profile-setup'
-      ? 'Your email is confirmed. We need one more account detail before the demo identity step.'
-      : t('successBody');
+  const body = dest === 'profile-setup' ? t('profileSuccessBody') : t('successBody');
   return (
     <AuthShell narrow>
       <SuccessPanel title={t('successTitle')} description={body}>

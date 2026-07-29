@@ -2,8 +2,9 @@
 
 ## Status and scope
 
-This is an **opt-in development/staging POC**, disabled by default. It adds selected Dubai
-apartment and villa sale listings to the customer-app home and browse pages through the third-party
+This is an **opt-in development/staging POC**, disabled by default. Bayut is the first adapter in
+MARKAZ's provider-neutral external-listing registry. It adds selected Dubai sale listings to the
+customer-app home and browse pages through the third-party
 [BayutAPI on RapidAPI](https://docs.bayutapi.com/). MARKAZ's own `LIVE` listings remain the
 first-party source.
 
@@ -17,8 +18,9 @@ written data-redistribution permission and legal approval. Bayut's current
 
 - The feed shows up to three newest internal MARKAZ listings first.
 - External results fill the remaining spaces, up to six cards in total.
-- Equivalent external units are collapsed by image or community/layout signature, and the
-  remaining apartment and villa results are selected round-robin when both are available.
+- Equivalent external units are collapsed across all enabled providers by a normalised
+  community/layout/size/price signature. Results are selected round-robin across every supported
+  property category.
 - External cards say **External via BayutAPI**, include an unaffiliated-source disclosure,
   and open the source listing on Bayut in a new tab.
 - External cards cannot be saved or offered on inside MARKAZ. Only internal `LIVE` listings
@@ -29,10 +31,10 @@ written data-redistribution permission and legal approval. Bayut's current
 ## Browse-page behaviour
 
 - Direct MARKAZ results continue to use the internal marketplace search and security-barrier view.
-- A separate, clearly labelled external section shows up to twelve selected BayutAPI apartments
-  and villas, so third-party cards are not mistaken for direct MARKAZ listings.
+- A separate, clearly labelled external section shows up to twelve selected external properties,
+  so third-party cards are not mistaken for direct MARKAZ listings.
 - Search, property type, bedroom, bathroom, price, size, community, and sort controls are applied
-  client-side to this selected external set. Filters that cannot be verified from the public
+  server-side to the normalised external set. Filters that cannot be verified from the public
   provider projection hide the external set rather than returning misleading matches.
 - External cards open on Bayut and expose no MARKAZ Save or Make-an-Offer controls.
 
@@ -57,6 +59,8 @@ To switch the integration off, set `BAYUT_API_MODE=disabled` or remove both vari
   URL or hostname.
 - Searches are fixed to the latest Dubai apartments and villas for sale. The browser cannot
   send arbitrary upstream search fields.
+- The registry calls enabled adapters independently. One provider failure does not remove results
+  from another provider, and adding another licensed feed does not change the public card contract.
 - Only an explicit card allowlist crosses the public tRPC boundary: provider ID, title,
   price, type, emirate, community, beds, baths, size, approved image URL, Bayut URL, and the
   provider's verification flag. Agent/contact data, descriptions, permits, and raw payloads

@@ -25,9 +25,10 @@ nav + account menu). The slug is **cosmetic** — lookups use the opaque `public
 `marketplaceQuerySchema` (`packages/domain/src/marketplace.ts`) is shared by the
 URL-state UI and the server query so validation mirrors. Params:
 
-- `q` (free text, ≤100), `type`, `emirate`, `area`, `minPrice`/`maxPrice`,
-  `beds` (`studio`/`1`…`5`), `baths` (`1`…`4`), `minSize`/`maxSize`, `furnishing`,
-  `completion`, `investmentCase` (bool), `sort`, `page`.
+- `location` (free text, ≤100), `propertyType`, `emirate`, `area`,
+  `minPrice`/`maxPrice`, `bedrooms` (`studio`/`1`…`5`), `baths` (`1`…`4`),
+  `minSize`/`maxSize`, `furnishing`, `completion`, `investmentCase` (bool), `sort`,
+  `page`.
 - Coerced from strings; **range refinements** keep `minPrice ≤ maxPrice` and
   `minSize ≤ maxSize`.
 - `parseMarketplaceQuery` is **lenient**: an individually-invalid field is dropped
@@ -36,8 +37,9 @@ URL-state UI and the server query so validation mirrors. Params:
   via `.catch()` (`NEWEST`, `1`).
 
 Filters map to SQL over the view in `buildConditions` (marketplace router):
-`q` is an `ilike` across community/emirate/building/type; `beds === 'studio'` →
-`bedrooms = 0`, otherwise `bedrooms >= n`; `investmentCase` → `ic_visible = true`.
+`location` is an `ilike` across community/emirate/building/type;
+`bedrooms === 'studio'` → `bedrooms = 0`, otherwise `bedrooms >= n`;
+`investmentCase` → `ic_visible = true`.
 
 ## Sorts (§22)
 
@@ -63,8 +65,11 @@ change); the prev/next buttons pass `resetPage = false`. The list query uses
 - **`getByPublicId`** (`publicTxProcedure`) — `toPublicDetail` by opaque id, or
   **`null`** (unified unavailable state, anti-enumeration). Adds owner-only
   `isOwner` / `manageListingId` **outside** the projection when a session owns it.
-- **`getFilterOptions`** (`publicTxProcedure`) — distinct emirates / communities /
-  property types from the LIVE view, for filter menus.
+- **`facets`** (`publicTxProcedure`) — inventory counts for property type,
+  emirate, community, bedrooms, bathrooms, and configured price bands. It uses
+  one aggregate statement over the LIVE security-barrier view. Each dimension
+  ignores its own current filter so the UI can count and disable alternatives
+  without fetching public rows into JavaScript.
 - **`myLivePublicIds`** (`customerProcedure`) — the viewer's own LIVE public ids,
   so the grid badges "Your listing".
 - **`saved.*`** (`customerProcedure`): `save` (idempotent; LIVE only; **owner cannot

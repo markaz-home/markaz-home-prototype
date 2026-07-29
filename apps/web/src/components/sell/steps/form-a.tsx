@@ -40,7 +40,7 @@ export function FormAStep({ listingId }: { listingId: string }) {
       <div className="space-y-6">
         <SimDisclosure title={t('disclosureTitle')} body={t('disclosureBody')} />
         <div>
-          <h1 className="font-display text-brand-900 text-2xl font-medium">{t('title')}</h1>
+          <h1 className="font-display text-foreground text-2xl font-medium">{t('title')}</h1>
           <p className="text-muted-foreground mt-1">{t('description')}</p>
         </div>
         {error ? <Alert variant="destructive">{error}</Alert> : null}

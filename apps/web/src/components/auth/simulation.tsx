@@ -1,19 +1,4 @@
-import { Info } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import { cn } from '@markaz/ui';
-
-/** Persistent UAE PASS demo disclosure (design spec §16.2). */
-export function DemoDisclosure() {
-  const t = useTranslations('identity');
-  return (
-    <div className="bg-brand-100 text-foreground flex items-start gap-2.5 rounded-lg p-3 text-sm">
-      <Info className="text-primary mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-      <p>
-        <span className="font-medium">{t('disclosureTitle')}</span> {t('disclosureBody')}
-      </p>
-    </div>
-  );
-}
 
 type ChipTone = 'pending' | 'verified' | 'failed';
 /** Demo status chip — text always carries the state, not colour alone. */

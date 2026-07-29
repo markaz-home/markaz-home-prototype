@@ -23,7 +23,13 @@ vi.mock('@/i18n/navigation', () => ({
     href: string;
     onClick?: () => void;
   }) => (
-    <a href={href} onClick={onClick}>
+    <a
+      href={href}
+      onClick={(event) => {
+        event.preventDefault();
+        onClick?.();
+      }}
+    >
       {children}
     </a>
   ),

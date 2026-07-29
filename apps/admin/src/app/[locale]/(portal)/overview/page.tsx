@@ -84,10 +84,10 @@ export default async function OverviewPage({ params }: { params: Promise<{ local
               <Link
                 key={q.key}
                 href={q.href}
-                className="rounded-lg border bg-amber-50 p-4 transition-colors hover:bg-amber-100"
+                className="bg-warning/10 hover:bg-warning/15 rounded-lg border p-4 transition-colors"
               >
-                <p className="text-2xl font-semibold tabular-nums text-amber-900">{q.value}</p>
-                <p className="text-sm text-amber-900">{t(`overview.queue.${q.key}`)}</p>
+                <p className="text-warning text-2xl font-semibold tabular-nums">{q.value}</p>
+                <p className="text-foreground text-sm">{t(`overview.queue.${q.key}`)}</p>
               </Link>
             ))}
           </div>

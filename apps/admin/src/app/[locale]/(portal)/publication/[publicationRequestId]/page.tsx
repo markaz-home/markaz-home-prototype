@@ -51,7 +51,7 @@ export default async function PublicationDetailPage({
         description={r.listing?.publicId ?? undefined}
         actions={
           isPending ? (
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <ApprovePublicationAction requestId={r.id} />
               <ReturnPublicationAction requestId={r.id} />
             </div>
@@ -88,7 +88,7 @@ export default async function PublicationDetailPage({
                 <li key={c.key} className="flex items-center justify-between gap-2 text-sm">
                   <span>{t(`publication.checklist.${c.key}`)}</span>
                   {c.pass ? (
-                    <span className="inline-flex items-center gap-1 text-emerald-700">
+                    <span className="text-success inline-flex items-center gap-1">
                       <CheckCircle2 className="h-4 w-4" aria-hidden />
                       {t('publication.checklist.pass')}
                     </span>

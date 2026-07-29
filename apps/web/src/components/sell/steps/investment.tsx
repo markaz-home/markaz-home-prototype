@@ -68,10 +68,10 @@ function InvestmentInner({ listingId, data }: { listingId: string; data: GetData
     <WizardShell listing={data as unknown as WizardListing} current="investment-case">
       <div className="space-y-6">
         <div>
-          <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+          <p className="text-primary text-[11px] font-semibold uppercase tracking-[0.18em]">
             {t('stepLabel')}
           </p>
-          <h1 className="font-display text-brand-900 mt-1 text-2xl font-medium">{t('title')}</h1>
+          <h1 className="font-display text-foreground mt-1 text-2xl font-medium">{t('title')}</h1>
           <p className="text-muted-foreground mt-1">{t('description')}</p>
         </div>
         <Alert variant="info">{t('privacyNote')}</Alert>

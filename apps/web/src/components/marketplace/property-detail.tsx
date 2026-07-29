@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Bath, BedDouble, Car, Maximize, Share2, Sofa } from 'lucide-react';
+import { ArrowLeft, Bath, BedDouble, Car, Info, Maximize, Share2, Sofa } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Alert, Badge, Button, Card, CardContent, toast } from '@markaz/ui';
+import { Badge, Button, Card, CardContent, toast } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import { formatAed, formatNumber, formatPct } from '@/lib/format';
@@ -29,7 +29,7 @@ export function PropertyDetail({
   const tf = useTranslations('filters');
   const ti = useTranslations('investmentCase');
   const ts = useTranslations('save');
-  const tm = useTranslations('marketplace');
+  const ta = useTranslations('amenities');
   const locale = useLocale();
   const [announce, setAnnounce] = useState('');
   const returnPath = `/${locale}/properties/${detail.publicId}/${detail.slug ?? ''}`;
@@ -73,26 +73,29 @@ export function PropertyDetail({
 
   return (
     <div className="container max-w-[1360px] py-8">
-      <nav aria-label="Breadcrumb" className="text-muted-foreground mb-4 text-sm">
-        <Link href="/properties" className="hover:text-foreground">
+      <nav
+        aria-label="Breadcrumb"
+        className="text-muted-foreground mb-4 flex flex-wrap items-center gap-1.5 text-sm"
+      >
+        <Link href="/properties" className="hover:text-foreground inline-flex items-center gap-1.5">
+          <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden />
           {t('breadcrumb')}
         </Link>
-        {detail.community && <span> · {detail.community}</span>}
+        {detail.community && <span>· {detail.community}</span>}
       </nav>
-
-      <Alert className="mb-4">
-        <p className="font-medium">{tm('prototypeTitle')}</p>
-        <p className="text-muted-foreground text-sm">{tm('prototypeBody')}</p>
-      </Alert>
 
       <PropertyGallery photos={detail.photoUrls} headline={detail.headline} />
 
       <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-3xl font-semibold">{formatAed(detail.askingPriceAed, locale)}</p>
-          <h1 className="mt-1 text-xl font-medium">{detail.headline}</h1>
-          <p className="text-muted-foreground mt-1">
+        <div className="min-w-0">
+          <h1 className="font-display text-3xl font-medium tracking-tight" dir="auto">
+            {detail.headline}
+          </h1>
+          <p className="text-muted-foreground mt-1.5 text-sm">
             {[detail.community, detail.emirate].filter(Boolean).join(' · ')}
+          </p>
+          <p className="text-primary mt-3 text-3xl font-semibold tabular-nums" dir="ltr">
+            {formatAed(detail.askingPriceAed, locale)}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -182,10 +185,10 @@ export function PropertyDetail({
           {detail.features.length > 0 && (
             <section>
               <h2 className="text-lg font-semibold">{t('amenities')}</h2>
-              <ul className="mt-2 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
+              <ul className="mt-3 flex flex-wrap gap-2">
                 {detail.features.map((f) => (
-                  <li key={f} className="bg-muted rounded-md px-3 py-2">
-                    {titleCaseFeature(f)}
+                  <li key={f}>
+                    <Badge variant="outline">{ta(f as 'BALCONY')}</Badge>
                   </li>
                 ))}
               </ul>
@@ -194,7 +197,7 @@ export function PropertyDetail({
 
           <section>
             <h2 className="text-lg font-semibold">{t('details')}</h2>
-            <dl className="mt-2 grid grid-cols-1 gap-x-8 gap-y-2 text-sm sm:grid-cols-2">
+            <dl className="border-border/70 bg-card/40 mt-3 grid grid-cols-1 gap-x-8 rounded-lg border p-5 text-sm sm:grid-cols-2">
               {detail.propertyType && (
                 <Row
                   label={t('labelType')}
@@ -219,16 +222,19 @@ export function PropertyDetail({
             </dl>
           </section>
 
-          <Alert>
-            <p className="font-medium">{t('directTitle')}</p>
-            <p className="text-muted-foreground text-sm">{t('directBody')}</p>
-          </Alert>
+          <p className="text-muted-foreground border-border/60 flex items-start gap-2 border-t pt-5 text-xs leading-relaxed">
+            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+            <span>
+              <span className="text-foreground font-medium">{t('directTitle')}</span> —{' '}
+              {t('directBody')}
+            </span>
+          </p>
         </div>
 
         {/* Investment Case rail */}
         {ic && (
-          <aside className="lg:col-span-1">
-            <Card>
+          <aside className="lg:sticky lg:top-24 lg:col-span-1 lg:self-start">
+            <Card className="bg-card/40">
               <CardContent className="space-y-4 pt-6">
                 <div>
                   <h2 className="text-lg font-semibold">{ti('title')}</h2>
@@ -241,8 +247,9 @@ export function PropertyDetail({
                     value={
                       ic.estimatedAnnualisedReturnPct != null
                         ? formatPct(ic.estimatedAnnualisedReturnPct, locale)
-                        : ti('unavailable')
+                        : null
                     }
+                    unavailableLabel={ti('unavailable')}
                   />
                   <Metric label={ti('priceSqft')} value={formatAed(ic.pricePerSqftAed, locale)} />
                 </dl>
@@ -278,20 +285,31 @@ function Row({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-function Metric({ label, value }: { label: string; value: string }) {
+function Metric({
+  label,
+  value,
+  unavailableLabel,
+}: {
+  label: string;
+  value: string | null;
+  unavailableLabel?: string;
+}) {
   return (
-    <div className="flex items-baseline justify-between gap-2">
+    <div className="border-border/50 flex items-baseline justify-between gap-3 border-b pb-2.5 last:border-0 last:pb-0">
       <dt className="text-muted-foreground text-sm">{label}</dt>
-      <dd className="text-lg font-semibold">{value}</dd>
+      {value ? (
+        <dd className="text-lg font-semibold tabular-nums" dir="ltr">
+          {value}
+        </dd>
+      ) : (
+        // Keep the row's rhythm: a dash in the value slot, the reason as a title.
+        <dd className="text-muted-foreground text-lg" title={unavailableLabel}>
+          —
+        </dd>
+      )}
     </div>
   );
 }
 function titleCase(s: string): string {
   return s.charAt(0) + s.slice(1).toLowerCase();
-}
-function titleCaseFeature(s: string): string {
-  return s
-    .split('_')
-    .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
-    .join(' ');
 }

@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { Bath, BedDouble, Maximize } from 'lucide-react';
 import { Alert, Badge, Button } from '@markaz/ui';
 import { trpc } from '@/trpc/react';
 import { useRouter } from '@/i18n/navigation';
@@ -12,6 +13,8 @@ import { supabase } from './step-shared';
 export function PreviewScreen({ listingId }: { listingId: string }) {
   const t = useTranslations('preview');
   const ti = useTranslations('investment');
+  const ta = useTranslations('amenities');
+  const tp = useTranslations('property');
   const router = useRouter();
   const preview = trpc.listing.preview.useQuery({ listingId });
   const [urls, setUrls] = useState<Record<string, string>>({});
@@ -27,63 +30,125 @@ export function PreviewScreen({ listingId }: { listingId: string }) {
   if (!preview.data) return <WizardLoading />;
   const d = preview.data;
   const cover = d.coverPhotoPath ? urls[d.coverPhotoPath] : undefined;
+  const p = d.property;
+  const beds =
+    p?.bedrooms === 0
+      ? tp('bedsStudio')
+      : p?.bedrooms != null
+        ? tp('beds', { count: p.bedrooms })
+        : null;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 py-6">
       <Alert variant="info" title={t('bannerTitle')}>
         {t('bannerBody')}
       </Alert>
-      {cover ? (
-        <img
-          src={cover}
-          alt={d.title ?? 'cover'}
-          className="bg-muted aspect-[16/9] w-full rounded-lg object-cover"
-        />
-      ) : null}
-      <div>
-        <h1 className="font-display text-brand-900 text-3xl font-medium">{d.title}</h1>
-        <p className="mt-1 text-xl font-medium">{formatAed(d.askingPriceAed)}</p>
-      </div>
-      {d.property ? (
-        <p className="text-muted-foreground text-sm">
-          {[
-            d.property.bedrooms === 0 ? 'Studio' : `${d.property.bedrooms} bd`,
-            `${d.property.bathrooms} ba`,
-            d.property.sizeSqft ? `${d.property.sizeSqft} sq ft` : null,
-          ]
-            .filter(Boolean)
-            .join(' · ')}
-        </p>
-      ) : null}
-      {d.description ? <p className="whitespace-pre-line text-sm">{d.description}</p> : null}
-      {d.property?.features?.length ? (
-        <ul className="flex flex-wrap gap-2">
-          {d.property.features.map((f) => (
-            <li key={f}>
-              <Badge variant="outline">{f.toLowerCase().replace(/_/g, ' ')}</Badge>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-      {d.investmentCase ? (
-        <div className="rounded-lg border p-4 text-sm">
-          <p className="mb-1 font-medium">{ti('summaryTitle')}</p>
-          <p>
-            {ti('estimatedRoi')}: {d.investmentCase.estimatedRoiPct ?? '—'}%
-          </p>
-          <p>
-            {ti('annualised')}: {d.investmentCase.estimatedAnnualisedReturnPct ?? '—'}%
-          </p>
+
+      {/* One card, as the public page presents it: cover, then the facts. */}
+      <article className="border-border/70 bg-card/40 overflow-hidden rounded-lg border">
+        {cover ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={cover} alt="" className="bg-muted aspect-[16/9] w-full object-cover" />
+        ) : null}
+
+        <div className="space-y-5 p-6">
+          <header>
+            <h1 className="font-display text-foreground text-3xl font-medium" dir="auto">
+              {d.title}
+            </h1>
+            <p className="text-primary mt-2 text-2xl font-semibold tabular-nums" dir="ltr">
+              {formatAed(d.askingPriceAed)}
+            </p>
+            {p ? (
+              <div className="text-muted-foreground mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
+                {beds ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    <BedDouble className="h-4 w-4" aria-hidden /> {beds}
+                  </span>
+                ) : null}
+                {p.bathrooms != null ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    <Bath className="h-4 w-4" aria-hidden /> {tp('baths', { count: p.bathrooms })}
+                  </span>
+                ) : null}
+                {p.sizeSqft != null ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    <Maximize className="h-4 w-4" aria-hidden />{' '}
+                    {tp('sqft', { size: String(p.sizeSqft) })}
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
+          </header>
+
+          {d.description ? (
+            <p className="text-muted-foreground whitespace-pre-line text-sm leading-relaxed">
+              {d.description}
+            </p>
+          ) : null}
+
+          {p?.features?.length ? (
+            <ul className="flex flex-wrap gap-2">
+              {p.features.map((f) => (
+                <li key={f}>
+                  <Badge variant="outline">{ta(f)}</Badge>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
+          {d.investmentCase ? (
+            <section className="border-border/60 border-t pt-5">
+              <h2 className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.14em]">
+                {ti('summaryTitle')}
+              </h2>
+              {/* Figures read as figures: label above, value large and aligned. */}
+              <dl className="mt-3 grid grid-cols-2 gap-3">
+                <Stat
+                  label={ti('estimatedRoi')}
+                  value={
+                    d.investmentCase.estimatedRoiPct != null
+                      ? `${d.investmentCase.estimatedRoiPct}%`
+                      : '—'
+                  }
+                />
+                <Stat
+                  label={ti('annualised')}
+                  value={
+                    d.investmentCase.estimatedAnnualisedReturnPct != null
+                      ? `${d.investmentCase.estimatedAnnualisedReturnPct}%`
+                      : '—'
+                  }
+                />
+              </dl>
+            </section>
+          ) : null}
         </div>
-      ) : null}
-      <div className="flex gap-3 border-t pt-4">
+      </article>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Button variant="outline" onClick={() => router.push(`/sell/listings/${listingId}/ready`)}>
           {t('backToReady')}
         </Button>
-        <Button variant="ghost" onClick={() => router.push(`/sell/listings/${listingId}/details`)}>
+        <button
+          type="button"
+          onClick={() => router.push(`/sell/listings/${listingId}/details`)}
+          className="text-muted-foreground hover:text-foreground text-sm underline-offset-4 hover:underline"
+        >
           {t('editListing')}
-        </Button>
+        </button>
       </div>
+    </div>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border-border/70 bg-background/40 rounded-lg border p-3">
+      <dt className="text-muted-foreground text-xs">{label}</dt>
+      <dd className="mt-1 text-xl font-semibold tabular-nums" dir="ltr">
+        {value}
+      </dd>
     </div>
   );
 }

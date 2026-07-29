@@ -36,7 +36,7 @@ export function DocumentPanel({ transactionId }: { transactionId: string }) {
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <FileLock2 className="h-4 w-4 text-amber-700" aria-hidden />
+          <FileLock2 className="text-warning h-4 w-4" aria-hidden />
           {t('document.title')}
         </CardTitle>
       </CardHeader>

@@ -51,6 +51,22 @@ describe('ResetPasswordForm (recovery session — no code field)', () => {
     expect(replace).toHaveBeenCalledWith('/reset-password/success');
   });
 
+  it('does not claim success when ending the recovery session fails', async () => {
+    signOut.mockResolvedValue({ error: { message: 'network unavailable' } });
+    const user = userEvent.setup();
+    renderWithIntl(<ResetPasswordForm />);
+    await user.type(screen.getByLabelText(/^New password/), 'NewMarkaz!2');
+    await user.type(screen.getByLabelText(/^Confirm new password/), 'NewMarkaz!2');
+    await user.click(screen.getByRole('button', { name: 'Update password' }));
+
+    expect(
+      await screen.findByText(
+        'Your password was updated, but we could not end this recovery session. Try again before leaving this page.',
+      ),
+    ).toBeInTheDocument();
+    expect(replace).not.toHaveBeenCalled();
+  });
+
   it('rejects a password longer than 128 characters (no silent truncation, no updateUser)', async () => {
     renderWithIntl(<ResetPasswordForm />);
     const tooLong = `Aa1!${'a'.repeat(125)}`; // 129 chars

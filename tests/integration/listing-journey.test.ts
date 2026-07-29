@@ -65,12 +65,12 @@ afterAll(async () => {
   await closeConnections();
 });
 
-async function drive(a: ReturnType<typeof callerFor>, listingId: string) {
+async function drive(a: ReturnType<typeof callerFor>, ownerId: string, listingId: string) {
   await a.listing.saveDetails({ listingId, ...VALID_DETAILS });
   await a.listing.document.register({
     listingId,
     documentType: 'TITLE_DEED',
-    storagePath: `${listingId}/doc.pdf`,
+    storagePath: `${ownerId}/${listingId}/doc.pdf`,
     originalName: 'Fictional_Title_Deed.pdf',
     contentType: 'application/pdf',
     sizeBytes: 1024,
@@ -92,7 +92,7 @@ async function drive(a: ReturnType<typeof callerFor>, listingId: string) {
   await a.listing.formA.complete({ listingId, confirm: true });
   await a.listing.photos.register({
     listingId,
-    storagePath: `${listingId}/p1.jpg`,
+    storagePath: `${ownerId}/${listingId}/p1.jpg`,
     originalName: 'p1.jpg',
     contentType: 'image/jpeg',
     sizeBytes: 2048,
@@ -108,7 +108,7 @@ d('listing journey (backend)', () => {
     const { listingId } = await a.listing.create();
     created.push(listingId);
 
-    await drive(a, listingId);
+    await drive(a, customerA, listingId);
 
     const review = await a.listing.review.status({ listingId });
     expect(review.ready).toBe(true);
@@ -147,7 +147,7 @@ d('listing journey (backend)', () => {
     await a.listing.document.register({
       listingId,
       documentType: 'TITLE_DEED',
-      storagePath: `${listingId}/d.pdf`,
+      storagePath: `${customerA}/${listingId}/d.pdf`,
     });
     await a.listing.verification.start({ listingId, demoOutcome: 'FAILURE' });
     const failed = await a.listing.verification.status({ listingId });
@@ -164,7 +164,7 @@ d('listing journey (backend)', () => {
     const a = callerFor(customerA);
     const { listingId } = await a.listing.create();
     created.push(listingId);
-    await drive(a, listingId);
+    await drive(a, customerA, listingId);
     // make the investment case private
     await a.listing.investment.setVisibility({ listingId, visible: false });
     const preview = await a.listing.preview({ listingId });
@@ -182,7 +182,7 @@ d('listing journey (backend)', () => {
     await a.listing.document.register({
       listingId,
       documentType: 'TITLE_DEED',
-      storagePath: `${listingId}/d1.pdf`,
+      storagePath: `${customerA}/${listingId}/d1.pdf`,
     });
     await a.listing.verification.start({ listingId });
     await a.listing.verification.status({ listingId });
@@ -192,7 +192,7 @@ d('listing journey (backend)', () => {
     await a.listing.document.register({
       listingId,
       documentType: 'OQOOD',
-      storagePath: `${listingId}/d2.pdf`,
+      storagePath: `${customerA}/${listingId}/d2.pdf`,
     });
     g = await a.listing.get({ listingId });
     expect(g.state).toBe('DOCUMENT_UPLOADED');

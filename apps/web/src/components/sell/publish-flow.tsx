@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle2, Circle, MinusCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Circle, Eye, Lock, MinusCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Alert, Button, Card, CardContent, Skeleton, cn } from '@markaz/ui';
 import { Link, useRouter } from '@/i18n/navigation';
@@ -67,7 +67,8 @@ export function PublishFlow({ listingId }: { listingId: string }) {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <nav aria-label="Breadcrumb" className="text-muted-foreground text-sm">
-        <Link href="/sell" className="hover:text-foreground">
+        <Link href="/sell" className="hover:text-foreground inline-flex items-center gap-1.5">
+          <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden />
           {t('returnToListings')}
         </Link>
       </nav>
@@ -159,11 +160,18 @@ export function PublishFlow({ listingId }: { listingId: string }) {
           <Card>
             <CardContent className="space-y-3 pt-6 text-sm">
               <p>{t('confirmPrivacy')}</p>
-              <ul className="text-muted-foreground list-disc space-y-1 ps-5">
-                <li>{t('confirmBullet1')}</li>
-                <li>{t('confirmBullet2')}</li>
-                <li>{t('confirmBullet3')}</li>
-                <li>{t('confirmBullet4')}</li>
+              <ul className="text-muted-foreground mt-3 space-y-2 text-sm">
+                {(
+                  ['confirmBullet1', 'confirmBullet2', 'confirmBullet3', 'confirmBullet4'] as const
+                ).map((key) => (
+                  <li key={key} className="flex items-start gap-2.5">
+                    <span
+                      aria-hidden
+                      className="bg-primary mt-[0.45rem] h-1.5 w-1.5 shrink-0 rounded-full"
+                    />
+                    <span>{t(key)}</span>
+                  </li>
+                ))}
               </ul>
             </CardContent>
           </Card>
@@ -214,12 +222,30 @@ function Summary({
   items: string[];
   tone: 'public' | 'private';
 }) {
+  // Each row is marked, so the two lists are scannable and cannot be mistaken
+  // for one another: an eye for what buyers see, a lock for what they never do.
+  const Marker = tone === 'public' ? Eye : Lock;
   return (
-    <div className={cn('rounded-md border p-4', tone === 'private' && 'bg-muted/40')}>
-      <p className="text-sm font-semibold">{title}</p>
-      <ul className="text-muted-foreground mt-2 space-y-1 text-sm">
+    <div className={cn('rounded-lg border p-4', tone === 'private' && 'bg-muted/40')}>
+      <p className="flex items-center gap-2 text-sm font-semibold">
+        <Marker
+          className={cn('h-4 w-4', tone === 'public' ? 'text-primary' : 'text-muted-foreground')}
+          aria-hidden
+        />
+        {title}
+      </p>
+      <ul className="text-muted-foreground mt-3 space-y-2 text-sm">
         {items.map((i) => (
-          <li key={i}>{i}</li>
+          <li key={i} className="flex items-start gap-2.5">
+            <span
+              aria-hidden
+              className={cn(
+                'mt-[0.45rem] h-1.5 w-1.5 shrink-0 rounded-full',
+                tone === 'public' ? 'bg-primary' : 'bg-muted-foreground/50',
+              )}
+            />
+            <span>{i}</span>
+          </li>
         ))}
       </ul>
     </div>

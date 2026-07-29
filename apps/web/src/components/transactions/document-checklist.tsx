@@ -94,11 +94,11 @@ function DocRow({
   async function onFile(file: File) {
     setError(null);
     if (!(ALLOWED_DOCUMENT_MIME as readonly string[]).includes(file.type)) {
-      setError('Upload a PDF, JPG, or PNG file.');
+      setError(t('errUnsupported'));
       return;
     }
     if (file.size <= 0 || file.size > MAX_DOCUMENT_BYTES) {
-      setError('File size must be 10 MB or less.');
+      setError(t('errSize'));
       return;
     }
     setBusy(true);

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Home, Plus, MoreVertical } from 'lucide-react';
+import { Plus, MoreVertical } from 'lucide-react';
 import {
   Button,
   Card,
@@ -75,7 +75,7 @@ export function MyListings() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-brand-900 text-3xl font-medium tracking-tight">
+          <h1 className="font-display text-foreground text-3xl font-medium tracking-tight">
             {t('myTitle')}
           </h1>
           <p className="text-muted-foreground mt-1">{t('myDescription')}</p>
@@ -89,16 +89,12 @@ export function MyListings() {
 
       {items.length === 0 ? (
         <EmptyState
-          icon={<Home className="text-primary h-8 w-8" aria-hidden />}
+          icon={null}
           title={t('emptyTitle')}
-          description={t('emptyBody')}
           action={
-            <div className="space-y-2 text-center">
-              <Button onClick={() => create.mutate()} loading={create.isPending}>
-                <Plus className="me-1.5 h-4 w-4" aria-hidden /> {t('createNew')}
-              </Button>
-              <p className="text-muted-foreground text-xs">{t('emptySupporting')}</p>
-            </div>
+            <Button onClick={() => create.mutate()} loading={create.isPending}>
+              <Plus className="me-1.5 h-4 w-4" aria-hidden /> {t('createNew')}
+            </Button>
           }
         />
       ) : (
@@ -109,7 +105,7 @@ export function MyListings() {
                 <CardContent className="space-y-3 p-5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-brand-900 truncate font-medium">
+                      <p className="text-foreground truncate font-medium">
                         {(l.title as string) || t('untitled')}
                       </p>
                       {l.community ? (
@@ -137,7 +133,7 @@ export function MyListings() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-                  <Badge variant={l.ready ? 'success' : 'outline'}>
+                  <Badge variant={l.state === 'SOLD_DEMO' || l.ready ? 'default' : 'outline'}>
                     {t(`stateLabel.${l.state as string}` as never)}
                   </Badge>
                   <p className="text-muted-foreground text-sm">
@@ -146,7 +142,9 @@ export function MyListings() {
                       total: l.totalRequired as number,
                     })}
                   </p>
-                  {l.state === 'LIVE' || l.state === 'PAUSED' ? (
+                  {l.state === 'SOLD_DEMO' ? (
+                    <p className="text-muted-foreground text-sm font-medium">{t('soldNote')}</p>
+                  ) : l.state === 'LIVE' || l.state === 'PAUSED' ? (
                     <p className="text-muted-foreground text-sm font-medium">
                       {t(`stateLabel.${l.state as string}` as never)}
                     </p>
@@ -160,7 +158,9 @@ export function MyListings() {
                     </p>
                   )}
                   <div className="flex flex-wrap gap-2 pt-1">
-                    {l.state === 'LIVE' || l.state === 'PAUSED' ? (
+                    {/* Sold is terminal: nothing to publish, pause or edit. The
+                        manage screen only models LIVE/PAUSED, so it is not offered. */}
+                    {l.state === 'SOLD_DEMO' ? null : l.state === 'LIVE' || l.state === 'PAUSED' ? (
                       <Button
                         variant="outline"
                         size="sm"

@@ -78,6 +78,7 @@ const SAFE_META_KEYS = new Set([
 export interface AuditRow {
   id: string;
   actorId: string | null;
+  actorAccountType?: 'CUSTOMER' | 'ADMIN' | null;
   action: string;
   entityType: string;
   entityId: string | null;
@@ -94,7 +95,7 @@ export function toAuditEvent(r: AuditRow) {
     id: r.id,
     action: r.action,
     actorType: r.actorId
-      ? r.action.startsWith('ADMIN_')
+      ? r.actorAccountType === 'ADMIN'
         ? ('ADMIN' as const)
         : ('CUSTOMER' as const)
       : ('SYSTEM' as const),

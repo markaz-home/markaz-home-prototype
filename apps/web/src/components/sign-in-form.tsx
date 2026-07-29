@@ -9,10 +9,9 @@ import { Alert, Button, FormField, Input } from '@markaz/ui';
 import { createSupabaseBrowserClient } from '@markaz/auth/browser';
 import { Link, useRouter } from '@/i18n/navigation';
 import { AuthShell, AuthHeading } from '@/components/auth/auth-shell';
-import { CustomerSupportPanel } from '@/components/auth/support-panel';
 import { PasswordField } from '@/components/auth/password-field';
-import { ErrorSummary } from '@/components/auth/error-summary';
 import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
+import { resolvePostSignInDestination } from '@/lib/auth-redirect';
 
 export function SignInForm({
   uaePassStaging = false,
@@ -48,11 +47,18 @@ export function SignInForm({
   async function onUaePass() {
     setFormError(null);
     setUaeLoading(true);
+    const postSignInDestination = resolvePostSignInDestination(params.get('next'));
+    const callbackParams = new URLSearchParams({ locale });
+    if (postSignInDestination !== '/dashboard') {
+      callbackParams.set('next', postSignInDestination);
+    }
     const { error } = await supabase.auth.signInWithOAuth({
       // supabase-js 2.47's Provider union predates custom providers; the identifier
       // is the public `custom:<name>` slug, not a secret.
       provider: 'custom:uae-pass' as 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback?locale=${locale}` },
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?${callbackParams.toString()}`,
+      },
     });
     if (error) {
       setFormError(tu('error'));
@@ -73,9 +79,6 @@ export function SignInForm({
 
   const fe = (code?: string) =>
     code ? tv(FIELD_ERROR_KEYS[code] ?? 'unexpectedError') : undefined;
-  const errorList = (['email', 'password'] as const)
-    .filter((k) => errors[k])
-    .map((k) => ({ id: k, message: fe(errors[k]?.message) ?? '' }));
 
   async function onSubmit(data: SignInInput) {
     setFormError(null);
@@ -92,11 +95,12 @@ export function SignInForm({
       setFormError(key === 'invalid_credentials' ? t('incorrect') : tv(AUTH_ERROR_KEYS[key]));
       return;
     }
-    router.replace('/dashboard');
+    router.replace(resolvePostSignInDestination(params.get('next')));
   }
 
   return (
-    <AuthShell support={<CustomerSupportPanel />} narrow>
+    // No support panel: the card is centred on its own.
+    <AuthShell narrow>
       <div className="space-y-6">
         {sessionExpired ? (
           <Alert variant="warning" title={ts('expiredTitle')}>
@@ -105,7 +109,6 @@ export function SignInForm({
         ) : null}
         <AuthHeading title={t('title')} description={t('description')} />
         {uaePassError ? <Alert variant="destructive">{uaePassError}</Alert> : null}
-        <ErrorSummary errors={errorList} />
         {formError ? <Alert variant="destructive">{formError}</Alert> : null}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
@@ -156,7 +159,6 @@ export function SignInForm({
               {ta('createAccount')}
             </Link>
           </p>
-          <p className="text-muted-foreground text-center text-xs">{t('security')}</p>
         </form>
 
         {uaePassStaging ? (
@@ -175,7 +177,6 @@ export function SignInForm({
             >
               {uaeLoading ? tu('starting') : tu('button')}
             </Button>
-            <p className="text-muted-foreground text-center text-xs">{tu('testEnvNote')}</p>
           </div>
         ) : null}
       </div>

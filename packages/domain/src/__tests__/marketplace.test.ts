@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest';
 import {
   marketplaceQuerySchema,
   parseMarketplaceQuery,
-  bedsFilter,
+  bedroomsFilter,
   paginate,
   DEFAULT_SORT,
   MARKETPLACE_PAGE_SIZE,
+  MARKETPLACE_PRICE_BANDS,
 } from '../marketplace';
 
 describe('marketplaceQuerySchema', () => {
@@ -13,12 +14,12 @@ describe('marketplaceQuerySchema', () => {
     const parsed = marketplaceQuerySchema.parse({
       minPrice: '1000000',
       maxPrice: '2000000',
-      beds: '2',
+      bedrooms: '2',
       page: '3',
     });
     expect(parsed.minPrice).toBe(1_000_000);
     expect(parsed.maxPrice).toBe(2_000_000);
-    expect(parsed.beds).toBe('2');
+    expect(parsed.bedrooms).toBe('2');
     expect(parsed.page).toBe(3);
     expect(parsed.sort).toBe(DEFAULT_SORT);
   });
@@ -48,32 +49,45 @@ describe('marketplaceQuerySchema', () => {
 
 describe('parseMarketplaceQuery (lenient URL parse)', () => {
   it('drops an individually-invalid field but keeps the rest', () => {
-    const parsed = parseMarketplaceQuery({ type: 'NOT_A_TYPE', beds: '2' });
-    expect(parsed.type).toBeUndefined();
-    expect(parsed.beds).toBe('2');
+    const parsed = parseMarketplaceQuery({ propertyType: 'NOT_A_TYPE', bedrooms: '2' });
+    expect(parsed.propertyType).toBeUndefined();
+    expect(parsed.bedrooms).toBe('2');
   });
 
   it('keeps a valid query intact', () => {
     const parsed = parseMarketplaceQuery({
-      type: 'APARTMENT',
+      propertyType: 'APARTMENT',
       minPrice: '500000',
       sort: 'PRICE_ASC',
     });
-    expect(parsed.type).toBe('APARTMENT');
+    expect(parsed.propertyType).toBe('APARTMENT');
     expect(parsed.minPrice).toBe(500_000);
     expect(parsed.sort).toBe('PRICE_ASC');
   });
 });
 
-describe('bedsFilter', () => {
+describe('bedroomsFilter', () => {
   it('maps studio to a studio-only predicate', () => {
-    expect(bedsFilter('studio')).toEqual({ studioOnly: true });
+    expect(bedroomsFilter('studio')).toEqual({ studioOnly: true });
   });
   it('maps a number to a minimum predicate', () => {
-    expect(bedsFilter('3')).toEqual({ min: 3 });
+    expect(bedroomsFilter('3')).toEqual({ min: 3 });
   });
   it('returns null for an absent value', () => {
-    expect(bedsFilter(undefined)).toBeNull();
+    expect(bedroomsFilter(undefined)).toBeNull();
+  });
+});
+
+describe('marketplace price bands', () => {
+  it('uses non-overlapping integer AED boundaries', () => {
+    const bands = Object.values(MARKETPLACE_PRICE_BANDS);
+    for (let index = 1; index < bands.length; index += 1) {
+      const previous = bands[index - 1]!;
+      const current = bands[index]!;
+      expect(previous.maxPrice).not.toBeNull();
+      expect(current.minPrice).not.toBeNull();
+      expect(previous.maxPrice! + 1).toBe(current.minPrice);
+    }
   });
 });
 

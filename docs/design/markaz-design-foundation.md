@@ -4,7 +4,7 @@
 **Product:** MARKAZ Home  
 **Primary design context:** Desktop web, with responsive mobile behaviour  
 **Prototype horizon:** Eight-week polished, deployable prototype  
-**Last updated:** June 2026
+**Last updated:** 19 July 2026
 
 ---
 
@@ -537,9 +537,65 @@ Reset and destructive actions require:
 
 ## 8. Approved Visual Direction
 
+### 8.0 July 2026 CEO direction — scoped supersession
+
+The CEO-directed **Platform Gold** theme supersedes the earlier blue-only rule for
+two customer-facing surfaces:
+
+- The public landing page and public marketplace
+- Customer authentication and onboarding
+
+These surfaces use an accessible near-black and warm-gold token layer to align
+with the wider MARKAZ platform direction. The layer is deliberately scoped at
+the public and auth layouts: it does **not** change the authenticated customer
+workspace or the Admin / Operations portal. Those surfaces retain the existing
+Architectural Blue tokens until a later, explicitly approved migration.
+
+Implementation rules for the scoped theme:
+
+- Gold communicates brand hierarchy, focus, and primary action; it is not used
+  for status meaning.
+- Warm near-black and charcoal surfaces carry most visual weight.
+- Contrast, keyboard focus, RTL, and reduced-motion behavior remain mandatory.
+- Existing owned logo artwork may be tone-adjusted in code for this prototype;
+  a reviewed gold/light vector export is required before production use.
+- Do not import or copy imagery, logos, or proprietary assets from the separate
+  MARKAZ platform implementation.
+- The semantic token contract remains unchanged so the blue app/admin themes
+  and the Platform Gold public/auth theme can coexist.
+
+#### Accent and canvas values (July 2026 alignment)
+
+The accent is the warm copper gold `#C8A27A` (`--primary: 31 41% 63%`) on a
+neutral near-black canvas `#0C0C0C` (`--background: 0 0% 5%`). Earlier gold
+tokens were yellower and warm-tinted; they were retuned in one place
+(`packages/ui/src/styles/globals.css`) so the public and auth surfaces read as
+one brand. Muted body text is `0 0% 62%` — 7.3:1 on the canvas.
+
+#### Public landing hero and nav
+
+- The hero is a **full-bleed cover band**: headline, supporting line, then the
+  property search bar. The cover photograph is **not yet chosen or licensed**,
+  so the band renders blank. When approved artwork lands, set
+  `--hero-cover-image` on `.platform-gold-hero-cover`; nothing else changes.
+  Artwork must not be taken from the separate MARKAZ platform implementation.
+- The legibility scrim (`.platform-gold-hero-scrim`) is opaque at the inline
+  start and clears toward the far edge, with an explicit RTL mirror — CSS
+  gradients cannot take logical directions.
+- The hero is deliberately capped in height so featured properties remain
+  visible above the fold on a laptop viewport.
+- The hero search bar is the **one inverted (light) control** on this theme, so
+  it stays legible once artwork sits behind it. Its surface roles are tokens
+  (`--hero-search*`), not one-off colours, and it sets `color-scheme: light` so
+  native select popups match.
+- The public header is three-part: brand at the inline start, the three primary
+  destinations (Browse Properties / How It Works / For Sellers) **centred and in
+  brand gold**, and Login + Sign Up at the inline end. Gold here is hierarchy,
+  not status.
+
 ### 8.1 Direction name
 
-**Architectural Blue — Quiet Editorial Intelligence**
+**Architectural Blue — Quiet Editorial Intelligence** (default app/admin theme)
 
 The product combines:
 
@@ -582,7 +638,7 @@ The product combines:
 - Excessive gradients
 - Glowing cards
 - Glassmorphism
-- Gold-and-black luxury styling
+- Unscoped or inaccessible gold-and-black styling
 - Large numbers of competing cards
 - Oversized border radii
 - Decorative charts
@@ -646,7 +702,7 @@ Use the standalone mark for:
 - Preserve clear space equal to at least the icon’s inner doorway width.
 - Do not place the wordmark over visually busy photography without a solid or sufficiently opaque surface.
 - Do not apply gradients to the wordmark.
-- Do not add gold accents.
+- Outside the scoped public/auth Platform Gold theme, do not add gold accents.
 - Do not rotate, distort, outline, or animate individual logo paths.
 - Keep the application-mark corner radius restrained.
 - Maintain consistent spacing between **M**, the symbol, and **RKAZ**.
@@ -668,7 +724,8 @@ Before production use, it should be recreated as a precise vector asset with:
 
 ## 10. Colour System
 
-Blue is the primary MARKAZ Home brand colour.
+Blue is the primary MARKAZ Home app/admin brand colour. Platform Gold is the
+scoped public/auth brand layer defined in §8.0.
 
 It should communicate trust, clarity, architecture, and calmness without becoming a generic corporate navy interface.
 
@@ -1476,9 +1533,10 @@ The following decisions are now considered locked for the working prototype:
 - Offers and transactions are distinct stages.
 - The customer product uses horizontal navigation.
 - Admin uses a persistent sidebar.
-- Blue is the primary brand colour.
-- The visual direction is Architectural Blue with quiet editorial typography.
-- Gold-and-black luxury styling is not part of the visual system.
+- Blue remains the default customer-workspace and Admin colour system.
+- Public and customer-auth surfaces use the CEO-directed Platform Gold theme (§8.0).
+- Both themes share semantic tokens and quiet editorial typography; theme scope
+  must remain explicit at the layout boundary.
 - The wordmark uses **M + home/arch symbol + RKAZ**.
 - The home/arch symbol replaces the A.
 - A standalone blue-square application mark is used for compact contexts.

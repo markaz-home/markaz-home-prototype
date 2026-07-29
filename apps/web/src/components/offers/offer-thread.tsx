@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { ArrowLeft, Hourglass } from 'lucide-react';
 import {
   Alert,
   Button,
@@ -29,7 +30,7 @@ import { useOfferThreadChannel } from '@markaz/realtime';
 import { Link, useRouter } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import type { RouterOutputs } from '@/trpc/types';
-import { formatAed } from '@/lib/format';
+import { formatAed, formatDateTime } from '@/lib/format';
 import {
   AmountComparison,
   NonBindingDisclosure,
@@ -38,6 +39,11 @@ import {
   useOfferErrorMessage,
 } from './shared';
 import { OfferTimeline } from './offer-timeline';
+import { ListboxSelect } from '@/components/ui/listbox-select';
+
+/** Dialog-sized trigger: matches the 44px inputs used inside offer dialogs. */
+const TALL_TRIGGER =
+  'border-input bg-background hover:border-primary/50 flex h-11 w-full items-center justify-between gap-2 rounded-md border px-3 text-start text-sm outline-none focus-visible:ring-ring focus-visible:ring-2';
 
 /** Shared, perspective-aware offer thread (offers-design-spec §19–24). */
 export function OfferThread({ threadId }: { threadId: string }) {
@@ -94,7 +100,8 @@ export function OfferThread({ threadId }: { threadId: string }) {
         {announce}
       </span>
       <nav aria-label="Breadcrumb" className="text-muted-foreground text-sm">
-        <Link href="/offers" className="hover:text-foreground">
+        <Link href="/offers" className="hover:text-foreground inline-flex items-center gap-1.5">
+          <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden />
           {t('title')}
         </Link>
       </nav>
@@ -175,7 +182,7 @@ function CurrentProposal({ thread }: { thread: ThreadData }) {
           {cp.expiresAt ? (
             <Meta
               label={t('thread.validUntil', {
-                date: new Date(cp.expiresAt).toLocaleString(locale),
+                date: formatDateTime(cp.expiresAt, locale),
               })}
               value=""
             />
@@ -227,29 +234,46 @@ function DecisionPanel({
   const canWithdraw = thread.perspective === 'BUYER';
 
   return (
-    <Card>
-      <CardContent className="space-y-3 pt-6">
+    <Card className="bg-card/40">
+      <CardContent className="space-y-4 pt-6">
         {canAct ? (
           <>
-            <Button className="w-full" onClick={() => setDialog('accept')}>
-              {t('actions.accept')}
-            </Button>
-            <Button className="w-full" variant="outline" onClick={() => setDialog('counter')}>
-              {t('actions.counter')}
-            </Button>
-            <Button className="w-full" variant="ghost" onClick={() => setDialog('reject')}>
-              {t('actions.reject')}
-            </Button>
+            <p className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.14em]">
+              {t('actions.title')}
+            </p>
+            <div className="space-y-2">
+              <Button className="w-full" onClick={() => setDialog('accept')}>
+                {t('actions.accept')}
+              </Button>
+              <Button className="w-full" variant="outline" onClick={() => setDialog('counter')}>
+                {t('actions.counter')}
+              </Button>
+              <Button className="w-full" variant="ghost" onClick={() => setDialog('reject')}>
+                {t('actions.reject')}
+              </Button>
+            </div>
           </>
         ) : (
-          <p className="text-muted-foreground text-sm">
-            {thread.perspective === 'BUYER' ? t('status.waitingSeller') : t('status.waitingBuyer')}
-          </p>
+          // Waiting is a state, not an empty panel: say who has the ball and
+          // that nothing is required from this side right now.
+          <div className="flex items-start gap-3">
+            <Hourglass className="text-primary mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            <div>
+              <p className="text-sm font-medium">
+                {thread.perspective === 'BUYER'
+                  ? t('status.waitingSeller')
+                  : t('status.waitingBuyer')}
+              </p>
+              <p className="text-muted-foreground mt-1 text-xs">{t('status.waitingHelp')}</p>
+            </div>
+          </div>
         )}
         {canWithdraw ? (
-          <Button className="w-full" variant="ghost" onClick={() => setDialog('withdraw')}>
-            {t('actions.withdraw')}
-          </Button>
+          <div className="border-border/60 border-t pt-4">
+            <Button className="w-full" variant="outline" onClick={() => setDialog('withdraw')}>
+              {t('actions.withdraw')}
+            </Button>
+          </div>
         ) : null}
 
         {dialog === 'counter' ? (
@@ -462,20 +486,18 @@ function CounterDialog({
         </div>
         <div className="space-y-2">
           <Label htmlFor="counter-expiry">{t('form.expiry')}</Label>
-          <select
+          <ListboxSelect
             id="counter-expiry"
             value={expiry}
-            onChange={(e) => setExpiry(e.target.value as ExpiryOption)}
-            className="bg-background h-11 w-full rounded-md border px-3"
-          >
-            {EXPIRY_OPTIONS.map((o) => (
-              <option key={o} value={o}>
-                {t(
-                  `expiry.${o === '48h' ? 'h48' : o === '3d' ? 'd3' : o === '7d' ? 'd7' : 'none'}` as 'expiry.d7',
-                )}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => setExpiry(v as ExpiryOption)}
+            classNames={{ button: TALL_TRIGGER }}
+            options={EXPIRY_OPTIONS.map((o) => ({
+              value: o,
+              label: t(
+                `expiry.${o === '48h' ? 'h48' : o === '3d' ? 'd3' : o === '7d' ? 'd7' : 'none'}` as 'expiry.d7',
+              ),
+            }))}
+          />
         </div>
         <NonBindingDisclosure variant="counter" />
         <DialogFooter>
@@ -608,19 +630,19 @@ function RejectDialog({
         {!isBuyer ? (
           <div className="space-y-2">
             <Label htmlFor="reject-reason">{t('reject.reasonLabel')}</Label>
-            <select
+            <ListboxSelect
               id="reject-reason"
               value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              className="bg-background h-11 w-full rounded-md border px-3"
-            >
-              <option value="">—</option>
-              {REJECT_REASON_CODES.map((c) => (
-                <option key={c} value={c}>
-                  {t(`reject.reason${c}` as 'reject.reasonOTHER')}
-                </option>
-              ))}
-            </select>
+              onChange={setReason}
+              classNames={{ button: TALL_TRIGGER }}
+              options={[
+                { value: '', label: '—' },
+                ...REJECT_REASON_CODES.map((c) => ({
+                  value: c,
+                  label: t(`reject.reason${c}` as 'reject.reasonOTHER'),
+                })),
+              ]}
+            />
           </div>
         ) : null}
         <DialogFooter>

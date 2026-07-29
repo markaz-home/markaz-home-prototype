@@ -12,6 +12,8 @@ import {
 } from '@markaz/domain';
 import { Alert, Button, FormField, Input, cn } from '@markaz/ui';
 import { trpc } from '@/trpc/react';
+import { ListboxSelect } from '@/components/ui/listbox-select';
+import { PlaceCombobox } from '@/components/ui/place-combobox';
 import { useRouter } from '@/i18n/navigation';
 import { WizardShell, WizardLoading, ListingUnavailable, type WizardListing } from '../wizard';
 import { useAutosave } from '../use-autosave';
@@ -63,6 +65,7 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
   const t = useTranslations('details');
   const tl = useTranslations('listing');
   const tv = useTranslations('validation');
+  const ta = useTranslations('amenities');
   const router = useRouter();
   const save = trpc.listing.saveDetails.useMutation();
   const autosave = useAutosave(listingId, data.version);
@@ -161,8 +164,6 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
     }
   }
 
-  const selectCls = 'h-10 w-full rounded-md border border-input bg-background px-3 text-sm';
-
   return (
     <WizardShell
       listing={data as unknown as WizardListing}
@@ -171,10 +172,10 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
     >
       <div className="space-y-6">
         <div>
-          <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+          <p className="text-primary text-[11px] font-semibold uppercase tracking-[0.18em]">
             {t('stepLabel')}
           </p>
-          <h1 className="font-display text-brand-900 mt-1 text-2xl font-medium tracking-tight">
+          <h1 className="font-display text-foreground mt-1 text-2xl font-medium tracking-tight">
             {t('title')}
           </h1>
           <p className="text-muted-foreground mt-1">{t('description')}</p>
@@ -207,7 +208,7 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
                   className={cn(
                     'rounded-md border p-3 text-sm',
                     form.propertyType === pt
-                      ? 'border-primary bg-brand-100 font-medium'
+                      ? 'border-primary bg-primary/15 font-medium'
                       : 'border-input',
                   )}
                   aria-pressed={form.propertyType === pt}
@@ -220,23 +221,24 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
 
           <FormField id="emirate" label={t('emirate')}>
             <Input id="emirate" value="Dubai" readOnly aria-readonly />
-            <p className="text-muted-foreground mt-1 text-xs">{t('emirateHelp')}</p>
           </FormField>
 
           <div className="grid gap-5 sm:grid-cols-2">
             <FormField id="community" label={t('community')} error={fieldErrors.community} required>
-              <Input
+              <PlaceCombobox
                 id="community"
+                kind="AREA"
                 value={form.community}
-                onChange={(e) => set('community', e.target.value)}
+                onChange={(v) => set('community', v)}
                 placeholder={t('communityPlaceholder')}
               />
             </FormField>
             <FormField id="building" label={t('building')} error={fieldErrors.building}>
-              <Input
+              <PlaceCombobox
                 id="building"
+                kind="BUILDING"
                 value={form.buildingOrProject}
-                onChange={(e) => set('buildingOrProject', e.target.value)}
+                onChange={(v) => set('buildingOrProject', v)}
                 placeholder={t('buildingPlaceholder')}
               />
             </FormField>
@@ -249,37 +251,27 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
               onChange={(e) => set('unitIdentifier', e.target.value)}
               placeholder={t('unitPlaceholder')}
             />
-            <p className="text-muted-foreground mt-1 text-xs">{t('unitHelp')}</p>
           </FormField>
 
           <div className="grid gap-5 sm:grid-cols-3">
             <FormField id="bedrooms" label={t('bedrooms')} error={fieldErrors.bedrooms} required>
-              <select
+              <ListboxSelect
                 id="bedrooms"
-                className={selectCls}
-                value={form.bedrooms}
-                onChange={(e) => set('bedrooms', Number(e.target.value))}
-              >
-                {BEDROOM_OPTIONS.map((n) => (
-                  <option key={n} value={n}>
-                    {n === 0 ? t('studio') : n}
-                  </option>
-                ))}
-              </select>
+                value={String(form.bedrooms)}
+                onChange={(v) => set('bedrooms', Number(v))}
+                options={BEDROOM_OPTIONS.map((n) => ({
+                  value: String(n),
+                  label: n === 0 ? t('studio') : String(n),
+                }))}
+              />
             </FormField>
             <FormField id="bathrooms" label={t('bathrooms')} error={fieldErrors.bathrooms} required>
-              <select
+              <ListboxSelect
                 id="bathrooms"
-                className={selectCls}
-                value={form.bathrooms}
-                onChange={(e) => set('bathrooms', Number(e.target.value))}
-              >
-                {BATHROOM_OPTIONS.map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
+                value={String(form.bathrooms)}
+                onChange={(v) => set('bathrooms', Number(v))}
+                options={BATHROOM_OPTIONS.map((n) => ({ value: String(n), label: String(n) }))}
+              />
             </FormField>
             <FormField id="size" label={t('size')} error={fieldErrors.size} required>
               <Input
@@ -300,42 +292,36 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
               error={fieldErrors.furnishing}
               required
             >
-              <select
+              <ListboxSelect
                 id="furnishing"
-                className={selectCls}
                 value={form.furnishingStatus}
-                onChange={(e) => set('furnishingStatus', e.target.value)}
-              >
-                <option value="" disabled>
-                  —
-                </option>
-                {FURNISHING_STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {t(
+                onChange={(v) => set('furnishingStatus', v)}
+                options={[
+                  { value: '', label: '—', disabled: true },
+                  ...FURNISHING_STATUSES.map((s) => ({
+                    value: s,
+                    label: t(
                       `furnishing${s === 'PARTLY_FURNISHED' ? 'Partly' : s === 'FURNISHED' ? 'Furnished' : 'Unfurnished'}`,
-                    )}
-                  </option>
-                ))}
-              </select>
+                    ),
+                  })),
+                ]}
+              />
             </FormField>
             <FormField id="occupancy" label={t('occupancy')} error={fieldErrors.occupancy} required>
-              <select
+              <ListboxSelect
                 id="occupancy"
-                className={selectCls}
                 value={form.occupancyStatus}
-                onChange={(e) => set('occupancyStatus', e.target.value)}
-              >
-                <option value="" disabled>
-                  —
-                </option>
-                {OCCUPANCY_STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {t(
+                onChange={(v) => set('occupancyStatus', v)}
+                options={[
+                  { value: '', label: '—', disabled: true },
+                  ...OCCUPANCY_STATUSES.map((s) => ({
+                    value: s,
+                    label: t(
                       `occupancy${s === 'OWNER_OCCUPIED' ? 'Owner' : s === 'TENANT_OCCUPIED' ? 'Tenant' : 'Vacant'}`,
-                    )}
-                  </option>
-                ))}
-              </select>
+                    ),
+                  })),
+                ]}
+              />
             </FormField>
             <FormField
               id="completion"
@@ -343,21 +329,18 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
               error={fieldErrors.completion}
               required
             >
-              <select
+              <ListboxSelect
                 id="completion"
-                className={selectCls}
                 value={form.completionStatus}
-                onChange={(e) => set('completionStatus', e.target.value)}
-              >
-                <option value="" disabled>
-                  —
-                </option>
-                {COMPLETION_STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {t(s === 'READY' ? 'completionReady' : 'completionOffPlan')}
-                  </option>
-                ))}
-              </select>
+                onChange={(v) => set('completionStatus', v)}
+                options={[
+                  { value: '', label: '—', disabled: true },
+                  ...COMPLETION_STATUSES.map((s) => ({
+                    value: s,
+                    label: t(s === 'READY' ? 'completionReady' : 'completionOffPlan'),
+                  })),
+                ]}
+              />
             </FormField>
           </div>
 
@@ -403,7 +386,7 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
                     checked={form.features.includes(a)}
                     onChange={() => toggleFeature(a)}
                   />
-                  <span>{a.toLowerCase().replace(/_/g, ' ')}</span>
+                  <span>{ta(a)}</span>
                 </label>
               ))}
             </div>

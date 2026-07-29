@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { ArrowLeft } from 'lucide-react';
 import { Alert, Badge, Button, Card, CardContent, Skeleton } from '@markaz/ui';
 import { isTerminal } from '@markaz/domain';
 import { useTransactionChannel } from '@markaz/realtime';
@@ -50,11 +51,17 @@ function Loaded({ d, rt }: { d: Detail; rt: string }) {
 
   return (
     <div className="space-y-6 pb-24 lg:pb-0">
-      <nav aria-label="Breadcrumb" className="text-muted-foreground text-sm">
-        <Link href="/transactions" className="hover:underline">
+      <nav
+        aria-label="Breadcrumb"
+        className="text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm"
+      >
+        <Link href="/transactions" className="inline-flex items-center gap-1.5 hover:underline">
+          <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden />
           {t('title')}
-        </Link>{' '}
-        · <span dir="ltr">{d.reference}</span>
+        </Link>
+        <span>
+          · <span dir="ltr">{d.reference}</span>
+        </span>
       </nav>
 
       {rt === 'stale' || rt === 'reconnecting' ? (
@@ -92,16 +99,27 @@ function Loaded({ d, rt }: { d: Detail; rt: string }) {
           <Timeline d={d} />
         </div>
         <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-          <Card>
-            <CardContent className="space-y-1 pt-6 text-sm">
+          <Card className="bg-card/40">
+            <CardContent className="space-y-3 pt-6 text-sm">
               <p className="font-medium" role="status">
                 {t(d.nextActorKey)}
               </p>
-              <p className="text-muted-foreground">
+              {/* Progress as a bar, not just a sentence: the shape of the journey
+                  is the thing a participant checks on every visit. */}
+              <div className="bg-foreground/10 h-1.5 w-full overflow-hidden rounded-full">
+                <div
+                  className="bg-primary h-full rounded-full transition-[inline-size]"
+                  style={{
+                    inlineSize: `${d.totalStages ? Math.round((d.completedStages / d.totalStages) * 100) : 0}%`,
+                  }}
+                />
+              </div>
+              <p className="text-muted-foreground text-xs">
                 {t('progress.stages', { completed: d.completedStages, total: d.totalStages })}
               </p>
             </CardContent>
           </Card>
+          {/* Cancellation is a last resort — it sits quietly under the panel. */}
           {!done ? <CancellationControl d={d} refresh={refresh} /> : null}
         </aside>
       </div>
