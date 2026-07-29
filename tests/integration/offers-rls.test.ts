@@ -115,9 +115,13 @@ d('offer RLS + write boundary (live DB)', () => {
       () =>
         asUser(
           buyer1,
-          (tx) => tx`update public.offer_threads set status = 'ACCEPTED' where id = ${threadId}`,
+          (tx) =>
+            tx`update public.offer_threads
+               set status = 'ACCEPTED'
+               where id = ${threadId}
+               returning id`,
         ),
-      /permission denied|immutable|only by the server/i,
+      /permission denied|row-level security/i,
     );
   });
 
@@ -126,9 +130,13 @@ d('offer RLS + write boundary (live DB)', () => {
       () =>
         asUser(
           buyer1,
-          (tx) => tx`update public.offer_threads set next_actor = 'BUYER' where id = ${threadId}`,
+          (tx) =>
+            tx`update public.offer_threads
+               set next_actor = 'BUYER'
+               where id = ${threadId}
+               returning id`,
         ),
-      /permission denied|immutable|only by the server/i,
+      /permission denied|row-level security/i,
     );
   });
 
@@ -138,9 +146,12 @@ d('offer RLS + write boundary (live DB)', () => {
         asUser(
           buyer1,
           (tx) =>
-            tx`update public.offer_proposals set amount_aed = 1 where id = ${currentProposalId}`,
+            tx`update public.offer_proposals
+               set amount_aed = 1
+               where id = ${currentProposalId}
+               returning id`,
         ),
-      /permission denied|immutable/i,
+      /permission denied|row-level security/i,
     );
   });
 

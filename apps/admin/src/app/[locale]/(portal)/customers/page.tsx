@@ -52,7 +52,7 @@ export default async function CustomersPage({
           {r.displayName}
           {r.attention ? (
             <AlertTriangle
-              className="h-3.5 w-3.5 text-amber-600"
+              className="text-warning h-3.5 w-3.5"
               aria-label={t('customers.attention')}
             />
           ) : null}

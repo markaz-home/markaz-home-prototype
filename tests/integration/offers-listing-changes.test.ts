@@ -7,6 +7,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   asService,
+  asTrustedUser,
   asUser,
   cleanup,
   closePool,
@@ -60,7 +61,7 @@ d('pause + material-change behaviour (live DB)', () => {
     const tB = await createOffer(buyer2, listing, 810_000);
 
     // This is exactly what listing.pause runs (listing.ts calls close_listing_offers).
-    await asUser(
+    await asTrustedUser(
       seller,
       (tx) => tx`select public.close_listing_offers(${listing}::uuid, 'LISTING_PAUSED')`,
     );

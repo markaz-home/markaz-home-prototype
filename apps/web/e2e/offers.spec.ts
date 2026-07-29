@@ -122,6 +122,28 @@ test('buyer can withdraw an active offer', async ({ browser }) => {
   await expect(bp.getByText(/withdrawn/i).first()).toBeVisible();
 });
 
+test('buyer can submit an offer with the keyboard only', async ({ page }) => {
+  test.skip(skip, 'full stack required');
+  const l = await createLiveListing(seller.id, { askingPrice: 2_000_000 });
+  await signIn(page, buyer2);
+  await page.goto(`/en/properties/${l.publicId}/${l.slug}/offer`);
+
+  const amount = page.getByLabel(/Your offer/i);
+  await amount.focus();
+  await page.keyboard.type('1750000');
+  const review = page.getByRole('button', { name: 'Review offer' });
+  await review.focus();
+  await page.keyboard.press('Enter');
+
+  const submit = page.getByRole('button', { name: 'Submit offer' });
+  await expect(submit).toBeVisible();
+  await submit.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByText(/Your offer has been sent|Waiting for seller/i).first()).toBeVisible({
+    timeout: 15_000,
+  });
+});
+
 test('privacy: a non-participant cannot open another buyer thread', async ({ browser }) => {
   test.skip(skip, 'full stack required');
   const l = await createLiveListing(seller.id, { askingPrice: 2_000_000 });

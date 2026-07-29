@@ -16,18 +16,24 @@ import {
 import { Link, usePathname } from '@/i18n/navigation';
 import { BrandLogo } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { SignOutButton } from '@/components/sign-out-button';
 
+/**
+ * `match` is the path prefix that marks a link as the current section. Links
+ * without one never show as active — the home page is not a destination that
+ * one of these items "is".
+ */
 const PUBLIC_LINKS = [
-  { href: '/properties', key: 'browse' },
-  { href: '/', key: 'howItWorks' },
-  { href: '/sell', key: 'forSellers' },
+  { href: '/properties', key: 'browse', match: '/properties' },
+  { href: '/how-it-works', key: 'howItWorks', match: '/how-it-works' },
+  { href: '/sign-in?next=/sell', key: 'forSellers' },
 ] as const;
 
 const AUTHED_LINKS = [
-  { href: '/dashboard', key: 'dashboard' },
-  { href: '/properties', key: 'browse' },
-  { href: '/saved-properties', key: 'saved' },
-  { href: '/sell', key: 'myListings' },
+  { href: '/dashboard', key: 'dashboard', match: '/dashboard' },
+  { href: '/properties', key: 'browse', match: '/properties' },
+  { href: '/saved-properties', key: 'saved', match: '/saved-properties' },
+  { href: '/sell', key: 'myListings', match: '/sell' },
 ] as const;
 
 /** Adaptive marketplace chrome (design spec §11). Public nav for anonymous
@@ -44,35 +50,37 @@ export function MarketplaceHeader({
   const [open, setOpen] = useState(false);
   const links = isAuthenticated ? AUTHED_LINKS : PUBLIC_LINKS;
 
-  const isActive = (href: string) =>
-    href === '/properties' ? pathname.startsWith('/properties') : pathname === href;
+  const isActive = (item: { href: string; match?: string }) =>
+    item.match ? pathname === item.match || pathname.startsWith(`${item.match}/`) : false;
 
   return (
-    <header className="bg-background/95 sticky top-0 z-40 border-b backdrop-blur">
-      <div className="container flex h-16 items-center justify-between gap-4">
-        <div className="flex items-center gap-6">
+    <header className="bg-background/85 sticky top-0 z-40 border-b backdrop-blur-xl">
+      <div className="container flex h-16 items-center gap-4">
+        <div className="flex flex-1 items-center justify-start">
           <Link href={isAuthenticated ? '/dashboard' : '/'} aria-label={t('home')}>
             <BrandLogo />
           </Link>
-          <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
-            {links.map((item) => (
-              <Link
-                key={item.href + item.key}
-                href={item.href}
-                className={cn(
-                  'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  isActive(item.href)
-                    ? 'bg-secondary text-secondary-foreground'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-              >
-                {t(item.key)}
-              </Link>
-            ))}
-          </nav>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Centred primary nav — brand gold, per the platform direction. */}
+        <nav className="hidden items-center justify-center gap-1 md:flex" aria-label={t('primary')}>
+          {links.map((item) => (
+            <Link
+              key={item.href + item.key}
+              href={item.href}
+              className={cn(
+                'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                isActive(item)
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-primary/85 hover:bg-primary/10 hover:text-primary',
+              )}
+            >
+              {t(item.key)}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex flex-1 items-center justify-end gap-2">
           <LanguageSwitcher />
           {isAuthenticated ? (
             <>
@@ -98,16 +106,20 @@ export function MarketplaceHeader({
                   <DropdownMenuItem asChild>
                     <Link href="/sell">{t('myListings')}</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <SignOutButton asMenuItem />
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
           ) : (
             <>
-              <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-                <Link href="/sign-in">{t('signIn')}</Link>
+              <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
+                <Link href="/sign-in">{t('logIn')}</Link>
               </Button>
               <Button asChild size="sm" className="hidden sm:inline-flex">
-                <Link href="/sell">{t('listProperty')}</Link>
+                <Link href="/sign-up">{t('signUp')}</Link>
               </Button>
             </>
           )}
@@ -125,7 +137,7 @@ export function MarketplaceHeader({
       </div>
 
       {open && (
-        <nav className="bg-background border-t md:hidden" aria-label="Primary mobile">
+        <nav className="bg-card border-t md:hidden" aria-label={t('primaryMobile')}>
           <div className="container flex flex-col py-2">
             {links.map((item) => (
               <Link
@@ -137,22 +149,37 @@ export function MarketplaceHeader({
                 {t(item.key)}
               </Link>
             ))}
-            {!isAuthenticated && (
-              <Link
-                href="/sign-in"
-                className="text-foreground rounded-md px-3 py-2 text-sm font-medium"
-                onClick={() => setOpen(false)}
-              >
-                {t('signIn')}
-              </Link>
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href="/sell"
+                  className="text-foreground rounded-md px-3 py-2 text-sm font-medium"
+                  onClick={() => setOpen(false)}
+                >
+                  {t('listProperty')}
+                </Link>
+                <div className="px-3 py-2">
+                  <SignOutButton />
+                </div>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/sign-in"
+                  className="text-foreground rounded-md px-3 py-2 text-sm font-medium"
+                  onClick={() => setOpen(false)}
+                >
+                  {t('logIn')}
+                </Link>
+                <Link
+                  href="/sign-up"
+                  className="text-primary rounded-md px-3 py-2 text-sm font-semibold"
+                  onClick={() => setOpen(false)}
+                >
+                  {t('signUp')}
+                </Link>
+              </>
             )}
-            <Link
-              href="/sell"
-              className="text-foreground rounded-md px-3 py-2 text-sm font-medium"
-              onClick={() => setOpen(false)}
-            >
-              {t('listProperty')}
-            </Link>
           </div>
         </nav>
       )}

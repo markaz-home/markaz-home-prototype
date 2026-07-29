@@ -85,14 +85,16 @@ incomplete customers can **never** reach the dashboard. `requireCustomerStep`
 Supabase **Auth** owns credentials, the password hash, email-confirmation
 state, and all verification/recovery codes, links, and tokens. **`profiles`** owns `full_name`,
 `account_type`, identity status, consent timestamps, and `onboarding_completed_at`
-— **no secrets**. RLS on `profiles` is unchanged.
+— **no secrets**. Customers may read their own profile, but profile mutation is accepted only
+inside the verified MARKAZ API transaction context; direct Supabase REST updates cannot forge
+identity or onboarding state.
 
 ### Audit events
 
-Server-side: `ACCOUNT_PROFILE_COMPLETED`, `DEMO_IDENTITY_STARTED/VERIFIED/FAILED`.
-Client-emitted via the allow-listed `audit.record` tRPC procedure: `EMAIL_VERIFIED`,
-`CUSTOMER_SIGNED_OUT`, `ADMIN_ACCESS_DENIED`. Generic metadata only — never
-passwords, codes, or tokens.
+Audit rows are server-derived inside authenticated MARKAZ API transactions or reviewed
+`SECURITY DEFINER` workflows. The former client-selected `audit.record` endpoint was removed;
+browser sessions cannot insert arbitrary audit actions or metadata. Never record passwords,
+codes, tokens, signed URLs, or raw provider errors.
 
 ## Session handling
 

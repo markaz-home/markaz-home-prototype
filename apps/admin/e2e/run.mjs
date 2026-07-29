@@ -4,6 +4,13 @@
 // so `pnpm test:e2e` stays green without Docker/Supabase. Honest: it does NOT claim to
 // have run when it has not.
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { config as loadEnv } from 'dotenv';
+
+// Match the Next applications' local-env precedence so the root release command
+// runs the real suite when the repo already has a configured local stack.
+loadEnv({ path: fileURLToPath(new URL('../../../.env.local', import.meta.url)) });
+loadEnv({ path: fileURLToPath(new URL('../../../.env', import.meta.url)) });
 
 if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
   console.log(

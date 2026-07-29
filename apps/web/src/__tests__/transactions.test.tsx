@@ -52,6 +52,7 @@ vi.mock('@/trpc/react', () => {
 
 import { TransactionsHub } from '@/components/transactions/transactions-hub';
 import { TransactionWorkspace } from '@/components/transactions/transaction-workspace';
+import { Portfolio } from '@/components/transactions/portfolio';
 
 function r(ui: React.ReactElement, locale: 'en' | 'ar' = 'en') {
   return render(
@@ -154,6 +155,29 @@ describe('TransactionsHub', () => {
       'href',
       '/transactions/tx1',
     );
+  });
+});
+
+describe('Portfolio', () => {
+  it('shows completed transactions from both customer perspectives', () => {
+    h.Q.listMine = {
+      isLoading: false,
+      isError: false,
+      data: [
+        {
+          ...detail().data,
+          status: 'COMPLETED_DEMO',
+          perspective: 'SELLER',
+          completedAt: '2026-07-14T09:00:00Z',
+        },
+      ],
+    };
+
+    r(<Portfolio />);
+
+    expect(screen.getByText('Sold')).toBeInTheDocument();
+    expect(screen.getByText('Marina Villa')).toBeInTheDocument();
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/transactions/tx1');
   });
 });
 

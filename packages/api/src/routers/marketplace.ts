@@ -2,34 +2,55 @@ import { and, asc, desc, eq, gte, ilike, lte, or, sql, type SQL } from 'drizzle-
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import {
+  BATHS_OPTIONS,
+  BEDS_OPTIONS,
+  MARKETPLACE_PRICE_BANDS,
+  PROPERTY_TYPES,
+  marketplaceQuerySchema,
+  paginate,
+  type MarketplaceQuery,
+} from '@markaz/domain';
+import {
   listings,
   savedProperties,
   auditEvents,
   marketplaceListings as mv,
   type Tx,
 } from '@markaz/db';
-import { marketplaceQuerySchema, paginate, type MarketplaceQuery } from '@markaz/domain';
 import { toPublicCard, toPublicDetail, type PublicListingRow } from '../public-projection';
 import { router, publicTxProcedure, customerProcedure } from '../trpc';
 
+type FacetDimension = 'propertyType' | 'emirate' | 'community' | 'price' | 'bedrooms' | 'baths';
+
 /** Filter conditions over the public marketplace view (LIVE-only by construction). */
-function buildConditions(input: MarketplaceQuery): SQL[] {
+function buildConditions(
+  input: MarketplaceQuery,
+  omit: ReadonlySet<FacetDimension> = new Set(),
+): SQL[] {
   const c: SQL[] = [];
-  if (input.type) c.push(eq(mv.propertyType, input.type));
-  if (input.emirate) c.push(eq(mv.emirate, input.emirate));
-  if (input.area) c.push(ilike(mv.community, `%${input.area}%`));
-  if (input.minPrice != null) c.push(gte(mv.askingPrice, String(input.minPrice)));
-  if (input.maxPrice != null) c.push(lte(mv.askingPrice, String(input.maxPrice)));
+  if (!omit.has('propertyType') && input.propertyType) {
+    c.push(eq(mv.propertyType, input.propertyType));
+  }
+  if (!omit.has('emirate') && input.emirate) c.push(eq(mv.emirate, input.emirate));
+  if (!omit.has('community') && input.area) c.push(ilike(mv.community, `%${input.area}%`));
+  if (!omit.has('price') && input.minPrice != null) {
+    c.push(gte(mv.askingPrice, String(input.minPrice)));
+  }
+  if (!omit.has('price') && input.maxPrice != null) {
+    c.push(lte(mv.askingPrice, String(input.maxPrice)));
+  }
   if (input.minSize != null) c.push(gte(mv.sizeSqft, String(input.minSize)));
   if (input.maxSize != null) c.push(lte(mv.sizeSqft, String(input.maxSize)));
   if (input.furnishing) c.push(eq(mv.furnishingStatus, input.furnishing));
   if (input.completion) c.push(eq(mv.completionStatus, input.completion));
-  if (input.beds === 'studio') c.push(eq(mv.bedrooms, 0));
-  else if (input.beds) c.push(gte(mv.bedrooms, Number(input.beds)));
-  if (input.baths) c.push(gte(mv.bathrooms, Number(input.baths)));
+  if (!omit.has('bedrooms')) {
+    if (input.bedrooms === 'studio') c.push(eq(mv.bedrooms, 0));
+    else if (input.bedrooms) c.push(gte(mv.bedrooms, Number(input.bedrooms)));
+  }
+  if (!omit.has('baths') && input.baths) c.push(gte(mv.bathrooms, Number(input.baths)));
   if (input.investmentCase) c.push(eq(mv.icVisible, true));
-  if (input.q) {
-    const like = `%${input.q}%`;
+  if (input.location) {
+    const like = `%${input.location}%`;
     const m = or(
       ilike(mv.community, like),
       ilike(mv.emirate, like),
@@ -52,6 +73,35 @@ function orderFor(sortKey: MarketplaceQuery['sort']) {
     default:
       return [desc(mv.publishedAt), asc(mv.publicId)];
   }
+}
+
+const facetCountSchema = z.object({
+  value: z.string(),
+  count: z.coerce.number().int().nonnegative(),
+});
+
+type FacetCount = z.infer<typeof facetCountSchema>;
+type FacetRow = {
+  property_types: unknown;
+  emirates: unknown;
+  communities: unknown;
+  bedrooms: unknown;
+  baths: unknown;
+  price_bands: unknown;
+};
+
+function whereFragment(conditions: SQL[]) {
+  const condition = conditions.length ? and(...conditions) : undefined;
+  return condition ? sql`where ${condition}` : sql.empty();
+}
+
+function parseFacetCounts(value: unknown): FacetCount[] {
+  return z.array(facetCountSchema).parse(value ?? []);
+}
+
+function completeFacetCounts(order: readonly string[], counts: FacetCount[]): FacetCount[] {
+  const byValue = new Map(counts.map((item) => [item.value, item.count]));
+  return order.map((value) => ({ value, count: byValue.get(value) ?? 0 }));
 }
 
 type ViewRow = typeof mv.$inferSelect;
@@ -150,16 +200,171 @@ export const marketplaceRouter = router({
       return { ...toPublicDetail(toRow(row)), isOwner, manageListingId };
     }),
 
-  /** Distinct public facet values for filter menus (LIVE only). */
-  getFilterOptions: publicTxProcedure.query(async ({ ctx }) => {
-    const rows = await ctx.tx
-      .select({ emirate: mv.emirate, community: mv.community, type: mv.propertyType })
-      .from(mv);
-    const uniq = (xs: (string | null)[]) => [...new Set(xs.filter((x): x is string => !!x))].sort();
+  /**
+   * Inventory-aware public facets. Each dimension ignores its own active
+   * filter, so the UI can show viable alternatives without loading every row
+   * into JavaScript. This is one SQL statement over the security-barrier view.
+   */
+  facets: publicTxProcedure.input(marketplaceQuerySchema).query(async ({ ctx, input }) => {
+    const typeWhere = whereFragment(buildConditions(input, new Set(['propertyType'])));
+    const emirateWhere = whereFragment(buildConditions(input, new Set(['emirate'])));
+    const communityWhere = whereFragment([
+      ...buildConditions(input, new Set(['community'])),
+      sql`${mv.community} is not null and btrim(${mv.community}) <> ''`,
+    ]);
+    const bedroomsWhere = whereFragment([
+      ...buildConditions(input, new Set(['bedrooms'])),
+      sql`${mv.bedrooms} is not null`,
+    ]);
+    const bathsWhere = whereFragment([
+      ...buildConditions(input, new Set(['baths'])),
+      sql`${mv.bathrooms} is not null`,
+    ]);
+    const priceWhere = whereFragment([
+      ...buildConditions(input, new Set(['price'])),
+      sql`${mv.askingPrice} is not null`,
+    ]);
+
+    const under1m = MARKETPLACE_PRICE_BANDS.under1m.maxPrice;
+    const from1m = MARKETPLACE_PRICE_BANDS['1to3m'].minPrice;
+    const under3m = MARKETPLACE_PRICE_BANDS['1to3m'].maxPrice;
+    const from3m = MARKETPLACE_PRICE_BANDS['3to5m'].minPrice;
+    const under5m = MARKETPLACE_PRICE_BANDS['3to5m'].maxPrice;
+    const from5m = MARKETPLACE_PRICE_BANDS['5plus'].minPrice;
+
+    const rows = await ctx.tx.execute(
+      sql<FacetRow>`
+        select
+          coalesce((
+            select jsonb_agg(type_counts)
+            from (
+              select ${mv.propertyType}::text as value, count(*)::int as count
+              from ${mv}
+              ${typeWhere}
+              group by ${mv.propertyType}
+              order by ${mv.propertyType}
+            ) type_counts
+          ), '[]'::jsonb) as property_types,
+          coalesce((
+            select jsonb_agg(emirate_counts)
+            from (
+              select ${mv.emirate}::text as value, count(*)::int as count
+              from ${mv}
+              ${emirateWhere}
+              group by ${mv.emirate}
+              order by ${mv.emirate}
+            ) emirate_counts
+          ), '[]'::jsonb) as emirates,
+          coalesce((
+            select jsonb_agg(community_counts)
+            from (
+              select ${mv.community}::text as value, count(*)::int as count
+              from ${mv}
+              ${communityWhere}
+              group by ${mv.community}
+              order by ${mv.community}
+            ) community_counts
+          ), '[]'::jsonb) as communities,
+          (
+            select jsonb_build_array(
+              jsonb_build_object(
+                'value', 'studio',
+                'count', (count(*) filter (where ${mv.bedrooms} = 0))::int
+              ),
+              jsonb_build_object(
+                'value', '1',
+                'count', (count(*) filter (where ${mv.bedrooms} >= 1))::int
+              ),
+              jsonb_build_object(
+                'value', '2',
+                'count', (count(*) filter (where ${mv.bedrooms} >= 2))::int
+              ),
+              jsonb_build_object(
+                'value', '3',
+                'count', (count(*) filter (where ${mv.bedrooms} >= 3))::int
+              ),
+              jsonb_build_object(
+                'value', '4',
+                'count', (count(*) filter (where ${mv.bedrooms} >= 4))::int
+              ),
+              jsonb_build_object(
+                'value', '5',
+                'count', (count(*) filter (where ${mv.bedrooms} >= 5))::int
+              )
+            )
+            from ${mv}
+            ${bedroomsWhere}
+          ) as bedrooms,
+          (
+            select jsonb_build_array(
+              jsonb_build_object(
+                'value', '1',
+                'count', (count(*) filter (where ${mv.bathrooms} >= 1))::int
+              ),
+              jsonb_build_object(
+                'value', '2',
+                'count', (count(*) filter (where ${mv.bathrooms} >= 2))::int
+              ),
+              jsonb_build_object(
+                'value', '3',
+                'count', (count(*) filter (where ${mv.bathrooms} >= 3))::int
+              ),
+              jsonb_build_object(
+                'value', '4',
+                'count', (count(*) filter (where ${mv.bathrooms} >= 4))::int
+              )
+            )
+            from ${mv}
+            ${bathsWhere}
+          ) as baths,
+          (
+            select jsonb_build_array(
+              jsonb_build_object(
+                'value', 'under1m',
+                'count',
+                (count(*) filter (where ${mv.askingPrice}::numeric <= ${under1m}))::int
+              ),
+              jsonb_build_object(
+                'value', '1to3m',
+                'count',
+                (
+                  count(*) filter (
+                    where ${mv.askingPrice}::numeric >= ${from1m}
+                      and ${mv.askingPrice}::numeric <= ${under3m}
+                  )
+                )::int
+              ),
+              jsonb_build_object(
+                'value', '3to5m',
+                'count',
+                (
+                  count(*) filter (
+                    where ${mv.askingPrice}::numeric >= ${from3m}
+                      and ${mv.askingPrice}::numeric <= ${under5m}
+                  )
+                )::int
+              ),
+              jsonb_build_object(
+                'value', '5plus',
+                'count',
+                (count(*) filter (where ${mv.askingPrice}::numeric >= ${from5m}))::int
+              )
+            )
+            from ${mv}
+            ${priceWhere}
+          ) as price_bands
+      `,
+    );
+
+    const row = rows[0];
+    const priceBandOrder = Object.keys(MARKETPLACE_PRICE_BANDS);
     return {
-      emirates: uniq(rows.map((r) => r.emirate)),
-      communities: uniq(rows.map((r) => r.community)),
-      propertyTypes: uniq(rows.map((r) => r.type)),
+      propertyTypes: completeFacetCounts(PROPERTY_TYPES, parseFacetCounts(row?.property_types)),
+      emirates: parseFacetCounts(row?.emirates),
+      communities: parseFacetCounts(row?.communities),
+      bedrooms: completeFacetCounts(BEDS_OPTIONS, parseFacetCounts(row?.bedrooms)),
+      baths: completeFacetCounts(BATHS_OPTIONS, parseFacetCounts(row?.baths)),
+      priceBands: completeFacetCounts(priceBandOrder, parseFacetCounts(row?.price_bands)),
     };
   }),
 

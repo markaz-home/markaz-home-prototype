@@ -20,7 +20,7 @@ export function QueueLive() {
   return (
     <div
       role="status"
-      className="inline-flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs text-amber-900"
+      className="border-warning/30 bg-warning/10 text-warning inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs"
     >
       <WifiOff className="h-3.5 w-3.5" aria-hidden />
       {status === 'stale' ? t('realtime.stale') : t('realtime.reconnecting')}

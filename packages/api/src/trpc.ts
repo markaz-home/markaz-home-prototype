@@ -5,13 +5,23 @@ import { withUserContext, withAnonContext, type Tx } from '@markaz/db';
 import { hasCapability, PROTOTYPE_ADMIN_CAPABILITIES, type AdminCapability } from '@markaz/domain';
 import type { Context, AuthenticatedUser } from './context';
 
+export function clientErrorMessage(
+  code: string,
+  message: string,
+  production = process.env.NODE_ENV === 'production',
+): string {
+  return production && code === 'INTERNAL_SERVER_ERROR' ? 'Internal server error' : message;
+}
+
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
     return {
       ...shape,
+      message: clientErrorMessage(error.code, shape.message),
       data: {
         ...shape.data,
+        stack: process.env.NODE_ENV === 'production' ? undefined : shape.data.stack,
         zod: error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
     };
@@ -37,8 +47,11 @@ const logging = middleware(async ({ ctx, path, type, next }) => {
   const result = await next();
   const ms = Date.now() - start;
   const fields = { path, type, ok: result.ok, ms, userId: ctx.user?.id };
-  if (ms >= SLOW_REQUEST_MS) ctx.log.warn({ ...fields, slow: true }, 'trpc.request.slow');
-  else ctx.log.info(fields, 'trpc.request');
+  if (!result.ok) {
+    ctx.log.error({ ...fields, errorCode: result.error.code }, 'trpc.request.failed');
+  } else if (ms >= SLOW_REQUEST_MS) {
+    ctx.log.warn({ ...fields, slow: true }, 'trpc.request.slow');
+  } else ctx.log.info(fields, 'trpc.request');
   return result;
 });
 

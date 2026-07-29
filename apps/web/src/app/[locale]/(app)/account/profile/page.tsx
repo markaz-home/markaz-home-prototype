@@ -1,5 +1,6 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { Card, CardContent, CardHeader, CardTitle, StatusBadge } from '@markaz/ui';
+import { isIdentityVerified } from '@markaz/domain';
 import { getSession } from '@/server/session';
 
 export default async function AccountProfilePage({
@@ -13,13 +14,18 @@ export default async function AccountProfilePage({
   const session = await getSession();
   const profile = session?.profile;
 
-  const verified =
-    session?.uaePassAuthenticated || profile?.identityVerificationStatus === 'VERIFIED_DEMO';
-  const identityLabel = session?.uaePassAuthenticated
-    ? t('identityUaePassStaging')
-    : profile?.identityVerificationStatus === 'VERIFIED_DEMO'
-      ? t('identityDemo')
-      : (profile?.identityVerificationStatus ?? 'NOT_STARTED');
+  const identityStatus = profile?.identityVerificationStatus ?? 'NOT_STARTED';
+  const verified = session?.uaePassAuthenticated || isIdentityVerified(identityStatus);
+  const identityLabel =
+    session?.uaePassAuthenticated || identityStatus === 'VERIFIED_STAGING'
+      ? t('identityUaePassStaging')
+      : identityStatus === 'VERIFIED_DEMO'
+        ? t('identityDemo')
+        : identityStatus === 'PENDING'
+          ? t('identityPending')
+          : identityStatus === 'FAILED_DEMO'
+            ? t('identityFailed')
+            : t('identityNotStarted');
 
   return (
     <div className="space-y-6">

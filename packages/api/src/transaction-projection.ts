@@ -137,6 +137,9 @@ export function toTransactionListItem(
     completedStages: completedStageCount(row.status),
     totalStages: TRANSACTION_STAGES.length,
     progress,
+    // Distinct from `lastActivityAt`: the moment both parties confirmed, which a
+    // later edit or admin action must not move.
+    completedAt: row.completedAt?.toISOString() ?? null,
     lastActivityAt: row.updatedAt.toISOString(),
   };
 }

@@ -2,6 +2,7 @@
 
 The database is rebuilt from a **single ordered SQL history** in
 `supabase/migrations/`, followed by `supabase/seed.sql` (ADR 0003).
+The Week 8 baseline replays through `20260301000821_storage_production_constraints.sql`.
 
 ## The full local reset flow
 
@@ -51,6 +52,8 @@ no admin env is set. Writing Supabase Auth tables via SQL is unsupported, hence 
 API.
 
 See `demo-runbook.md` for the sign-up + admin-bootstrap steps.
+See `database-migrations.md` for controlled deployment and `backup-restore.md` for the
+tested local recovery equivalent and production gaps.
 
 ## Notes
 
@@ -58,3 +61,5 @@ See `demo-runbook.md` for the sign-up + admin-bootstrap steps.
   stack (`pnpm supabase:start`).
 - Migrations and admin/setup ops connect to the database **directly**
   (`DIRECT_DATABASE_URL`), not through the pooler (ADR 0005).
+- Before any controlled deployment, take a verified backup and run the fresh replay plus
+  full live integration suite. A skipped RLS/Storage suite is not a pass.

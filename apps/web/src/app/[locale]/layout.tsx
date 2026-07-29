@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-page-custom-font -- The locale layout is the App Router root layout for every customer route. */
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
@@ -8,7 +9,7 @@ import { TRPCProvider } from '@/trpc/react';
 import '@markaz/ui/styles.css';
 
 export const metadata: Metadata = {
-  title: 'MARKAZ Home',
+  title: 'Markaz Home',
   description: 'Buy and sell property in the UAE — one account does both.',
 };
 

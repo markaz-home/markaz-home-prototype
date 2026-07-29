@@ -16,21 +16,19 @@ import { CANCELLATION_REASONS } from '@markaz/domain';
 import { Link } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import type { RouterOutputs } from '@/trpc/types';
+import { ListboxSelect } from '@/components/ui/listbox-select';
+import { CompletionSummary } from './completion-summary';
+
+/** Dialog-sized trigger: matches the 44px inputs used inside these dialogs. */
+const TALL_TRIGGER =
+  'border-input bg-background hover:border-primary/50 flex h-11 w-full items-center justify-between gap-2 rounded-md border px-3 text-start text-sm outline-none focus-visible:ring-ring focus-visible:ring-2';
 
 type Detail = RouterOutputs['transactions']['get'];
 
 export function TerminalPanel({ d }: { d: Detail }) {
   const t = useTranslations('transactions');
-  if (d.status === 'COMPLETED_DEMO') {
-    return (
-      <Card>
-        <CardContent className="space-y-2 pt-6">
-          <h2 className="text-lg font-semibold">{t('completion.successTitle')}</h2>
-          <p className="text-muted-foreground text-sm">{t('completion.successBody')}</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  // Completion is the end of the journey — it gets a record, not a sentence.
+  if (d.status === 'COMPLETED_DEMO') return <CompletionSummary d={d} />;
   if (d.status === 'CANCELLED') {
     return (
       <Card>
@@ -111,20 +109,21 @@ export function CancellationControl({ d, refresh }: { d: Detail; refresh: () => 
             <DialogTitle>{t('cancellation.requestTitle')}</DialogTitle>
           </DialogHeader>
           <p className="text-muted-foreground text-sm">{t('cancellation.requestBody')}</p>
-          <label className="text-sm">
-            {t('cancellation.reasonLabel')}
-            <select
-              value={reason}
-              onChange={(e) => setReason(e.target.value as typeof reason)}
-              className="mt-1 h-11 w-full rounded-md border px-3"
-            >
-              {CANCELLATION_REASONS.map((r) => (
-                <option key={r} value={r}>
-                  {t(`cancellation.reason.${r}` as 'cancellation.reason.OTHER')}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="text-sm">
+            <span id="cancel-reason-label">{t('cancellation.reasonLabel')}</span>
+            <div className="mt-1">
+              <ListboxSelect
+                labelledBy="cancel-reason-label"
+                value={reason}
+                onChange={(v) => setReason(v as typeof reason)}
+                classNames={{ button: TALL_TRIGGER }}
+                options={CANCELLATION_REASONS.map((r) => ({
+                  value: r,
+                  label: t(`cancellation.reason.${r}` as 'cancellation.reason.OTHER'),
+                }))}
+              />
+            </div>
+          </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>
               {t('cancellation.keep')}

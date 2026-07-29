@@ -1,31 +1,30 @@
 import 'server-only';
 import { z } from 'zod';
+import {
+  ExternalListingError,
+  deduplicateExternalListings,
+  filterExternalListings,
+  selectDiverseExternalListings,
+  type ExternalListingCard,
+  type ExternalListingCategory,
+  type ExternalListingLocale,
+  type ExternalListingProvider,
+} from './external-listing-provider';
 
 export const BAYUT_API_HOST = 'uae-real-estate2.p.rapidapi.com';
 const BAYUT_PROPERTIES_URL = `https://${BAYUT_API_HOST}/properties_search`;
 const BAYUT_CACHE_TTL_MS = 60 * 60 * 1_000;
 const BAYUT_MAX_FEATURED = 12;
+export const BAYUT_IMAGE_HOSTS = [
+  'images.bayut.com',
+  'bayut-production.s3.eu-central-1.amazonaws.com',
+] as const;
+export const BAYUT_LINK_HOSTS = ['bayut.com', 'www.bayut.com'] as const;
 
 export type BayutApiMode = 'disabled' | 'rapidapi';
-export type BayutLocale = 'en' | 'ar';
-export type BayutPropertyCategory = 'APARTMENT' | 'VILLA' | 'OTHER';
-
-export interface BayutPropertyCard {
-  source: 'BAYUT_API';
-  providerId: string;
-  title: string;
-  askingPriceAed: number;
-  category: BayutPropertyCategory;
-  propertyType: string | null;
-  emirate: string | null;
-  community: string | null;
-  bedrooms: number | null;
-  bathrooms: number | null;
-  sizeSqft: number | null;
-  coverUrl: string | null;
-  externalUrl: string;
-  verified: boolean;
-}
+export type BayutLocale = ExternalListingLocale;
+export type BayutPropertyCategory = ExternalListingCategory;
+export type BayutPropertyCard = ExternalListingCard & { source: 'BAYUT_API' };
 
 export type BayutApiErrorCode =
   | 'CONFIGURATION_MISSING'
@@ -33,8 +32,8 @@ export type BayutApiErrorCode =
   | 'UPSTREAM_ERROR'
   | 'INVALID_RESPONSE';
 
-export class BayutApiError extends Error {
-  constructor(readonly code: BayutApiErrorCode) {
+export class BayutApiError extends ExternalListingError {
+  constructor(override readonly code: BayutApiErrorCode) {
     super(code);
     this.name = 'BayutApiError';
   }
@@ -147,8 +146,15 @@ function localizedName(
   return locale === 'ar' ? (value.name_ar ?? value.name ?? null) : (value.name ?? null);
 }
 
+/**
+ * Classify the provider's free-text sub-type into a MARKAZ category so the UI can
+ * label it in our own vocabulary (and so browse filters can match it). Order
+ * matters: the more specific dwelling types are checked first.
+ */
 function propertyCategory(value: string | null | undefined): BayutPropertyCategory {
   const normalized = value?.trim().toLowerCase() ?? '';
+  if (normalized.includes('townhouse')) return 'TOWNHOUSE';
+  if (normalized.includes('penthouse')) return 'PENTHOUSE';
   if (normalized.includes('apartment')) return 'APARTMENT';
   if (normalized.includes('villa')) return 'VILLA';
   return 'OTHER';
@@ -163,16 +169,12 @@ function toCard(raw: unknown, locale: BayutLocale): BayutPropertyCard | null {
     localizedName(p.location?.sub_community, locale) ??
     localizedName(p.location?.community, locale);
   const externalUrl =
-    allowedHttpsUrl(p.meta?.url, ['bayut.com', 'www.bayut.com']) ??
+    allowedHttpsUrl(p.meta?.url, BAYUT_LINK_HOSTS) ??
     `https://www.bayut.com/property/details-${p.id}.html`;
-  const allowedImageHosts = [
-    'images.bayut.com',
-    'bayut-production.s3.eu-central-1.amazonaws.com',
-  ] as const;
   const coverUrl =
-    allowedHttpsUrl(p.media?.cover_photo, allowedImageHosts) ??
+    allowedHttpsUrl(p.media?.cover_photo, BAYUT_IMAGE_HOSTS) ??
     p.media?.photos
-      ?.map((photo) => allowedHttpsUrl(photo, allowedImageHosts))
+      ?.map((photo) => allowedHttpsUrl(photo, BAYUT_IMAGE_HOSTS))
       .find((photo): photo is string => photo !== null) ??
     null;
 
@@ -194,48 +196,8 @@ function toCard(raw: unknown, locale: BayutLocale): BayutPropertyCard | null {
   };
 }
 
-function normalizedKeyPart(value: string | null) {
-  return value?.trim().toLowerCase().replace(/\s+/g, ' ') ?? '';
-}
-
-function propertySignature(card: BayutPropertyCard) {
-  if (!card.community) return null;
-  if (card.bedrooms === null && card.bathrooms === null && card.sizeSqft === null) return null;
-  return [
-    card.category,
-    normalizedKeyPart(card.community),
-    card.bedrooms ?? '',
-    card.bathrooms ?? '',
-    card.sizeSqft === null ? '' : Math.round(card.sizeSqft),
-  ].join('|');
-}
-
 function selectDiverseCards(cards: BayutPropertyCard[], limit: number) {
-  const unique: BayutPropertyCard[] = [];
-  const seenImages = new Set<string>();
-  const seenSignatures = new Set<string>();
-
-  for (const card of cards) {
-    const signature = propertySignature(card);
-    if (card.coverUrl && seenImages.has(card.coverUrl)) continue;
-    if (signature && seenSignatures.has(signature)) continue;
-    unique.push(card);
-    if (card.coverUrl) seenImages.add(card.coverUrl);
-    if (signature) seenSignatures.add(signature);
-  }
-
-  const buckets = (['APARTMENT', 'VILLA', 'OTHER'] as const).map((category) =>
-    unique.filter((card) => card.category === category),
-  );
-  const selected: BayutPropertyCard[] = [];
-  while (selected.length < limit && buckets.some((bucket) => bucket.length > 0)) {
-    for (const bucket of buckets) {
-      const card = bucket.shift();
-      if (card) selected.push(card);
-      if (selected.length === limit) break;
-    }
-  }
-  return selected;
+  return selectDiverseExternalListings(deduplicateExternalListings(cards), limit);
 }
 
 export async function loadBayutFeaturedProperties({
@@ -299,3 +261,18 @@ export async function loadBayutFeaturedProperties({
   cache.set(cacheKey, { expiresAt: now + BAYUT_CACHE_TTL_MS, items });
   return items;
 }
+
+export const bayutProvider: ExternalListingProvider = {
+  id: 'BAYUT_API',
+  mode: (env = process.env) => (getBayutApiMode(env) === 'rapidapi' ? 'enabled' : 'disabled'),
+  imageHosts: BAYUT_IMAGE_HOSTS,
+  linkHosts: BAYUT_LINK_HOSTS,
+  async search(params, env = process.env) {
+    const pool = await loadBayutFeaturedProperties({
+      locale: params.locale,
+      limit: BAYUT_MAX_FEATURED,
+      env,
+    });
+    return selectDiverseExternalListings(filterExternalListings(pool, params.query), params.limit);
+  },
+};

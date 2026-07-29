@@ -80,6 +80,17 @@ export function customerStatusLabel(status: 'ACTIVE' | 'ACTIONS_RESTRICTED'): Ma
     : { tone: 'complete', key: 'customers.status.active' };
 }
 
+export function customerIdentityStatusLabel(status: string): Mapped {
+  const tone: Record<string, StatusTone> = {
+    NOT_STARTED: 'neutral',
+    PENDING: 'attention',
+    VERIFIED_DEMO: 'complete',
+    FAILED_DEMO: 'failed',
+    VERIFIED_STAGING: 'complete',
+  };
+  return { tone: tone[status] ?? 'neutral', key: `customers.identityStatus.${status}` };
+}
+
 export function actorTypeTone(actorType: 'ADMIN' | 'CUSTOMER' | 'SYSTEM'): StatusTone {
   return actorType === 'ADMIN' ? 'info' : actorType === 'SYSTEM' ? 'neutral' : 'complete';
 }

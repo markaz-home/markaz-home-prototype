@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { listings, propertyPhotos } from '@markaz/db';
 import { router, customerProcedure } from '../../trpc';
+import { isOwnedListingStoragePath } from '../../storage-path';
 import { loadOwned, audit, buildSnapshot } from './shared';
 
 // --- Photos (§18) ---------------------------------------------------------
@@ -11,9 +12,9 @@ export const photosRouter = router({
     .input(
       z.object({
         listingId: z.string().uuid(),
-        storagePath: z.string().min(1),
+        storagePath: z.string().min(1).max(500),
         originalName: z.string().max(255).optional(),
-        contentType: z.string().max(120).optional(),
+        contentType: z.enum(['image/jpeg', 'image/png', 'image/webp']).optional(),
         sizeBytes: z
           .number()
           .int()
@@ -24,6 +25,15 @@ export const photosRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       await loadOwned(ctx.tx, input.listingId);
+      if (
+        !isOwnedListingStoragePath({
+          path: input.storagePath,
+          userId: ctx.user.id,
+          listingId: input.listingId,
+        })
+      ) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Invalid photo storage path.' });
+      }
       const existing = await ctx.tx
         .select()
         .from(propertyPhotos)

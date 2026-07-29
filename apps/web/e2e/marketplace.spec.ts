@@ -48,7 +48,7 @@ test.describe('public marketplace', () => {
   test('anonymous visitor can browse, filter, and open a property', async ({ page }) => {
     await page.goto('/en/properties');
     await expect(page.getByRole('heading', { level: 1 })).toContainText(/Properties/i);
-    await expect(page.getByText(/Prototype marketplace/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Verified Markaz Listings' })).toBeVisible();
 
     // The provisioned LIVE listing appears and opens its detail page.
     const card = page.locator(`a[href*="/properties/${live.publicId}"]`).first();

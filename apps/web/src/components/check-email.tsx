@@ -23,12 +23,9 @@ export function CheckEmail() {
           <Button asChild>
             <Link href={`/verify-email?email=${encodeURIComponent(email)}`}>{t('enterCode')}</Link>
           </Button>
-          <Link
-            href="/sign-up"
-            className="text-muted-foreground hover:text-foreground text-center text-sm"
-          >
-            {t('changeEmail')}
-          </Link>
+          <Button asChild variant="outline" className="rounded-full">
+            <Link href="/sign-up">{t('changeEmail')}</Link>
+          </Button>
         </div>
         <p className="text-muted-foreground pt-2 text-xs">{t('help')}</p>
       </SuccessPanel>

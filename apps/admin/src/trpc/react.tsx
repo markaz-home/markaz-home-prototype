@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createTRPCReact, httpBatchLink } from '@trpc/react-query';
 import superjson from 'superjson';
-import type { AppRouter } from '@markaz/api';
+import type { AdminAppRouter } from '@markaz/api';
 
-export const trpc = createTRPCReact<AppRouter>();
+export const trpc = createTRPCReact<AdminAppRouter>();
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(

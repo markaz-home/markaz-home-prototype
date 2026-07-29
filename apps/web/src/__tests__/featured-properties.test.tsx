@@ -47,9 +47,11 @@ const internalCard = {
 const externalCard = {
   source: 'BAYUT_API' as const,
   providerId: 'bayut-1',
-  title: 'External villa in Dubai Hills',
+  // Representative provider headline: promo claims, separator spam, ALL CAPS.
+  title: '5BR SINGLE ROW | 4% DLD WAIVER | HIGH ROI',
   askingPriceAed: 5_500_000,
-  propertyType: 'Villa',
+  category: 'VILLA' as const,
+  propertyType: 'Villas',
   emirate: 'Dubai',
   community: 'Dubai Hills Estate',
   bedrooms: 4,
@@ -74,26 +76,56 @@ describe('FeaturedProperties', () => {
 
     renderFeatured();
 
-    expect(screen.getByText('Listed on MARKAZ')).toBeInTheDocument();
+    expect(screen.getByText('Listed on Markaz')).toBeInTheDocument();
     expect(screen.getByText('External via BayutAPI')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Two-bedroom apartment/i })).toHaveAttribute(
       'href',
       '/properties/markaz-1/marina-apartment',
     );
-    const externalLink = screen.getByRole('link', { name: /External villa/i });
+    // External cards show a headline composed from structured fields, never the
+    // provider's marketing copy.
+    expect(screen.getByText('Villa in Dubai Hills Estate')).toBeInTheDocument();
+    expect(screen.queryByText(/DLD WAIVER/i)).not.toBeInTheDocument();
+    const externalLink = screen.getByRole('link', { name: /Villa in Dubai Hills Estate/i });
     expect(externalLink).toHaveAttribute('href', 'https://www.bayut.com/property/details-1.html');
     expect(externalLink).toHaveAttribute('target', '_blank');
     expect(externalLink).toHaveAttribute('rel', expect.stringContaining('nofollow'));
-    expect(screen.getByText(/unaffiliated third-party API/i)).toBeInTheDocument();
+    expect(screen.getByText(/unaffiliated third-party providers/i)).toBeInTheDocument();
   });
 
-  it('fails closed without disrupting the rest of the landing page', () => {
+  it('keeps the section present while one source is still loading', () => {
+    h.Q.internal = { isLoading: false, data: [] };
+    h.Q.external = { isLoading: true, data: undefined };
+
+    const view = renderFeatured();
+
+    expect(screen.getByRole('heading', { name: 'Featured properties' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Loading featured properties');
+    expect(screen.queryByText('More featured properties are coming soon')).not.toBeInTheDocument();
+
+    h.Q.external = { isLoading: false, data: { enabled: true, available: true, items: [] } };
+    view.rerender(
+      <NextIntlClientProvider locale="en" messages={loadMessages('en')}>
+        <FeaturedProperties />
+      </NextIntlClientProvider>,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Featured properties' })).toBeInTheDocument();
+    expect(screen.getByText('More featured properties are coming soon')).toBeInTheDocument();
+  });
+
+  it('shows an intentional unavailable state without disrupting the landing page', () => {
     h.Q.internal = { isLoading: false, isError: true, data: undefined };
-    h.Q.external = { isLoading: false, isError: false, data: { items: [] } };
+    h.Q.external = { isLoading: false, isError: true, data: undefined };
 
     renderFeatured();
 
-    expect(screen.queryByRole('heading', { name: 'Featured properties' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Featured properties' })).toBeInTheDocument();
+    expect(screen.getByText('Featured properties are temporarily unavailable')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'View all properties' })).toHaveAttribute(
+      'href',
+      '/properties',
+    );
   });
 
   it('renders the Arabic source disclosure from the shared message catalogue', () => {
@@ -106,6 +138,6 @@ describe('FeaturedProperties', () => {
     renderFeatured('ar');
 
     expect(screen.getByText('مصدر خارجي عبر BayutAPI')).toBeInTheDocument();
-    expect(screen.getByText(/غير تابعة لـ MARKAZ/)).toBeInTheDocument();
+    expect(screen.getByText(/غير تابعة لـ Markaz/)).toBeInTheDocument();
   });
 });

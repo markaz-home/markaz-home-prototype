@@ -112,14 +112,17 @@ d('RLS identity propagation + policy matrix', () => {
   });
 
   it('a customer cannot promote themselves to ADMIN', async () => {
-    await expectError(
-      () =>
-        asUser(
-          customerA,
-          (tx) => tx`update public.profiles set account_type = 'ADMIN' where id = ${customerA}`,
-        ),
-      /cannot be changed|permission denied|violates|only/i,
+    const changed = await asUser(
+      customerA,
+      (tx) =>
+        tx`update public.profiles
+           set account_type = 'ADMIN'
+           where id = ${customerA}
+           returning id`,
     );
+    // PostgreSQL deliberately reports a policy-hidden UPDATE as zero affected
+    // rows rather than leaking that the target row exists.
+    expect(changed).toHaveLength(0);
     const r = await asUser(
       customerA,
       (tx) => tx`select account_type::text as t from public.profiles where id = ${customerA}`,

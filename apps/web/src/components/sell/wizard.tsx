@@ -1,6 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import { Check, Lock, Loader2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Check, Lock, Loader2, AlertTriangle } from 'lucide-react';
 import type { WizardStep, SectionStatus } from '@markaz/domain';
 import { Alert, Badge, Spinner, cn } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
@@ -57,8 +57,8 @@ export function AutosaveIndicator({ state }: { state: AutosaveState }) {
 /** Calm pale-blue simulation disclosure shown on every simulated screen (§5.5). */
 export function SimDisclosure({ title, body }: { title: string; body: string }) {
   return (
-    <div className="border-brand-200 bg-brand-100/50 rounded-lg border p-4 text-sm">
-      <p className="text-brand-900 flex items-center gap-2 font-medium">
+    <div className="border-primary/25 bg-primary/5 rounded-lg border p-4 text-sm">
+      <p className="text-foreground flex items-center gap-2 font-medium">
         <Badge variant="warning" className="uppercase tracking-wide">
           Demo
         </Badge>
@@ -120,7 +120,7 @@ function PropertyIdentity({ listing }: { listing: WizardListing }) {
     ? td(`type${p.propertyType.charAt(0)}${p.propertyType.slice(1).toLowerCase()}` as never)
     : '';
   const bits = [p.buildingOrProject, typeLabel, p.community].filter(Boolean);
-  return <p className="text-brand-900 text-sm font-medium">{bits.join(' · ')}</p>;
+  return <p className="text-foreground text-sm font-medium">{bits.join(' · ')}</p>;
 }
 
 /** Wizard chrome: property identity + autosave + stepper. Used by every step page. */
@@ -141,13 +141,17 @@ export function WizardShell({
 
   return (
     <div className="mx-auto w-full max-w-5xl">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <Link href="/sell" className="text-muted-foreground hover:text-foreground text-sm">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <Link
+          href="/sell"
+          className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm"
+        >
+          <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden />
           {t('backToListings')}
         </Link>
         <AutosaveIndicator state={autosave} />
       </div>
-      <div className="mb-6">
+      <div className="mb-4">
         <PropertyIdentity listing={listing} />
         <p className="text-muted-foreground mt-1 text-xs">
           {t('stepOf', { current: currentIdx + 1, total: 9 })}
@@ -164,22 +168,33 @@ export function WizardShell({
                 <span
                   className={cn(
                     'flex items-center gap-2 rounded-md px-3 py-2 text-sm',
-                    isCurrent && 'bg-brand-100 text-brand-900 font-medium',
+                    isCurrent && 'bg-primary/15 text-foreground font-medium',
                     !isCurrent && accessible && 'text-foreground hover:bg-muted',
-                    !accessible && 'text-muted-foreground',
+                    !accessible && !isCurrent && 'text-muted-foreground',
                   )}
                   aria-current={isCurrent ? 'step' : undefined}
                 >
+                  {/* Ringed marker; the current step's ring turns gold so
+                      "where am I" reads at a glance even when the step also
+                      carries a status glyph. */}
                   {status === 'COMPLETE' ? (
-                    <Check className="text-success h-4 w-4" aria-hidden />
+                    <StepMarker current={isCurrent} complete>
+                      <Check className="h-3.5 w-3.5" aria-hidden />
+                    </StepMarker>
                   ) : status === 'FAILED' || status === 'REQUIRES_ATTENTION' ? (
-                    <AlertTriangle className="text-warning h-4 w-4" aria-hidden />
+                    <StepMarker current={isCurrent}>
+                      <AlertTriangle className="text-warning h-3.5 w-3.5" aria-hidden />
+                    </StepMarker>
                   ) : status === 'PENDING' ? (
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                    <StepMarker current={isCurrent}>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+                    </StepMarker>
                   ) : !accessible ? (
-                    <Lock className="h-3.5 w-3.5" aria-hidden />
+                    <StepMarker>
+                      <Lock className="h-3 w-3" aria-hidden />
+                    </StepMarker>
                   ) : (
-                    <span className="h-4 w-4 text-center text-xs">{i + 1}</span>
+                    <StepMarker current={isCurrent}>{i + 1}</StepMarker>
                   )}
                   <span>
                     {t(s.labelKey)}
@@ -201,8 +216,63 @@ export function WizardShell({
             })}
           </ol>
         </nav>
-        <div className="min-w-0">{children}</div>
+        <div className="min-w-0">
+          <WizardProgress current={currentIdx} total={WIZARD_STEP_CONFIG.length} />
+          <div className="platform-gold-panel border-border/70 bg-card/40 mt-3 rounded-lg border p-6 md:p-7">
+            {children}
+          </div>
+        </div>
       </div>
+    </div>
+  );
+}
+
+/** Ringed step marker used by the step rail. */
+function StepMarker({
+  children,
+  current = false,
+  complete = false,
+}: {
+  children: React.ReactNode;
+  current?: boolean;
+  complete?: boolean;
+}) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        'grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[11px] font-medium',
+        // Gold carries both "done" and "here"; green would be the only cool
+        // colour on the workspace palette.
+        current
+          ? 'border-primary bg-primary text-primary-foreground'
+          : complete
+            ? 'border-primary/60 text-primary'
+            : 'border-foreground/25 text-muted-foreground',
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
+/**
+ * Segmented progress bar over the form — the same device as the auth flow's
+ * three-step bar, stretched to the nine listing steps. Decorative: the step
+ * eyebrow and the rail carry the readable position.
+ */
+function WizardProgress({ current, total }: { current: number; total: number }) {
+  return (
+    <div className="flex items-center gap-1.5" aria-hidden>
+      {Array.from({ length: total }, (_, i) => (
+        <span
+          key={i}
+          className={cn(
+            'h-1 flex-1 rounded-full transition-colors',
+            i <= current ? 'bg-primary' : 'bg-foreground/20',
+          )}
+        />
+      ))}
     </div>
   );
 }

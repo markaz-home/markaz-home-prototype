@@ -17,13 +17,17 @@ From a clean clone to both apps running against a local Supabase stack.
 # 1. Install workspace dependencies
 pnpm install
 
-# 2. Create your local env file
-cp .env.example .env
-
-# 3. Start the local Supabase stack (Docker)
+# 2. Start the local Supabase stack (Docker)
 pnpm supabase:start
 
-# 4. Apply the canonical migrations + (minimal) seed
+# 3. Create `.env.local` from `.env.example`, then replace the Supabase/DB
+#    placeholders with CURRENT values from `supabase status -o env`.
+#    For SUPABASE_SERVICE_ROLE_KEY use SERVICE_ROLE_KEY (legacy JWT), not
+#    SECRET_KEY; the local Admin API/bootstrap requires the role JWT.
+cp .env.example .env.local
+
+# 4. Validate configuration and apply migrations + minimal seed
+pnpm config:check
 pnpm supabase:reset
 
 # 5. Run both apps, then SIGN UP in the web app to create accounts
@@ -50,7 +54,8 @@ pnpm dev
 
 ## Environment variables
 
-Defined in `.env.example` (copied to `.env`). See `infra/environment-contract.md`
+Defined in `.env.example` (copied to ignored `.env.local`). See
+`ENVIRONMENT-VARIABLES.md` and `infra/environment-contract.md`
 for which are **server-only**. Key ones:
 
 - Public: `NEXT_PUBLIC_WEB_URL`, `NEXT_PUBLIC_ADMIN_URL`,
@@ -70,6 +75,8 @@ pnpm lint           # eslint
 pnpm typecheck      # tsc --noEmit (strict)
 pnpm test           # unit/component (Vitest)
 pnpm test:e2e       # Playwright (needs the local Supabase stack running)
+pnpm config:check   # fail safely on missing/unsafe configuration
+pnpm security:secrets # scan repository candidates without printing values
 
 pnpm db:generate    # drizzle-kit generate (REVIEW only; fold into canonical SQL)
 pnpm db:migrate     # apply migrations
@@ -92,3 +99,9 @@ pnpm supabase:status  # show local service status/URLs
 - **Cannot log in** — see `authentication.md` (email + password; the new-account
   verification **code** and the password-recovery **link** arrive in the mail
   inbox at :54324). **Sign up** in the app first — no accounts are pre-seeded.
+- **Storage/integration tests skip while the stack is up** — `.env.local` likely has a
+  stale `sb_secret_` value. Refresh all local values from `supabase status -o env` and map
+  its legacy `SERVICE_ROLE_KEY` JWT to `SUPABASE_SERVICE_ROLE_KEY`.
+- **Hosted `.env` exists** — keep local-first `.env.local` current. Destructive tests reject
+  non-loopback targets, but application dev can still feel slow or affect the wrong environment
+  if local overrides are stale.

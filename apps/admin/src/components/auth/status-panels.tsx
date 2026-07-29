@@ -16,10 +16,7 @@ export function SuccessPanel({
     <div className="space-y-5">
       <CheckCircle2 className="text-success h-9 w-9" aria-hidden />
       <div className="space-y-2">
-        <h1
-          tabIndex={-1}
-          className="font-display text-brand-900 text-3xl font-medium tracking-tight"
-        >
+        <h1 tabIndex={-1} className="font-display text-primary text-3xl font-medium tracking-tight">
           {title}
         </h1>
         {description ? <p className="text-muted-foreground">{description}</p> : null}
@@ -48,10 +45,7 @@ export function ErrorPanel({
     <div className="space-y-5">
       <Icon className="text-destructive h-9 w-9" aria-hidden />
       <div className="space-y-2">
-        <h1
-          tabIndex={-1}
-          className="font-display text-brand-900 text-3xl font-medium tracking-tight"
-        >
+        <h1 tabIndex={-1} className="font-display text-primary text-3xl font-medium tracking-tight">
           {title}
         </h1>
         {description ? <p className="text-muted-foreground">{description}</p> : null}

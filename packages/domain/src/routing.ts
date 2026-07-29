@@ -32,7 +32,7 @@ export interface PostAuthState {
  *   email/password email not verified → verify-email
  *   authenticated, profile incomplete → profile-setup (fallback; normal path fills it at sign-up)
  *   complete, identity NOT_STARTED/PENDING/FAILED_DEMO → uae-pass (resumes sub-state)
- *   complete, VERIFIED_DEMO or trusted provider identity → dashboard
+ *   complete, VERIFIED_DEMO/VERIFIED_STAGING or trusted provider identity → dashboard
  *
  * Incomplete customers can never reach the dashboard. Provider-authenticated sessions
  * do not additionally require MARKAZ's email/password verification code.

@@ -4,7 +4,11 @@ import {
   canSelfAssignAccountType,
   DEFAULT_ACCOUNT_TYPE,
 } from '../account';
-import { canTransitionIdentity, isIdentityVerified } from '../identity';
+import {
+  canTransitionIdentity,
+  isIdentityVerified,
+  simulatedIdentityStatusSchema,
+} from '../identity';
 import { isProfileComplete } from '../profile';
 import { resolvePostAuthDestination } from '../routing';
 import {
@@ -45,6 +49,20 @@ describe('identity machine', () => {
     expect(canTransitionIdentity('FAILED_DEMO', 'PENDING')).toBe(true);
     expect(canTransitionIdentity('NOT_STARTED', 'VERIFIED_DEMO')).toBe(false);
     expect(isIdentityVerified('VERIFIED_DEMO')).toBe(true);
+  });
+
+  it('records staging only from eligible incomplete states and treats it as verified', () => {
+    expect(canTransitionIdentity('NOT_STARTED', 'VERIFIED_STAGING')).toBe(true);
+    expect(canTransitionIdentity('PENDING', 'VERIFIED_STAGING')).toBe(true);
+    expect(canTransitionIdentity('FAILED_DEMO', 'VERIFIED_STAGING')).toBe(true);
+    expect(canTransitionIdentity('VERIFIED_DEMO', 'VERIFIED_STAGING')).toBe(false);
+    expect(canTransitionIdentity('VERIFIED_STAGING', 'PENDING')).toBe(false);
+    expect(isIdentityVerified('VERIFIED_STAGING')).toBe(true);
+  });
+
+  it('never accepts VERIFIED_STAGING through the browser-driven simulation schema', () => {
+    expect(simulatedIdentityStatusSchema.safeParse('VERIFIED_DEMO').success).toBe(true);
+    expect(simulatedIdentityStatusSchema.safeParse('VERIFIED_STAGING').success).toBe(false);
   });
 });
 
@@ -97,6 +115,14 @@ describe('profile completeness + post-auth routing', () => {
       resolvePostAuthDestination({
         emailVerified: true,
         profile: { ...complete, identityVerificationStatus: 'VERIFIED_DEMO' },
+      }),
+    ).toBe('dashboard');
+  });
+  it('routes a recorded staging identity to the dashboard', () => {
+    expect(
+      resolvePostAuthDestination({
+        emailVerified: true,
+        profile: { ...complete, identityVerificationStatus: 'VERIFIED_STAGING' },
       }),
     ).toBe('dashboard');
   });

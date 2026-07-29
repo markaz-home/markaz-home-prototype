@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { forgotPasswordSchema, mapAuthError, type ForgotPasswordInput } from '@markaz/domain';
 import { Alert, Button, FormField, Input } from '@markaz/ui';
 import { createSupabaseBrowserClient } from '@markaz/auth/browser';
@@ -15,6 +15,7 @@ export function ForgotPasswordForm() {
   const tv = useTranslations('validation');
   const tf = useTranslations('signup');
   const router = useRouter();
+  const locale = useLocale();
   const [supabase] = useState(() => createSupabaseBrowserClient());
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +33,9 @@ export function ForgotPasswordForm() {
 
   async function onSubmit(data: ForgotPasswordInput) {
     setError(null);
-    const redirectTo = `${window.location.origin}/auth/confirm`;
+    // Put the locale in the callback path so the recovery template can append
+    // its token query string without losing the user's selected language.
+    const redirectTo = `${window.location.origin}/auth/confirm/${locale}`;
     const { error: err } = await supabase.auth.resetPasswordForEmail(data.email, { redirectTo });
     // Only surface rate/provider failures — never reveal account existence.
     if (err) {

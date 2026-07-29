@@ -26,7 +26,7 @@ export function NewListingPreflight() {
   if (draft.data) {
     return (
       <div className="mx-auto max-w-lg space-y-4 py-10 text-center">
-        <h1 className="font-display text-brand-900 text-2xl font-medium">{t('resumeTitle')}</h1>
+        <h1 className="font-display text-foreground text-2xl font-medium">{t('resumeTitle')}</h1>
         <p className="text-muted-foreground">{t('resumeBody')}</p>
         <div className="flex flex-col items-center gap-2">
           <Button onClick={() => router.replace(`/sell/listings/${draft.data!.listingId}`)}>

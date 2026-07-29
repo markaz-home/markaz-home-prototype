@@ -6,7 +6,11 @@ import { DataSection, Field, FieldGrid } from '@/components/admin/detail';
 import { StatusBadge } from '@/components/admin/status-badge';
 import { NotesPanel } from '@/components/admin/notes-panel';
 import { RestrictCustomerAction, RestoreCustomerAction } from '@/components/admin/entity-actions';
-import { customerStatusLabel, formatWhen } from '@/components/admin/labels';
+import {
+  customerIdentityStatusLabel,
+  customerStatusLabel,
+  formatWhen,
+} from '@/components/admin/labels';
 
 export default async function CustomerDetailPage({
   params,
@@ -33,6 +37,7 @@ export default async function CustomerDetailPage({
     );
 
   const status = customerStatusLabel(c.status);
+  const identityStatus = customerIdentityStatusLabel(c.identityStatus);
 
   return (
     <PageShell maxWidth={1440}>
@@ -55,7 +60,10 @@ export default async function CustomerDetailPage({
                 label={t('customers.col.status')}
                 value={<StatusBadge tone={status.tone} label={t(status.key)} />}
               />
-              <Field label={t('customers.identity')} value={c.identityStatus} />
+              <Field
+                label={t('customers.identity')}
+                value={<StatusBadge tone={identityStatus.tone} label={t(identityStatus.key)} />}
+              />
               <Field
                 label={t('customers.onboarded')}
                 value={c.onboarded ? t('yes') : t('customers.notOnboarded')}

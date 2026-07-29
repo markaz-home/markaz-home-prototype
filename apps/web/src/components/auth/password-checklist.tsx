@@ -1,6 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import { Check, X, Minus } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { checkPasswordRequirements, passwordStrength } from '@markaz/domain';
 import { cn } from '@markaz/ui';
 
@@ -64,16 +64,27 @@ export function PasswordChecklist({
       <ul className="grid grid-cols-1 gap-1 text-xs sm:grid-cols-2">
         {RULES.map((rule) => {
           const ok = req[RULE_FIELD[rule]];
-          const Icon = ok ? Check : submitted ? X : Minus;
+          // An untouched, empty field is not a failure — stay neutral until
+          // there is something to judge, even after a submit attempt.
+          const failed = !ok && submitted && password.length > 0;
           return (
             <li
               key={rule}
               className={cn(
                 'flex items-center gap-1.5',
-                ok ? 'text-success' : submitted ? 'text-destructive' : 'text-muted-foreground',
+                ok ? 'text-success' : failed ? 'text-destructive' : 'text-muted-foreground',
               )}
             >
-              <Icon className="h-3.5 w-3.5" aria-hidden />
+              {ok ? (
+                <Check className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              ) : failed ? (
+                <X className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              ) : (
+                // Plain bullet until the rule is met or the form is submitted.
+                <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center" aria-hidden>
+                  <span className="h-1 w-1 rounded-full bg-current" />
+                </span>
+              )}
               <span>{t(rule)}</span>
             </li>
           );

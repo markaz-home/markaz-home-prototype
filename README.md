@@ -6,9 +6,9 @@ through a transaction). Admin operations live in a **separate** application. Rea
 engineering throughout; only the regulated integrations (UAE PASS, DLD, Trakheesi,
 payment) are **simulated** — behind named interfaces, with persisted outcomes.
 
-This repository implements **Weeks 1–6**: the application foundation, the listing
+This repository implements **Weeks 1–8**: the application foundation, the listing
 wizard, publication + marketplace, offers & negotiation, the transaction tracker,
-and the admin portal.
+the Admin portal, release-candidate hardening, and controlled-deployment preparation.
 
 ## What's built
 
@@ -20,6 +20,8 @@ and the admin portal.
 | **Week 4** | Non-binding buyer offers / seller offer management — one thread per (buyer, listing), immutable proposals, single-accepted-offer enforcement                                      | `WEEK-4.md`                |
 | **Week 5** | Shared **simulated** transaction tracker on an accepted offer (17 milestones / 6 stages), private participant-scoped documents                                                    | `WEEK-5.md`                |
 | **Week 6** | Separate **admin portal** — capability-gated, reason-coded, audited operational controls (restriction, publication review, listing/transaction recovery, audited document access) | `WEEK-6.md`                |
+| **Week 7** | Full release-candidate hardening, RLS/Storage/a11y/E2E evidence, and immutable `rc-week-7` baseline                                                                               | `WEEK-7.md`                |
+| **Week 8** | Environment/security hardening, local backup/restore proof, operational runbooks, readiness assessment, and final handover                                                        | `WEEK-8.md`                |
 
 Everything regulated is **simulated** — no real payment, escrow, contract, DLD,
 Trakheesi, or UAE PASS integration is performed.
@@ -54,13 +56,14 @@ from the keys `supabase start` printed:
 # .env.local  — local overrides; both apps + db scripts prefer this over .env
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<sb_publishable_… from `supabase status`>
-SUPABASE_SERVICE_ROLE_KEY=<sb_secret_… from `supabase status`>
+SUPABASE_SERVICE_ROLE_KEY=<legacy SERVICE_ROLE_KEY JWT from `supabase status -o env`>
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
 DIRECT_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
 ```
 
 ```bash
 pnpm supabase:reset            # apply canonical migrations (see the reset note below)
+pnpm config:check              # fail fast on unsafe/missing runtime configuration
 pnpm dev                       # web on :3000, admin on :3001
 ```
 
@@ -129,7 +132,7 @@ pnpm db:setup          # env-driven ADMIN bootstrap (Admin API); no-op without B
 pnpm db:generate       # drizzle-kit generate (REVIEW only; fold into canonical SQL)
 ```
 
-Schema is a **single ordered SQL history** in `supabase/migrations/` (0100 → 0815);
+Schema is a **single ordered SQL history** in `supabase/migrations/` (0100 → 0821);
 Drizzle is the typed mirror and generated SQL is reviewed in, never applied separately.
 `supabase/seed.sql` is intentionally minimal — **no** demo Auth users. `db:setup` and
 the seed/migrate scripts prefer `.env.local`, so local runs never touch a hosted DB
@@ -138,8 +141,9 @@ by accident. See `docs/runbooks/database-reset.md`.
 ## Running tests
 
 ```bash
-pnpm typecheck && pnpm lint && pnpm test && pnpm build   # what CI runs
+pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build
 pnpm test:e2e                                            # Playwright (needs the stack + apps)
+pnpm security:secrets                                    # value-suppressing repository scan
 ```
 
 > **Integration + e2e tests require the local Supabase stack** and the service-role
@@ -162,12 +166,13 @@ ADRs 0001–0029 in `docs/adr/`. Highlights by milestone:
 See also `docs/architecture/` (incl. `admin-portal.md`, `offers.md`, `transactions.md`,
 `marketplace.md`, `auth-and-rls.md`) and `docs/runbooks/`.
 
-## Deferred (next milestone+)
+## Deferred / outside this prototype
 
 - **Durable background jobs** (`apps/worker` is a placeholder).
 - **Real** DLD / Trakheesi / Madmoun / payment / UAE PASS integrations.
 - Any **AWS provisioning** (`infra/` holds boundary contracts only).
 - Free-form messaging/chat, contact exchange, email/SMS/push delivery, map search.
+- Public production launch. See `PRODUCTION-READINESS.md` and `FINAL-LIMITATIONS.md`.
 
 ## Known limitations
 
@@ -179,6 +184,12 @@ the Edge Runtime` comes from a transitive dependency of `@supabase/ssr` used by 
   dependency.
 - **Self-hosted-Supabase-on-RDS is NOT validated** (ADR-0006).
 - **Session-expired detection is best-effort** (ADR-0009).
+- **Production operations are not configured** — no selected host/topology, production email,
+  monitoring/error tracking, secrets manager, backup/PITR/Storage recovery, incident drill, or
+  completed dependency-audit evidence.
+
+The full bounded assessment, deployment/rollback procedures, and owner handover are in
+`PRODUCTION-READINESS.md`, `DEPLOYMENT-RUNBOOK.md`, `ROLLBACK-RUNBOOK.md`, and `HANDOVER.md`.
 
 ## Platform workstream boundary
 

@@ -1,8 +1,10 @@
 import { and, eq, isNull } from 'drizzle-orm';
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { listings, ownershipDocuments, verifications } from '@markaz/db';
 import { listingStageIndex } from '@markaz/domain';
 import { router, customerProcedure } from '../../trpc';
+import { isOwnedListingStoragePath } from '../../storage-path';
 import { loadOwned, audit, invalidateDownstream } from './shared';
 
 // --- Ownership document ---------------------------------------------------
@@ -12,9 +14,9 @@ export const documentRouter = router({
       z.object({
         listingId: z.string().uuid(),
         documentType: z.enum(['TITLE_DEED', 'OQOOD']),
-        storagePath: z.string().min(1),
+        storagePath: z.string().min(1).max(500),
         originalName: z.string().max(255).optional(),
-        contentType: z.string().max(120).optional(),
+        contentType: z.enum(['application/pdf', 'image/jpeg', 'image/png']).optional(),
         sizeBytes: z
           .number()
           .int()
@@ -25,6 +27,15 @@ export const documentRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const listing = await loadOwned(ctx.tx, input.listingId);
+      if (
+        !isOwnedListingStoragePath({
+          path: input.storagePath,
+          userId: ctx.user.id,
+          listingId: input.listingId,
+        })
+      ) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Invalid document storage path.' });
+      }
       const replacing = listingStageIndex(listing.state) >= listingStageIndex('DOCUMENT_UPLOADED');
       await ctx.tx
         .update(ownershipDocuments)

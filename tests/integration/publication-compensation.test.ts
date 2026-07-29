@@ -208,10 +208,13 @@ d('publication compensation + idempotency', () => {
   it('Scenario E — repeated cleanup is safe and removes only the supplied keys', async () => {
     // A sentinel object under an unrelated prefix must survive a targeted cleanup.
     const sentinelPrefix = `itest-sentinel-${owner.replace(/-/g, '').slice(0, 8)}`;
-    const sentinelKey = `${sentinelPrefix}/keep.txt`;
+    const sentinelKey = `${sentinelPrefix}/keep.png`;
     await service!.storage
       .from('listing-photos')
-      .upload(sentinelKey, new Blob(['keep']), { upsert: true, contentType: 'text/plain' });
+      .upload(sentinelKey, new Blob(['keep'], { type: 'image/png' }), {
+        upsert: true,
+        contentType: 'image/png',
+      });
 
     const listingId = await driveToReady(owner, 1);
     await submit(listingId);

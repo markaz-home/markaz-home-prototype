@@ -1,7 +1,8 @@
+/* eslint-disable @next/next/no-img-element -- Marketplace photos can be runtime provider URLs and are not guaranteed to satisfy Next Image host configuration. */
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { Bath, BedDouble, Maximize } from 'lucide-react';
+import { Bath, BedDouble, Maximize, TrendingUp } from 'lucide-react';
 import { Badge, Card, cn } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
 import { formatAed, formatNumber } from '@/lib/format';
@@ -92,7 +93,15 @@ export function PropertyCard({ card, isAuthenticated, saved, owned }: PropertyCa
           </div>
 
           {card.investmentCaseAvailable && (
-            <Badge variant="outline" className={cn('mt-1 w-fit')}>
+            // Gold-tinted: this is the one card signal that says "there are
+            // figures inside", so it should read as a feature, not a footnote.
+            <Badge
+              variant="outline"
+              className={cn(
+                'border-primary/40 bg-primary/10 text-primary mt-1 w-fit gap-1.5 font-medium',
+              )}
+            >
+              <TrendingUp className="h-3.5 w-3.5" aria-hidden />
               {t('investmentAvailable')}
             </Badge>
           )}
