@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithIntl } from './test-utils';
 
@@ -10,6 +10,9 @@ const auditMutateAsync = vi.fn().mockResolvedValue({});
 const signOut = vi.fn().mockResolvedValue({});
 const replace = vi.fn();
 let completeSetupOnSuccess: (() => void) | undefined;
+let syncIdentityOnSuccess:
+  | ((profile: { identityVerificationStatus: 'VERIFIED_STAGING' }) => void)
+  | undefined;
 
 vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({ replace, refresh: vi.fn() }),
@@ -29,7 +32,12 @@ vi.mock('@/trpc/react', () => ({
         },
       },
       syncUaePassIdentity: {
-        useMutation: () => ({ mutate: syncIdentityMutate, isPending: false }),
+        useMutation: (options?: {
+          onSuccess?: (profile: { identityVerificationStatus: 'VERIFIED_STAGING' }) => void;
+        }) => {
+          syncIdentityOnSuccess = options?.onSuccess;
+          return { mutate: syncIdentityMutate, isPending: false };
+        },
       },
     },
     audit: { record: { useMutation: () => ({ mutateAsync: auditMutateAsync }) } },
@@ -45,6 +53,7 @@ beforeEach(() => {
   linkIdentity.mockReset().mockResolvedValue({ error: null });
   replace.mockReset();
   completeSetupOnSuccess = undefined;
+  syncIdentityOnSuccess = undefined;
 });
 
 describe('ProfileSetupForm', () => {
@@ -148,6 +157,26 @@ describe('UaePassFlow (UAE PASS Staging)', () => {
     );
     expect(syncIdentityMutate).toHaveBeenCalledTimes(1);
     expect(syncIdentityMutate).toHaveBeenCalledWith();
+  });
+
+  it('completes the journey after the fallback identity sync succeeds', () => {
+    renderWithIntl(
+      <UaePassFlow initialStatus="NOT_STARTED" providerLinked uaePassStaging locale="en" />,
+    );
+    act(() => syncIdentityOnSuccess?.({ identityVerificationStatus: 'VERIFIED_STAGING' }));
+    expect(replace).toHaveBeenCalledWith('/dashboard');
+  });
+
+  it('recovers a completed provider callback even when provider metadata is briefly stale', () => {
+    renderWithIntl(
+      <UaePassFlow
+        initialStatus="NOT_STARTED"
+        uaePassStaging
+        locale="en"
+        notice="uae_pass_record_error"
+      />,
+    );
+    expect(syncIdentityMutate).toHaveBeenCalledTimes(1);
   });
 
   it('does not expose legacy simulation controls for a pending demo status', () => {

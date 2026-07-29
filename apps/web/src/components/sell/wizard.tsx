@@ -54,7 +54,7 @@ export function AutosaveIndicator({ state }: { state: AutosaveState }) {
   );
 }
 
-/** Calm pale-blue simulation disclosure shown on every simulated screen (§5.5). */
+/** Calm token-based simulation disclosure shown on every simulated screen (§5.5). */
 export function SimDisclosure({ title, body }: { title: string; body: string }) {
   return (
     <div className="border-primary/25 bg-primary/5 rounded-lg border p-4 text-sm">

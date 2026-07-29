@@ -28,7 +28,7 @@ vi.mock('@/components/transactions/shared', () => ({
 import { WorkspaceShell } from '@/components/workspace-shell';
 
 describe('WorkspaceShell (shared Platform Gold workspace)', () => {
-  it('uses the copper wordmark instead of the retired blue workspace logo', () => {
+  it('uses the copper wordmark throughout the customer workspace', () => {
     render(
       <NextIntlClientProvider locale="en" messages={loadMessages('en')}>
         <WorkspaceShell displayName="Tania">
@@ -41,7 +41,6 @@ describe('WorkspaceShell (shared Platform Gold workspace)', () => {
     expect(logos.length).toBeGreaterThan(0);
     for (const logo of logos) {
       expect(logo).toHaveAttribute('src', expect.stringContaining('markaz-logo-gold.png'));
-      expect(logo).not.toHaveAttribute('src', expect.stringContaining('logo-web.png'));
     }
     expect(screen.getByText('Dashboard content')).toBeInTheDocument();
   });

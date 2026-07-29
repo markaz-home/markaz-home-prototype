@@ -3,89 +3,56 @@
 @tailwind utilities;
 
 /*
- * MARKAZ Home design tokens — "Architectural Blue, Quiet Editorial Intelligence"
- * (docs/design/markaz-design-foundation.md, §10 colour, §11 type, §12 radius).
- * Tokens are HSL channels (shadcn convention) so the palette swaps in one place.
- * Brand blue creates hierarchy and confidence — it never dominates by weight
- * (target ~65–75% white/off-white, 15–25% blue, §10.2). RTL-safe.
+ * MARKAZ Home design tokens — "Platform Gold, Quiet Editorial Intelligence".
+ * Tokens are HSL channels (shadcn convention) and are the default for every
+ * application surface, including root error/not-found states. RTL-safe.
  */
 @layer base {
   :root {
-    /* Brand blue scale (§10.1) */
-    --brand-900: 209 64% 16%; /* #0F2A44 Deep Architectural Blue */
-    --brand-800: 208 61% 22%; /* #163A5A Ocean Ink */
-    --brand-700: 206 58% 29%; /* #1F4E73 Clear Blue */
-    --brand-500: 209 31% 41%; /* #486A8A Slate Blue */
-    --brand-300: 208 37% 77%; /* #AFC6DA Mist Blue */
-    --brand-100: 204 44% 94%; /* #EAF2F7 Pale Blue */
+    color-scheme: dark;
 
-    /* Surfaces & text */
-    --background: 216 38% 97%; /* #F6F8FB Cool Off-White canvas */
-    --foreground: 210 43% 14%; /* #142332 Blue Black */
-    --card: 0 0% 100%;
-    --card-foreground: 210 43% 14%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 43% 14%;
+    /* Warm copper-gold brand scale. */
+    --brand-900: 31 41% 63%;
+    --brand-800: 27 33% 58%;
+    --brand-700: 31 43% 60%;
+    --brand-500: 30 27% 48%;
+    --brand-300: 31 30% 76%;
+    --brand-100: 33 33% 90%;
 
-    /* Primary = Clear Blue (buttons, links, active controls) */
-    --primary: 206 58% 29%;
-    --primary-foreground: 0 0% 100%;
+    /* Near-black surfaces and high-contrast text. */
+    --background: 0 0% 5%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 100%;
 
-    /* Secondary / muted / accent = Pale Blue family */
-    --secondary: 204 44% 94%;
-    --secondary-foreground: 209 64% 16%;
-    --muted: 204 44% 94%;
-    --muted-foreground: 208 15% 41%; /* #59697A Slate — darkened to clear WCAG AA 4.5:1 on the off-white canvas */
-    --accent: 204 44% 94%;
-    --accent-foreground: 209 64% 16%;
+    --primary: 31 41% 63%;
+    --primary-foreground: 24 39% 8%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 92%;
+    --muted: 0 0% 11%;
+    --muted-foreground: 0 0% 62%;
+    --accent: 31 20% 18%;
+    --accent-foreground: 31 45% 82%;
 
-    /* Semantic (§10.3) — never colour alone; always pair with label/icon */
-    --destructive: 4 76% 40%;
-    --destructive-foreground: 0 0% 100%;
-    --success: 146 61% 30%;
-    --success-foreground: 0 0% 100%;
-    --warning: 26 90% 37%;
-    --warning-foreground: 0 0% 100%;
+    /* Semantic colours are reserved for status and always paired with copy/icon. */
+    --destructive: 4 72% 64%;
+    --destructive-foreground: 24 39% 8%;
+    --success: 145 43% 55%;
+    --success-foreground: 24 39% 8%;
+    --warning: 38 88% 64%;
+    --warning-foreground: 24 39% 8%;
 
-    /* Lines & focus */
-    --border: 205 29% 88%; /* #D9E3EA Blue Grey */
-    --input: 205 29% 88%;
-    --ring: 206 58% 29%;
+    --border: 0 0% 18%;
+    --input: 0 0% 22%;
+    --ring: 31 41% 63%;
 
-    --radius: 0.625rem; /* 10px — inputs/buttons 8–10, cards 10–12 (§12.4) */
+    --radius: 0.625rem;
 
-    /* Typography (§11): Manrope interface, Source Serif 4 display */
     --font-sans: var(--font-manrope), system-ui, sans-serif;
     --font-display: var(--font-source-serif), Georgia, 'Times New Roman', serif;
     --font-arabic: var(--font-noto-sans-arabic), var(--font-sans);
-  }
-
-  /* Dark surface (used by the admin operations portal, §8.2) */
-  .dark {
-    --brand-900: 209 64% 16%;
-    --background: 209 60% 11%;
-    --foreground: 204 44% 94%;
-    --card: 208 55% 14%;
-    --card-foreground: 204 44% 94%;
-    --popover: 208 55% 14%;
-    --popover-foreground: 204 44% 94%;
-    --primary: 208 50% 62%;
-    --primary-foreground: 209 64% 12%;
-    --secondary: 208 40% 20%;
-    --secondary-foreground: 204 44% 94%;
-    --muted: 208 40% 20%;
-    --muted-foreground: 208 24% 70%;
-    --accent: 208 40% 22%;
-    --accent-foreground: 204 44% 94%;
-    --destructive: 4 64% 52%;
-    --destructive-foreground: 0 0% 100%;
-    --success: 146 45% 45%;
-    --success-foreground: 209 64% 12%;
-    --warning: 26 78% 52%;
-    --warning-foreground: 209 64% 12%;
-    --border: 208 35% 24%;
-    --input: 208 35% 26%;
-    --ring: 208 50% 56%;
   }
 
   /*

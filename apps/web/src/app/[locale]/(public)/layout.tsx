@@ -1,7 +1,6 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { MarketplaceHeader } from '@/components/marketplace/marketplace-header';
 import { PublicFooter } from '@/components/marketplace/public-footer';
-import { BodyTheme } from '@/components/theme/body-theme';
 import { getSession } from '@/server/session';
 
 /**
@@ -22,7 +21,6 @@ export default async function PublicLayout({
 
   return (
     <div className="theme-platform-gold flex min-h-dvh flex-col">
-      <BodyTheme className="theme-platform-gold" />
       <a
         href="#main"
         className="focus:bg-background sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-3"

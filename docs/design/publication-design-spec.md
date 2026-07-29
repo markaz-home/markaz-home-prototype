@@ -50,7 +50,7 @@ The marketplace uses:
 - Idempotent, authenticated saving with safe anonymous return-to-intent behaviour
 - A Saved Properties experience that withholds details when a listing becomes unavailable
 
-The visual direction remains **Architectural Blue — Quiet Editorial Intelligence**: strong UAE property photography, Source Serif 4 for selected editorial headings, Manrope for interface content, Cool Off-White canvas, Clear Blue actions, restrained borders, generous spacing, and minimal decorative motion.
+The visual direction remains **Platform Gold — Quiet Editorial Intelligence**: strong UAE property photography, Source Serif 4 for selected editorial headings, Manrope for interface content, a near-black canvas, copper-gold actions, restrained borders, generous spacing, and minimal decorative motion.
 
 ---
 
@@ -253,7 +253,7 @@ Do not expose storage paths, internal review notes, database fields, or technica
 > **Publication review simulated**  
 > This prototype does not perform a real regulatory or legal publication review.
 
-Show this disclosure on confirmation, pending, approved, and returned-for-changes states. Use a pale-blue information treatment, not an official seal or warning-red banner.
+Show this disclosure on confirmation, pending, approved, and returned-for-changes states. Use a muted charcoal information treatment, not an official seal or warning-red banner.
 
 ---
 
@@ -1346,7 +1346,7 @@ Use a horizontal toolbar beneath search rather than a permanent sidebar. This ke
 
 - Each primary filter opens an anchored popover.
 - `More filters` opens a 420–480 px side sheet from logical end.
-- Active controls use pale-blue background and include a count where relevant.
+- Active controls use the copper-accent surface and include a count where relevant.
 - Active chips appear on the next row.
 - Popover changes apply when the user selects `Apply`.
 - A single-select filter may apply immediately only if it does not create inconsistent multi-field state; use consistent Apply behaviour for Price and range controls.
@@ -1787,7 +1787,7 @@ Omit the section entirely when fewer than 2 suitable properties exist. Do not ca
 
 An accessible modal route or dialog:
 
-- Dark neutral background, not brand-blue wash
+- Dark neutral background without a coloured wash
 - Close button at logical end/top
 - Large current image
 - Previous and Next controls
@@ -3625,14 +3625,14 @@ The design is implementation-ready with the defaults below. Confirm these items 
 
 Use the approved MARKAZ visual system:
 
-- **Direction:** Architectural Blue — Quiet Editorial Intelligence
-- **Primary blue:** `#1F4E73`
-- **Deep blue:** `#0F2A44`
-- **Pale blue:** `#EAF2F7`
-- **Canvas:** `#F6F8FB`
-- **Surface:** `#FFFFFF`
-- **Text:** `#142332`
-- **Borders:** `#D9E3EA`
+- **Direction:** Platform Gold — Quiet Editorial Intelligence
+- **Primary copper:** `#C8A27A`
+- **Copper hover:** `#B89172`
+- **Canvas:** `#0C0C0C`
+- **Surface:** `#121212`
+- **Text:** `#FFFFFF`
+- **Secondary text:** `#9E9E9E`
+- **Borders:** `#2E2E2E`
 - **Display:** Source Serif 4 for selected public headings
 - **Interface:** Manrope
 - **Card radius:** 10–12 px

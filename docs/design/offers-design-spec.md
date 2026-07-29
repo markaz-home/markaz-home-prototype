@@ -16,7 +16,7 @@ Week 4 adds a complete, non-binding negotiation experience to the existing MARKA
 
 The experience begins from the Week 3 public property page, continues through offer creation and structured negotiation, and may end with one accepted offer. It does not create a transaction, payment, escrow, MOU, Form F, legal commitment, viewing workflow, or direct buyer-seller communication. Acceptance creates a clear Week 5 handoff only.
 
-This specification preserves the implemented Week 3 marketplace, public/private projection boundary, anonymous browsing, safe authentication return, `LIVE` and `PAUSED` listing behaviour, RLS identity model, Realtime foundation, English/Arabic localisation, RTL support, and the approved Architectural Blue design language.
+This specification preserves the implemented Week 3 marketplace, public/private projection boundary, anonymous browsing, safe authentication return, `LIVE` and `PAUSED` listing behaviour, RLS identity model, Realtime foundation, English/Arabic localisation, RTL support, and the approved Platform Gold design language.
 
 ---
 
@@ -1190,8 +1190,8 @@ Do not use speech bubbles or avatars.
 
 ## 20.2 Actor treatment
 
-- Buyer action: blue outlined marker
-- Seller action: deep-blue filled marker
+- Buyer action: copper outlined marker
+- Seller action: copper filled marker
 - System action: neutral grey marker
 - Accepted: restrained green check
 - Closed: neutral icon
@@ -2574,4 +2574,4 @@ It must not communicate:
 - urgency or pressure;
 - a completed property transaction.
 
-The final implementation should retain MARKAZ’s calm Architectural Blue system, property-first visual context, precise amount hierarchy, and transparent next actions while protecting every participant’s identity, negotiation, and competing-offer information.
+The final implementation should retain MARKAZ’s calm Platform Gold system, property-first visual context, precise amount hierarchy, and transparent next actions while protecting every participant’s identity, negotiation, and competing-offer information.

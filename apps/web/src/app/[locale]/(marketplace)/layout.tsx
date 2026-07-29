@@ -2,7 +2,6 @@ import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { MarketplaceHeader } from '@/components/marketplace/marketplace-header';
 import { PublicFooter } from '@/components/marketplace/public-footer';
 import { WorkspaceShell } from '@/components/workspace-shell';
-import { BodyTheme } from '@/components/theme/body-theme';
 import { getSession } from '@/server/session';
 
 /**
@@ -37,7 +36,6 @@ export default async function MarketplaceLayout({
   if (session && session.profile?.accountType !== 'ADMIN') {
     return (
       <div className="theme-platform-gold min-h-dvh">
-        <BodyTheme className="theme-platform-gold" />
         {skipLink}
         {/* The marketplace pages bring their own `container`, so no shell padding. */}
         <WorkspaceShell displayName={session.profile?.fullName ?? null} padded={false}>
@@ -49,7 +47,6 @@ export default async function MarketplaceLayout({
 
   return (
     <div className="theme-platform-gold flex min-h-dvh flex-col">
-      <BodyTheme className="theme-platform-gold" />
       {skipLink}
       <MarketplaceHeader isAuthenticated={false} displayName={null} />
       <main id="main" className="flex-1">

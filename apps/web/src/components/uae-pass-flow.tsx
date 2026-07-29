@@ -51,19 +51,26 @@ export function UaePassFlow({
   const syncMutation = trpc.profile.syncUaePassIdentity.useMutation({
     onSuccess: (profile) => {
       setError(null);
+      setNotice(null);
       setStatus(profile.identityVerificationStatus);
+      router.replace('/dashboard');
     },
     onError: () => setError(t('stagingRecordError')),
   });
   const syncIdentity = syncMutation.mutate;
 
   useEffect(() => {
-    if (!providerLinked || !STAGING_SYNC_ELIGIBLE.has(initialStatus) || syncStarted.current) {
+    const shouldRecoverReturnedLink = providerLinked || initialNotice === 'uae_pass_record_error';
+    if (
+      !shouldRecoverReturnedLink ||
+      !STAGING_SYNC_ELIGIBLE.has(initialStatus) ||
+      syncStarted.current
+    ) {
       return;
     }
     syncStarted.current = true;
     syncIdentity();
-  }, [initialStatus, providerLinked, syncIdentity]);
+  }, [initialNotice, initialStatus, providerLinked, syncIdentity]);
 
   async function linkUaePassIdentity() {
     setError(null);
@@ -99,6 +106,7 @@ export function UaePassFlow({
         uae_pass_error: t('stagingFailure'),
         uae_pass_identity_unavailable: t('stagingIdentityUnavailable'),
         uae_pass_configuration_error: t('stagingConfigurationError'),
+        uae_pass_record_error: t('stagingRecordError'),
       }[notice]
     : null;
   const noticeVariant =

@@ -52,7 +52,7 @@ export default async function TransactionsPage({
           </span>
           {r.paused ? (
             <PauseCircle
-              className="h-3.5 w-3.5 text-slate-500"
+              className="text-muted-foreground h-3.5 w-3.5"
               aria-label={t('adminTransactions.paused')}
             />
           ) : null}

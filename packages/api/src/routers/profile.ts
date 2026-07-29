@@ -59,17 +59,11 @@ export const profileRouter = router({
 
   /**
    * Record a linked UAE PASS Staging identity without accepting a browser claim.
-   * The tRPC context derives providers from Supabase-controlled app_metadata, and
-   * the database function independently checks auth.identities before writing.
+   * The database function derives the actor from auth.uid() and checks the
+   * canonical auth.identities table before writing. Do not pre-gate this on
+   * app_metadata.providers: that metadata can briefly be stale after a link.
    */
   syncUaePassIdentity: customerProcedure.mutation(async ({ ctx }) => {
-    if (!ctx.user.authProviders?.includes('custom:uae-pass')) {
-      throw new TRPCError({
-        code: 'PRECONDITION_FAILED',
-        message: 'UAE PASS identity is not linked',
-      });
-    }
-
     await ctx.tx.execute(sql`select public.sync_uae_pass_staging_identity()`);
     const row = await loadOwnProfile(ctx.tx, ctx.user.id);
     if (!row) throw new TRPCError({ code: 'NOT_FOUND', message: 'Profile not found' });

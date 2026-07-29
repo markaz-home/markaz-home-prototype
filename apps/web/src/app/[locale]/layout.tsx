@@ -55,7 +55,7 @@ export default async function LocaleLayout({
       className={`${manrope.variable} ${sourceSerif.variable} ${notoSansArabic.variable}`}
       suppressHydrationWarning
     >
-      <body className="bg-background text-foreground min-h-dvh antialiased">
+      <body className="theme-platform-gold bg-background text-foreground min-h-dvh antialiased">
         <NextIntlClientProvider messages={messages}>
           <TRPCProvider>{children}</TRPCProvider>
           <Toaster />

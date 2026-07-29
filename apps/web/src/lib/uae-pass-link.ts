@@ -3,6 +3,7 @@ export const UAE_PASS_LINK_NOTICES = [
   'uae_pass_error',
   'uae_pass_identity_unavailable',
   'uae_pass_configuration_error',
+  'uae_pass_record_error',
 ] as const;
 
 export type UaePassLinkNotice = (typeof UAE_PASS_LINK_NOTICES)[number];

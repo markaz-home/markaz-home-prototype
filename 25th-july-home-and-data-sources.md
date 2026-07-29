@@ -20,7 +20,7 @@ was cleaned up.
 
 This theme is shared by the public **and** auth layouts, so the sign-in/sign-up screens changed
 colour too (verified, they render correctly). The authenticated workspace and admin portal still
-use Architectural Blue.
+use Platform Gold.
 
 ### Hero
 

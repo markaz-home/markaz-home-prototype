@@ -4,7 +4,6 @@ import { House } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { BrandLogo } from '@/components/brand-logo';
-import { BodyTheme } from '@/components/theme/body-theme';
 
 const LEGAL = { terms: '#terms', privacy: '#privacy' };
 
@@ -18,7 +17,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   const common = useTranslations('common');
   return (
     <div className="theme-platform-gold flex min-h-dvh flex-col">
-      <BodyTheme className="theme-platform-gold" />
       <a
         href="#main"
         className="focus:bg-primary focus:text-primary-foreground sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded focus:px-3 focus:py-2"

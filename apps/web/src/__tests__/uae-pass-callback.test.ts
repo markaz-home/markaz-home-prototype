@@ -2,8 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock the SSR server client so no real Supabase/network is touched.
 const exchangeCodeForSession = vi.fn();
+const syncUaePassIdentity = vi.fn();
 vi.mock('@markaz/auth/server', () => ({
-  createSupabaseServerClient: async () => ({ auth: { exchangeCodeForSession } }),
+  createSupabaseServerClient: async () => ({
+    auth: { exchangeCodeForSession },
+    rpc: syncUaePassIdentity,
+  }),
 }));
 
 import { GET } from '@/app/auth/callback/route';
@@ -15,6 +19,7 @@ const locationOf = (res: Response) => new URL(res.headers.get('location') ?? '',
 
 beforeEach(() => {
   exchangeCodeForSession.mockReset().mockResolvedValue({ error: null });
+  syncUaePassIdentity.mockReset().mockResolvedValue({ error: null });
 });
 
 describe('/auth/callback (OAuth code exchange — UAE PASS staging)', () => {
@@ -34,9 +39,28 @@ describe('/auth/callback (OAuth code exchange — UAE PASS staging)', () => {
     expect(locationOf(res).pathname).toBe('/en/sell');
   });
 
-  it('returns a successful identity link to the onboarding step', async () => {
+  it('records a successful identity link before completing onboarding', async () => {
     const res = await GET(req('?code=abc123&locale=en&next=%2Fonboarding%2Fuae-pass'));
-    expect(locationOf(res).pathname).toBe('/en/onboarding/uae-pass');
+    expect(syncUaePassIdentity).toHaveBeenCalledWith('sync_uae_pass_staging_identity');
+    expect(locationOf(res).pathname).toBe('/en/dashboard');
+  });
+
+  it('retries the idempotent identity write once after a transient failure', async () => {
+    syncUaePassIdentity
+      .mockResolvedValueOnce({ error: new Error('temporary') })
+      .mockResolvedValueOnce({ error: null });
+    const res = await GET(req('?code=abc123&locale=en&next=%2Fonboarding%2Fuae-pass'));
+    expect(syncUaePassIdentity).toHaveBeenCalledTimes(2);
+    expect(locationOf(res).pathname).toBe('/en/dashboard');
+  });
+
+  it('keeps a linked customer recoverable when both server writes fail', async () => {
+    syncUaePassIdentity.mockResolvedValue({ error: new Error('temporary') });
+    const res = await GET(req('?code=abc123&locale=en&next=%2Fonboarding%2Fuae-pass'));
+    const url = locationOf(res);
+    expect(syncUaePassIdentity).toHaveBeenCalledTimes(2);
+    expect(url.pathname).toBe('/en/onboarding/uae-pass');
+    expect(url.searchParams.get('notice')).toBe('uae_pass_record_error');
   });
 
   it('rejects an external post-sign-in destination', async () => {

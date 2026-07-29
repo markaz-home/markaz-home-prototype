@@ -522,7 +522,7 @@ Width:
 - Collapsed: 72 px
 
 Surface: Platform Gold card/near-black tokens from
-`packages/ui/src/styles/globals.css`; do not hardcode the legacy blue scale.
+`packages/ui/src/styles/globals.css`; do not hardcode a second brand palette.
 
 Order:
 

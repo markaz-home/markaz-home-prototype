@@ -12,11 +12,13 @@ export default function GlobalError({ reset }: { error: Error; reset: () => void
           alignItems: 'center',
           justifyContent: 'center',
           padding: '2rem',
+          background: '#0c0c0c',
+          color: '#ffffff',
         }}
       >
         <div style={{ textAlign: 'center', maxWidth: '28rem' }}>
           <h1 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Something went wrong</h1>
-          <p style={{ color: '#64748b', marginTop: '0.5rem' }}>
+          <p style={{ color: '#9e9e9e', marginTop: '0.5rem' }}>
             We hit an unexpected problem. Please try again.
           </p>
           <button
@@ -25,7 +27,10 @@ export default function GlobalError({ reset }: { error: Error; reset: () => void
               marginTop: '1.25rem',
               padding: '0.5rem 1rem',
               borderRadius: '0.375rem',
-              border: '1px solid #cbd5e1',
+              border: '1px solid #c8a27a',
+              background: '#c8a27a',
+              color: '#1b120c',
+              fontWeight: 600,
               cursor: 'pointer',
             }}
           >

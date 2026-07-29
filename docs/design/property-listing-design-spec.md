@@ -40,18 +40,18 @@ The MARKAZ listing journey should feel like a guided property setup workspace ra
 
 The recommended experience uses a persistent desktop step rail, a compact mobile progress indicator, a focused form canvas, and a sticky action area. Each screen has one dominant task and one clear next action. Required and optional information are visibly distinguished. Simulated government and legal steps look credible but never official.
 
-The visual language follows the approved MARKAZ **Architectural Blue — Quiet Editorial Intelligence** foundation:
+The visual language follows the approved MARKAZ **Platform Gold — Quiet Editorial Intelligence** foundation:
 
-- Cool off-white page canvas
-- White form surfaces
-- Deep architectural blue navigation and headings
-- Clear blue primary actions
-- Pale-blue information and simulation panels
+- Near-black page canvas
+- Charcoal form surfaces
+- Copper-gold navigation hierarchy and headings
+- Copper-gold primary actions
+- Muted charcoal information and simulation panels
 - Manrope for functional UI
 - Source Serif 4 used sparingly for major editorial headings
 - Restrained borders and shadows
 - Generous spacing
-- No glassmorphism, neon, gold luxury styling, or generic SaaS progress graphics
+- No glassmorphism, neon, excessive metallic effects, or generic SaaS progress graphics
 
 ## 1.1 Source precedence
 
@@ -256,7 +256,7 @@ Private, financial, and simulated steps require plain-language explanations befo
 
 ## 5.5 Simulations are believable, not official
 
-Use the approved labels exactly. Simulation disclosures stay visible on every simulated screen but use calm pale-blue styling rather than warning-red styling.
+Use the approved labels exactly. Simulation disclosures stay visible on every simulated screen but use calm muted-charcoal styling rather than warning-red styling.
 
 ## 5.6 Property context persists
 
@@ -558,7 +558,7 @@ Upload a fictional sample document...
 
 | Visual state     | Treatment                                                    |
 | ---------------- | ------------------------------------------------------------ |
-| Current          | Deep-blue label, pale-blue background, current-step marker   |
+| Current          | Copper label, muted charcoal background, current-step marker |
 | Complete         | Check icon, standard text, clickable                         |
 | Optional skipped | `Skipped` text, neutral icon, clickable                      |
 | Future available | Standard text, clickable only when prerequisites allow       |
@@ -1031,7 +1031,7 @@ Collect one fictional sample Title Deed or Oqood file in the private ownership-d
 
 ## 13.3 Mandatory safety notice
 
-Use a prominent pale-amber or pale-blue privacy panel before the uploader.
+Use a prominent muted warning or information panel before the uploader.
 
 > **Use a fictional sample document only**
 >
@@ -2443,7 +2443,7 @@ Failure because data changed in another tab:
 
 > Ready to publish
 
-- Separate pale-blue note:
+- Separate muted information note:
 
 > Private · Not live
 
@@ -2878,7 +2878,7 @@ Label:
 
 > Cover photograph
 
-Deep-blue badge with white text; text always present.
+Copper badge with near-black text; text always present.
 
 ## 23.25 Photo Reorder Control
 

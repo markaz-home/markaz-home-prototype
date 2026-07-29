@@ -1,7 +1,6 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { requireCustomerStep } from '@/server/session';
 import { WorkspaceShell } from '@/components/workspace-shell';
-import { BodyTheme } from '@/components/theme/body-theme';
 import { SaveIntentRedirect } from '@/components/marketplace/save-intent-redirect';
 import { OfferIntentRedirect } from '@/components/offers/offer-intent-redirect';
 
@@ -22,7 +21,6 @@ export default async function AppLayout({
   // the public and authentication journeys.
   return (
     <div className="theme-platform-gold min-h-dvh">
-      <BodyTheme className="theme-platform-gold" />
       <a
         href="#main"
         className="focus:bg-background sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-3"

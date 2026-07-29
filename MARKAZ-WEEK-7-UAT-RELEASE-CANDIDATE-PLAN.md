@@ -295,7 +295,7 @@ snapshots, object lists, and audit events.
   reason-code labels.
 - Confirm destructive/controlled actions use dialogs, explicit impact copy, no hidden default
   reason, disabled/double-submit protection, and focus restoration.
-- Compare core screens to the approved Architectural Blue token foundation and available
+- Compare core screens to the approved Platform Gold token foundation and available
   approved screenshots; log polish separately from functional defects.
 
 **Gate:** A misleading legal/payment/identity claim is at least S1; a cosmetic mismatch is

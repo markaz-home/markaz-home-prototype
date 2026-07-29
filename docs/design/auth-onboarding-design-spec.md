@@ -553,23 +553,20 @@ There is no Admin Create Account route.
 
 ## 9.1 Visual direction
 
-Use the approved **Architectural Blue — Quiet Editorial Intelligence** system.
+Use the approved **Platform Gold — Quiet Editorial Intelligence** system.
 
 ### Brand tokens
 
-| Token                   | Value     |
-| ----------------------- | --------- |
-| Deep Architectural Blue | `#0F2A44` |
-| Ocean Ink               | `#163A5A` |
-| Clear Blue              | `#1F4E73` |
-| Slate Blue              | `#486A8A` |
-| Mist Blue               | `#AFC6DA` |
-| Pale Blue               | `#EAF2F7` |
-| Cool Off-White          | `#F6F8FB` |
-| Surface White           | `#FFFFFF` |
-| Blue Black              | `#142332` |
-| Secondary Slate         | `#647482` |
-| Border Blue Grey        | `#D9E3EA` |
+| Token             | Value     |
+| ----------------- | --------- |
+| Copper Gold       | `#C8A27A` |
+| Copper Gold Hover | `#B89172` |
+| Near-black Canvas | `#0C0C0C` |
+| Charcoal Surface  | `#121212` |
+| Raised Charcoal   | `#1F1F1F` |
+| Primary Text      | `#FFFFFF` |
+| Secondary Text    | `#9E9E9E` |
+| Border            | `#2E2E2E` |
 
 Use semantic green, amber, and red only for success, attention, and failure. Do not use colour as the only status signal.
 
@@ -592,7 +589,7 @@ The symbol replaces the “A”.
 
 ### Desktop: 1200 px and above
 
-- Page background: Cool Off-White
+- Page background: Near-black canvas
 - Header height: 72 px
 - Header surface: white with 1 px bottom border
 - Main content max width: 1280 px
@@ -626,7 +623,7 @@ Rules:
 
 - Do not show stock-photo collages.
 - Do not place form text over photography.
-- Use a subtle deep-blue tint or solid caption area for readability.
+- Use a near-black scrim or solid caption area for readability.
 - Do not display legal, regulatory, or identity claims in the image.
 - Hide the panel below 1024 px.
 
@@ -1746,7 +1743,7 @@ Admin authentication must look related to MARKAZ but operationally distinct.
 ### Desktop
 
 - Split layout or centred 440 px form
-- Deep Architectural Blue side panel or top band
+- Near-black side panel or top band with copper-gold hierarchy
 - MARKAZ logo plus `OPERATIONS`
 - `Authorised access only` label
 - No property-marketplace navigation
@@ -3250,4 +3247,4 @@ It should not communicate:
 - A separate buyer and seller system
 - An Admin pathway available to the public
 
-The final implementation should feel visually connected to the approved MARKAZ landing page through its architectural blue palette, editorial restraint, precise spacing, and approved home-arch wordmark, while remaining focused enough that account creation and recovery are fast, understandable, and accessible.
+The final implementation should feel visually connected to the approved MARKAZ landing page through its Platform Gold palette, editorial restraint, precise spacing, and approved home-arch wordmark, while remaining focused enough that account creation and recovery are fast, understandable, and accessible.

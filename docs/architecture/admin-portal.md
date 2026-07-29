@@ -10,8 +10,8 @@ A **separate Next.js app** (`apps/admin`, port 3001). The customer app exposes *
 admin route or link. Admin pages live under `[locale]/(portal)/*` behind `requireAdmin`
 (cookie session → `account_type === 'ADMIN'`, else access-denied). Eight fixed nav areas
 (§8): Overview (list only) + 7 areas each with a list + detail page = 15 operational routes, plus a
-root `[locale]/page.tsx` redirect to `/overview`. A header hosts global search; a dark-blue
-sidebar hosts the nav, language switch, and sign-out.
+root `[locale]/page.tsx` redirect to `/overview`. A header hosts global search; a branded
+near-black Platform Gold sidebar hosts the nav, language switch, and sign-out.
 
 ## 2. Security boundary (unchanged model)
 

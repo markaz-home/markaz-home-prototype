@@ -539,8 +539,7 @@ Reset and destructive actions require:
 
 ### 8.0 July 2026 CEO direction — unified product theme
 
-The CEO-directed **Platform Gold** theme supersedes the earlier blue-only rule
-across the complete prototype:
+The CEO-directed **Platform Gold** theme governs the complete prototype:
 
 - The public landing page and public marketplace
 - Customer authentication and onboarding
@@ -563,7 +562,7 @@ Implementation rules:
 - Do not import or copy imagery, logos, or proprietary assets from the separate
   MARKAZ platform implementation.
 - The semantic token contract remains unchanged. Components consume tokens;
-  they do not hardcode gold, black, or the legacy blue scale.
+  they do not hardcode brand colours.
 
 #### Accent and canvas values (July 2026 alignment)
 
@@ -668,15 +667,15 @@ The logo may be read as:
 **Primary wordmark**
 
 - Thin geometric letterforms
-- Deep architectural blue
+- Warm copper-gold on near-black
 - Home/arch icon replacing the A
 - Optional small “HOME” descriptor where space allows
 
 **Standalone application mark**
 
 - Layered home/arch symbol
-- White linework
-- Deep-blue rounded-square background
+- Copper-gold linework
+- Near-black rounded-square background
 - Used for favicon, app icon, compact mobile contexts, and branded system moments
 
 ### 9.3 Logo usage
@@ -725,40 +724,35 @@ Before production use, it should be recreated as a precise vector asset with:
 
 ## 10. Colour System
 
-Platform Gold is the primary MARKAZ Home prototype colour system across all
-product surfaces. The Architectural Blue scale remains documented as a legacy
-fallback token set, not the active workspace or Admin theme.
-
-It should communicate trust, clarity, architecture, and calmness without becoming a generic corporate navy interface.
+Platform Gold is the MARKAZ Home colour system across every product surface.
+There is no secondary product palette or route-specific visual identity.
 
 ### 10.1 Brand palette
 
-| Token                               |       Hex | Primary usage                                                    |
-| ----------------------------------- | --------: | ---------------------------------------------------------------- |
-| Brand 900 — Deep Architectural Blue | `#0F2A44` | Primary text, headers, dark navigation, strong brand moments     |
-| Brand 800 — Ocean Ink               | `#163A5A` | Hover states, selected navigation, dark surfaces                 |
-| Brand 700 — Clear Blue              | `#1F4E73` | Primary buttons, links, active controls                          |
-| Brand 500 — Slate Blue              | `#486A8A` | Secondary icons, charts, supporting emphasis                     |
-| Brand 300 — Mist Blue               | `#AFC6DA` | Borders, inactive progress, soft data visualisation              |
-| Brand 100 — Pale Blue               | `#EAF2F7` | Informational panels, selected filters, active background states |
-| Canvas — Cool Off-White             | `#F6F8FB` | Main page background                                             |
-| Surface — White                     | `#FFFFFF` | Cards, forms, modals, content surfaces                           |
-| Text — Blue Black                   | `#142332` | Primary body text                                                |
-| Text Secondary — Slate              | `#647482` | Supporting copy and metadata                                     |
-| Border — Blue Grey                  | `#D9E3EA` | Dividers, input borders, card outlines                           |
+| Token                    |       Hex | Primary usage                              |
+| ------------------------ | --------: | ------------------------------------------ |
+| Copper Gold              | `#C8A27A` | Primary actions, focus and brand hierarchy |
+| Copper Gold Hover        | `#B89172` | Hover and pressed states                   |
+| Near-black Canvas        | `#0C0C0C` | Application background                     |
+| Charcoal Surface         | `#121212` | Cards, menus, forms and navigation         |
+| Raised Charcoal          | `#1F1F1F` | Secondary and selected surfaces            |
+| Primary Text             | `#FFFFFF` | Headings and primary body copy             |
+| Secondary Text           | `#9E9E9E` | Supporting copy and metadata               |
+| Border                   | `#2E2E2E` | Dividers, input borders and card outlines  |
+| Inverted Control Surface | `#FFFFFF` | Public hero search only                    |
+| Inverted Control Text    | `#171717` | Public hero search labels and values       |
 
 ### 10.2 Usage proportions
 
 Recommended visual balance:
 
-- 65–75% white and cool off-white
-- 15–25% deep and mid blue
-- 5–10% pale blue
+- 70–80% near-black and charcoal
+- 10–20% white text and inverted content surfaces
+- 5–10% copper-gold hierarchy and focus
 - Semantic colours only where status meaning is required
 
-Do not reintroduce the legacy blue palette directly in customer or Admin
-components. The active Platform Gold theme owns hierarchy through semantic
-tokens.
+All customer and Admin components consume semantic tokens. Do not introduce a
+second brand palette directly in components.
 
 ### 10.3 Semantic colours
 

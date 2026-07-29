@@ -31,7 +31,6 @@ describe('AdminNav (shared Platform Gold workspace)', () => {
     );
     expect(screen.getByText('Operations')).toBeInTheDocument();
     expect(container.querySelector('aside')).toHaveClass('bg-card/40');
-    expect(container.querySelector('aside')).not.toHaveClass('bg-brand-900');
   });
 });
 

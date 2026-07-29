@@ -35,9 +35,9 @@ provisioned here. Section 6A of the technical plan governs.
 ### Packages
 
 `config` (eslint/tsconfig/tailwind presets) · `ui` (RTL-safe shadcn/Radix component
-set implementing the approved **MARKAZ "Architectural Blue" design foundation** —
-brand-blue scale, Clear-Blue primary, Cool-Off-White canvas, Manrope + Source
-Serif 4, dark-blue admin sidebar) · `i18n` (next-intl en/ar, RTL, AED
+set implementing the original MARKAZ token foundation (now superseded by the
+unified **Platform Gold** direction — near-black canvas, copper-gold hierarchy,
+Manrope + Source Serif 4, branded Admin sidebar) · `i18n` (next-intl en/ar, RTL, AED
 formatting) · `domain` (types + state machines + zod + `resolvePostAuthDestination`)
 · `db` (Drizzle schema + dual app/direct clients + the RLS-context helper) · `auth`
 (Supabase SSR clients + RBAC) · `api` (tRPC) · `realtime` · `observability` (pino).

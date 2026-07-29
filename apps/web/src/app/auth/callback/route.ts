@@ -65,6 +65,33 @@ export async function GET(request: NextRequest) {
     return recoverFromError(resolveUaePassLinkError(error));
   }
 
+  if (isIdentityLink) {
+    // Complete the onboarding write before leaving the callback. Previously the
+    // browser had to discover the newly linked provider from app_metadata and
+    // issue a second request, which could briefly be stale after identity linking.
+    // The database function is idempotent and independently verifies the linked
+    // auth.identities row, so a single retry is safe and never trusts a browser
+    // claim.
+    let syncError: unknown = null;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        const result = await supabase.rpc('sync_uae_pass_staging_identity');
+        syncError = result.error;
+      } catch {
+        syncError = new Error('identity sync request failed');
+      }
+      if (!syncError) break;
+    }
+    if (syncError) {
+      console.warn('[uae-pass] linked identity could not be recorded');
+      return backToIdentityStep('uae_pass_record_error');
+    }
+
+    // The identity result is now persisted, so complete the journey immediately.
+    // A fresh server request also avoids any prefetched onboarding state.
+    return NextResponse.redirect(new URL(`/${locale}/dashboard`, origin));
+  }
+
   // Session established. The (app) guard reroutes onboarding as needed.
   return NextResponse.redirect(new URL(`/${locale}${destination}`, origin));
 }

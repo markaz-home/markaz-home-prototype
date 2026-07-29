@@ -17,7 +17,7 @@ Week 5 begins when Week 4 has atomically accepted one proposal, closed competing
 
 The transaction tracker is a guided prototype. It records confirmations, fictional files, simulated deposit, simulated document review, simulated due-diligence checks, transfer readiness, a simulated appointment, completion, cancellation, and recoverable failures. It does not process money, create binding documents, verify identities or ownership, perform conveyancing, book a government appointment, or transfer property.
 
-The design preserves the existing unified `CUSTOMER` account, accepted offer thread and proposal, participant-only RLS model, in-app notification system, Realtime refetch pattern, English and Arabic localisation, RTL behaviour, and the approved MARKAZ **Architectural Blue — Quiet Editorial Intelligence** visual language.
+The design preserves the existing unified `CUSTOMER` account, accepted offer thread and proposal, participant-only RLS model, in-app notification system, Realtime refetch pattern, English and Arabic localisation, RTL behaviour, and the approved MARKAZ **Platform Gold — Quiet Editorial Intelligence** visual language.
 
 ---
 
@@ -1758,8 +1758,8 @@ Each event includes:
 
 ## 33.3 Actor treatment
 
-- Buyer: outlined blue marker
-- Seller: deep-blue filled marker
+- Buyer: outlined copper marker
+- Seller: filled copper marker
 - Shared: dual-circle or neutral linked marker
 - System: slate marker
 - Success: restrained green check plus text
@@ -1997,7 +1997,7 @@ All components use shared MARKAZ colour, typography, spacing, radius, focus, and
 | Transaction Card              | Property, amount, perspective, stage, progress, next action | Active, waiting, completed, cancelled, failed                 | Explicit CTA; card not one giant link; mobile single column    |
 | Perspective Badge             | `You are buying/selling`                                    | Buyer, seller                                                 | Text plus icon; never account role; logical placement          |
 | Transaction Header            | Reference, property, amount, status, last updated           | Active, terminal                                              | One h1; compact mobile variant; mixed names bidi-isolated      |
-| Simulation Disclosure         | Persistent legal/simulation boundary                        | Full, compact                                                 | Pale-blue information panel; text always visible               |
+| Simulation Disclosure         | Persistent legal/simulation boundary                        | Full, compact                                                 | Muted charcoal information panel; text always visible          |
 | Stage Progress Tracker        | Six grouped stages                                          | Complete, current, future, blocked, failed, cancelled         | Ordered list; aria-current; horizontal desktop, compact mobile |
 | Stage Preview Panel           | Explains future stage and prerequisites                     | Future, blocked                                               | Non-actionable; link to blocker when allowed                   |
 | Current Milestone Card        | Stage title, status, actor, tasks, action                   | Buyer, seller, both, system                                   | Main workspace focus; sticky action separated                  |
@@ -2925,4 +2925,4 @@ It must not communicate:
 - that property ownership has actually transferred;
 - that MARKAZ is acting as a bank, escrow provider, law firm, conveyancer, or government portal.
 
-The final experience should retain the approved Architectural Blue system, spacious property-first composition, precise progress hierarchy, calm task ownership, and visible simulation boundaries across desktop, mobile, English, and Arabic.
+The final experience should retain the approved Platform Gold system, spacious property-first composition, precise progress hierarchy, calm task ownership, and visible simulation boundaries across desktop, mobile, English, and Arabic.

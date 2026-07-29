@@ -33,7 +33,7 @@ The auth/onboarding UI follows the approved design spec: split AuthShell (header
 with language switcher + footer + support panel), 3-step progress, a 6-cell
 verification code (one logical accessible input), the full screen inventory (Check
 Email, Email Verified, Recovery Email Sent, Password Updated, Signed Out, Session
-Expired, provider/error panels), and a deep-blue Operations shell for admin.
+Expired, provider/error panels), and a branded Operations shell for admin.
 
 ## Context
 
