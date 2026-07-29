@@ -17,6 +17,7 @@ vi.mock('@/i18n/navigation', () => ({
 vi.mock('next/navigation', () => ({ useSearchParams: () => new URLSearchParams() }));
 
 import { AdminSignInFlow } from '@/components/admin-sign-in-flow';
+import AdminAuthLayout from '@/app/[locale]/(auth)/layout';
 
 beforeEach(() => {
   signInWithPassword.mockReset().mockResolvedValue({ error: null });
@@ -26,11 +27,32 @@ beforeEach(() => {
 describe('AdminSignInFlow (Operations)', () => {
   it('renders the Operations sign-in with no Create account', () => {
     renderWithIntl(<AdminSignInFlow />);
-    expect(screen.getByRole('heading', { name: 'Sign in to Operations' })).toBeInTheDocument();
+    const heading = screen.getByRole('heading', { name: 'Sign in to Operations' });
+    expect(heading).toBeInTheDocument();
+    expect(heading.closest('.platform-gold-admin-auth-card')).toBeInTheDocument();
     // "MARKAZ Operations" branding now lives in the persistent (auth) layout.
     expect(screen.getByText('Authorised access only')).toBeInTheDocument();
-    expect(screen.getByLabelText(/^Password/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Password/)).toHaveAttribute(
+      'placeholder',
+      'Enter your password',
+    );
     expect(screen.queryByText('Create account')).not.toBeInTheDocument();
+  });
+
+  it('renders the persistent Platform Gold operations cover', () => {
+    const { container } = renderWithIntl(
+      <AdminAuthLayout>
+        <div>Secure admin content</div>
+      </AdminAuthLayout>,
+    );
+
+    expect(container.querySelector('.theme-platform-gold')).toBeInTheDocument();
+    expect(screen.getByAltText('Markaz Home')).toHaveAttribute(
+      'src',
+      expect.stringContaining('markaz-logo-gold.png'),
+    );
+    expect(container.querySelector('img[src*="admin-auth-dubai"]')).toBeInTheDocument();
+    expect(screen.getByText('Secure admin content')).toBeInTheDocument();
   });
 
   it('signs in with password and routes to overview', async () => {

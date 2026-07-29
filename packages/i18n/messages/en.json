@@ -220,7 +220,6 @@
     "introBody": "Use your UAE PASS staging account to complete identity verification.",
     "stagingAction": "Continue with UAE PASS",
     "stagingStarting": "Redirecting to UAE PASS…",
-    "stagingEnvironmentNote": "Staging environment — no production verification.",
     "stagingCancelled": "UAE PASS Staging was cancelled. Try again when you are ready.",
     "stagingFailure": "UAE PASS Staging could not be completed. Try again.",
     "stagingIdentityUnavailable": "This UAE PASS identity cannot be linked to this Markaz account. Contact Markaz support for help.",

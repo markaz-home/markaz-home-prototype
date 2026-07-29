@@ -91,8 +91,8 @@ describe('UaePassFlow (UAE PASS Staging)', () => {
     expect(screen.getByRole('heading', { name: 'Verify with UAE PASS' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Continue with UAE PASS' })).toBeInTheDocument();
     expect(
-      screen.getByText('Staging environment — no production verification.'),
-    ).toBeInTheDocument();
+      screen.queryByText('Staging environment — no production verification.'),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText(/Test identity environment\./)).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Start demo verification' }),
@@ -168,6 +168,7 @@ describe('UaePassFlow (UAE PASS Staging)', () => {
   it('renders compact Arabic staging copy', () => {
     renderWithIntl(<UaePassFlow initialStatus="NOT_STARTED" uaePassStaging />, 'ar');
     expect(screen.getByRole('heading', { name: 'التحقق عبر UAE PASS' })).toBeInTheDocument();
-    expect(screen.getByText(/بيئة اختبار — لا يتم إجراء تحقق إنتاجي/)).toBeInTheDocument();
+    expect(screen.getByText(/حساب UAE PASS الخاص ببيئة الاختبار/)).toBeInTheDocument();
+    expect(screen.queryByText(/لا يتم إجراء تحقق إنتاجي/)).not.toBeInTheDocument();
   });
 });

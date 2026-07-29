@@ -269,6 +269,23 @@
     font-size: 0.8125rem;
   }
 
+  /*
+   * Operations auth uses the same Platform Gold card but with calmer, larger
+   * controls for repeated internal sign-in and recovery tasks.
+   */
+  .theme-platform-gold .platform-gold-admin-auth-card input:not([type='checkbox']) {
+    height: 2.875rem;
+    border-radius: 0.75rem;
+    padding-inline: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .theme-platform-gold .platform-gold-admin-auth-card button[type='submit'] {
+    height: 3rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+
   .theme-platform-gold .platform-gold-auth-card input[type='checkbox'] {
     appearance: none;
     border: 1px solid hsl(0 0% 100% / 0.24);
