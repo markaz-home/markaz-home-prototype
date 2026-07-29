@@ -9,7 +9,6 @@ import {
   Receipt,
   BadgeCheck,
   ScrollText,
-  ShieldCheck,
   Menu,
 } from 'lucide-react';
 import {
@@ -24,6 +23,7 @@ import {
 } from '@markaz/ui';
 import { Link, usePathname } from '@/i18n/navigation';
 import { AdminSignOut } from './admin-sign-out';
+import { BrandLogo } from './brand-logo';
 
 // Spec §8 — the eight fixed operations areas, in order.
 const ITEMS = [
@@ -42,10 +42,12 @@ export function AdminNav({ email }: { email: string | null }) {
   const pathname = usePathname();
 
   return (
-    <aside className="bg-brand-900 text-brand-100 hidden w-60 shrink-0 flex-col lg:flex">
-      <div className="border-brand-800 flex h-16 items-center gap-2 border-b px-4 font-semibold text-white">
-        <ShieldCheck className="text-brand-300 h-5 w-5" aria-hidden />
-        {t('appName')}
+    <aside className="border-border/70 bg-card/40 text-foreground hidden w-60 shrink-0 flex-col border-e lg:flex">
+      <div className="border-border/70 flex h-16 items-center gap-2.5 border-b px-4">
+        <BrandLogo className="h-6 w-auto" />
+        <span className="text-muted-foreground text-[10px] font-semibold uppercase tracking-[0.16em]">
+          {t('operationsLabel')}
+        </span>
       </div>
       <nav className="flex-1 space-y-1 p-2" aria-label={t('navigationLabel')}>
         {ITEMS.map(({ href, key, icon: Icon }) => {
@@ -59,8 +61,8 @@ export function AdminNav({ email }: { email: string | null }) {
               className={cn(
                 'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                 active
-                  ? 'bg-brand-700 text-white'
-                  : 'text-brand-300 hover:bg-brand-800 hover:text-white',
+                  ? 'bg-primary/10 text-foreground'
+                  : 'text-muted-foreground hover:bg-foreground/5 hover:text-foreground',
               )}
             >
               <Icon className="h-4 w-4" aria-hidden />
@@ -69,13 +71,13 @@ export function AdminNav({ email }: { email: string | null }) {
           );
         })}
       </nav>
-      <div className="border-brand-800 mt-auto border-t p-3">
-        <div className="border-brand-700 bg-brand-800/60 flex items-center gap-2.5 rounded-lg border px-3 py-2.5">
+      <div className="border-border/70 mt-auto border-t p-3">
+        <div className="border-border/70 bg-foreground/[0.02] flex items-center gap-2.5 rounded-lg border px-3 py-2.5">
           <span className="min-w-0 flex-1">
-            <span className="text-brand-300 block text-[10px] uppercase tracking-wide">
+            <span className="text-muted-foreground block text-[10px] uppercase tracking-wide">
               {t('signedInAs')}
             </span>
-            <span className="block truncate text-[13px] font-medium text-white">{email}</span>
+            <span className="block truncate text-[13px] font-medium">{email}</span>
           </span>
           <AdminSignOut variant="icon" />
         </div>
@@ -103,9 +105,11 @@ export function AdminMobileNav({ email }: { email: string | null }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-64 lg:hidden">
-        <DropdownMenuLabel className="flex items-center gap-2">
-          <ShieldCheck className="text-primary h-4 w-4" aria-hidden />
-          {t('appName')}
+        <DropdownMenuLabel className="flex items-center gap-2.5">
+          <BrandLogo className="h-5 w-auto" />
+          <span className="text-muted-foreground text-[10px] uppercase tracking-[0.14em]">
+            {t('operationsLabel')}
+          </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {ITEMS.map(({ href, key, icon: Icon }) => {
