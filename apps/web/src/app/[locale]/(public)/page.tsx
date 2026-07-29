@@ -19,7 +19,9 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
        * sizes are generated instead of sending the original asset to everyone.
        * Sized so the featured properties below stay visible above the fold.
        */}
-      <section className="relative isolate flex min-h-[420px] items-center md:max-h-[640px] md:min-h-[max(460px,calc(64svh-4rem))]">
+      {/* The explicit z-index raises this isolated stacking context above the
+       * following content, so an open search listbox is never painted under it. */}
+      <section className="relative isolate z-10 flex min-h-[420px] items-center md:max-h-[640px] md:min-h-[max(460px,calc(64svh-4rem))]">
         {/* -z-10 keeps the band behind the content without clipping the section. */}
         <div aria-hidden className="platform-gold-hero-cover absolute inset-0 -z-10">
           <Image

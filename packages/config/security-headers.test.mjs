@@ -27,6 +27,15 @@ describe('securityHeaders', () => {
     assert.match(csp, /ws:\/\/127\.0\.0\.1:54321/);
   });
 
+  it('keeps font styles and files self-hosted', () => {
+    const csp = new Map(securityHeaders(env, 'web').map(({ key, value }) => [key, value])).get(
+      'Content-Security-Policy',
+    );
+    assert.match(csp, /style-src 'self' 'unsafe-inline'/);
+    assert.match(csp, /font-src 'self' data:/);
+    assert.doesNotMatch(csp, /fonts\.(?:googleapis|gstatic)\.com/);
+  });
+
   it('adds HSTS and removes unsafe-eval only for HTTPS production', () => {
     const production = {
       ...env,
