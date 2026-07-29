@@ -76,12 +76,77 @@ async function subscribe(
   return channel;
 }
 
-async function waitForEvent(rows: EventRow[], eventType: string): Promise<void> {
+async function waitForRealtimeReady(client: SupabaseClient, principalId: string): Promise<void> {
+  let received = false;
+  const name = `rt-warmup-${principalId}`;
+  const channel = client.channel(name).on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'realtime_counters',
+      filter: 'id=eq.demo',
+    },
+    () => {
+      received = true;
+    },
+  );
+
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error(`Realtime readiness subscribe timed out: ${name}`)),
+      8_000,
+    );
+    channel.subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        clearTimeout(timer);
+        resolve();
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        clearTimeout(timer);
+        reject(new Error(`Realtime readiness subscribe failed: ${name} (${status})`));
+      }
+    });
+  });
+
+  try {
+    // On a fresh local/CI stack, Realtime can acknowledge the channel before its
+    // Postgres CDC listener has finished warming. Prove an actual database-change
+    // round trip before testing the security-sensitive offer stream.
+    const deadline = Date.now() + 8_000;
+    while (!received && Date.now() < deadline) {
+      await asUser(
+        principalId,
+        (tx) => tx`update public.realtime_counters
+                   set value = value + 1, updated_at = now()
+                   where id = 'demo'`,
+      );
+      if (!received) {
+        await new Promise((resolve) => setTimeout(resolve, 250));
+      }
+    }
+    if (!received) {
+      throw new Error('Realtime CDC readiness probe received no update within 8 seconds');
+    }
+  } finally {
+    await client.removeChannel(channel);
+  }
+}
+
+async function waitForEvent(
+  rows: EventRow[],
+  eventType: string,
+  participant: 'seller' | 'buyer',
+): Promise<void> {
   const deadline = Date.now() + 8_000;
   while (!rows.some((row) => row.event_type === eventType) && Date.now() < deadline) {
     await new Promise((resolve) => setTimeout(resolve, 50));
   }
-  expect(rows.some((row) => row.event_type === eventType)).toBe(true);
+  if (!rows.some((row) => row.event_type === eventType)) {
+    const receivedTypes = rows.map((row) => row.event_type).join(', ') || 'none';
+    throw new Error(
+      `Realtime ${participant} channel did not receive ${eventType}; received: ${receivedTypes}`,
+    );
+  }
 }
 
 d('Realtime participant isolation (local stack)', () => {
@@ -124,6 +189,8 @@ d('Realtime participant isolation (local stack)', () => {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
+    await waitForRealtimeReady(sellerClient, seller.id);
+
     const sellerRows: EventRow[] = [];
     const buyerRows: EventRow[] = [];
     const outsiderRows: EventRow[] = [];
@@ -148,8 +215,8 @@ d('Realtime participant isolation (local stack)', () => {
       );
 
       await Promise.all([
-        waitForEvent(sellerRows, 'SELLER_COUNTERED'),
-        waitForEvent(buyerRows, 'SELLER_COUNTERED'),
+        waitForEvent(sellerRows, 'SELLER_COUNTERED', 'seller'),
+        waitForEvent(buyerRows, 'SELLER_COUNTERED', 'buyer'),
       ]);
       await new Promise((resolve) => setTimeout(resolve, 500));
       expect(outsiderRows).toHaveLength(0);
