@@ -91,9 +91,8 @@
   /*
    * CEO-directed customer-facing theme: "Platform Gold".
    *
-   * This is intentionally scoped to the public marketplace and customer auth
-   * layouts. The default customer workspace and the admin `.dark` theme keep
-   * the Architectural Blue tokens above. Gold is used for hierarchy and focus;
+   * This is shared by the public marketplace, customer auth and workspace, and
+   * the separate operations portal. Gold is used for hierarchy and focus;
    * near-black, warm-neutral surfaces carry the visual weight.
    */
   .theme-platform-gold {

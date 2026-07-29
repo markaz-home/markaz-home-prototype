@@ -2,10 +2,38 @@ import { describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { RESTRICT_REASONS } from '@markaz/domain';
 import { renderWithIntl } from './test-utils';
+
+vi.mock('@/i18n/navigation', () => ({
+  usePathname: () => '/overview',
+  Link: ({ children, href, ...props }: React.ComponentProps<'a'>) => (
+    <a href={String(href)} {...props}>
+      {children}
+    </a>
+  ),
+}));
+vi.mock('@/components/admin-sign-out', () => ({
+  AdminSignOut: () => <button type="button">Sign out</button>,
+}));
+
 import { StatusBadge } from '@/components/admin/status-badge';
 import { ReasonSelect } from '@/components/admin/reason-select';
 import { ActionDialog } from '@/components/admin/action-dialog';
 import { Field } from '@/components/admin/detail';
+import { AdminNav } from '@/components/admin-nav';
+
+describe('AdminNav (shared Platform Gold workspace)', () => {
+  it('uses the Markaz copper wordmark and token-based portal surface', () => {
+    const { container } = renderWithIntl(<AdminNav email="admin@markaz.test" />);
+
+    expect(screen.getByAltText('Markaz')).toHaveAttribute(
+      'src',
+      expect.stringContaining('markaz-logo-gold.png'),
+    );
+    expect(screen.getByText('Operations')).toBeInTheDocument();
+    expect(container.querySelector('aside')).toHaveClass('bg-card/40');
+    expect(container.querySelector('aside')).not.toHaveClass('bg-brand-900');
+  });
+});
 
 describe('StatusBadge (spec §37 — text + icon, never colour-only)', () => {
   it('renders the label text alongside an icon', () => {

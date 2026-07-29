@@ -81,20 +81,21 @@ emailVerified, profile })` → verify-email → profile-setup (fallback) → uae
 {en,ar}.json`). Support RTL via logical CSS properties + the `dir` attribute.
   Don't hardcode strings or left/right. Arabic legal/transactional copy is
   unreviewed — flag it, don't claim it's approved.
-- **Design tokens** live in `packages/ui/src/styles/globals.css` and implement the
-  approved **MARKAZ "Architectural Blue" foundation** (`docs/design/
-markaz-design-foundation.md`): brand blue scale (`brand-900…100`), Clear Blue
-  primary, Cool Off-White canvas, Manrope (interface) + Source Serif 4 (display,
-  use `font-display` for hero/public headings), 10px radius, minimal shadows. The
-  admin portal uses the dark-blue sidebar. Don't scatter one-off colors/spacing;
-  use the tokens and `@markaz/ui` components. Blue is for hierarchy, not weight
-  (~65–75% white/off-white).
+- **Design tokens** live in `packages/ui/src/styles/globals.css`. The approved
+  **MARKAZ Platform Gold** foundation (`docs/design/markaz-design-foundation.md`)
+  applies consistently to public, auth, authenticated customer, and Admin
+  surfaces: near-black canvas, warm copper-gold hierarchy, Manrope (interface) +
+  Source Serif 4 (display; use `font-display` for hero/public headings), 10px
+  radius, and minimal shadows. The Admin portal uses the branded token-based
+  operations sidebar. Do not remove `theme-platform-gold` from workspace layout
+  boundaries or force the blue logo in a gold workspace. Don't scatter one-off
+  colors/spacing; use the tokens and `@markaz/ui` components.
 
 ## Auth flow architecture (routes, layouts, sessions — keep it stable)
 
 - **Route groups + persistent chrome.** Auth/onboarding screens live under
   `apps/web/src/app/[locale]/(auth)/` with a **shared layout** that renders the
-  chrome ONCE (header + language switcher + footer; admin: the deep-blue Operations
+  chrome ONCE (header + language switcher + footer; admin: the Platform Gold Operations
   band). The dashboard/app lives under `[locale]/(app)/` (CustomerNav). Route groups
   don't change URLs. `AuthShell`/`AdminAuthShell` render ONLY inner content — do NOT
   re-add per-page header/footer or a full-screen `[locale]/loading.tsx` spinner;

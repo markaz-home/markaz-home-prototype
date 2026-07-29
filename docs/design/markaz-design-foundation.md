@@ -537,21 +537,22 @@ Reset and destructive actions require:
 
 ## 8. Approved Visual Direction
 
-### 8.0 July 2026 CEO direction — scoped supersession
+### 8.0 July 2026 CEO direction — unified product theme
 
-The CEO-directed **Platform Gold** theme supersedes the earlier blue-only rule for
-two customer-facing surfaces:
+The CEO-directed **Platform Gold** theme supersedes the earlier blue-only rule
+across the complete prototype:
 
 - The public landing page and public marketplace
 - Customer authentication and onboarding
+- The authenticated customer workspace
+- The Admin / Operations portal
 
 These surfaces use an accessible near-black and warm-gold token layer to align
-with the wider MARKAZ platform direction. The layer is deliberately scoped at
-the public and auth layouts: it does **not** change the authenticated customer
-workspace or the Admin / Operations portal. Those surfaces retain the existing
-Architectural Blue tokens until a later, explicitly approved migration.
+with the wider MARKAZ platform direction. The theme is applied at each app or
+route-group layout boundary so moving between public, auth, customer, and
+operations journeys does not change the brand palette.
 
-Implementation rules for the scoped theme:
+Implementation rules:
 
 - Gold communicates brand hierarchy, focus, and primary action; it is not used
   for status meaning.
@@ -561,8 +562,8 @@ Implementation rules for the scoped theme:
   a reviewed gold/light vector export is required before production use.
 - Do not import or copy imagery, logos, or proprietary assets from the separate
   MARKAZ platform implementation.
-- The semantic token contract remains unchanged so the blue app/admin themes
-  and the Platform Gold public/auth theme can coexist.
+- The semantic token contract remains unchanged. Components consume tokens;
+  they do not hardcode gold, black, or the legacy blue scale.
 
 #### Accent and canvas values (July 2026 alignment)
 
@@ -595,13 +596,13 @@ one brand. Muted body text is `0 0% 62%` — 7.3:1 on the canvas.
 
 ### 8.1 Direction name
 
-**Architectural Blue — Quiet Editorial Intelligence** (default app/admin theme)
+**Platform Gold — Quiet Editorial Intelligence** (unified prototype theme)
 
 The product combines:
 
 - The warmth and aspiration of premium real estate
 - The clarity and precision of a transaction product
-- A calm blue brand system
+- A warm copper-gold hierarchy on restrained near-black surfaces
 - Strong property imagery
 - Editorial public-page typography
 - Structured, accessible application UI
@@ -621,13 +622,13 @@ The product combines:
 - More structured and functional
 - Sans-serif-first interface
 - Property context retained throughout
-- Blue used for hierarchy, actions, and active states
+- Copper-gold used for hierarchy, actions, and active states
 
 **Admin portal**
 
 - Densest surface
-- Persistent dark-blue sidebar
-- Cooler neutral workspace
+- Persistent branded near-black sidebar with copper-gold hierarchy
+- Calm charcoal workspace
 - Minimal decorative typography
 - Strong tables, queues, filters, and statuses
 
@@ -638,7 +639,7 @@ The product combines:
 - Excessive gradients
 - Glowing cards
 - Glassmorphism
-- Unscoped or inaccessible gold-and-black styling
+- One-off or inaccessible gold-and-black styling outside the shared tokens
 - Large numbers of competing cards
 - Oversized border radii
 - Decorative charts
@@ -702,7 +703,7 @@ Use the standalone mark for:
 - Preserve clear space equal to at least the icon’s inner doorway width.
 - Do not place the wordmark over visually busy photography without a solid or sufficiently opaque surface.
 - Do not apply gradients to the wordmark.
-- Outside the scoped public/auth Platform Gold theme, do not add gold accents.
+- Use the copper wordmark consistently across Platform Gold surfaces.
 - Do not rotate, distort, outline, or animate individual logo paths.
 - Keep the application-mark corner radius restrained.
 - Maintain consistent spacing between **M**, the symbol, and **RKAZ**.
@@ -724,8 +725,9 @@ Before production use, it should be recreated as a precise vector asset with:
 
 ## 10. Colour System
 
-Blue is the primary MARKAZ Home app/admin brand colour. Platform Gold is the
-scoped public/auth brand layer defined in §8.0.
+Platform Gold is the primary MARKAZ Home prototype colour system across all
+product surfaces. The Architectural Blue scale remains documented as a legacy
+fallback token set, not the active workspace or Admin theme.
 
 It should communicate trust, clarity, architecture, and calmness without becoming a generic corporate navy interface.
 
@@ -754,7 +756,9 @@ Recommended visual balance:
 - 5–10% pale blue
 - Semantic colours only where status meaning is required
 
-Do not fill entire customer dashboards with dark blue. Blue should create hierarchy and confidence rather than visual weight.
+Do not reintroduce the legacy blue palette directly in customer or Admin
+components. The active Platform Gold theme owns hierarchy through semantic
+tokens.
 
 ### 10.3 Semantic colours
 
@@ -1533,10 +1537,10 @@ The following decisions are now considered locked for the working prototype:
 - Offers and transactions are distinct stages.
 - The customer product uses horizontal navigation.
 - Admin uses a persistent sidebar.
-- Blue remains the default customer-workspace and Admin colour system.
-- Public and customer-auth surfaces use the CEO-directed Platform Gold theme (§8.0).
-- Both themes share semantic tokens and quiet editorial typography; theme scope
-  must remain explicit at the layout boundary.
+- Public, customer-auth, authenticated customer, and Admin surfaces use the
+  CEO-directed Platform Gold theme (§8.0).
+- All surfaces share semantic tokens and quiet editorial typography; the theme
+  must remain explicit at every app or route-group layout boundary.
 - The wordmark uses **M + home/arch symbol + RKAZ**.
 - The home/arch symbol replaces the A.
 - A standalone blue-square application mark is used for compact contexts.

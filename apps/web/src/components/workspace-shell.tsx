@@ -135,7 +135,7 @@ export function WorkspaceShell({
     <div className="flex min-h-dvh">
       <aside className="border-border/70 bg-card/40 hidden w-[15rem] shrink-0 flex-col border-e pb-4 md:flex">
         <Link href="/dashboard" className="px-5 pt-6">
-          <BrandLogo variant="blue" className="h-11 w-auto md:h-11" />
+          <BrandLogo className="h-11 w-auto md:h-11" />
         </Link>
         <p className="text-muted-foreground mt-7 px-6 text-[10px] font-semibold uppercase tracking-[0.16em]">
           {t('workspace')}
@@ -157,7 +157,7 @@ export function WorkspaceShell({
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
             <Link href="/dashboard">
-              <BrandLogo variant="blue" className="h-8 w-auto md:h-8" />
+              <BrandLogo className="h-8 w-auto md:h-8" />
             </Link>
           </div>
           <div className="ms-auto flex items-center gap-1">
