@@ -1,6 +1,6 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
 import { webRouter, createTRPCContext } from '@markaz/api';
-import { isTrustedHttpRequestOrigin } from '@markaz/api/http-security';
+import { getHttpRequestOrigin, isTrustedHttpRequestOrigin } from '@markaz/api/http-security';
 import { getAuthProviderIds, getAuthUser } from '@markaz/auth/server';
 
 const handler = (req: Request) => {
@@ -8,6 +8,7 @@ const handler = (req: Request) => {
     !isTrustedHttpRequestOrigin({
       method: req.method,
       origin: req.headers.get('origin'),
+      requestOrigin: getHttpRequestOrigin(req),
       allowedOrigin: process.env.NEXT_PUBLIC_WEB_URL,
     })
   ) {
