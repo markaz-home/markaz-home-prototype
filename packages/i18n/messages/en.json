@@ -158,8 +158,10 @@
     "resent": "A new verification code has been sent.",
     "successTitle": "Email verified",
     "successBody": "Your email is confirmed. Next, continue with UAE PASS identity verification.",
+    "demoSuccessBody": "Your email is confirmed. Continue to your dashboard to complete this demo account setup.",
     "profileSuccessBody": "Your email is confirmed. Add the remaining account detail, then continue to identity verification.",
     "continueIdentity": "Continue to identity verification",
+    "continueDashboard": "Continue to your dashboard",
     "completeProfile": "Complete profile"
   },
   "signin": {
