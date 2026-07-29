@@ -55,9 +55,9 @@
     --radius: 0.625rem; /* 10px — inputs/buttons 8–10, cards 10–12 (§12.4) */
 
     /* Typography (§11): Manrope interface, Source Serif 4 display */
-    --font-sans: 'Manrope', var(--font-inter, ui-sans-serif), system-ui, sans-serif;
-    --font-display: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-    --font-arabic: 'Noto Sans Arabic', var(--font-sans);
+    --font-sans: var(--font-manrope), system-ui, sans-serif;
+    --font-display: var(--font-source-serif), Georgia, 'Times New Roman', serif;
+    --font-arabic: var(--font-noto-sans-arabic), var(--font-sans);
   }
 
   /* Dark surface (used by the admin operations portal, §8.2) */
