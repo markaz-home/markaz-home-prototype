@@ -6,7 +6,7 @@
 **Application:** Separate `apps/admin` deployment  
 **Primary languages:** English and Arabic  
 **Accessibility target:** WCAG 2.2 AA  
-**Design direction:** Architectural Blue — Operational Precision  
+**Design direction:** Platform Gold — Operational Precision
 **Last updated:** July 2026
 
 ---
@@ -76,7 +76,8 @@ The final product model is:
 
 1. Keep one `ADMIN` account type; use capabilities rather than new account roles.
 2. No customer impersonation or customer-mode switch.
-3. Use a persistent dark-blue desktop sidebar and a compact mobile navigation sheet.
+3. Use a persistent branded near-black desktop sidebar with copper-gold hierarchy
+   and a compact mobile navigation sheet.
 4. Use one global search that returns grouped, permission-filtered entity results.
 5. Use page-based pagination for operational tables.
 6. Use entity-specific timelines plus one global Audit area.
@@ -520,7 +521,8 @@ Width:
 - Expanded: 256 px
 - Collapsed: 72 px
 
-Surface: Deep Architectural Blue `#0F2A44`.
+Surface: Platform Gold card/near-black tokens from
+`packages/ui/src/styles/globals.css`; do not hardcode the legacy blue scale.
 
 Order:
 
