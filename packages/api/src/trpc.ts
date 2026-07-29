@@ -58,6 +58,23 @@ const logging = middleware(async ({ ctx, path, type, next }) => {
 /** Public procedure — no authentication required. */
 export const publicProcedure = t.procedure.use(logging);
 
+/**
+ * Rethrow a failed middleware result inside the transaction callback so the
+ * transaction rejects with the resolver's (possibly mapped) error. tRPC's
+ * `next()` never rejects — it returns `{ ok: false, error }` — so without this
+ * the callback would resolve, postgres.js would commit any prior writes, and
+ * a query that errored inside the transaction would surface as the RAW
+ * database error (postgres.js `begin` rethrows the first query error when the
+ * callback resolves), discarding resolver-level mappings such as
+ * PRECONDITION_FAILED. Rejecting here both rolls back and preserves the
+ * mapped error.
+ */
+async function unwrapTxResult<T extends { ok: boolean }>(resultPromise: Promise<T>): Promise<T> {
+  const result = await resultPromise;
+  if (!result.ok) throw (result as { error?: unknown }).error;
+  return result;
+}
+
 /** Requires an authenticated user; runs the resolver inside an RLS-scoped tx. */
 const enforceUserWithRls = middleware(async ({ ctx, next }) => {
   if (!ctx.user) {
@@ -67,7 +84,7 @@ const enforceUserWithRls = middleware(async ({ ctx, next }) => {
   return withUserContext(
     ctx.db,
     { userId: user.id, email: user.email, accountType: user.accountType },
-    (tx) => next({ ctx: { ...ctx, user, tx } }),
+    (tx) => unwrapTxResult(next({ ctx: { ...ctx, user, tx } })),
   );
 });
 
@@ -117,10 +134,10 @@ const publicWithRls = middleware(async ({ ctx, next }) => {
     return withUserContext(
       ctx.db,
       { userId: user.id, email: user.email, accountType: user.accountType },
-      (tx) => next({ ctx: { ...ctx, tx } }),
+      (tx) => unwrapTxResult(next({ ctx: { ...ctx, tx } })),
     );
   }
-  return withAnonContext(ctx.db, (tx) => next({ ctx: { ...ctx, tx } }));
+  return withAnonContext(ctx.db, (tx) => unwrapTxResult(next({ ctx: { ...ctx, tx } })));
 });
 
 /** Anonymous-or-authenticated procedure with an RLS tx (`ctx.tx`). */
