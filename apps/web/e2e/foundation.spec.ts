@@ -19,6 +19,27 @@ test.describe('foundation', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
   });
 
+  test('hero filters stay above the featured-property section', async ({ page }) => {
+    await page.goto('/en');
+    await page.getByRole('button', { name: 'Bedrooms Any' }).click();
+
+    const listbox = page.getByRole('listbox', { name: 'Bedrooms' });
+    await expect(listbox).toBeVisible();
+
+    const isTopmost = await listbox.evaluate((element) => {
+      const menu = element.getBoundingClientRect();
+      const hero = element.closest('section');
+      const followingContent = hero?.nextElementSibling;
+      const followingTop = followingContent?.getBoundingClientRect().top ?? menu.top;
+      const x = menu.left + menu.width / 2;
+      const y = Math.min(menu.bottom - 2, Math.max(menu.top + 2, followingTop + 2));
+      const topmost = document.elementFromPoint(x, y);
+      return topmost === element || element.contains(topmost);
+    });
+
+    expect(isTopmost).toBe(true);
+  });
+
   test('an unauthenticated visitor is redirected from a protected route to sign-in', async ({
     page,
   }) => {
