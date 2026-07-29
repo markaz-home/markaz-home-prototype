@@ -24,6 +24,10 @@ async function loadOwnProfile(tx: Tx, id: string) {
   return rows[0];
 }
 
+function isUnlinkedUaePassIdentity(error: unknown): boolean {
+  return error instanceof Error && error.message.includes('UAE_PASS_IDENTITY_NOT_LINKED');
+}
+
 export const profileRouter = router({
   /** The authenticated user's own profile (via RLS). */
   get: protectedProcedure.query(async ({ ctx }) => {
@@ -64,7 +68,17 @@ export const profileRouter = router({
    * app_metadata.providers: that metadata can briefly be stale after a link.
    */
   syncUaePassIdentity: customerProcedure.mutation(async ({ ctx }) => {
-    await ctx.tx.execute(sql`select public.sync_uae_pass_staging_identity()`);
+    try {
+      await ctx.tx.execute(sql`select public.sync_uae_pass_staging_identity()`);
+    } catch (error) {
+      if (isUnlinkedUaePassIdentity(error)) {
+        throw new TRPCError({
+          code: 'PRECONDITION_FAILED',
+          message: 'UAE PASS identity is not linked',
+        });
+      }
+      throw error;
+    }
     const row = await loadOwnProfile(ctx.tx, ctx.user.id);
     if (!row) throw new TRPCError({ code: 'NOT_FOUND', message: 'Profile not found' });
     return toProfileDto(row);
