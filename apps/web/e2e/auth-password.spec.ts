@@ -71,9 +71,7 @@ test.describe('email/password authentication', () => {
     test.skip(!(await mailpitReachable()), 'Local Supabase/Mailpit not running');
   });
 
-  test('new customer: sign up → verify → simulated identity handoff → dashboard', async ({
-    page,
-  }) => {
+  test('new customer: sign up → check email → verify → UAE PASS checkpoint', async ({ page }) => {
     const email = `e2e-signup-${Date.now()}@markaz.test`;
     await page.goto('/en/sign-up');
     await page.getByLabel(/Full name/i).fill('Test Customer');
@@ -92,9 +90,14 @@ test.describe('email/password authentication', () => {
     await page.getByRole('button', { name: 'Verify email' }).click();
 
     await expect(page).toHaveURL(/\/en\/verify-email\/success/, { timeout: 15_000 });
-    await page.getByRole('link', { name: /Continue to your dashboard/i }).click();
-    await expect(page).toHaveURL(/\/en\/dashboard/, { timeout: 15_000 });
-    await expect(page.getByRole('heading', { name: /Welcome back, Test/i })).toBeVisible();
+    await page.getByRole('link', { name: /Continue to identity verification/i }).click();
+    await expect(page).toHaveURL(/\/en\/onboarding\/uae-pass/);
+    await expect(page.getByRole('heading', { name: 'Verify with UAE PASS' })).toBeVisible();
+    await expect(
+      page
+        .getByRole('button', { name: 'Continue with UAE PASS' })
+        .or(page.getByText(/UAE PASS identity linking is not available in this environment/i)),
+    ).toBeVisible();
     await expect(page.getByRole('button', { name: 'Start demo verification' })).toHaveCount(0);
   });
 

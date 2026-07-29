@@ -161,10 +161,8 @@
     "resent": "تم إرسال رمز تحقق جديد.",
     "successTitle": "تم التحقق من البريد الإلكتروني",
     "successBody": "تم تأكيد بريدك الإلكتروني. تابع الآن للتحقق من الهوية عبر UAE PASS.",
-    "demoSuccessBody": "تم تأكيد بريدك الإلكتروني. تابع إلى لوحة التحكم لإكمال إعداد هذا الحساب التجريبي.",
     "profileSuccessBody": "تم تأكيد بريدك الإلكتروني. أضف بيانات الحساب المتبقية، ثم تابع إلى التحقق من الهوية.",
     "continueIdentity": "المتابعة إلى التحقق من الهوية",
-    "continueDashboard": "المتابعة إلى لوحة التحكم",
     "completeProfile": "إكمال الملف الشخصي"
   },
   "signin": {
@@ -225,7 +223,6 @@
     "introBody": "استخدم حساب UAE PASS الخاص ببيئة الاختبار لإكمال التحقق من الهوية.",
     "stagingAction": "المتابعة عبر UAE PASS",
     "stagingStarting": "جارٍ التحويل إلى UAE PASS…",
-    "stagingEnvironmentNote": "بيئة اختبار — لا يتم إجراء تحقق إنتاجي.",
     "stagingCancelled": "تم إلغاء UAE PASS في بيئة الاختبار. حاول مجددًا عندما تكون مستعدًا.",
     "stagingFailure": "تعذّر إكمال UAE PASS في بيئة الاختبار. حاول مجددًا.",
     "stagingIdentityUnavailable": "لا يمكن ربط هوية UAE PASS هذه بحساب Markaz. تواصل مع دعم Markaz للمساعدة.",

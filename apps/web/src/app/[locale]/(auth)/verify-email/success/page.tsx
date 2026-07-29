@@ -1,6 +1,5 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { resolvePostAuthDestination } from '@markaz/domain';
-import { getUaePassMode } from '@markaz/auth/uae-pass/server';
 import { Button } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
 import { AuthShell } from '@/components/auth/auth-shell';
@@ -23,20 +22,8 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
       : dest === 'dashboard'
         ? '/dashboard'
         : '/onboarding/uae-pass';
-  const continuesToDashboard =
-    dest === 'dashboard' || (dest === 'uae-pass' && getUaePassMode() === 'simulated');
-  const label =
-    dest === 'profile-setup'
-      ? t('completeProfile')
-      : continuesToDashboard
-        ? t('continueDashboard')
-        : t('continueIdentity');
-  const body =
-    dest === 'profile-setup'
-      ? t('profileSuccessBody')
-      : continuesToDashboard
-        ? t('demoSuccessBody')
-        : t('successBody');
+  const label = dest === 'profile-setup' ? t('completeProfile') : t('continueIdentity');
+  const body = dest === 'profile-setup' ? t('profileSuccessBody') : t('successBody');
   return (
     <AuthShell narrow>
       <SuccessPanel title={t('successTitle')} description={body}>

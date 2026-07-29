@@ -146,14 +146,9 @@ export function UaePassFlow({
               <div className="space-y-4">
                 <AuthHeading title={t('introTitle')} description={t('introBody')} />
                 {uaePassStaging ? (
-                  <>
-                    <Button className="w-full" loading={linkLoading} onClick={linkUaePassIdentity}>
-                      {linkLoading ? t('stagingStarting') : t('stagingAction')}
-                    </Button>
-                    <p className="text-muted-foreground text-center text-xs">
-                      {t('stagingEnvironmentNote')}
-                    </p>
-                  </>
+                  <Button className="w-full" loading={linkLoading} onClick={linkUaePassIdentity}>
+                    {linkLoading ? t('stagingStarting') : t('stagingAction')}
+                  </Button>
                 ) : (
                   <Alert variant="warning">{t('stagingConfigurationError')}</Alert>
                 )}

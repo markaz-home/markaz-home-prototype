@@ -1,8 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { isIdentityVerified } from '@markaz/domain';
-import { getUaePassMode, isUaePassStagingEnabled } from '@markaz/auth/uae-pass/server';
-import { completeOwnSimulatedIdentity } from '@markaz/db';
+import { isUaePassStagingEnabled } from '@markaz/auth/uae-pass/server';
 import { requireCustomerStep } from '@/server/session';
 import { UaePassFlow } from '@/components/uae-pass-flow';
 import { parseUaePassLinkNotice } from '@/lib/uae-pass-link';
@@ -23,20 +22,6 @@ export default async function UaePassPage({
   const status = session.profile?.identityVerificationStatus ?? 'NOT_STARTED';
   if (status === 'VERIFIED_DEMO' || (!session.uaePassAuthenticated && isIdentityVerified(status))) {
     redirect(`/${locale}/dashboard`);
-  }
-
-  // The hosted prototype defaults to simulated mode, where a customer should
-  // not be blocked by staging credentials they cannot possess. Complete the
-  // named, persisted demo outcome on the server and continue without exposing
-  // simulation controls. Staging mode still requires the provider round trip.
-  if (getUaePassMode() === 'simulated' && !session.uaePassAuthenticated) {
-    const profile = await completeOwnSimulatedIdentity({
-      id: session.userId,
-      email: session.email ?? undefined,
-    });
-    if (profile?.identityVerificationStatus === 'VERIFIED_DEMO') {
-      redirect(`/${locale}/dashboard`);
-    }
   }
 
   const notice = parseUaePassLinkNotice((await searchParams).notice);
