@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-page-custom-font -- The locale layout is the App Router root layout for every customer route. */
 import type { Metadata } from 'next';
 import { Manrope, Noto_Sans_Arabic, Source_Serif_4 } from 'next/font/google';
 import { notFound } from 'next/navigation';

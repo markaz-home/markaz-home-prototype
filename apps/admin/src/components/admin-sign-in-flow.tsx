@@ -57,7 +57,7 @@ export function AdminSignInFlow() {
           </Alert>
         ) : null}
         <div>
-          <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+          <p className="text-primary mb-3 text-[11px] font-semibold uppercase tracking-[0.2em]">
             {t('authorised')}
           </p>
           <AdminHeading title={t('signinTitle')} description={t('signinBody')} />
@@ -87,6 +87,7 @@ export function AdminSignInFlow() {
               id="password"
               autoComplete="current-password"
               dir="ltr"
+              placeholder={ts('passwordPlaceholder')}
               aria-invalid={!!errors.password}
               {...register('password')}
             />
@@ -94,7 +95,7 @@ export function AdminSignInFlow() {
           <div className="flex justify-end">
             <Link
               href="/forgot-password"
-              className="text-primary text-sm font-medium underline-offset-4 hover:underline"
+              className="text-primary hover:text-primary/80 text-sm font-medium underline-offset-4 hover:underline"
             >
               {ts('forgot')}
             </Link>

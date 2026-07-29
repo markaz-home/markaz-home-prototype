@@ -223,7 +223,6 @@
     "introBody": "استخدم حساب UAE PASS الخاص ببيئة الاختبار لإكمال التحقق من الهوية.",
     "stagingAction": "المتابعة عبر UAE PASS",
     "stagingStarting": "جارٍ التحويل إلى UAE PASS…",
-    "stagingEnvironmentNote": "بيئة اختبار — لا يتم إجراء تحقق إنتاجي.",
     "stagingCancelled": "تم إلغاء UAE PASS في بيئة الاختبار. حاول مجددًا عندما تكون مستعدًا.",
     "stagingFailure": "تعذّر إكمال UAE PASS في بيئة الاختبار. حاول مجددًا.",
     "stagingIdentityUnavailable": "لا يمكن ربط هوية UAE PASS هذه بحساب Markaz. تواصل مع دعم Markaz للمساعدة.",
