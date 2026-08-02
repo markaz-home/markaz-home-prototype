@@ -8,7 +8,6 @@ import { useListing } from './step-shared';
 
 // --- Ready ------------------------------------------------------------------
 export function ReadyScreen({ listingId }: { listingId: string }) {
-  const t = useTranslations('ready');
   const tpub = useTranslations('publication');
   const router = useRouter();
   const get = useListing(listingId);
@@ -52,7 +51,7 @@ export function ReadyScreen({ listingId }: { listingId: string }) {
         onClick={() => router.push(`/sell/listings/${listingId}/details`)}
         className="text-muted-foreground hover:text-foreground mt-4 text-sm underline-offset-4 hover:underline"
       >
-        {t('editListing')}
+        {tpub('editListing')}
       </button>
 
       <p className="text-muted-foreground border-border/60 mt-8 flex items-start gap-2 border-t pt-5 text-start text-xs">

@@ -5,14 +5,15 @@
 MARKAZ Home is a property marketplace for the UAE (initial focus: Dubai). A single
 customer account can both **sell** (list a property) and **buy** (browse listings,
 make offers, move through a transaction). Admin operations live in a separate
-application. The prototype spans **Weeks 1–6**: the application foundation (monorepo,
+application. The prototype spans **Weeks 1–8**: the application foundation (monorepo,
 shared packages, real auth + onboarding, the database with RLS, storage, a Realtime
 proof), the listing wizard, publication + the public marketplace, non-binding offers
-and negotiation, simulated transactions, and a separate admin operations portal. Only
-the regulated integrations (UAE PASS, DLD, Trakheesi, payment) are simulated, behind
-named interfaces with persisted outcomes.
+and negotiation, simulated transactions, a separate admin operations portal,
+release-candidate hardening, and controlled-deployment preparation. Only the regulated
+integrations (UAE PASS, DLD, Trakheesi, payment) are simulated, behind named interfaces
+with persisted outcomes.
 
-## The two applications
+## Applications and worker boundary
 
 | App           | Purpose                                                        | Port (local) | Origin env              |
 | ------------- | -------------------------------------------------------------- | ------------ | ----------------------- |
@@ -83,14 +84,16 @@ Trusted server ops (migrations/seed/worker/admin maintenance) use
 `withServiceContext`; the service-role key is **never** used for customer
 requests.
 
-## Scope (Weeks 1–6) vs deferred
+## Scope (Weeks 1–8) vs deferred
 
 **Built:** the application foundation (monorepo + shared packages, real email +
 password auth with a 6-digit signup code + onboarding routing, profiles + marketplace
 schema, RLS policy set + integration-test gate, storage buckets + boundary tests,
 Realtime proof, canonical migrations), the property-listing wizard, publication + the
 public marketplace, non-binding offers and negotiation, the simulated transaction
-workspace, and the separate admin operations portal.
+workspace, the separate admin operations portal, release-candidate quality/security/
+accessibility hardening, and provider-neutral deployment, rollback, recovery, and
+operational-readiness documentation.
 
 **Deferred:** durable background jobs (`apps/worker`), any AWS provisioning, real
 DLD/Trakheesi/Madmoun/payment integrations, free-form messaging/chat, contact
@@ -99,7 +102,7 @@ exchange, and map search.
 ## Platform boundary
 
 The **platform-engineering team** owns AWS/Terraform/RDS/ECS/ECR/SES/ElastiCache/
-SonarQube and the self-hosted Supabase deployment in me-central-1 (UAE). Week 1
+SonarQube and the self-hosted Supabase deployment in me-central-1 (UAE). This repository
 did **not** provision AWS and does **not** claim self-hosted-Supabase-on-RDS is
 validated — that is the §6A.1 gate (ADR 0006). Application development runs on
 the official Supabase local Docker stack; a managed-Supabase bridge is available

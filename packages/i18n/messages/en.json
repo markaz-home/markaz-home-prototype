@@ -16,7 +16,6 @@
     "language": "Language",
     "demoBadge": "Demo",
     "demoSimulationOnly": "Demo simulation only.",
-    "comingSoon": "This area is part of the next milestone.",
     "noMatches": "No matches. You can type your own.",
     "searching": "Searching…",
     "suggestionsUnavailable": "Suggestions are temporarily unavailable. You can still type your own."
@@ -435,21 +434,8 @@
     "beforeContactThree": "State whether the issue happened in English or Arabic and on desktop or mobile.",
     "contactAvailability": "Live contact submission will be added before an external pilot."
   },
-  "placeholders": {
-    "browseTitle": "Browse Properties",
-    "browseBody": "The public marketplace, search, and property detail pages arrive in the next milestone.",
-    "myListingsTitle": "My Listings",
-    "myListingsBody": "The full listing wizard and management tools arrive in the next milestone.",
-    "offersTitle": "Offers",
-    "offersBody": "Made and received offers, counters, and the Low Offers split arrive next.",
-    "transactionsTitle": "Transactions",
-    "transactionsBody": "The shared transaction tracker arrives in the next milestone.",
-    "notificationsTitle": "Notifications",
-    "notificationsBody": "Your notifications will appear here.",
-    "helpTitle": "Help",
-    "helpBody": "Help and support content will appear here.",
+  "accountProfile": {
     "profileTitle": "Profile",
-    "profileBody": "Your account details.",
     "emailLabel": "Email",
     "accountTypeLabel": "Account type",
     "identityLabel": "Identity",
@@ -500,7 +486,6 @@
     "loadingMetrics": "Loading metrics…",
     "emptyMetrics": "No data yet.",
     "metricsPartialError": "Some metrics couldn't be loaded.",
-    "sectionPlaceholder": "This admin section is part of a later milestone.",
     "brand": "Markaz operations",
     "authorised": "Authorised access only",
     "signinTitle": "Sign in to Operations",
@@ -1435,22 +1420,10 @@
     "prototypeTitle": "Prototype listing",
     "prototypeBody": "Ownership verification, Form A, Trakheesi, and permit results in this prototype are simulated. They do not represent official government, legal, or property approval.",
     "notPublicTitle": "Not yet public",
-    "notPublicBody": "Marking the listing ready does not publish it. Publication will be handled in a later product stage.",
-    "confirmReview": "I have reviewed the listing and understand it will remain private until a future publication step.",
+    "notPublicBody": "Marking the listing ready does not publish it. You can then submit it for simulated publication review; it stays private until that review is approved.",
+    "confirmReview": "I have reviewed the listing and understand it will remain private until I submit it for review and the simulated publication review is approved.",
     "markReady": "Mark listing ready",
     "checking": "Checking listing readiness…"
-  },
-  "ready": {
-    "title": "Your listing is ready",
-    "description": "You have completed the required property details, demo verification steps, photographs, and listing settings.",
-    "note": "Your listing is not live yet. Review the preview before publishing in the next product stage.",
-    "statusChip": "Ready to publish",
-    "privateNote": "Private · Not live",
-    "viewPreview": "View listing preview",
-    "backToListings": "Return to My Listings",
-    "editListing": "Edit listing",
-    "nextStage": "Next stage: Publication",
-    "nextStageBody": "Publishing the listing will be added in the next product milestone."
   },
   "preview": {
     "bannerTitle": "Private preview",

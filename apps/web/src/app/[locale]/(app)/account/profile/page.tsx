@@ -10,7 +10,7 @@ export default async function AccountProfilePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations('placeholders');
+  const t = await getTranslations('accountProfile');
   const session = await getSession();
   const profile = session?.profile;
 
