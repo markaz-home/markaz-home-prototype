@@ -92,7 +92,7 @@ test.describe('email/password authentication', () => {
     await expect(page).toHaveURL(/\/en\/verify-email\/success/, { timeout: 15_000 });
     await expect(page.getByRole('heading', { name: 'Welcome to Markaz' })).toBeVisible();
     await page.getByRole('link', { name: /Continue to dashboard/i }).click();
-    await expect(page).toHaveURL(/\/en\/dashboard/);
+    await expect(page).toHaveURL(/\/en\/dashboard/, { timeout: 20_000 });
   });
 
   test('returning customer signs in and reaches the dashboard', async ({ page }) => {

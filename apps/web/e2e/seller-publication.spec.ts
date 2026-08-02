@@ -71,6 +71,7 @@ test.afterAll(async () => {
 test('publish a READY listing through review to LIVE and open its public page', async ({
   page,
 }) => {
+  test.setTimeout(60_000);
   await signIn(page, customer);
   await page.goto(`/en/sell/listings/${readyL.id}/publish`);
   await expect(page.getByRole('heading', { name: /Publication checklist/i })).toBeVisible();

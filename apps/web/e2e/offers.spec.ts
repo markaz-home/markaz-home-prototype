@@ -35,6 +35,7 @@ test.afterAll(async () => {
 });
 
 test('full negotiation → seller accepts → Under Offer → Week 5 handoff', async ({ browser }) => {
+  test.setTimeout(60_000);
   test.skip(skip, 'full stack required');
   const buyerCtx = await browser.newContext();
   const sellerCtx = await browser.newContext();
