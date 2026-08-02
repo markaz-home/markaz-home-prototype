@@ -10,10 +10,5 @@ export default async function ProfileOnboardingPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const session = await requireCustomerStep(locale, ['profile-setup']);
-  return (
-    <ProfileSetupForm
-      email={session.email}
-      identityAuthenticatedByProvider={session.uaePassAuthenticated}
-    />
-  );
+  return <ProfileSetupForm email={session.email} />;
 }

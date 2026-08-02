@@ -45,9 +45,7 @@ export const profileRouter = router({
         fullName: input.fullName.trim(),
         termsAcceptedAt: now,
         privacyAcceptedAt: now,
-        ...(ctx.user.authProviders?.includes('custom:uae-pass')
-          ? { onboardingCompletedAt: now }
-          : {}),
+        onboardingCompletedAt: now,
       })
       .where(eq(profiles.id, ctx.user.id));
     await ctx.tx.insert(auditEvents).values({

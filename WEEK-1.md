@@ -66,8 +66,9 @@ overview.
 
 ### Authentication flow
 
-Real Supabase email OTP (6-digit, local inbox). New customer: landing → email →
-OTP → profile setup → simulated UAE PASS → dashboard. Returning verified customer
+Real Supabase email OTP (6-digit, local inbox). At Week 1 delivery, a new customer followed landing → email →
+OTP → profile setup → simulated UAE PASS → dashboard. ADR-0030 later retired UAE PASS as a required
+signup step; the current flow continues from email verification/profile readiness to the dashboard. Returning verified customer
 (`VERIFIED_DEMO` + complete profile) skips onboarding → dashboard. Admin: same OTP
 inside the admin app → requires `ADMIN` → else access-denied. Sessions via
 `@supabase/ssr` secure cookies.
@@ -92,7 +93,7 @@ hidden, role is `authenticated`) and `storage.test.ts`. Recorded in **ADR-0004**
 
 ### Tests
 
-51 automated tests: unit (domain state machines, account/identity/routing rules,
+51 automated tests at Week 1 delivery: unit (domain state machines, account/identity/routing rules,
 AED/i18n, env + RBAC), component (sign-in states, profile validation, UAE PASS
 states, en/ar rendering, admin login), integration (the RLS + storage gates), and
 Playwright e2e specs (foundation + OTP-via-local-inbox).

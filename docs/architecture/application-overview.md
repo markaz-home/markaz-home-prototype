@@ -51,7 +51,8 @@ pinned dev dependency** (run via `pnpm supabase`), not installed globally.
 
 **Real:**
 
-- Supabase email OTP authentication (6-digit), `@supabase/ssr` secure cookies.
+- Supabase email/password authentication with a 6-digit signup verification code,
+  `@supabase/ssr` secure cookies, and optional UAE PASS Staging sign-in.
 - PostgreSQL schema with Row-Level Security, triggers, and grants.
 - RLS identity propagation for direct Drizzle queries (ADR 0004).
 - Storage buckets with enforced access boundaries (private + public).
@@ -59,7 +60,6 @@ pinned dev dependency** (run via `pnpm supabase`), not installed globally.
 
 **Simulated (clearly fictional, behind named interfaces with persisted outcomes):**
 
-- UAE PASS identity step (sets identity status to `VERIFIED_DEMO`).
 - Ownership verification, Form A, and Trakheesi permit steps of the listing journey
   (failures stay recoverable — recorded `FAILED_DEMO`, never `REJECTED`).
 - DLD title transfer, escrow/deposit, and payment in the transaction workspace — no

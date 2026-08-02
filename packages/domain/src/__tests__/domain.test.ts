@@ -100,14 +100,14 @@ describe('profile completeness + post-auth routing', () => {
       }),
     ).toBe('profile-setup');
   });
-  it('routes complete-but-unverified-identity to UAE PASS (incl. PENDING/FAILED resume)', () => {
+  it('routes a complete profile to dashboard without requiring an identity step', () => {
     for (const s of ['NOT_STARTED', 'PENDING', 'FAILED_DEMO'] as const) {
       expect(
         resolvePostAuthDestination({
           emailVerified: true,
           profile: { ...complete, identityVerificationStatus: s },
         }),
-      ).toBe('uae-pass');
+      ).toBe('dashboard');
     }
   });
   it('routes a fully-onboarded customer to the dashboard', () => {
@@ -126,7 +126,7 @@ describe('profile completeness + post-auth routing', () => {
       }),
     ).toBe('dashboard');
   });
-  it('treats a trusted provider-authenticated identity as satisfying the demo identity gate', () => {
+  it('routes a complete provider-authenticated profile directly to dashboard', () => {
     expect(
       resolvePostAuthDestination({
         emailVerified: true,

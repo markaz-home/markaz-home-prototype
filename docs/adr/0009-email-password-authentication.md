@@ -1,7 +1,7 @@
 # ADR 0009: Email + Password Authentication (replaces passwordless OTP)
 
 - **Status:** Accepted
-- **Date:** 2026-06 (revised after the auth/onboarding design-spec pass)
+- **Date:** 2026-06 (revised 2026-08 by ADR-0030)
 
 ## Summary (authoritative)
 
@@ -29,8 +29,8 @@ Official Supabase link    → Forgot Password and Reset Password
 - **No custom codes, passwords, hashes, or tokens are built, stored, or logged by
   app code** — Supabase Auth owns them all.
 
-The auth/onboarding UI follows the approved design spec: split AuthShell (header
-with language switcher + footer + support panel), 3-step progress, a 6-cell
+The auth/onboarding UI follows the approved design spec as amended by ADR-0030:
+split AuthShell (header with language switcher + footer + support panel), 2-step progress, a 6-cell
 verification code (one logical accessible input), the full screen inventory (Check
 Email, Email Verified, Recovery Email Sent, Password Updated, Signed Out, Session
 Expired, provider/error panels), and a branded Operations shell for admin.
@@ -72,8 +72,9 @@ supabase.auth.signUp({
 
 The user is routed to `/[locale]/verify-email`, where they enter the 6-digit
 code from the **`confirmation`** email template and the app calls
-`verifyOtp({ type: 'signup' })`. On success the customer continues to the
-simulated UAE PASS identity step and then the dashboard.
+`verifyOtp({ type: 'signup' })`. On success the customer sees the Welcome state
+and continues directly to the dashboard. UAE PASS is an optional sign-in method,
+not an onboarding requirement (ADR-0030).
 
 `enable_confirmations = true` in `supabase/config.toml`; the `confirmation.html`
 template carries the 6-digit `{{ .Token }}`. Confirmation is intentionally **not**

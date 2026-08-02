@@ -23,16 +23,15 @@ Sign In → "Continue with UAE PASS Staging"
   → GoTrue /auth/v1/callback (token + userinfo, account resolution by `sub`)
   → app /auth/callback?code=…  → exchangeCodeForSession → standard Supabase session
   → first sign-in: handle_new_user trigger creates the normal CUSTOMER profile
-  → (app) guard requires profile setup, then treats the trusted provider identity
-    as satisfying the old simulated UAE PASS step
+  → (app) guard requires profile setup when needed, then continues to the dashboard
 ```
 
 - **First** UAE PASS sign-in creates the normal CUSTOMER profile via the existing safe
   `handle_new_user` trigger — no bespoke provisioning.
 - **Repeat** sign-ins with the same UAE PASS subject (`sub`) resolve to the **same**
   account (GoTrue links identities by provider subject natively).
-- Email/password customers continue through the existing simulated identity step;
-  customers authenticated by `custom:uae-pass` do not repeat that simulation.
+- Email/password customers verify the six-digit email code and continue directly
+  to the dashboard. UAE PASS is not repeated as an onboarding step (ADR-0030).
 
 ## Official sources (verify before changing anything)
 
@@ -125,8 +124,8 @@ Open `/en/sign-in` → the **"Continue with UAE PASS Staging"** button appears.
 ### Expected success flow
 
 Click → redirected to UAE PASS staging → authenticate → back to `/auth/callback` →
-standard Supabase session → first-time users complete profile setup → dashboard. The
-trusted provider identity skips the old simulated UAE PASS step. Each new UAE PASS
+standard Supabase session → first-time users complete profile setup → dashboard. There is no
+post-login identity step. Each new UAE PASS
 login attempt sends `prompt=login` and `forceAuth=true`, so an existing UAE PASS
 browser SSO session is not silently reused and UAE PASS must start a fresh interactive
 mobile challenge. The matching-code screen and mobile approval UI remain controlled by
@@ -207,7 +206,7 @@ ownership-verification flow and, in production, DLD/Trakheesi — never by UAE P
 
 ## Rollback to simulated mode
 
-Set `UAE_PASS_MODE=simulated` (or unset it). The UAE PASS button disappears; email +
-password and the existing simulated onboarding are unchanged. Optionally delete the
-provider: `DELETE {SUPABASE_URL}/auth/v1/admin/custom-providers/custom:uae-pass`
-(service-role). No app code or schema changes are needed to roll back.
+Set `UAE_PASS_MODE=simulated` (or unset it). The UAE PASS button disappears; the two-step email +
+password signup and normal email/password sign-in remain available. Optionally delete the provider:
+`DELETE {SUPABASE_URL}/auth/v1/admin/custom-providers/custom:uae-pass` (service-role). No app code or
+schema changes are needed to roll back.

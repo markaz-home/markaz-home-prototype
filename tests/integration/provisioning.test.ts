@@ -92,4 +92,46 @@ d('account provisioning', () => {
 
     expect(row.email).toBe(`${userId}@no-email.uaepass.invalid`);
   });
+
+  it('marks a complete email signup profile ready without an identity-verification step', async () => {
+    const userId = randomUUID();
+    const email = `itest_signup_metadata_${userId}@markaz.test`;
+    const row = await asService(async (tx) => {
+      await tx`insert into auth.users (
+                 id, email, aud, role, raw_user_meta_data, created_at, updated_at
+               ) values (
+                 ${userId}, ${email}, 'authenticated', 'authenticated',
+                 jsonb_build_object(
+                   'full_name', 'Signup Customer',
+                   'terms_accepted', true,
+                   'privacy_accepted', true
+                 ),
+                 now(), now()
+               )`;
+      const rows = await tx`select
+                              full_name,
+                              terms_accepted_at is not null as terms_accepted,
+                              privacy_accepted_at is not null as privacy_accepted,
+                              onboarding_completed_at is not null as onboarded,
+                              identity_verification_status::text as identity_status
+                            from public.profiles
+                            where id = ${userId}`;
+      await tx`delete from auth.users where id = ${userId}`;
+      return rows[0] as {
+        full_name: string;
+        terms_accepted: boolean;
+        privacy_accepted: boolean;
+        onboarded: boolean;
+        identity_status: string;
+      };
+    });
+
+    expect(row).toEqual({
+      full_name: 'Signup Customer',
+      terms_accepted: true,
+      privacy_accepted: true,
+      onboarded: true,
+      identity_status: 'NOT_STARTED',
+    });
+  });
 });

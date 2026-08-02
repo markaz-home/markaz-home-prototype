@@ -49,7 +49,8 @@ by app code — Supabase Auth owns them all.
 | `/[locale]/forgot-password` (+ `/check-email`)                               | `resetPasswordForEmail`; generic response                         |
 | `/auth/confirm`                                                              | **top-level** (outside `[locale]`) recovery/confirmation callback |
 | `/[locale]/reset-password` (+ `/success`)                                    | new password only — **no code field**; recovery-session gated     |
-| `/[locale]/onboarding/uae-pass`                                              | simulated UAE PASS; `/onboarding/profile` is a fallback           |
+| `/[locale]/onboarding/profile`                                               | fallback only when required profile data is missing               |
+| `/[locale]/onboarding/uae-pass`                                              | retired checkpoint; redirects safely to Dashboard (ADR-0030)      |
 | `/[locale]/signed-out`, `/[locale]/auth/error`, `/[locale]/auth/unavailable` | status panels                                                     |
 | `/[locale]/dashboard`                                                        | reached only by verified + complete customers                     |
 
@@ -78,8 +79,8 @@ sign-up can never create an admin.
 ## 5. Final email-verification flow
 
 `verify-email` (enter the 6-digit `confirmation` code) → `verifyOtp({
-type:'signup' })` → `verify-email/success` → simulated UAE PASS → (success screen,
-"Go to dashboard") → dashboard. Weak-password, invalid-code, expired-code, resend,
+type:'signup' })` → `verify-email/success` (Welcome) → dashboard. Weak-password,
+invalid-code, expired-code, resend,
 and rate-limit states are surfaced with safe, non-enumerating copy.
 
 ## 6. Final sign-in flow
@@ -248,7 +249,8 @@ both apps; each item below names its evidence (E2E / component / integration /
 server-side code guard).
 
 - **New customer** (sign up → `confirmation` code from Mailpit → verify → simulated
-  UAE PASS → "Go to dashboard" → dashboard): **E2E** ✅.
+  UAE PASS → "Go to dashboard" → dashboard): **E2E** ✅ at delivery time. The current flow is
+  sign up → code → welcome → dashboard; ADR-0030 retired mandatory UAE PASS onboarding.
 - **Duplicate email** (safe copy with Sign In / Forgot Password; no duplicate Auth
   user; no duplicate profile): **E2E** (safe copy) + **integration** (idempotent
   profile) ✅.

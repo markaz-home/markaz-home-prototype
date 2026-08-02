@@ -4,11 +4,15 @@
 
 - Customer Auth is Supabase email/password. Signup uses a six-digit `signup` OTP; recovery uses the
   official Supabase recovery **link** through `/auth/confirm`.
-- Email verification gates profile setup, UAE PASS staging/simulation, then the customer app.
+- Email verification gates profile setup, then the customer app. UAE PASS staging is an optional
+  sign-in method and is not part of signup onboarding (ADR-0030).
 - The Admin app has no signup. `pnpm db:setup` creates the initial Admin through the Supabase Admin
   API, then the database trigger/RLS boundary prevents customer self-promotion.
 - A `CUSTOMER` reaching the Admin origin receives access denied. The customer app has no Admin route.
 - Session cookies are managed by `@supabase/ssr`; app code does not build, store, or log tokens.
+- Customer and Admin sessions use a 30-minute inactivity limit. A client guard records only the last
+  interaction timestamp so an open, returning, or second tab signs out immediately; GoTrue remains
+  the server-side session boundary.
 
 ## Environment setup checklist
 
@@ -24,8 +28,13 @@
    special character. The client/domain policy already enforces this; local CLI cannot configure it.
 7. Configure provider rate limits for signup, verification resend, login, recovery, and token
    refresh. Record the approved values in the platform change ticket.
-8. Verify refresh-token rotation, JWT lifetime, inactivity expectations, and cookie behavior on the
-   selected HTTPS topology. Session-expiry detection remains best-effort.
+8. Mirror `supabase/config.toml` in the hosted Auth Sessions settings: 30-minute inactivity timeout,
+   10-minute JWT lifetime, refresh-token rotation enabled, and 10-second refresh-token reuse interval.
+   Verify the policy and cookie behavior on the selected HTTPS topology. Supabase evaluates its
+   session limit when a token refresh occurs; the shorter JWT bounds that server-side enforcement lag,
+   while the browser guard applies the user-facing idle deadline on return.
+9. Keep manual identity linking disabled. The customer app uses UAE PASS only as a standalone sign-in
+   provider and does not expose an account-linking flow.
 
 ## Verification script
 
@@ -36,7 +45,8 @@ pnpm --filter @markaz/web exec playwright test auth-password.spec.ts foundation.
 pnpm --filter @markaz/admin exec playwright test admin.spec.ts
 ```
 
-Manually verify signup → code → profile → identity boundary → dashboard; bad login; duplicate signup
+Manually verify signup → code → welcome → dashboard (and the profile fallback when signup metadata is
+incomplete); bad login; duplicate signup
 anti-enumeration; resend; recovery link → new password → forced fresh sign-in; signed-out and expired
 session; Admin bootstrap/sign-in; customer denial at Admin.
 
@@ -48,15 +58,15 @@ by SQL and never seed shared customer accounts.
 
 ## UAE PASS
 
-`UAE_PASS_MODE=simulated` is the safe default. Staging requires issued client credentials, the UAE
-PASS staging app/test account, registered callbacks, and an explicit
+UAE PASS is optional on the Sign In screen. `UAE_PASS_MODE=simulated` is the safe default. Staging
+requires issued client credentials, the UAE PASS staging app/test account, registered callbacks, and an explicit
 `UAE_PASS_ALLOW_REMOTE_SETUP=true` only during approved setup. Production UAE PASS endpoints and
 credentials are not implemented or approved.
 
 ## Production blockers
 
-- Production GoTrue password policy, rate limits, redirect allow-list, cookie behavior, and session
-  policy are not verified on a selected platform.
+- Production GoTrue password policy, rate limits, redirect allow-list, cookie behavior, and the
+  configured inactivity policy are not verified on a selected platform.
 - Production email/domain is not configured.
-- UAE PASS production onboarding is outside this prototype.
+- UAE PASS production sign-in/provider approval is outside this prototype.
 - Arabic legal and transactional Auth copy has not been professionally reviewed.

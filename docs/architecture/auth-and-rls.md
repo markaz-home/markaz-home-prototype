@@ -16,11 +16,12 @@ on older CLIs); SES delivers in deployed demos.
 `/[locale]/sign-up` (full name, email, password, confirm, Terms, Privacy) →
 `signUp({ email, password, options:{ data:{ full_name, terms_accepted,
 privacy_accepted } } })` → `/[locale]/verify-email` (6-digit `confirmation` code)
-→ `verifyOtp({ type:'signup' })` → **simulated UAE PASS** → dashboard.
+→ `verifyOtp({ type:'signup' })` → Welcome → dashboard.
 
-The UAE PASS step is simulated and sets identity status to `VERIFIED_DEMO`. The
-normal path hydrates `full_name` + consent from Auth metadata via
-`handle_new_user`, so **profile-setup is a fallback only**.
+The normal path hydrates `full_name` + consent from Auth metadata via
+`handle_new_user`, so **profile-setup is a fallback only**. UAE PASS Staging is
+available only as an optional sign-in method; it is not a post-sign-up checkpoint
+(ADR 0030).
 
 ### Returning customer (sign-in)
 
@@ -28,8 +29,8 @@ normal path hydrates `full_name` + consent from Auth metadata via
 return a **single generic** message — "The email or password is incorrect." —
 that never reveals which field was wrong, whether the account exists, or whether
 it is an admin. `email_not_confirmed` is the one case acted on: it routes to
-`verify-email`. A returning verified customer (`VERIFIED_DEMO` + complete profile)
-skips onboarding and goes straight to the dashboard.
+`verify-email`. A returning verified customer with a complete profile goes
+straight to the dashboard.
 
 ### Password recovery
 
@@ -76,9 +77,9 @@ only by the provisioning script (`pnpm db:setup`, Supabase Admin API).
 The post-auth destination is decided by **`resolvePostAuthDestination({
 emailVerified, profile })`** in `@markaz/domain` (single source of truth). It
 gates on **email verification first**: `verify-email → profile-setup (fallback) →
-uae-pass (resumes NOT_STARTED/PENDING/FAILED) → dashboard`. Unverified or
-incomplete customers can **never** reach the dashboard. `requireCustomerStep`
-(`apps/web/src/server/session.ts`) enforces the same order server-side.
+dashboard`. Unverified or incomplete customers can **never** reach the dashboard.
+Identity status is not an account-access gate. `requireCustomerStep`
+(`apps/web/src/server/session.ts`) enforces the same order server-side (ADR 0030).
 
 ### Data ownership (Auth vs profiles)
 
@@ -100,8 +101,11 @@ codes, tokens, signed URLs, or raw provider errors.
 
 `@supabase/ssr` manages secure cookies on the server and client. The app never
 stores raw access/refresh tokens itself. Server components and tRPC read the
-session from cookies to establish `ctx.user`. Session-expiry is surfaced
-best-effort via a `?expired=1` hint on the sign-in route.
+session from cookies to establish `ctx.user`. GoTrue applies a 30-minute
+inactivity timeout with 10-minute access JWTs. A client guard persists only a
+last-interaction timestamp so it can enforce the same deadline in an open tab,
+across same-origin tabs, or immediately after the browser returns. Expiry routes
+to the localized `?notice=session-expired` sign-in state.
 
 ## RLS identity strategy (ADR 0004)
 

@@ -1,13 +1,11 @@
 import { isProfileComplete, type Profile } from './profile';
-import { isIdentityVerified } from './identity';
 
 /** Logical post-authentication destinations (locale prefix added by the app). */
-export type PostAuthDestination = 'verify-email' | 'profile-setup' | 'uae-pass' | 'dashboard';
+export type PostAuthDestination = 'verify-email' | 'profile-setup' | 'dashboard';
 
 export const POST_AUTH_PATHS: Record<PostAuthDestination, string> = {
   'verify-email': '/verify-email',
   'profile-setup': '/onboarding/profile',
-  'uae-pass': '/onboarding/uae-pass',
   dashboard: '/dashboard',
 };
 
@@ -31,11 +29,12 @@ export interface PostAuthState {
  *
  *   email/password email not verified → verify-email
  *   authenticated, profile incomplete → profile-setup (fallback; normal path fills it at sign-up)
- *   complete, identity NOT_STARTED/PENDING/FAILED_DEMO → uae-pass (resumes sub-state)
- *   complete, VERIFIED_DEMO/VERIFIED_STAGING or trusted provider identity → dashboard
+ *   authenticated, profile complete → dashboard
  *
- * Incomplete customers can never reach the dashboard. Provider-authenticated sessions
- * do not additionally require MARKAZ's email/password verification code.
+ * UAE PASS remains an optional sign-in provider, not a post-sign-up onboarding
+ * requirement. Incomplete customers can never reach the dashboard.
+ * Provider-authenticated sessions do not additionally require MARKAZ's
+ * email/password verification code.
  */
 export function resolvePostAuthDestination(state: PostAuthState): PostAuthDestination {
   // A trusted external provider (e.g. UAE PASS staging) already authenticated this
@@ -44,11 +43,6 @@ export function resolvePostAuthDestination(state: PostAuthState): PostAuthDestin
   // email_verified=false), which must NOT trap the user on the verify-email screen.
   if (!state.identityAuthenticatedByProvider && !state.emailVerified) return 'verify-email';
   if (!state.profile || !isProfileComplete(state.profile)) return 'profile-setup';
-  if (
-    !state.identityAuthenticatedByProvider &&
-    !isIdentityVerified(state.profile.identityVerificationStatus)
-  )
-    return 'uae-pass';
   return 'dashboard';
 }
 

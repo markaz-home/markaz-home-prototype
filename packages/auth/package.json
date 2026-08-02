@@ -10,6 +10,7 @@
     "./server": "./src/server.ts",
     "./browser": "./src/browser.ts",
     "./middleware": "./src/middleware.ts",
+    "./session-inactivity": "./src/session-inactivity.ts",
     "./uae-pass": "./src/uae-pass.ts",
     "./uae-pass/server": "./src/uae-pass-server.ts"
   },

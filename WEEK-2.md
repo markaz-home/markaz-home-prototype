@@ -42,6 +42,9 @@ email/password auth + verification + recovery, simulated UAE PASS, onboarding
 routing, en/ar + RTL, `@markaz/ui`, Supabase local, realtime + storage
 foundations, demo provisioning. No authentication redesign.
 
+> Current amendment: ADR-0030 later made UAE PASS an optional Sign In provider and removed it from
+> signup onboarding; this historical delivery report otherwise remains unchanged.
+
 ## 3. Route inventory (design spec §6.1)
 
 ```

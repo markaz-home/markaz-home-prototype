@@ -2,7 +2,7 @@
  * Deterministic E2E provisioning for the Week-4 offer flows.
  *
  * Rather than scraping the signup OTP email, these helpers create confirmed,
- * onboarded customers via the Supabase Admin API and seed a LIVE listing via SQL,
+ * profile-complete customers via the Supabase Admin API and seed a LIVE listing via SQL,
  * so specs start from a known state and only drive the OFFER journey through the UI.
  *
  * Requires the full local stack (`pnpm supabase:start && pnpm supabase:reset`) and,
@@ -62,7 +62,7 @@ export type ProvisionListingState =
   | 'LIVE'
   | 'PAUSED';
 
-/** Create a confirmed, onboarded CUSTOMER (skips the email-code UI). */
+/** Create a confirmed, profile-complete CUSTOMER (skips the email-code UI). */
 export async function createCustomer(tag: string): Promise<Customer> {
   seq += 1;
   const email = `e2e_${tag}_${process.pid}_${seq}@markaz.test`;
@@ -74,14 +74,13 @@ export async function createCustomer(tag: string): Promise<Customer> {
   if (error || !data.user) throw new Error(`createUser failed: ${error?.message}`);
   const id = data.user.id;
   // handle_new_user creates the profile row. Fully complete it so the customer lands
-  // on the dashboard (profile complete + identity VERIFIED_DEMO) and offers are allowed:
-  // resolvePostAuthDestination requires fullName + terms + privacy + VERIFIED_DEMO.
+  // on the dashboard and offers are allowed. Identity is intentionally left at
+  // NOT_STARTED because UAE PASS is not an onboarding requirement (ADR-0030).
   await sql`
     update public.profiles set
       full_name = ${`E2E ${tag}`},
       terms_accepted_at = now(),
       privacy_accepted_at = now(),
-      identity_verification_status = 'VERIFIED_DEMO',
       onboarding_completed_at = now()
     where id = ${id}`;
   createdUsers.push(id);

@@ -22,8 +22,9 @@ them from the inbox only.
 3. You are routed to **verify-email**. Open the inbox at
    **http://127.0.0.1:54324**, open the newest message for your email, copy the
    **6-digit code**, and enter it.
-4. Continue through the **simulated UAE PASS** step → dashboard. The normal path
-   skips profile-setup (it is hydrated from sign-up metadata).
+4. The success screen welcomes you and continues directly to the dashboard. The normal path skips
+   profile-setup because the profile is hydrated from sign-up metadata; incomplete legacy metadata
+   uses profile-setup as a fallback.
 
 ### Retrieving the code or link from Mailpit (manual)
 
@@ -70,8 +71,9 @@ requires `account_type === 'ADMIN'`; otherwise it shows an **access-denied**
 screen. Admins are created only by `pnpm db:setup` (Supabase Admin API).
 
 Routing is decided by `resolvePostAuthDestination` in `@markaz/domain` — it gates
-on email verification first, so unverified/incomplete customers never reach the
-dashboard.
+on email verification first and profile completeness second, so unverified/incomplete customers
+never reach the dashboard. UAE PASS remains an optional provider on the Sign In screen and is not a
+signup step (ADR-0030).
 
 ## Accounts
 

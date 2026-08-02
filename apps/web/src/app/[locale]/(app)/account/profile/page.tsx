@@ -1,6 +1,5 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { Card, CardContent, CardHeader, CardTitle, StatusBadge } from '@markaz/ui';
-import { isIdentityVerified } from '@markaz/domain';
 import { getSession } from '@/server/session';
 
 export default async function AccountProfilePage({
@@ -15,17 +14,7 @@ export default async function AccountProfilePage({
   const profile = session?.profile;
 
   const identityStatus = profile?.identityVerificationStatus ?? 'NOT_STARTED';
-  const verified = session?.uaePassAuthenticated || isIdentityVerified(identityStatus);
-  const identityLabel =
-    session?.uaePassAuthenticated || identityStatus === 'VERIFIED_STAGING'
-      ? t('identityUaePassStaging')
-      : identityStatus === 'VERIFIED_DEMO'
-        ? t('identityDemo')
-        : identityStatus === 'PENDING'
-          ? t('identityPending')
-          : identityStatus === 'FAILED_DEMO'
-            ? t('identityFailed')
-            : t('identityNotStarted');
+  const hasUaePassIdentity = session?.uaePassAuthenticated || identityStatus === 'VERIFIED_STAGING';
 
   return (
     <div className="space-y-6">
@@ -37,10 +26,12 @@ export default async function AccountProfilePage({
         <CardContent className="space-y-3 text-sm">
           <Row label={t('emailLabel')} value={profile?.email ?? session?.email ?? '—'} />
           <Row label={t('accountTypeLabel')} value={profile?.accountType ?? 'CUSTOMER'} />
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">{t('identityLabel')}</span>
-            <StatusBadge tone={verified ? 'success' : 'warning'}>{identityLabel}</StatusBadge>
-          </div>
+          {hasUaePassIdentity ? (
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">{t('identityLabel')}</span>
+              <StatusBadge tone="success">{t('identityUaePassStaging')}</StatusBadge>
+            </div>
+          ) : null}
         </CardContent>
       </Card>
     </div>

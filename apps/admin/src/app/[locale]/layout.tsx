@@ -6,6 +6,7 @@ import { setRequestLocale, getMessages } from 'next-intl/server';
 import { routing, getDirection, isLocale } from '@markaz/i18n';
 import { Toaster } from '@markaz/ui';
 import { TRPCProvider } from '@/trpc/react';
+import { SessionInactivityGuard } from '@/components/session-inactivity-guard';
 import '@markaz/ui/styles.css';
 
 const manrope = Manrope({
@@ -57,6 +58,7 @@ export default async function LocaleLayout({
     >
       <body className="theme-platform-gold bg-background text-foreground min-h-dvh antialiased">
         <NextIntlClientProvider messages={messages}>
+          <SessionInactivityGuard redirectTo={`/${locale}/login?notice=session-expired`} />
           <TRPCProvider>{children}</TRPCProvider>
           <Toaster />
         </NextIntlClientProvider>

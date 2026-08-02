@@ -1,4 +1,5 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
+import { redirect } from 'next/navigation';
 import { resolvePostAuthDestination } from '@markaz/domain';
 import { Button } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
@@ -16,14 +17,14 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
     identityAuthenticatedByProvider: session?.uaePassAuthenticated ?? false,
     profile: session?.profile ?? null,
   });
-  const href =
-    dest === 'profile-setup'
-      ? '/onboarding/profile'
-      : dest === 'dashboard'
-        ? '/dashboard'
-        : '/onboarding/uae-pass';
-  const label = dest === 'profile-setup' ? t('completeProfile') : t('continueIdentity');
-  const body = dest === 'profile-setup' ? t('profileSuccessBody') : t('successBody');
+  if (!session) redirect(`/${locale}/sign-in`);
+  if (dest === 'verify-email') {
+    redirect(`/${locale}/verify-email?email=${encodeURIComponent(session.email ?? '')}`);
+  }
+  const needsProfile = dest === 'profile-setup';
+  const href = needsProfile ? '/onboarding/profile' : '/dashboard';
+  const label = needsProfile ? t('completeProfile') : t('continueDashboard');
+  const body = needsProfile ? t('profileSuccessBody') : t('successBody');
   return (
     <AuthShell narrow>
       <SuccessPanel title={t('successTitle')} description={body}>

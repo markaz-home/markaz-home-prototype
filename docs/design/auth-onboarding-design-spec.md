@@ -11,6 +11,19 @@
 
 ---
 
+## Current product amendment — August 2026
+
+[ADR-0030](../adr/0030-optional-uae-pass-sign-in.md) supersedes the third
+customer-onboarding step described in this historical milestone specification.
+Current customer setup is **Account details → Email verification → Welcome →
+Dashboard**. `/onboarding/profile` remains a fallback for missing data.
+`/onboarding/uae-pass` is retired, and UAE PASS Staging remains only as an
+optional method on Sign In. Any later Step 3, simulated-identity, or mandatory
+identity-gate wording in this document is retained as historical design context,
+not current implementation guidance.
+
+---
+
 ## Milestone Understanding
 
 This milestone replaces the existing customer and Admin email-OTP sign-in experience with a complete email-and-password authentication system while preserving the parts of the Week 1 foundation that remain valid: Supabase Auth, secure sessions, the `CUSTOMER` and `ADMIN` account model, separate customer and Admin applications, account-state routing, the persistent profile, simulated UAE PASS, English and Arabic support, RTL behaviour, and the approved MARKAZ visual system.
@@ -23,7 +36,7 @@ The finished milestone must support:
 - Official Supabase password-recovery and reset flow
 - Safe duplicate-account and incorrect-credential messaging
 - Resumption of incomplete onboarding
-- A clearly disclosed simulated UAE PASS journey
+- Optional UAE PASS Staging sign-in, separate from email/password onboarding
 - Session-expiration and sign-out states
 - Separate Admin sign-in and recovery
 - Explicit denial when a customer account signs into the Admin application
@@ -49,7 +62,7 @@ The final authentication model for this milestone is:
 - Six-digit code for email verification only
 - Official Supabase recovery flow for forgotten passwords
 - Secure session handling through the established Supabase architecture
-- Simulated UAE PASS after email and profile completion
+- Optional UAE PASS Staging sign-in; no post-sign-up identity checkpoint
 - No SMS authentication
 - No social sign-in
 - No Buyer/Seller role selection

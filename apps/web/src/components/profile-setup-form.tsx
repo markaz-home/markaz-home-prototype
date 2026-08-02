@@ -11,13 +11,7 @@ import { AuthShell, AuthHeading } from '@/components/auth/auth-shell';
 import { AuthProgress, type StepStatus } from '@/components/auth/auth-progress';
 import { FIELD_ERROR_KEYS } from '@/components/auth/error-keys';
 
-export function ProfileSetupForm({
-  email,
-  identityAuthenticatedByProvider = false,
-}: {
-  email?: string | null;
-  identityAuthenticatedByProvider?: boolean;
-}) {
+export function ProfileSetupForm({ email }: { email?: string | null }) {
   const t = useTranslations('profile');
   const tv = useTranslations('validation');
   const ts = useTranslations('signup');
@@ -35,14 +29,14 @@ export function ProfileSetupForm({
 
   const mutation = trpc.profile.completeSetup.useMutation({
     onSuccess: () => {
-      router.replace(identityAuthenticatedByProvider ? '/dashboard' : '/onboarding/uae-pass');
+      router.replace('/dashboard');
     },
     onError: () => setSaveError(tv('unexpectedError')),
   });
 
   const fe = (c?: string) => (c ? tv(FIELD_ERROR_KEYS[c] ?? 'unexpectedError') : undefined);
   // Setup-status resume variant (spec §9.7): account details needs attention.
-  const statuses: StepStatus[] = ['action', 'complete', 'upcoming'];
+  const statuses: StepStatus[] = ['action', 'complete'];
 
   return (
     <AuthShell narrow>

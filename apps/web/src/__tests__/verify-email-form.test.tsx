@@ -36,6 +36,7 @@ describe('VerifyEmailForm', () => {
     renderWithIntl(<VerifyEmailForm />);
     expect(screen.getByRole('heading', { name: 'Verify your email' })).toBeInTheDocument();
     expect(screen.getByLabelText('Verification code')).toBeInTheDocument();
+    expect(screen.getByText(/Step 2 of 2 · Email verification/)).toBeInTheDocument();
   });
 
   it('rejects a non-6-digit code client-side', async () => {

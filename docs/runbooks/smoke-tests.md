@@ -18,7 +18,9 @@ production without approval.
 ## Customer app
 
 - [ ] Landing page, signup, login, marketplace, and a property detail load in English and Arabic.
-- [ ] Signup → email code → profile → identity boundary → dashboard works.
+- [ ] Signup → email code → welcome → dashboard works; incomplete profile metadata uses the profile
+      fallback before the dashboard.
+- [ ] Optional UAE PASS sign-in reaches the dashboard without appearing in the signup journey.
 - [ ] Recovery link → reset → forced fresh sign-in works.
 - [ ] Anonymous/private route guards redirect safely.
 - [ ] Customer can create a listing, upload an approved fictional document/photo, and reach readiness.

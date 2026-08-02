@@ -28,15 +28,16 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   route handler runs `verifyOtp({ type:'recovery', token_hash })` → reset-password →
   `updateUser` → sign out → fresh sign-in). **Never** build, store, or log any code,
   password hash, or token — Supabase Auth owns them all (ADR-0009).
-- **Auth/onboarding UI follows `docs/design/auth-onboarding-design-spec.md`**: split
-  AuthShell (header w/ language switcher + footer + support panel), 3-step progress,
+- **Auth/onboarding UI follows `docs/design/auth-onboarding-design-spec.md` plus
+  ADR-0030**: split AuthShell (header w/ language switcher + footer + support panel), 2-step progress,
   6-cell verification code (one logical input), the full screen inventory (check-email,
   verify success, recovery-sent, password-updated, signed-out, session-expired, error
   panels), and the Operations shell for admin. Reuse `components/auth/*`.
 - **Routing gates on email verification first**: `resolvePostAuthDestination({
-emailVerified, profile })` → verify-email → profile-setup (fallback) → uae-pass
-  → dashboard; unverified/incomplete customers never reach the dashboard.
-  `requireCustomerStep` enforces it server-side.
+emailVerified, profile })` → verify-email → profile-setup (fallback) → dashboard;
+  unverified/incomplete customers never reach the dashboard. UAE PASS Staging is
+  an optional sign-in method only, never a post-sign-up gate. `requireCustomerStep`
+  enforces this server-side (ADR-0030).
 - **No public admin sign-up.** Admins are created **only** by the env-driven admin
   bootstrap (`pnpm db:setup` with `BOOTSTRAP_ADMIN_EMAIL`/`BOOTSTRAP_ADMIN_PASSWORD`,
   Supabase Admin API); the admin app requires `account_type === 'ADMIN'` or shows

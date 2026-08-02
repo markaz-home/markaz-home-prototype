@@ -112,7 +112,7 @@ export interface Principal {
 }
 
 /**
- * Create an onboarded CUSTOMER principal (auth.users → handle_new_user trigger
+ * Create a profile-complete CUSTOMER principal (auth.users → handle_new_user trigger
  * creates the profile) and return its id + generated email.
  */
 export async function createNamedPrincipal(tag: string): Promise<Principal> {
@@ -123,14 +123,19 @@ export async function createNamedPrincipal(tag: string): Promise<Principal> {
       values (gen_random_uuid(), ${email}, 'authenticated', 'authenticated', now(), now())
       returning id`;
     const uid = (u as { id: string }).id;
-    await tx`update public.profiles set onboarding_completed_at = now() where id = ${uid}`;
+    await tx`update public.profiles
+             set full_name = ${`Integration ${tag}`},
+                 terms_accepted_at = now(),
+                 privacy_accepted_at = now(),
+                 onboarding_completed_at = now()
+             where id = ${uid}`;
     createdUserIds.push(uid);
     return uid;
   });
   return { id, email };
 }
 
-/** Create an onboarded CUSTOMER principal and return its id. */
+/** Create a profile-complete CUSTOMER principal and return its id. */
 export async function createPrincipal(tag: string): Promise<string> {
   return (await createNamedPrincipal(tag)).id;
 }
@@ -160,7 +165,12 @@ export async function createAuthedPrincipal(tag: string): Promise<AuthedPrincipa
   const id = data.user.id;
   createdUserIds.push(id);
   await asService(
-    (tx) => tx`update public.profiles set onboarding_completed_at = now() where id = ${id}`,
+    (tx) => tx`update public.profiles
+                             set full_name = ${`Integration ${tag}`},
+                                 terms_accepted_at = now(),
+                                 privacy_accepted_at = now(),
+                                 onboarding_completed_at = now()
+                             where id = ${id}`,
   );
   return { id, email, password };
 }

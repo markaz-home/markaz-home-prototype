@@ -2,7 +2,7 @@
 import { useTranslations } from 'next-intl';
 import { cn } from '@markaz/ui';
 
-/** 3-step onboarding progress (design spec §9.7). */
+/** Two-step account setup progress: account details, then email verification. */
 export type StepStatus = 'complete' | 'current' | 'upcoming' | 'action';
 
 /**
@@ -10,15 +10,9 @@ export type StepStatus = 'complete' | 'current' | 'upcoming' | 'action';
  * direction. The bar is decorative; the eyebrow carries the visible text and the
  * full "step N of M" context goes to assistive technology.
  */
-export function AuthProgress({
-  current,
-  statuses,
-}: {
-  current: 0 | 1 | 2;
-  statuses?: StepStatus[];
-}) {
+export function AuthProgress({ current, statuses }: { current: 0 | 1; statuses?: StepStatus[] }) {
   const t = useTranslations('progress');
-  const STEPS = [t('stepAccount'), t('stepEmail'), t('stepIdentity')] as const;
+  const STEPS = [t('stepAccount'), t('stepEmail')] as const;
   const resolved: StepStatus[] =
     statuses ??
     STEPS.map((_, i) => (i < current ? 'complete' : i === current ? 'current' : 'upcoming'));
@@ -34,7 +28,7 @@ export function AuthProgress({
               'h-1 flex-1 rounded-full transition-colors',
               resolved[i] === 'action'
                 ? 'bg-warning'
-                : i <= current
+                : resolved[i] === 'complete' || resolved[i] === 'current'
                   ? 'bg-primary'
                   : // Upcoming steps must stay visible on the near-black card,
                     // so the remaining journey is legible at a glance.

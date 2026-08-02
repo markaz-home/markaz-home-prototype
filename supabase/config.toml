@@ -50,17 +50,23 @@ additional_redirect_urls = [
   "http://127.0.0.1:3000",
   "http://127.0.0.1:3001",
 ]
-jwt_expiry = 3600
+# A short-lived access token bounds server-side enforcement lag after GoTrue's
+# inactivity deadline. The browser guard applies the 30-minute limit immediately.
+jwt_expiry = 600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
 enable_signup = true
 enable_anonymous_sign_ins = false
-# Required by supabase.auth.linkIdentity() for the signed-in onboarding flow.
-# The hosted Supabase project must enable the equivalent Auth setting separately.
-enable_manual_linking = true
+# UAE PASS is an optional sign-in provider; no customer identity-linking flow is exposed.
+enable_manual_linking = false
+
+# End customer and Admin sessions after 30 minutes without a token refresh.
+# Hosted Supabase projects must mirror this Auth Sessions setting separately.
+[auth.sessions]
+inactivity_timeout = "30m"
 
 # Email + password is the normal sign-in method (Week 1.5, ADR-0009).
-# Email codes are used only for new-account verification and password recovery.
+# Email codes are used only for new-account verification; recovery uses the official link.
 [auth.email]
 enable_signup = true
 double_confirm_changes = true

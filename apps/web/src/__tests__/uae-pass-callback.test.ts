@@ -1,13 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock the SSR server client so no real Supabase/network is touched.
 const exchangeCodeForSession = vi.fn();
-const syncUaePassIdentity = vi.fn();
 vi.mock('@markaz/auth/server', () => ({
-  createSupabaseServerClient: async () => ({
-    auth: { exchangeCodeForSession },
-    rpc: syncUaePassIdentity,
-  }),
+  createSupabaseServerClient: async () => ({ auth: { exchangeCodeForSession } }),
 }));
 
 import { GET } from '@/app/auth/callback/route';
@@ -19,11 +14,10 @@ const locationOf = (res: Response) => new URL(res.headers.get('location') ?? '',
 
 beforeEach(() => {
   exchangeCodeForSession.mockReset().mockResolvedValue({ error: null });
-  syncUaePassIdentity.mockReset().mockResolvedValue({ error: null });
 });
 
-describe('/auth/callback (OAuth code exchange — UAE PASS staging)', () => {
-  it('exchanges the code and forwards to the localized dashboard on success', async () => {
+describe('/auth/callback (UAE PASS sign-in)', () => {
+  it('exchanges the code and forwards to the localized dashboard', async () => {
     const res = await GET(req('?code=abc123&locale=en'));
     expect(exchangeCodeForSession).toHaveBeenCalledWith('abc123');
     expect(locationOf(res).pathname).toBe('/en/dashboard');
@@ -39,46 +33,20 @@ describe('/auth/callback (OAuth code exchange — UAE PASS staging)', () => {
     expect(locationOf(res).pathname).toBe('/en/sell');
   });
 
-  it('records a successful identity link before completing onboarding', async () => {
-    const res = await GET(req('?code=abc123&locale=en&next=%2Fonboarding%2Fuae-pass'));
-    expect(syncUaePassIdentity).toHaveBeenCalledWith('sync_uae_pass_staging_identity');
-    expect(locationOf(res).pathname).toBe('/en/dashboard');
-  });
+  it.each(['https%3A%2F%2Fevil.example', '%2Fonboarding%2Fprofile', '%2Fonboarding%2Fuae-pass'])(
+    'rejects the unlisted destination %s',
+    async (next) => {
+      const res = await GET(req(`?code=abc123&locale=en&next=${next}`));
+      expect(locationOf(res).pathname).toBe('/en/dashboard');
+    },
+  );
 
-  it('retries the idempotent identity write once after a transient failure', async () => {
-    syncUaePassIdentity
-      .mockResolvedValueOnce({ error: new Error('temporary') })
-      .mockResolvedValueOnce({ error: null });
-    const res = await GET(req('?code=abc123&locale=en&next=%2Fonboarding%2Fuae-pass'));
-    expect(syncUaePassIdentity).toHaveBeenCalledTimes(2);
-    expect(locationOf(res).pathname).toBe('/en/dashboard');
-  });
-
-  it('keeps a linked customer recoverable when both server writes fail', async () => {
-    syncUaePassIdentity.mockResolvedValue({ error: new Error('temporary') });
-    const res = await GET(req('?code=abc123&locale=en&next=%2Fonboarding%2Fuae-pass'));
-    const url = locationOf(res);
-    expect(syncUaePassIdentity).toHaveBeenCalledTimes(2);
-    expect(url.pathname).toBe('/en/onboarding/uae-pass');
-    expect(url.searchParams.get('notice')).toBe('uae_pass_record_error');
-  });
-
-  it('rejects an external post-sign-in destination', async () => {
-    const res = await GET(req('?code=abc123&locale=en&next=https%3A%2F%2Fevil.example'));
-    expect(locationOf(res).pathname).toBe('/en/dashboard');
-  });
-
-  it('rejects an unlisted internal post-sign-in destination', async () => {
-    const res = await GET(req('?code=abc123&locale=en&next=%2Fonboarding%2Fprofile'));
-    expect(locationOf(res).pathname).toBe('/en/dashboard');
-  });
-
-  it('rejects an unknown locale by falling back to the default', async () => {
+  it('falls back to English for an unknown locale', async () => {
     const res = await GET(req('?code=abc123&locale=fr'));
     expect(locationOf(res).pathname).toBe('/en/dashboard');
   });
 
-  it('user cancellation (access_denied) → recoverable "cancelled" message (no exchange)', async () => {
+  it('returns cancellation to sign-in without exchanging a code', async () => {
     const res = await GET(req('?error=access_denied&locale=en'));
     expect(exchangeCodeForSession).not.toHaveBeenCalled();
     const url = locationOf(res);
@@ -86,68 +54,24 @@ describe('/auth/callback (OAuth code exchange — UAE PASS staging)', () => {
     expect(url.searchParams.get('error')).toBe('uae_pass_cancelled');
   });
 
-  it('a provider/server error (not cancellation) → generic failure, not "cancelled"', async () => {
-    const res = await GET(req('?error=server_error&error_code=unexpected_failure&locale=en'));
+  it('maps provider failures to a generic sign-in error', async () => {
+    const res = await GET(req('?error=server_error&error_code=provider_detail&locale=en'));
     expect(exchangeCodeForSession).not.toHaveBeenCalled();
     expect(locationOf(res).searchParams.get('error')).toBe('uae_pass');
   });
 
-  it('returns identity-link cancellation to onboarding with a neutral safe notice', async () => {
-    const res = await GET(req('?error=access_denied&locale=en&next=%2Fonboarding%2Fuae-pass'));
-    const url = locationOf(res);
-    expect(url.pathname).toBe('/en/onboarding/uae-pass');
-    expect(url.searchParams.get('notice')).toBe('uae_pass_cancelled');
-  });
-
-  it('maps an already-owned identity to a distinct non-enumerating onboarding notice', async () => {
-    const res = await GET(
-      req(
-        '?error=server_error&error_code=identity_already_exists&locale=en&next=%2Fonboarding%2Fuae-pass',
-      ),
-    );
-    const url = locationOf(res);
-    expect(url.pathname).toBe('/en/onboarding/uae-pass');
-    expect(url.searchParams.get('notice')).toBe('uae_pass_identity_unavailable');
-  });
-
-  it('maps disabled manual linking to its safe configuration notice', async () => {
-    const res = await GET(
-      req(
-        '?error=server_error&error_code=manual_linking_disabled&locale=en&next=%2Fonboarding%2Fuae-pass',
-      ),
-    );
-    expect(locationOf(res).searchParams.get('notice')).toBe('uae_pass_configuration_error');
-  });
-
-  it('missing code → safe sign-in error', async () => {
+  it('handles a missing code safely', async () => {
     const res = await GET(req('?locale=en'));
     expect(exchangeCodeForSession).not.toHaveBeenCalled();
     expect(locationOf(res).searchParams.get('error')).toBe('uae_pass');
   });
 
-  it('missing code in a link flow returns a generic onboarding notice', async () => {
-    const res = await GET(req('?locale=en&next=%2Fonboarding%2Fuae-pass'));
-    const url = locationOf(res);
-    expect(url.pathname).toBe('/en/onboarding/uae-pass');
-    expect(url.searchParams.get('notice')).toBe('uae_pass_error');
-  });
-
-  it('exchange failure → safe sign-in error (never a token/code in the redirect)', async () => {
-    exchangeCodeForSession.mockResolvedValue({ error: new Error('boom') });
+  it('does not reflect a failed authorization code or provider detail', async () => {
+    exchangeCodeForSession.mockResolvedValue({ error: new Error('provider detail') });
     const res = await GET(req('?code=abc123&locale=en'));
     const url = locationOf(res);
     expect(url.pathname).toBe('/en/sign-in');
     expect(url.searchParams.get('error')).toBe('uae_pass');
-    // The authorization code must never be reflected back into any URL.
-    expect(url.search).not.toContain('abc123');
-  });
-
-  it('exchange failure in a link flow remains recoverable on the identity step', async () => {
-    exchangeCodeForSession.mockResolvedValue({ error: new Error('provider detail') });
-    const res = await GET(req('?code=abc123&locale=en&next=%2Fonboarding%2Fuae-pass'));
-    const url = locationOf(res);
-    expect(url.pathname).toBe('/en/onboarding/uae-pass');
-    expect(url.searchParams.get('notice')).toBe('uae_pass_error');
     expect(url.search).not.toContain('abc123');
     expect(url.search).not.toContain('provider');
   });
