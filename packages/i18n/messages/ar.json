@@ -431,6 +431,8 @@
     "identityUnavailableBody": "قد تكون مرتبطة بحساب MARKAZ آخر. سجّل الخروج من UAE PASS وحاول باستخدام هوية الاختبار المقصودة، أو تواصل مع دعم MARKAZ.",
     "configurationErrorTitle": "ربط UAE PASS غير متاح",
     "configurationErrorBody": "ربط الهوية غير مهيأ لهذه البيئة. تواصل مع دعم MARKAZ.",
+    "linkRecordedPendingTitle": "تم ربط UAE PASS",
+    "linkRecordedPendingBody": "يمكنك استخدام UAE PASS لتسجيل الدخول. تعذّر على MARKAZ إكمال تحديث هذا الملف الشخصي حاليًا، لذا ستتم إعادة المحاولة تلقائيًا عند عودتك إلى هذه الصفحة.",
     "linkErrorTitle": "تعذّر ربط UAE PASS",
     "linkErrorBody": "لم يتغير حساب MARKAZ. حاول مرة أخرى."
   },

@@ -428,6 +428,8 @@
     "identityUnavailableBody": "It may already belong to another MARKAZ account. Sign out of UAE PASS and retry with the intended staging identity, or contact MARKAZ support.",
     "configurationErrorTitle": "UAE PASS linking is unavailable",
     "configurationErrorBody": "Identity linking is not configured for this environment. Contact MARKAZ support.",
+    "linkRecordedPendingTitle": "UAE PASS is linked",
+    "linkRecordedPendingBody": "You can use UAE PASS to sign in. MARKAZ could not finish updating this profile yet, so it will retry automatically when you return to this page.",
     "linkErrorTitle": "We couldn't link UAE PASS",
     "linkErrorBody": "Your MARKAZ account has not changed. Please try again."
   },

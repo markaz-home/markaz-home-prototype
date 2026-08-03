@@ -89,10 +89,10 @@ describe('/auth/callback (UAE PASS sign-in)', () => {
     expect(url.search).not.toContain('provider');
   });
 
-  it('records an authenticated identity link and returns to Profile', async () => {
+  it('completes an authenticated identity link and returns to Profile', async () => {
     const res = await GET(req('?code=abc123&locale=en&flow=link'));
     expect(exchangeCodeForSession).toHaveBeenCalledWith('abc123');
-    expect(rpc).toHaveBeenCalledWith('sync_uae_pass_staging_identity');
+    expect(rpc).not.toHaveBeenCalled();
     const url = locationOf(res);
     expect(url.pathname).toBe('/en/account/profile');
     expect(url.searchParams.get('uae_pass')).toBe('uae_pass_linked');
@@ -115,12 +115,12 @@ describe('/auth/callback (UAE PASS sign-in)', () => {
     expect(url.searchParams.get('uae_pass')).toBe('uae_pass_identity_unavailable');
   });
 
-  it('keeps a linked identity recoverable when recording fails twice', async () => {
+  it('does not let profile recording delay or override a completed Auth link', async () => {
     rpc.mockResolvedValue({ error: new Error('database unavailable') });
     const res = await GET(req('?code=abc123&locale=en&flow=link'));
-    expect(rpc).toHaveBeenCalledTimes(2);
+    expect(rpc).not.toHaveBeenCalled();
     const url = locationOf(res);
     expect(url.pathname).toBe('/en/account/profile');
-    expect(url.searchParams.get('uae_pass')).toBe('uae_pass_record_error');
+    expect(url.searchParams.get('uae_pass')).toBe('uae_pass_linked');
   });
 });

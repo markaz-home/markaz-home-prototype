@@ -94,6 +94,16 @@ d('UAE PASS Staging identity synchronization', () => {
     expect(permissions).toMatchObject({ auth_admin: true, customer: false, anonymous: false });
   });
 
+  it('bounds profile synchronization lock waits for callback recovery', async () => {
+    const [settings] = await asService(
+      (tx) =>
+        tx`select proconfig
+           from pg_proc
+           where oid = 'public.sync_uae_pass_staging_identity()'::regprocedure`,
+    );
+    expect((settings as { proconfig: string[] }).proconfig).toContain('lock_timeout=2s');
+  });
+
   it('requires the provider-derived session identity and accepts no client verification input', async () => {
     await expect(callerFor([]).profile.syncUaePassIdentity()).rejects.toMatchObject({
       code: 'PRECONDITION_FAILED',

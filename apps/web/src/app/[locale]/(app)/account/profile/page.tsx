@@ -18,6 +18,8 @@ export default async function AccountProfilePage({
   const profile = session?.profile;
   const uaePassLinked =
     !!session?.uaePassAuthenticated || profile?.identityVerificationStatus === 'VERIFIED_STAGING';
+  const uaePassSyncPending =
+    !!session?.uaePassAuthenticated && profile?.identityVerificationStatus !== 'VERIFIED_STAGING';
 
   return (
     <AccountProfile
@@ -26,6 +28,7 @@ export default async function AccountProfilePage({
       locale={locale}
       emailVerified={session?.emailVerified ?? false}
       uaePassLinked={uaePassLinked}
+      uaePassSyncPending={uaePassSyncPending}
       uaePassStaging={isUaePassStagingEnabled()}
       initialNotice={parseUaePassProfileNotice(query.uae_pass)}
     />

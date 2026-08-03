@@ -4,9 +4,19 @@ import userEvent from '@testing-library/user-event';
 import { renderWithIntl } from './test-utils';
 
 const linkIdentity = vi.fn();
+const syncUaePassIdentity = vi.fn();
 
 vi.mock('@markaz/auth/browser', () => ({
   createSupabaseBrowserClient: () => ({ auth: { linkIdentity } }),
+}));
+vi.mock('@/trpc/react', () => ({
+  trpc: {
+    profile: {
+      syncUaePassIdentity: {
+        useMutation: () => ({ mutate: syncUaePassIdentity }),
+      },
+    },
+  },
 }));
 
 import { AccountProfile } from '@/components/account-profile';
@@ -17,12 +27,14 @@ const baseProps = {
   locale: 'en',
   emailVerified: true,
   uaePassLinked: false,
+  uaePassSyncPending: false,
   uaePassStaging: true,
   initialNotice: null,
 } as const;
 
 beforeEach(() => {
   linkIdentity.mockReset().mockResolvedValue({ error: null });
+  syncUaePassIdentity.mockReset();
 });
 
 describe('AccountProfile', () => {
@@ -66,6 +78,30 @@ describe('AccountProfile', () => {
     expect(screen.getByText('UAE PASS Staging linked')).toBeInTheDocument();
     expect(screen.getByText('Linked')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Link UAE PASS Staging' })).not.toBeInTheDocument();
+  });
+
+  it('retries the secondary profile record after the linked page renders', async () => {
+    renderWithIntl(
+      <AccountProfile
+        {...baseProps}
+        uaePassLinked
+        uaePassSyncPending
+        initialNotice="uae_pass_linked"
+      />,
+    );
+
+    await waitFor(() => expect(syncUaePassIdentity).toHaveBeenCalledTimes(1));
+  });
+
+  it('never labels a canonical linked identity as an unchanged account', () => {
+    renderWithIntl(
+      <AccountProfile {...baseProps} uaePassLinked initialNotice="uae_pass_record_error" />,
+    );
+
+    expect(screen.getByText('UAE PASS is linked')).toBeInTheDocument();
+    expect(screen.getByText(/could not finish updating this profile yet/i)).toBeInTheDocument();
+    expect(screen.queryByText("We couldn't link UAE PASS")).not.toBeInTheDocument();
+    expect(screen.queryByText(/account has not changed/i)).not.toBeInTheDocument();
   });
 
   it('explains when staging linking is unavailable', () => {

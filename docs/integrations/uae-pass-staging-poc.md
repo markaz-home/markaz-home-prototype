@@ -23,7 +23,9 @@ Authenticated Profile → "Link UAE PASS Staging"
   → GoTrue /authorize?provider=custom:uae-pass  →  UAE PASS staging login
   → GoTrue /auth/v1/callback (token + userinfo, account resolution by `sub`)
   → app /auth/callback?code=…  → exchangeCodeForSession → standard Supabase session
-  → sync_uae_pass_staging_identity verifies auth.identities and records the link
+  → Profile renders the completed Auth link immediately
+  → sync_uae_pass_staging_identity verifies auth.identities and records the
+    profile/audit result on an idempotent, lock-bounded retry path
   → Profile displays the linked sign-in method
 
 Later Sign In → "Continue with UAE PASS Staging"

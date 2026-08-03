@@ -65,23 +65,10 @@ export async function GET(request: NextRequest) {
   }
 
   if (isIdentityLink) {
-    // Persist the result before rendering Profile. The SECURITY DEFINER function
-    // derives auth.uid() from this standard user session and independently checks
-    // auth.identities, so it never trusts browser/provider query parameters.
-    let syncError: unknown = null;
-    for (let attempt = 0; attempt < 2; attempt += 1) {
-      try {
-        const result = await supabase.rpc('sync_uae_pass_staging_identity');
-        syncError = result.error;
-      } catch {
-        syncError = new Error('identity sync request failed');
-      }
-      if (!syncError) break;
-    }
-    if (syncError) {
-      console.warn('[uae-pass] linked identity could not be recorded');
-      return backToProfile('uae_pass_record_error');
-    }
+    // The successful code exchange is the canonical account-link result: GoTrue
+    // has persisted the provider identity on this existing Auth user. Profile
+    // records are synchronized after Profile renders so a transient database lock
+    // cannot hold this callback open or misreport a completed link as a failure.
     return backToProfile('uae_pass_linked');
   }
 

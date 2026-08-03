@@ -23,9 +23,14 @@ UAE PASS must remain optional and must not return as a mandatory signup step (AD
   user. It returns a stable, non-enumerating marker and does not create application data.
 - The hook does not run for an authenticated `linkIdentity` target or an existing linked
   provider subject, so those flows continue normally.
-- The OAuth callback records `VERIFIED_STAGING` only through the existing
+- A successful OAuth code exchange is the account-link success boundary because GoTrue
+  has already persisted the canonical `auth.identities` row. The callback returns to
+  Profile immediately; it does not wait on application-table writes.
+- Profile records `VERIFIED_STAGING` through the existing
   `sync_uae_pass_staging_identity()` database function, which derives `auth.uid()` and
-  verifies the canonical `auth.identities` row.
+  verifies the canonical `auth.identities` row. The page retries this idempotent,
+  lock-bounded synchronization when the provider identity exists but the profile record
+  is still pending.
 - An unknown UAE PASS sign-in returns the user to email/password Sign In and then Profile,
   where the identity can be linked deliberately. No email-based merge is implemented.
 

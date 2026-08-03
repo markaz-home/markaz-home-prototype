@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { KeyRound, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import { createSupabaseBrowserClient } from '@markaz/auth/browser';
@@ -15,6 +15,7 @@ import {
   StatusBadge,
 } from '@markaz/ui';
 import { resolveUaePassLinkError, type UaePassProfileNotice } from '@/lib/uae-pass-link';
+import { trpc } from '@/trpc/react';
 
 interface AccountProfileProps {
   fullName: string | null;
@@ -22,6 +23,7 @@ interface AccountProfileProps {
   locale: string;
   emailVerified: boolean;
   uaePassLinked: boolean;
+  uaePassSyncPending: boolean;
   uaePassStaging: boolean;
   initialNotice: UaePassProfileNotice | null;
 }
@@ -32,6 +34,7 @@ export function AccountProfile({
   locale,
   emailVerified,
   uaePassLinked,
+  uaePassSyncPending,
   uaePassStaging,
   initialNotice,
 }: AccountProfileProps) {
@@ -39,6 +42,17 @@ export function AccountProfile({
   const [supabase] = useState(() => createSupabaseBrowserClient());
   const [notice, setNotice] = useState<UaePassProfileNotice | null>(initialNotice);
   const [linking, setLinking] = useState(false);
+  const syncStarted = useRef(false);
+  const { mutate: syncUaePassIdentity } = trpc.profile.syncUaePassIdentity.useMutation({
+    onSuccess: () => setNotice('uae_pass_linked'),
+    onError: () => setNotice('uae_pass_record_error'),
+  });
+
+  useEffect(() => {
+    if (!uaePassSyncPending || syncStarted.current) return;
+    syncStarted.current = true;
+    syncUaePassIdentity();
+  }, [syncUaePassIdentity, uaePassSyncPending]);
 
   async function linkUaePass() {
     setNotice(null);
@@ -60,7 +74,7 @@ export function AccountProfile({
     // On success Supabase redirects the browser to UAE PASS Staging.
   }
 
-  const noticeContent = notice ? getNoticeContent(notice, t) : null;
+  const noticeContent = notice ? getNoticeContent(notice, t, uaePassLinked) : null;
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
@@ -225,7 +239,7 @@ function SignInMethod({
 
 type Translation = ReturnType<typeof useTranslations<'accountProfile'>>;
 
-function getNoticeContent(notice: UaePassProfileNotice, t: Translation) {
+function getNoticeContent(notice: UaePassProfileNotice, t: Translation, uaePassLinked: boolean) {
   if (notice === 'uae_pass_linked') {
     return {
       variant: 'success' as const,
@@ -252,6 +266,13 @@ function getNoticeContent(notice: UaePassProfileNotice, t: Translation) {
       variant: 'warning' as const,
       title: t('configurationErrorTitle'),
       body: t('configurationErrorBody'),
+    };
+  }
+  if (notice === 'uae_pass_record_error' && uaePassLinked) {
+    return {
+      variant: 'warning' as const,
+      title: t('linkRecordedPendingTitle'),
+      body: t('linkRecordedPendingBody'),
     };
   }
   return {
