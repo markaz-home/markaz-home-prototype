@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const exchangeCodeForSession = vi.fn();
+const rpc = vi.fn();
 vi.mock('@markaz/auth/server', () => ({
-  createSupabaseServerClient: async () => ({ auth: { exchangeCodeForSession } }),
+  createSupabaseServerClient: async () => ({ auth: { exchangeCodeForSession }, rpc }),
 }));
 
 import { GET } from '@/app/auth/callback/route';
@@ -14,6 +15,7 @@ const locationOf = (res: Response) => new URL(res.headers.get('location') ?? '',
 
 beforeEach(() => {
   exchangeCodeForSession.mockReset().mockResolvedValue({ error: null });
+  rpc.mockReset().mockResolvedValue({ error: null });
 });
 
 describe('/auth/callback (UAE PASS sign-in)', () => {
@@ -60,6 +62,17 @@ describe('/auth/callback (UAE PASS sign-in)', () => {
     expect(locationOf(res).searchParams.get('error')).toBe('uae_pass');
   });
 
+  it('returns an unknown UAE PASS identity to email sign-in and then Profile', async () => {
+    const res = await GET(
+      req('?error=access_denied&error_description=MARKAZ_UAE_PASS_NOT_LINKED&locale=en'),
+    );
+    expect(exchangeCodeForSession).not.toHaveBeenCalled();
+    const url = locationOf(res);
+    expect(url.pathname).toBe('/en/sign-in');
+    expect(url.searchParams.get('error')).toBe('uae_pass_not_linked');
+    expect(url.searchParams.get('next')).toBe('/account/profile');
+  });
+
   it('handles a missing code safely', async () => {
     const res = await GET(req('?locale=en'));
     expect(exchangeCodeForSession).not.toHaveBeenCalled();
@@ -74,5 +87,40 @@ describe('/auth/callback (UAE PASS sign-in)', () => {
     expect(url.searchParams.get('error')).toBe('uae_pass');
     expect(url.search).not.toContain('abc123');
     expect(url.search).not.toContain('provider');
+  });
+
+  it('records an authenticated identity link and returns to Profile', async () => {
+    const res = await GET(req('?code=abc123&locale=en&flow=link'));
+    expect(exchangeCodeForSession).toHaveBeenCalledWith('abc123');
+    expect(rpc).toHaveBeenCalledWith('sync_uae_pass_staging_identity');
+    const url = locationOf(res);
+    expect(url.pathname).toBe('/en/account/profile');
+    expect(url.searchParams.get('uae_pass')).toBe('uae_pass_linked');
+  });
+
+  it('returns a cancelled identity link to Profile without changing the account', async () => {
+    const res = await GET(req('?error=access_denied&locale=en&flow=link'));
+    expect(exchangeCodeForSession).not.toHaveBeenCalled();
+    const url = locationOf(res);
+    expect(url.pathname).toBe('/en/account/profile');
+    expect(url.searchParams.get('uae_pass')).toBe('uae_pass_cancelled');
+  });
+
+  it('maps an identity already owned by another user to a safe Profile notice', async () => {
+    const res = await GET(
+      req('?error=server_error&error_code=identity_already_exists&locale=en&flow=link'),
+    );
+    const url = locationOf(res);
+    expect(url.pathname).toBe('/en/account/profile');
+    expect(url.searchParams.get('uae_pass')).toBe('uae_pass_identity_unavailable');
+  });
+
+  it('keeps a linked identity recoverable when recording fails twice', async () => {
+    rpc.mockResolvedValue({ error: new Error('database unavailable') });
+    const res = await GET(req('?code=abc123&locale=en&flow=link'));
+    expect(rpc).toHaveBeenCalledTimes(2);
+    const url = locationOf(res);
+    expect(url.pathname).toBe('/en/account/profile');
+    expect(url.searchParams.get('uae_pass')).toBe('uae_pass_record_error');
   });
 });

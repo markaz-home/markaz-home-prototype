@@ -3,6 +3,9 @@
 - **Status:** Accepted
 - **Date:** 2026-08-02
 
+> ADR-0031 refines the optional sign-in decision: UAE PASS is first linked from an
+> authenticated Profile and unknown provider subjects cannot create standalone users.
+
 ## Context
 
 Email/password signup previously ended at a mandatory third step that linked a

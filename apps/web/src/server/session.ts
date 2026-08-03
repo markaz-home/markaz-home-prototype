@@ -81,7 +81,6 @@ export async function requireCustomerStep(
   if (session.profile?.accountType === 'ADMIN') redirect(`/${locale}/access-denied`);
   const destination = resolvePostAuthDestination({
     emailVerified: session.emailVerified,
-    identityAuthenticatedByProvider: session.uaePassAuthenticated,
     profile: session.profile,
   });
   if (!allow.includes(destination)) {

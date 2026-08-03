@@ -1,48 +1,33 @@
-import { setRequestLocale, getTranslations } from 'next-intl/server';
-import { Card, CardContent, CardHeader, CardTitle, StatusBadge } from '@markaz/ui';
+import { setRequestLocale } from 'next-intl/server';
+import { isUaePassStagingEnabled } from '@markaz/auth/uae-pass/server';
+import { AccountProfile } from '@/components/account-profile';
+import { parseUaePassProfileNotice } from '@/lib/uae-pass-link';
 import { getSession } from '@/server/session';
 
 export default async function AccountProfilePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ uae_pass?: string | string[] }>;
 }) {
   const { locale } = await params;
+  const query = await searchParams;
   setRequestLocale(locale);
-  const t = await getTranslations('accountProfile');
   const session = await getSession();
   const profile = session?.profile;
-
-  const identityStatus = profile?.identityVerificationStatus ?? 'NOT_STARTED';
-  const hasUaePassIdentity = session?.uaePassAuthenticated || identityStatus === 'VERIFIED_STAGING';
+  const uaePassLinked =
+    !!session?.uaePassAuthenticated || profile?.identityVerificationStatus === 'VERIFIED_STAGING';
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">{t('profileTitle')}</h1>
-      <Card className="max-w-lg">
-        <CardHeader>
-          <CardTitle className="text-base">{profile?.fullName ?? '—'}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-sm">
-          <Row label={t('emailLabel')} value={profile?.email ?? session?.email ?? '—'} />
-          <Row label={t('accountTypeLabel')} value={profile?.accountType ?? 'CUSTOMER'} />
-          {hasUaePassIdentity ? (
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{t('identityLabel')}</span>
-              <StatusBadge tone="success">{t('identityUaePassStaging')}</StatusBadge>
-            </div>
-          ) : null}
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium">{value}</span>
-    </div>
+    <AccountProfile
+      fullName={profile?.fullName ?? null}
+      email={session?.email ?? profile?.email ?? null}
+      locale={locale}
+      emailVerified={session?.emailVerified ?? false}
+      uaePassLinked={uaePassLinked}
+      uaePassStaging={isUaePassStagingEnabled()}
+      initialNotice={parseUaePassProfileNotice(query.uae_pass)}
+    />
   );
 }

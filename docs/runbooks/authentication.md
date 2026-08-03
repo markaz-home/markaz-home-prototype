@@ -72,8 +72,8 @@ screen. Admins are created only by `pnpm db:setup` (Supabase Admin API).
 
 Routing is decided by `resolvePostAuthDestination` in `@markaz/domain` — it gates
 on email verification first and profile completeness second, so unverified/incomplete customers
-never reach the dashboard. UAE PASS remains an optional provider on the Sign In screen and is not a
-signup step (ADR-0030).
+never reach the dashboard. UAE PASS remains an optional linked provider on the Sign In screen, is
+managed from the authenticated Profile page, and is not a signup step (ADR-0030 / ADR-0031).
 
 ## Accounts
 

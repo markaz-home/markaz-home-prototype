@@ -75,6 +75,22 @@ describe('SignInForm', () => {
     expect(arg.options.redirectTo).toContain('next=%2Fsell');
   });
 
+  it('guides an unlinked UAE PASS user to email sign-in and then Profile', async () => {
+    getSearchParams.mockReturnValue(
+      new URLSearchParams('error=uae_pass_not_linked&next=%2Faccount%2Fprofile'),
+    );
+    const user = userEvent.setup();
+    renderWithIntl(<SignInForm uaePassStaging locale="en" />);
+
+    expect(screen.getByText("UAE PASS isn't linked yet")).toBeInTheDocument();
+    expect(screen.getByText(/link UAE PASS from Profile/i)).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText(/Email address/i), 'customer-a@markaz.demo');
+    await user.type(screen.getByLabelText(/^Password/), 'Aa1!aaaa');
+    await user.click(screen.getByRole('button', { name: 'Sign in' }));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/account/profile'));
+  });
+
   it('validates an invalid email without calling the provider', async () => {
     const user = userEvent.setup();
     renderWithIntl(<SignInForm />);

@@ -126,42 +126,35 @@ describe('profile completeness + post-auth routing', () => {
       }),
     ).toBe('dashboard');
   });
-  it('routes a complete provider-authenticated profile directly to dashboard', () => {
+  it('routes a complete linked-account profile directly to dashboard', () => {
     expect(
       resolvePostAuthDestination({
         emailVerified: true,
-        identityAuthenticatedByProvider: true,
         profile: { ...complete, identityVerificationStatus: 'NOT_STARTED' },
       }),
     ).toBe('dashboard');
   });
-  it('still requires profile completion before a trusted provider identity can reach dashboard', () => {
+  it('still requires profile completion before a linked account can reach dashboard', () => {
     expect(
       resolvePostAuthDestination({
         emailVerified: true,
-        identityAuthenticatedByProvider: true,
         profile: { ...complete, fullName: null, identityVerificationStatus: 'NOT_STARTED' },
       }),
     ).toBe('profile-setup');
   });
-  it('a provider-authenticated session skips MARKAZ email verification (UAE PASS email_verified=false)', () => {
-    // Unverified email + complete profile + provider identity → straight to dashboard.
+  it('requires verified MARKAZ email before any profile state can continue', () => {
     expect(
       resolvePostAuthDestination({
         emailVerified: false,
-        identityAuthenticatedByProvider: true,
         profile: { ...complete, identityVerificationStatus: 'NOT_STARTED' },
       }),
-    ).toBe('dashboard');
-    // Unverified email + incomplete profile → profile-setup, NOT verify-email.
+    ).toBe('verify-email');
     expect(
       resolvePostAuthDestination({
         emailVerified: false,
-        identityAuthenticatedByProvider: true,
         profile: { ...complete, fullName: null, identityVerificationStatus: 'NOT_STARTED' },
       }),
-    ).toBe('profile-setup');
-    // A password sign-up (no provider) with an unverified email still verifies first.
+    ).toBe('verify-email');
     expect(
       resolvePostAuthDestination({
         emailVerified: false,

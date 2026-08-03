@@ -49,6 +49,51 @@ d('UAE PASS Staging identity synchronization', () => {
       log: logger,
     } as Context);
 
+  it('allows email signup but rejects standalone UAE PASS user creation', async () => {
+    const [emailResult] = await asService(
+      (tx) =>
+        tx`select public.hook_prevent_unlinked_uae_pass_signup(
+          ${tx.json({ user: { app_metadata: { provider: 'email' } } })}::jsonb
+        ) as result`,
+    );
+    const [uaePassResult] = await asService(
+      (tx) =>
+        tx`select public.hook_prevent_unlinked_uae_pass_signup(
+          ${tx.json({ user: { app_metadata: { provider: 'custom:uae-pass' } } })}::jsonb
+        ) as result`,
+    );
+
+    expect((emailResult as { result: Record<string, unknown> }).result).toEqual({});
+    expect(
+      (uaePassResult as { result: { error: { http_code: number; message: string } } }).result,
+    ).toEqual({
+      error: { http_code: 403, message: 'MARKAZ_UAE_PASS_NOT_LINKED' },
+    });
+  });
+
+  it('exposes the signup hook only to Supabase Auth', async () => {
+    const [permissions] = await asService(
+      (tx) =>
+        tx`select
+          has_function_privilege(
+            'supabase_auth_admin',
+            'public.hook_prevent_unlinked_uae_pass_signup(jsonb)',
+            'EXECUTE'
+          ) as auth_admin,
+          has_function_privilege(
+            'authenticated',
+            'public.hook_prevent_unlinked_uae_pass_signup(jsonb)',
+            'EXECUTE'
+          ) as customer,
+          has_function_privilege(
+            'anon',
+            'public.hook_prevent_unlinked_uae_pass_signup(jsonb)',
+            'EXECUTE'
+          ) as anonymous`,
+    );
+    expect(permissions).toMatchObject({ auth_admin: true, customer: false, anonymous: false });
+  });
+
   it('requires the provider-derived session identity and accepts no client verification input', async () => {
     await expect(callerFor([]).profile.syncUaePassIdentity()).rejects.toMatchObject({
       code: 'PRECONDITION_FAILED',

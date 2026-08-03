@@ -34,6 +34,7 @@ export function SignInForm({
   const sessionExpired = params.get('notice') === 'session-expired';
   // Error redirected here by /auth/callback (provider failure or cancellation).
   const callbackError = params.get('error');
+  const uaePassNotLinked = callbackError === 'uae_pass_not_linked';
   const uaePassError =
     callbackError === 'uae_pass_cancelled'
       ? tu('cancelled')
@@ -108,6 +109,11 @@ export function SignInForm({
           </Alert>
         ) : null}
         <AuthHeading title={t('title')} description={t('description')} />
+        {uaePassNotLinked ? (
+          <Alert variant="warning" title={tu('notLinkedTitle')}>
+            {tu('notLinkedBody')}
+          </Alert>
+        ) : null}
         {uaePassError ? <Alert variant="destructive">{uaePassError}</Alert> : null}
         {formError ? <Alert variant="destructive">{formError}</Alert> : null}
 

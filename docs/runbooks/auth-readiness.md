@@ -33,8 +33,12 @@
    Verify the policy and cookie behavior on the selected HTTPS topology. Supabase evaluates its
    session limit when a token refresh occurs; the shorter JWT bounds that server-side enforcement lag,
    while the browser guard applies the user-facing idle deadline on return.
-9. Keep manual identity linking disabled. The customer app uses UAE PASS only as a standalone sign-in
-   provider and does not expose an account-linking flow.
+9. Enable manual identity linking. The customer app exposes it only to an already authenticated,
+   email-verified customer on Profile → Sign-in methods.
+10. Configure the **Before User Created** Postgres hook to
+    `public.hook_prevent_unlinked_uae_pass_signup`. Verify that email signup is allowed and an
+    unknown `custom:uae-pass` subject is rejected without creating `auth.users`, `auth.identities`,
+    or `public.profiles` rows.
 
 ## Verification script
 
@@ -58,10 +62,11 @@ by SQL and never seed shared customer accounts.
 
 ## UAE PASS
 
-UAE PASS is optional on the Sign In screen. `UAE_PASS_MODE=simulated` is the safe default. Staging
-requires issued client credentials, the UAE PASS staging app/test account, registered callbacks, and an explicit
-`UAE_PASS_ALLOW_REMOTE_SETUP=true` only during approved setup. Production UAE PASS endpoints and
-credentials are not implemented or approved.
+UAE PASS is optional and must first be linked from the authenticated Profile page.
+`UAE_PASS_MODE=simulated` is the safe default. Staging requires issued client credentials, the UAE
+PASS staging app/test account, registered callbacks, manual identity linking, the Before User Created
+hook, and an explicit `UAE_PASS_ALLOW_REMOTE_SETUP=true` only during approved setup. Production UAE
+PASS endpoints and credentials are not implemented or approved.
 
 ## Production blockers
 

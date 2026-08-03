@@ -12,12 +12,6 @@ export const POST_AUTH_PATHS: Record<PostAuthDestination, string> = {
 export interface PostAuthState {
   /** Whether the Supabase Auth email is confirmed (user.email_confirmed_at). */
   emailVerified: boolean;
-  /**
-   * A trusted external identity provider already authenticated this session.
-   * The web app derives this from Supabase-controlled app_metadata, never from
-   * editable user metadata or a client-supplied value.
-   */
-  identityAuthenticatedByProvider?: boolean;
   profile: Pick<
     Profile,
     'fullName' | 'termsAcceptedAt' | 'privacyAcceptedAt' | 'identityVerificationStatus'
@@ -28,20 +22,15 @@ export interface PostAuthState {
  * Decide where an authenticated user should land. Centralised + fully tested.
  *
  *   email/password email not verified → verify-email
- *   authenticated, profile incomplete → profile-setup (fallback; normal path fills it at sign-up)
- *   authenticated, profile complete → dashboard
+ *   verified, profile incomplete → profile-setup (fallback; normal path fills it at sign-up)
+ *   verified, profile complete → dashboard
  *
  * UAE PASS remains an optional sign-in provider, not a post-sign-up onboarding
- * requirement. Incomplete customers can never reach the dashboard.
- * Provider-authenticated sessions do not additionally require MARKAZ's
- * email/password verification code.
+ * requirement. It can only be linked to an existing email-verified account, so
+ * every customer session follows the same email-verification boundary.
  */
 export function resolvePostAuthDestination(state: PostAuthState): PostAuthDestination {
-  // A trusted external provider (e.g. UAE PASS staging) already authenticated this
-  // session. MARKAZ's own 6-digit email verification is only for email/password
-  // sign-ups — the provider may report the email as unverified (UAE PASS returns
-  // email_verified=false), which must NOT trap the user on the verify-email screen.
-  if (!state.identityAuthenticatedByProvider && !state.emailVerified) return 'verify-email';
+  if (!state.emailVerified) return 'verify-email';
   if (!state.profile || !isProfileComplete(state.profile)) return 'profile-setup';
   return 'dashboard';
 }

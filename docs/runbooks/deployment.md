@@ -70,12 +70,12 @@ hosting platform or GitHub environment secrets, not in Git.
 
 Integration policy:
 
-| Integration             | `development`                                     | `production`                                               |
-| ----------------------- | ------------------------------------------------- | ---------------------------------------------------------- |
-| Email/password          | Environment-specific real delivery                | Enable after template and delivery verification            |
-| UAE PASS                | Optional staging sign-in with registered callback | Disabled until production provider approval and URLs exist |
-| BayutAPI                | Private RapidAPI POC only                         | Disabled until redistribution permission/legal approval    |
-| DLD, Trakheesi, payment | Existing persisted simulation                     | Keep simulated until separately approved                   |
+| Integration             | `development`                                        | `production`                                               |
+| ----------------------- | ---------------------------------------------------- | ---------------------------------------------------------- |
+| Email/password          | Environment-specific real delivery                   | Enable after template and delivery verification            |
+| UAE PASS                | Optional linked staging sign-in + Auth creation hook | Disabled until production provider approval and URLs exist |
+| BayutAPI                | Private RapidAPI POC only                            | Disabled until redistribution permission/legal approval    |
+| DLD, Trakheesi, payment | Existing persisted simulation                        | Keep simulated until separately approved                   |
 
 ## First development deployment
 
@@ -86,7 +86,9 @@ Integration policy:
 5. Apply the canonical migrations using `DIRECT_DATABASE_URL`.
 6. Run `pnpm db:setup` only when the development admin bootstrap variables are intentionally set.
 7. Configure UAE PASS staging with the hosted Supabase callback and run `pnpm db:setup-uae-pass`.
-8. Deploy from `develop`, then smoke-test signup code, password recovery, UAE PASS, marketplace,
+8. Enable manual identity linking and select
+   `public.hook_prevent_unlinked_uae_pass_signup` as the hosted Before User Created Auth hook.
+9. Deploy from `develop`, then smoke-test signup code, password recovery, UAE PASS, marketplace,
    listing, offers, transactions, admin access, and Arabic/RTL rendering.
 
 ## Production promotion

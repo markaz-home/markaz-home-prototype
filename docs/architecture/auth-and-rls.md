@@ -20,8 +20,8 @@ privacy_accepted } } })` → `/[locale]/verify-email` (6-digit `confirmation` co
 
 The normal path hydrates `full_name` + consent from Auth metadata via
 `handle_new_user`, so **profile-setup is a fallback only**. UAE PASS Staging is
-available only as an optional sign-in method; it is not a post-sign-up checkpoint
-(ADR 0030).
+optionally linked later from the authenticated Profile page; it is not a post-sign-up
+checkpoint (ADR 0030 / ADR 0031).
 
 ### Returning customer (sign-in)
 
@@ -31,6 +31,10 @@ that never reveals which field was wrong, whether the account exists, or whether
 it is an admin. `email_not_confirmed` is the one case acted on: it routes to
 `verify-email`. A returning verified customer with a complete profile goes
 straight to the dashboard.
+
+A linked customer may instead use UAE PASS Staging. An unknown UAE PASS subject is
+rejected by the Before User Created hook before any Auth/application row is inserted;
+the customer is directed to email sign-in and then Profile to link explicitly.
 
 ### Password recovery
 
