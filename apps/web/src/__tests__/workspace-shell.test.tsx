@@ -42,6 +42,10 @@ describe('WorkspaceShell (shared Platform Gold workspace)', () => {
     for (const logo of logos) {
       expect(logo).toHaveAttribute('src', expect.stringContaining('markaz-logo-gold.png'));
     }
+    expect(screen.getByRole('link', { name: 'Profile' })).toHaveAttribute(
+      'href',
+      '/account/profile',
+    );
     expect(screen.getByText('Dashboard content')).toBeInTheDocument();
   });
 });

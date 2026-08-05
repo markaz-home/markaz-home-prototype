@@ -26,7 +26,6 @@ import { SignOutButton } from '@/components/sign-out-button';
 const PUBLIC_LINKS = [
   { href: '/properties', key: 'browse', match: '/properties' },
   { href: '/how-it-works', key: 'howItWorks', match: '/how-it-works' },
-  { href: '/sign-in?next=/sell', key: 'forSellers' },
 ] as const;
 
 const AUTHED_LINKS = [

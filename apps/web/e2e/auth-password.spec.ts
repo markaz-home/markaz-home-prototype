@@ -93,11 +93,42 @@ test.describe('email/password authentication', () => {
     await expect(page.getByRole('heading', { name: 'Welcome to Markaz' })).toBeVisible();
     await page.getByRole('link', { name: /Continue to dashboard/i }).click();
     await expect(page).toHaveURL(/\/en\/dashboard/, { timeout: 20_000 });
+    await expect(
+      page.getByRole('heading', { name: 'Finish setting up your account' }),
+    ).toBeVisible();
   });
 
   test('returning customer signs in and reaches the dashboard', async ({ page }) => {
     await signIn(page, signInCustomer.email, DEFAULT_PASSWORD);
     await expect(page).toHaveURL(/\/en\/dashboard/);
+  });
+
+  test('customer adds an optional mobile from the compact Profile editor', async ({ page }) => {
+    await signIn(page, signInCustomer.email, DEFAULT_PASSWORD);
+    await expect(page).toHaveURL(/\/en\/dashboard/);
+    await page.getByRole('link', { name: 'Complete profile' }).click();
+    await expect(page).toHaveURL(/\/en\/account\/profile/);
+
+    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.getByLabel('Mobile number').fill('050 123 4567');
+    await page.getByRole('button', { name: 'Save changes' }).click();
+
+    await expect(page.getByText('+971501234567')).toBeVisible();
+    await expect(page.getByText('Profile updated')).toBeVisible();
+    await expect(page.getByText('Manage how you sign in to MARKAZ.')).toBeVisible();
+    await expect(page.getByText(/second profile/i)).toHaveCount(0);
+  });
+
+  test('sign out clears the session and protected pages remain unavailable', async ({ page }) => {
+    await signIn(page, signInCustomer.email, DEFAULT_PASSWORD);
+    await expect(page).toHaveURL(/\/en\/dashboard/);
+
+    await page.getByRole('button', { name: /Signed in.*E2E auth-signin/i }).click();
+    await page.getByRole('button', { name: 'Sign out' }).click();
+    await expect(page).toHaveURL(/\/en\/signed-out/);
+
+    await page.goto('/en/dashboard');
+    await expect(page).toHaveURL(/\/en\/sign-in/);
   });
 
   test('incorrect password shows a generic error', async ({ page }) => {

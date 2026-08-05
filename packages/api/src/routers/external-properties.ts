@@ -6,7 +6,7 @@ import type {
   ExternalProviderResult,
   ExternalSearch,
 } from '../integrations/external-listing-provider';
-import { customerProcedure, publicProcedure, router } from '../trpc';
+import { publicProcedure, router } from '../trpc';
 
 const localeSchema = z.enum(['en', 'ar']).default('en');
 const limitSchema = z.number().int().min(1).max(12).default(6);
@@ -50,11 +50,12 @@ export const externalPropertiesRouter = router({
     .query(({ ctx, input }) => resolveExternalProperties(ctx.log, input)),
 
   /**
-   * Place type-ahead for the listing wizard's location fields (Dubai only).
-   * Customer-scoped: it proxies a keyed third-party quota, so it is not exposed
-   * anonymously. Failures degrade to no suggestions — the field takes free text.
+   * Place type-ahead for public search and the listing wizard (Dubai only).
+   * The provider key remains server-side; two-character minimums, bounded results,
+   * and the integration's day-long cache protect the keyed third-party quota.
+   * Failures degrade to no suggestions — both fields continue to accept free text.
    */
-  locations: customerProcedure
+  locations: publicProcedure
     .input(
       z.object({
         query: z.string().trim().max(80),

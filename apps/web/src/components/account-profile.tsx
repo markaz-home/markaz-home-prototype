@@ -1,8 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import { KeyRound, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import { profileUpdateSchema, type ProfileUpdateInput } from '@markaz/domain';
 import { createSupabaseBrowserClient } from '@markaz/auth/browser';
 import {
   Alert,
@@ -12,14 +15,20 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  FormField,
+  Input,
   StatusBadge,
 } from '@markaz/ui';
+import { useRouter } from '@/i18n/navigation';
+import { FIELD_ERROR_KEYS } from '@/components/auth/error-keys';
 import { resolveUaePassLinkError, type UaePassProfileNotice } from '@/lib/uae-pass-link';
 import { trpc } from '@/trpc/react';
 
 interface AccountProfileProps {
   fullName: string | null;
   email: string | null;
+  phoneE164: string | null;
+  phoneVerified: boolean;
   locale: string;
   emailVerified: boolean;
   uaePassLinked: boolean;
@@ -31,6 +40,8 @@ interface AccountProfileProps {
 export function AccountProfile({
   fullName,
   email,
+  phoneE164,
+  phoneVerified,
   locale,
   emailVerified,
   uaePassLinked,
@@ -39,13 +50,41 @@ export function AccountProfile({
   initialNotice,
 }: AccountProfileProps) {
   const t = useTranslations('accountProfile');
+  const tv = useTranslations('validation');
+  const router = useRouter();
   const [supabase] = useState(() => createSupabaseBrowserClient());
   const [notice, setNotice] = useState<UaePassProfileNotice | null>(initialNotice);
+  const [saveNotice, setSaveNotice] = useState<'success' | 'error' | null>(null);
   const [linking, setLinking] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [details, setDetails] = useState({ fullName, phoneE164 });
   const syncStarted = useRef(false);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ProfileUpdateInput>({
+    resolver: zodResolver(profileUpdateSchema),
+    defaultValues: { fullName: fullName ?? '', phone: phoneE164 ?? '' },
+  });
+
   const { mutate: syncUaePassIdentity } = trpc.profile.syncUaePassIdentity.useMutation({
     onSuccess: () => setNotice('uae_pass_linked'),
     onError: () => setNotice('uae_pass_record_error'),
+  });
+  const updateProfile = trpc.profile.update.useMutation({
+    onSuccess: (profile) => {
+      setDetails({ fullName: profile.fullName, phoneE164: profile.phoneE164 });
+      reset({ fullName: profile.fullName ?? '', phone: profile.phoneE164 ?? '' });
+      setEditing(false);
+      setSaveNotice('success');
+      // We stay on the same route; refresh updates the persistent workspace
+      // setup indicator with the newly saved profile state.
+      router.refresh();
+    },
+    onError: () => setSaveNotice('error'),
   });
 
   useEffect(() => {
@@ -74,18 +113,28 @@ export function AccountProfile({
     // On success Supabase redirects the browser to UAE PASS Staging.
   }
 
+  function cancelEditing() {
+    reset({ fullName: details.fullName ?? '', phone: details.phoneE164 ?? '' });
+    setSaveNotice(null);
+    setEditing(false);
+  }
+
   const noticeContent = notice ? getNoticeContent(notice, t, uaePassLinked) : null;
+  const fe = (code?: string) =>
+    code ? tv(FIELD_ERROR_KEYS[code] ?? 'unexpectedError') : undefined;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
-      <div className="space-y-2">
-        <p className="text-primary text-xs font-semibold uppercase tracking-[0.18em]">
-          {t('eyebrow')}
-        </p>
-        <h1 className="text-3xl font-semibold tracking-tight">{t('profileTitle')}</h1>
-        <p className="text-muted-foreground max-w-2xl text-sm leading-6">
-          {t('profileDescription')}
-        </p>
+    <div className="mx-auto max-w-5xl space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-2">
+          <p className="text-primary text-xs font-semibold uppercase tracking-[0.18em]">
+            {t('eyebrow')}
+          </p>
+          <h1 className="font-display text-3xl tracking-tight">{t('profileTitle')}</h1>
+          <p className="text-muted-foreground max-w-2xl text-sm leading-6">
+            {t('profileDescription')}
+          </p>
+        </div>
       </div>
 
       {noticeContent ? (
@@ -93,11 +142,17 @@ export function AccountProfile({
           {noticeContent.body}
         </Alert>
       ) : null}
+      {saveNotice === 'success' ? (
+        <Alert variant="success" title={t('saveSuccessTitle')}>
+          {t('saveSuccessBody')}
+        </Alert>
+      ) : null}
+      {saveNotice === 'error' ? <Alert variant="destructive">{t('saveError')}</Alert> : null}
 
-      <div className="grid min-w-0 gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+      <div className="grid min-w-0 items-start gap-5 lg:grid-cols-[0.9fr_1.1fr]">
         <Card className="min-w-0 overflow-hidden">
-          <CardHeader className="border-border/70 border-b">
-            <div className="flex items-start gap-3">
+          <CardHeader className="border-border/70 flex-row items-start justify-between gap-4 space-y-0 border-b">
+            <div className="flex min-w-0 items-start gap-3">
               <SectionIcon>
                 <UserRound className="h-5 w-5" aria-hidden />
               </SectionIcon>
@@ -106,12 +161,85 @@ export function AccountProfile({
                 <CardDescription>{t('detailsDescription')}</CardDescription>
               </div>
             </div>
+            {!editing ? (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setSaveNotice(null);
+                  setEditing(true);
+                }}
+              >
+                {t('editDetails')}
+              </Button>
+            ) : null}
           </CardHeader>
-          <CardContent className="divide-border/70 divide-y p-0">
-            <DetailRow label={t('nameLabel')} value={fullName ?? '—'} />
-            <DetailRow label={t('emailLabel')} value={email ?? '—'} dir="ltr" />
-            <DetailRow label={t('accountTypeLabel')} value={t('accountTypeCustomer')} />
-          </CardContent>
+
+          {editing ? (
+            <CardContent className="p-5 sm:p-6">
+              <form
+                className="space-y-5"
+                noValidate
+                onSubmit={handleSubmit((input) => {
+                  setSaveNotice(null);
+                  updateProfile.mutate(input);
+                })}
+              >
+                <FormField
+                  id="profileFullName"
+                  label={t('nameLabel')}
+                  error={fe(errors.fullName?.message)}
+                  required
+                >
+                  <Input
+                    id="profileFullName"
+                    autoComplete="name"
+                    aria-invalid={!!errors.fullName}
+                    {...register('fullName')}
+                  />
+                </FormField>
+                <FormField
+                  id="profilePhone"
+                  label={t('phoneLabel')}
+                  error={fe(errors.phone?.message)}
+                >
+                  <Input
+                    id="profilePhone"
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    dir="ltr"
+                    placeholder={t('phonePlaceholder')}
+                    aria-invalid={!!errors.phone}
+                    {...register('phone')}
+                  />
+                </FormField>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <Button type="button" variant="ghost" onClick={cancelEditing}>
+                    {t('cancelEdit')}
+                  </Button>
+                  <Button type="submit" loading={updateProfile.isPending}>
+                    {updateProfile.isPending ? t('savingDetails') : t('saveDetails')}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          ) : (
+            <CardContent className="divide-border/70 divide-y p-0">
+              <DetailRow label={t('nameLabel')} value={details.fullName ?? '—'} />
+              <DetailRow label={t('emailLabel')} value={email ?? '—'} dir="ltr" />
+              <DetailRow
+                label={t('phoneLabel')}
+                value={details.phoneE164 ?? t('phoneNotAdded')}
+                dir={details.phoneE164 ? 'ltr' : undefined}
+                status={
+                  details.phoneE164 ? t(phoneVerified ? 'phoneVerified' : 'phoneSaved') : null
+                }
+                statusTone={phoneVerified ? 'success' : 'neutral'}
+              />
+            </CardContent>
+          )}
         </Card>
 
         <Card id="sign-in-methods" className="min-w-0 scroll-mt-20 overflow-hidden">
@@ -162,21 +290,9 @@ export function AccountProfile({
                   <p className="text-muted-foreground text-sm">{t('uaePassUnavailable')}</p>
                 )
               ) : null}
-
-              <p className="text-muted-foreground text-xs leading-5">
-                {t('stagingEnvironmentNote')}
-              </p>
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      <div className="border-border/70 bg-card/40 flex gap-3 rounded-lg border p-4">
-        <ShieldCheck className="text-primary mt-0.5 h-5 w-5 shrink-0" aria-hidden />
-        <div className="space-y-1">
-          <p className="text-sm font-medium">{t('securityTitle')}</p>
-          <p className="text-muted-foreground text-sm leading-6">{t('securityDescription')}</p>
-        </div>
       </div>
     </div>
   );
@@ -190,18 +306,30 @@ function SectionIcon({ children }: { children: React.ReactNode }) {
   );
 }
 
-function DetailRow({ label, value, dir }: { label: string; value: string; dir?: 'ltr' | 'rtl' }) {
+function DetailRow({
+  label,
+  value,
+  dir,
+  status,
+  statusTone = 'neutral',
+}: {
+  label: string;
+  value: string;
+  dir?: 'ltr' | 'rtl';
+  status?: string | null;
+  statusTone?: 'success' | 'warning' | 'neutral';
+}) {
   return (
-    <div className="space-y-1 px-5 py-4 sm:px-6">
-      <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">{label}</p>
-      <p
-        className={
-          dir === 'ltr' ? 'break-all text-sm font-medium' : 'break-words text-sm font-medium'
-        }
-        dir={dir}
-      >
-        {value}
-      </p>
+    <div className="flex min-w-0 items-center justify-between gap-3 px-5 py-4 sm:px-6">
+      <div className="min-w-0 space-y-1">
+        <p className="text-muted-foreground text-[11px] font-medium uppercase tracking-wide">
+          {label}
+        </p>
+        <p className="break-words text-sm font-medium" dir={dir}>
+          {value}
+        </p>
+      </div>
+      {status ? <StatusBadge tone={statusTone}>{status}</StatusBadge> : null}
     </div>
   );
 }

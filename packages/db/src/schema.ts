@@ -22,6 +22,10 @@ import { sql } from 'drizzle-orm';
 
 // --- Enums -------------------------------------------------------------------
 export const accountType = pgEnum('account_type', ['CUSTOMER', 'ADMIN']);
+export const phoneVerificationSource = pgEnum('phone_verification_source', [
+  'MARKAZ_OTP',
+  'UAE_PASS',
+]);
 export const adminNoteCategory = pgEnum('admin_note_category', [
   'REVIEW',
   'CUSTOMER_SUPPORT',
@@ -175,6 +179,9 @@ export const profiles = pgTable(
     id: uuid('id').primaryKey(),
     email: text('email').notNull(),
     fullName: text('full_name'),
+    phoneE164: text('phone_e164'),
+    phoneVerifiedAt: timestamp('phone_verified_at', { withTimezone: true }),
+    phoneVerificationSource: phoneVerificationSource('phone_verification_source'),
     accountType: accountType('account_type').notNull().default('CUSTOMER'),
     identityVerificationStatus: identityVerificationStatus('identity_verification_status')
       .notNull()
