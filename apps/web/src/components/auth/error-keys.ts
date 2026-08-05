@@ -4,6 +4,7 @@ import type { AuthErrorKey } from '@markaz/domain';
 export const FIELD_ERROR_KEYS: Record<string, string> = {
   full_name_too_short: 'fullNameTooShort',
   full_name_too_long: 'fullNameTooLong',
+  phone_invalid: 'phoneInvalid',
   email_required: 'emailEmpty',
   email_invalid: 'emailInvalid',
   password_required: 'passwordEmpty',

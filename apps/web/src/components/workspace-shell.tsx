@@ -4,13 +4,16 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   ArrowLeftRight,
+  Bell,
   Building2,
+  CircleHelp,
   Heart,
   Landmark,
   LayoutDashboard,
   Menu,
   Receipt,
   Search,
+  UserRound,
   X,
 } from 'lucide-react';
 import {
@@ -93,43 +96,69 @@ export function WorkspaceShell({
     </nav>
   );
 
-  const accountMenu = (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className="border-border/70 bg-foreground/[0.02] hover:border-border flex w-full items-center gap-2.5 rounded-lg border px-3 py-2.5 text-start transition-colors"
-        >
-          <Avatar name={displayName} />
-          <span className="min-w-0 flex-1">
-            <span className="text-muted-foreground block text-[10px] uppercase tracking-wide">
-              {t('signedIn')}
+  const accountMenu = (placement: 'desktop' | 'mobile') => {
+    const desktop = placement === 'desktop';
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className="border-border/70 bg-foreground/[0.02] hover:border-border hover:bg-foreground/[0.04] focus-visible:ring-primary/40 flex w-full items-center gap-2.5 rounded-lg border px-3 py-2.5 text-start outline-none transition-colors focus-visible:ring-2"
+          >
+            <Avatar name={displayName} />
+            <span className="min-w-0 flex-1">
+              <span className="text-muted-foreground block text-[10px] uppercase tracking-wide">
+                {t('signedIn')}
+              </span>
+              <span className="block truncate text-[13px] font-medium">
+                {displayName ?? t('account')}
+              </span>
             </span>
-            <span className="block truncate text-[13px] font-medium">
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          side={desktop ? 'right' : 'bottom'}
+          align={desktop ? 'end' : 'start'}
+          sideOffset={12}
+          collisionPadding={16}
+          className="border-border/80 bg-popover/95 w-56 rounded-xl p-2 shadow-xl backdrop-blur"
+        >
+          <DropdownMenuLabel className="space-y-0.5 px-2.5 pb-2 pt-1.5">
+            <span className="text-muted-foreground block text-[10px] font-medium uppercase tracking-[0.14em]">
+              {t('account')}
+            </span>
+            <span className="block truncate text-sm font-semibold">
               {displayName ?? t('account')}
             </span>
-          </span>
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuLabel>{displayName ?? t('account')}</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/account/profile">{t('profile')}</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/account/notifications">{t('notifications')}</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/account/help">{t('help')}</Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <SignOutButton asMenuItem />
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator className="-mx-2 my-1" />
+          <DropdownMenuItem asChild className="rounded-lg px-2.5 py-2.5">
+            <Link href="/account/profile" className="flex w-full items-center gap-2">
+              <UserRound className="text-muted-foreground h-4 w-4" aria-hidden />
+              <span>{t('profile')}</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className="rounded-lg px-2.5 py-2.5">
+            <Link href="/account/notifications" className="flex w-full items-center gap-2">
+              <Bell className="text-muted-foreground h-4 w-4" aria-hidden />
+              {t('notifications')}
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className="rounded-lg px-2.5 py-2.5">
+            <Link href="/account/help" className="flex w-full items-center gap-2">
+              <CircleHelp className="text-muted-foreground h-4 w-4" aria-hidden />
+              {t('help')}
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator className="-mx-2 my-1" />
+          <DropdownMenuItem asChild className="rounded-lg px-2.5 py-2.5">
+            <SignOutButton asMenuItem />
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
 
   return (
     <div className="flex min-h-dvh">
@@ -141,7 +170,7 @@ export function WorkspaceShell({
           {t('workspace')}
         </p>
         <div className="mt-3">{nav()}</div>
-        <div className="mx-3 mt-auto pt-6">{accountMenu}</div>
+        <div className="mx-3 mt-auto pt-6">{accountMenu('desktop')}</div>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -161,15 +190,25 @@ export function WorkspaceShell({
             </Link>
           </div>
           <div className="ms-auto flex items-center gap-1">
-            <NotificationBell />
             <LanguageSwitcher />
+            <NotificationBell />
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+              className="border-primary/55 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary rounded-full border"
+            >
+              <Link href="/account/profile" aria-label={t('profile')} title={t('profile')}>
+                <UserRound className="h-4 w-4" aria-hidden />
+              </Link>
+            </Button>
           </div>
         </header>
 
         {open ? (
           <div className="border-border/70 bg-card border-b py-3 md:hidden">
             {nav(() => setOpen(false))}
-            <div className="mx-3 mt-3">{accountMenu}</div>
+            <div className="mx-3 mt-3">{accountMenu('mobile')}</div>
           </div>
         ) : null}
 

@@ -5,15 +5,31 @@ import { renderWithIntl } from './test-utils';
 
 const linkIdentity = vi.fn();
 const syncUaePassIdentity = vi.fn();
+const updateProfile = vi.fn();
+const refresh = vi.fn();
 
 vi.mock('@markaz/auth/browser', () => ({
   createSupabaseBrowserClient: () => ({ auth: { linkIdentity } }),
+}));
+vi.mock('@/i18n/navigation', () => ({
+  useRouter: () => ({ refresh }),
 }));
 vi.mock('@/trpc/react', () => ({
   trpc: {
     profile: {
       syncUaePassIdentity: {
         useMutation: () => ({ mutate: syncUaePassIdentity }),
+      },
+      update: {
+        useMutation: (options?: {
+          onSuccess?: (profile: { fullName: string; phoneE164: string | null }) => void;
+        }) => ({
+          mutate: (input: { fullName: string; phone: string }) => {
+            updateProfile(input);
+            options?.onSuccess?.({ fullName: input.fullName, phoneE164: '+971501234567' });
+          },
+          isPending: false,
+        }),
       },
     },
   },
@@ -24,6 +40,8 @@ import { AccountProfile } from '@/components/account-profile';
 const baseProps = {
   fullName: 'Tania Gole',
   email: 'tania@example.com',
+  phoneE164: null,
+  phoneVerified: false,
   locale: 'en',
   emailVerified: true,
   uaePassLinked: false,
@@ -35,6 +53,8 @@ const baseProps = {
 beforeEach(() => {
   linkIdentity.mockReset().mockResolvedValue({ error: null });
   syncUaePassIdentity.mockReset();
+  updateProfile.mockReset();
+  refresh.mockReset();
 });
 
 describe('AccountProfile', () => {
@@ -45,8 +65,32 @@ describe('AccountProfile', () => {
     expect(screen.getByText('Tania Gole')).toBeInTheDocument();
     expect(screen.getAllByText('tania@example.com')).toHaveLength(2);
     expect(screen.getByText('Email and password')).toBeInTheDocument();
+    expect(screen.getAllByText('Verified')).toHaveLength(1);
     expect(screen.getByText('UAE PASS Staging')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Link UAE PASS Staging' })).toBeInTheDocument();
+    expect(screen.getByText('Not added')).toBeInTheDocument();
+    expect(screen.queryByText('Account type')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Your identities stay attached to one account'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('edits and normalizes optional mobile contact details', async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<AccountProfile {...baseProps} />);
+
+    await user.click(screen.getByRole('button', { name: 'Edit' }));
+    const phone = screen.getByLabelText('Mobile number');
+    await user.type(phone, '050 123 4567');
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    expect(updateProfile).toHaveBeenCalledWith({
+      fullName: 'Tania Gole',
+      phone: '050 123 4567',
+    });
+    expect(await screen.findByText('+971501234567')).toBeInTheDocument();
+    expect(screen.getByText('Profile updated')).toBeInTheDocument();
+    expect(refresh).toHaveBeenCalledTimes(1);
   });
 
   it('starts explicit linking for the signed-in account', async () => {

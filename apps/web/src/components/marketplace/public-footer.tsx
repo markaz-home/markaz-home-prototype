@@ -1,4 +1,4 @@
-import { ArrowUpRight, LifeBuoy, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { BrandLogo } from '@/components/brand-logo';
@@ -6,7 +6,6 @@ import { BrandLogo } from '@/components/brand-logo';
 export function PublicFooter({ isAuthenticated }: { isAuthenticated: boolean }) {
   const t = useTranslations('footer');
   const year = new Date().getFullYear();
-  const supportHref = isAuthenticated ? '/account/help' : '/sign-in?next=/account/help';
   const accountHref = isAuthenticated ? '/dashboard' : '/sign-in';
 
   return (
@@ -71,14 +70,6 @@ export function PublicFooter({ isAuthenticated }: { isAuthenticated: boolean }) 
             <p className="text-muted-foreground mt-5 max-w-xs text-sm leading-6">
               {t('contactBody')}
             </p>
-            <Link
-              href={supportHref}
-              className="border-primary/35 text-foreground hover:border-primary hover:bg-primary/10 mt-5 inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors"
-            >
-              <LifeBuoy className="text-primary h-4 w-4" aria-hidden />
-              {t('supportCentre')}
-              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
-            </Link>
           </div>
         </div>
 

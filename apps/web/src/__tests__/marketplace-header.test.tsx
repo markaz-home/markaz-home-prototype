@@ -32,7 +32,7 @@ function renderHeader(isAuthenticated: boolean) {
 }
 
 describe('MarketplaceHeader', () => {
-  it('offers the three public destinations and both account actions to anonymous visitors', () => {
+  it('offers the public destinations and both account actions to anonymous visitors', () => {
     renderHeader(false);
 
     expect(screen.getByRole('link', { name: 'Browse Properties' })).toHaveAttribute(
@@ -43,11 +43,7 @@ describe('MarketplaceHeader', () => {
       'href',
       '/how-it-works',
     );
-    // Sellers still land on sign-in with the listing journey preserved.
-    expect(screen.getByRole('link', { name: 'For Sellers' })).toHaveAttribute(
-      'href',
-      '/sign-in?next=/sell',
-    );
+    expect(screen.queryByRole('link', { name: 'For Sellers' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Login' })).toHaveAttribute('href', '/sign-in');
     expect(screen.getByRole('link', { name: 'Sign Up' })).toHaveAttribute('href', '/sign-up');
   });
