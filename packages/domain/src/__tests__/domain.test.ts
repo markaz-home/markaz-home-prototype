@@ -9,7 +9,7 @@ import {
   isIdentityVerified,
   simulatedIdentityStatusSchema,
 } from '../identity';
-import { isProfileComplete } from '../profile';
+import { isProfileComplete, normalizePhoneE164, profileUpdateSchema } from '../profile';
 import { resolvePostAuthDestination } from '../routing';
 import {
   normalizeEmail,
@@ -161,6 +161,22 @@ describe('profile completeness + post-auth routing', () => {
         profile: { ...complete, identityVerificationStatus: 'NOT_STARTED' },
       }),
     ).toBe('verify-email');
+  });
+});
+
+describe('optional profile mobile', () => {
+  it('normalizes UAE-local and international contact numbers to E.164', () => {
+    expect(normalizePhoneE164('050 123 4567')).toBe('+971501234567');
+    expect(normalizePhoneE164('971-50-123-4567')).toBe('+971501234567');
+    expect(normalizePhoneE164('0044 7700 900123')).toBe('+447700900123');
+    expect(normalizePhoneE164('')).toBeNull();
+  });
+
+  it('rejects invalid contact numbers without making mobile mandatory', () => {
+    expect(profileUpdateSchema.safeParse({ fullName: 'Tania Gole', phone: '' }).success).toBe(true);
+    expect(
+      profileUpdateSchema.safeParse({ fullName: 'Tania Gole', phone: 'not-a-number' }).success,
+    ).toBe(false);
   });
 });
 

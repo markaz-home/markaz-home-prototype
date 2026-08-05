@@ -7,6 +7,15 @@ import { loadMessages } from '@markaz/i18n';
 const push = vi.fn();
 vi.mock('@/i18n/navigation', () => ({ useRouter: () => ({ push }) }));
 
+const locationSuggestions = [
+  {
+    id: 'dubai-hills',
+    name: 'Dubai Hills Estate',
+    level: 'community',
+    context: 'Dubai',
+  },
+];
+
 vi.mock('@/trpc/react', () => ({
   trpc: {
     marketplace: {
@@ -41,6 +50,14 @@ vi.mock('@/trpc/react', () => ({
       },
     },
     externalProperties: {
+      locations: {
+        useQuery: () => ({
+          data: locationSuggestions,
+          isFetching: false,
+          isFetched: true,
+          isError: false,
+        }),
+      },
       featured: {
         useQuery: () => ({
           data: {
@@ -68,7 +85,6 @@ vi.mock('@/trpc/react', () => ({
 import {
   HeroSearch,
   buildPropertySearchQuery,
-  rankPlaceSuggestions,
 } from '@/components/landing/hero-search';
 
 function renderHero() {
@@ -131,35 +147,14 @@ describe('buildPropertySearchQuery', () => {
   });
 });
 
-describe('rankPlaceSuggestions', () => {
-  const places = ['Dubai Marina', 'Marina Promenade', 'Palm Jumeirah', 'Dubai Hills Estate'];
-
-  it('suggests nothing until something is typed', () => {
-    expect(rankPlaceSuggestions(places, '   ')).toEqual([]);
-  });
-
-  it('puts prefix matches before matches found mid-name', () => {
-    expect(rankPlaceSuggestions(places, 'marina')).toEqual(['Marina Promenade', 'Dubai Marina']);
-  });
-
-  it('ignores case and still lists a name typed out in full', () => {
-    expect(rankPlaceSuggestions(places, 'PALM')).toEqual(['Palm Jumeirah']);
-    expect(rankPlaceSuggestions(places, 'Palm Jumeirah')).toEqual(['Palm Jumeirah']);
-  });
-
-  it('matches a district named mid-string, as typed without its article', () => {
-    expect(rankPlaceSuggestions(['The Meadows', 'The Lakes'], 'meadows')).toEqual(['The Meadows']);
-  });
-});
-
 describe('HeroSearch', () => {
-  it('completes a place from live inventory as you type', async () => {
+  it('completes a place from the provider-backed gazetteer as you type', async () => {
     const user = userEvent.setup();
     renderHero();
 
     const input = screen.getByRole('combobox', { name: 'Search' });
     await user.type(input, 'dubai h');
-    await user.click(await screen.findByRole('option', { name: 'Dubai Hills Estate' }));
+    await user.click(await screen.findByRole('option', { name: /Dubai Hills Estate/ }));
 
     expect(input).toHaveValue('Dubai Hills Estate');
     await user.click(screen.getByRole('button', { name: 'Search properties' }));

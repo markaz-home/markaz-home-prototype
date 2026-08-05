@@ -21,7 +21,8 @@ privacy_accepted } } })` → `/[locale]/verify-email` (6-digit `confirmation` co
 The normal path hydrates `full_name` + consent from Auth metadata via
 `handle_new_user`, so **profile-setup is a fallback only**. UAE PASS Staging is
 optionally linked later from the authenticated Profile page; it is not a post-sign-up
-checkpoint (ADR 0030 / ADR 0031).
+checkpoint (ADR 0030 / ADR 0031). Dashboard offers a dismissible, non-blocking
+account-setup prompt to add an optional contact mobile and link UAE PASS (ADR 0032).
 
 ### Returning customer (sign-in)
 
@@ -89,10 +90,12 @@ Identity status is not an account-access gate. `requireCustomerStep`
 
 Supabase **Auth** owns credentials, the password hash, email-confirmation
 state, and all verification/recovery codes, links, and tokens. **`profiles`** owns `full_name`,
-`account_type`, identity status, consent timestamps, and `onboarding_completed_at`
+optional `phone_e164` contact data + nullable verification provenance, `account_type`, identity
+status, consent timestamps, and `onboarding_completed_at`
 — **no secrets**. Customers may read their own profile, but profile mutation is accepted only
 inside the verified MARKAZ API transaction context; direct Supabase REST updates cannot forge
-identity or onboarding state.
+identity or onboarding state. Mobile is not a MARKAZ login, recovery, or UAE PASS linking key;
+provider subjects in `auth.identities` remain canonical (ADR 0032).
 
 ### Audit events
 

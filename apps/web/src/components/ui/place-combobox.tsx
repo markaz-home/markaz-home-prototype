@@ -23,6 +23,7 @@ export function PlaceCombobox({
   placeholder,
   kind = 'AREA',
   className,
+  classNames,
 }: {
   id: string;
   value: string;
@@ -30,6 +31,13 @@ export function PlaceCombobox({
   placeholder?: string;
   kind?: 'AREA' | 'BUILDING';
   className?: string;
+  classNames?: {
+    wrapper?: string;
+    panel?: string;
+    option?: string;
+    optionActive?: string;
+    status?: string;
+  };
 }) {
   const locale = useLocale();
   const t = useTranslations('common');
@@ -93,7 +101,7 @@ export function PlaceCombobox({
   }
 
   return (
-    <div ref={wrapperRef} className="relative">
+    <div ref={wrapperRef} className={cn('relative', classNames?.wrapper)}>
       <input
         id={id}
         role="combobox"
@@ -149,17 +157,29 @@ export function PlaceCombobox({
         <ul
           id={listboxId}
           role="listbox"
-          className="bg-popover text-popover-foreground border-border absolute inset-x-0 top-[calc(100%+0.25rem)] z-30 max-h-72 overflow-y-auto rounded-lg border py-1.5 shadow-xl"
+          className={cn(
+            'bg-popover text-popover-foreground border-border absolute inset-x-0 top-[calc(100%+0.25rem)] z-30 max-h-72 overflow-y-auto rounded-lg border py-1.5 shadow-xl',
+            classNames?.panel,
+          )}
         >
           {queryFailed ? (
-            <li className="text-warning px-3 py-2 text-sm">{t('suggestionsUnavailable')}</li>
+            <li className={cn('text-warning px-3 py-2 text-sm', classNames?.status)}>
+              {t('suggestionsUnavailable')}
+            </li>
           ) : searching ? (
-            <li className="text-muted-foreground flex items-center gap-2 px-3 py-2 text-sm">
+            <li
+              className={cn(
+                'text-muted-foreground flex items-center gap-2 px-3 py-2 text-sm',
+                classNames?.status,
+              )}
+            >
               <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
               {t('searching')}
             </li>
           ) : noMatches ? (
-            <li className="text-muted-foreground px-3 py-2 text-sm">{t('noMatches')}</li>
+            <li className={cn('text-muted-foreground px-3 py-2 text-sm', classNames?.status)}>
+              {t('noMatches')}
+            </li>
           ) : null}
           {suggestions.map((place, index) => (
             <li
@@ -175,7 +195,9 @@ export function PlaceCombobox({
               }}
               className={cn(
                 'cursor-pointer px-3 py-2 text-start text-sm',
-                index === active && 'bg-accent text-accent-foreground',
+                classNames?.option,
+                index === active &&
+                  (classNames?.optionActive ?? 'bg-accent text-accent-foreground'),
               )}
             >
               <span className="block truncate">{place.name}</span>

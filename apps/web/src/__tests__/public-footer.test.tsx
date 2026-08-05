@@ -22,7 +22,7 @@ function renderFooter(isAuthenticated: boolean) {
 }
 
 describe('PublicFooter', () => {
-  it('keeps anonymous journeys and support return paths intact', () => {
+  it('keeps anonymous journeys intact without presenting support as a link', () => {
     renderFooter(false);
 
     expect(screen.getByRole('contentinfo')).toBeInTheDocument();
@@ -38,10 +38,7 @@ describe('PublicFooter', () => {
       'href',
       '/sign-in?next=/sell',
     );
-    expect(screen.getByRole('link', { name: /Open support centre/i })).toHaveAttribute(
-      'href',
-      '/sign-in?next=/account/help',
-    );
+    expect(screen.queryByRole('link', { name: /Open support centre/i })).not.toBeInTheDocument();
     expect(screen.getByText(/Markaz Home. All rights reserved/)).toBeInTheDocument();
   });
 
@@ -56,9 +53,6 @@ describe('PublicFooter', () => {
       'href',
       '/dashboard',
     );
-    expect(screen.getByRole('link', { name: /Open support centre/i })).toHaveAttribute(
-      'href',
-      '/account/help',
-    );
+    expect(screen.queryByRole('link', { name: /Open support centre/i })).not.toBeInTheDocument();
   });
 });

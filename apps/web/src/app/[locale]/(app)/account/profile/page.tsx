@@ -25,6 +25,8 @@ export default async function AccountProfilePage({
     <AccountProfile
       fullName={profile?.fullName ?? null}
       email={session?.email ?? profile?.email ?? null}
+      phoneE164={profile?.phoneE164 ?? null}
+      phoneVerified={!!profile?.phoneVerifiedAt}
       locale={locale}
       emailVerified={session?.emailVerified ?? false}
       uaePassLinked={uaePassLinked}

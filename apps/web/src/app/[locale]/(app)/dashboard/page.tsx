@@ -9,6 +9,7 @@ import { formatAed } from '@/lib/format';
 import { isFreshDashboard } from '@/lib/dashboard-state';
 import { PropertyCard } from '@/components/marketplace/property-card';
 import { OfferStatusBadge } from '@/components/offers/shared';
+import { AccountSetupPrompt } from '@/components/account-setup-prompt';
 
 type ListingRow = {
   id: string;
@@ -34,6 +35,9 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
   const session = await getSession();
   const api = await getServerApi();
   const name = session?.profile?.fullName?.split(' ')[0] ?? null;
+  const uaePassLinked =
+    !!session?.uaePassAuthenticated ||
+    session?.profile?.identityVerificationStatus === 'VERIFIED_STAGING';
 
   // One parallel read per workspace area. A single failing area degrades to its
   // empty state plus a partial-load notice — never a blank dashboard.
@@ -124,6 +128,14 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
           </Button>
         </div>
       </div>
+
+      {session ? (
+        <AccountSetupPrompt
+          userId={session.userId}
+          hasMobile={!!session.profile?.phoneE164}
+          uaePassLinked={uaePassLinked}
+        />
+      ) : null}
 
       {failures.any ? (
         <Alert variant="warning">

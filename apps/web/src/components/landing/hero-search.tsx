@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
@@ -13,8 +13,8 @@ import { cn } from '@markaz/ui';
 import { useRouter } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import { ListboxSelect } from '@/components/ui/listbox-select';
+import { PlaceCombobox } from '@/components/ui/place-combobox';
 
-const MAX_SUGGESTIONS = 6;
 const EXTERNAL_FEATURED_LIMIT = 6;
 
 export interface HeroSearchValues {
@@ -51,24 +51,6 @@ export function buildPropertySearchQuery(values: HeroSearchValues): string {
 }
 
 /**
- * Rank place suggestions for what has been typed: matches that start with the
- * term first, then matches anywhere, each alphabetically. A fully typed name
- * still lists itself — dropping it reads as a broken control. Exported for tests.
- */
-export function rankPlaceSuggestions(places: string[], term: string): string[] {
-  const needle = term.trim().toLowerCase();
-  if (!needle) return [];
-  const starts: string[] = [];
-  const contains: string[] = [];
-  for (const place of places) {
-    const haystack = place.toLowerCase();
-    if (haystack.startsWith(needle)) starts.push(place);
-    else if (haystack.includes(needle)) contains.push(place);
-  }
-  return [...starts.sort(), ...contains.sort()].slice(0, MAX_SUGGESTIONS);
-}
-
-/**
  * Landing hero search (platform direction §8): one light "glass" bar carrying
  * location, property type, price band, and bedrooms straight into the public
  * marketplace. Dividers use logical properties so the bar mirrors under RTL.
@@ -97,14 +79,6 @@ export function HeroSearch() {
     { locale: locale === 'ar' ? 'ar' : 'en', limit: EXTERNAL_FEATURED_LIMIT },
     { staleTime: 60 * 60 * 1_000 },
   );
-  const places = useMemo(() => {
-    const all = [
-      ...(facets.data?.communities.map((item) => item.value) ?? []),
-      ...(external.data?.items.map((item) => item.community) ?? []),
-    ].filter((place): place is string => !!place?.trim());
-    return [...new Set(all)].sort();
-  }, [facets.data?.communities, external.data?.items]);
-
   const inventoryReady = !!facets.data && !!external.data;
   const typeCounts = useMemo(() => {
     const counts = new Map(
@@ -206,12 +180,11 @@ export function HeroSearch() {
       className="platform-gold-hero-search w-full max-w-3xl rounded-xl p-2.5 shadow-2xl md:p-3"
     >
       <div className="grid grid-cols-1 items-center gap-2 md:grid-cols-[minmax(0,1.9fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,1fr)_auto] md:gap-3">
-        <PlaceField
+        <HeroPlaceField
           label={t('searchLocation')}
           placeholder={t('searchLocationPlaceholder')}
           value={values.location}
           onChange={set('location')}
-          places={places}
         />
         <HeroSelect
           label={tf('propertyType')}
@@ -281,117 +254,42 @@ const panelCls =
 const optionCls =
   'flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2 text-start text-sm';
 
-/** Close on outside pointer-down; shared by the combobox and the selects. */
-function useDismiss(open: boolean, close: () => void) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const onPointerDown = (event: MouseEvent) => {
-      if (!ref.current?.contains(event.target as Node)) close();
-    };
-    document.addEventListener('mousedown', onPointerDown);
-    return () => document.removeEventListener('mousedown', onPointerDown);
-  }, [open, close]);
-  return ref;
-}
-
 /**
- * Location combobox: suggests communities from real inventory as you type
- * (ARIA 1.2 combobox — list popup, `aria-activedescendant`, free text allowed).
+ * The listing form's provider-backed area autocomplete, dressed for the hero.
+ * Free text remains available when the provider has no matching place.
  */
-function PlaceField({
+function HeroPlaceField({
   label,
   placeholder,
   value,
   onChange,
-  places,
 }: {
   label: string;
   placeholder: string;
   value: string;
   onChange: (value: string) => void;
-  places: string[];
 }) {
   const id = useId();
-  const listboxId = `${id}-listbox`;
-  const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(-1);
-  const suggestions = useMemo(() => rankPlaceSuggestions(places, value), [places, value]);
-  const wrapperRef = useDismiss(open, () => setOpen(false));
-  const isOpen = open && suggestions.length > 0;
-
-  function choose(place: string) {
-    onChange(place);
-    setOpen(false);
-    setActive(-1);
-  }
-
   return (
-    <div ref={wrapperRef} className="contents">
-      <Field id={id} label={label}>
-        <input
-          id={id}
-          role="combobox"
-          aria-expanded={isOpen}
-          aria-controls={listboxId}
-          aria-autocomplete="list"
-          aria-activedescendant={isOpen && active >= 0 ? `${listboxId}-${active}` : undefined}
-          autoComplete="off"
-          value={value}
-          placeholder={placeholder}
-          onChange={(event) => {
-            onChange(event.target.value);
-            setOpen(true);
-            setActive(-1);
-          }}
-          onFocus={() => setOpen(true)}
-          onKeyDown={(event) => {
-            if (event.key === 'ArrowDown') {
-              event.preventDefault();
-              setOpen(true);
-              setActive((prev) => (prev + 1) % Math.max(suggestions.length, 1));
-            } else if (event.key === 'ArrowUp') {
-              event.preventDefault();
-              setActive((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
-            } else if (event.key === 'Enter' && isOpen && active >= 0) {
-              // Take the highlighted suggestion instead of submitting the form.
-              event.preventDefault();
-              choose(suggestions[active]!);
-            } else if (event.key === 'Escape' && isOpen) {
-              event.preventDefault();
-              setOpen(false);
-              setActive(-1);
-            }
-          }}
-          className="w-full bg-transparent text-sm font-semibold outline-none placeholder:font-normal placeholder:text-[hsl(var(--hero-search-muted))]"
-        />
-
-        {isOpen && (
-          <ul id={listboxId} role="listbox" aria-labelledby={`${id}-label`} className={panelCls}>
-            {suggestions.map((place, index) => (
-              <li
-                key={place}
-                id={`${listboxId}-${index}`}
-                role="option"
-                aria-selected={index === active}
-                onMouseEnter={() => setActive(index)}
-                // Fires before the input's blur, so the value still lands.
-                onMouseDown={(event) => {
-                  event.preventDefault();
-                  choose(place);
-                }}
-                className={cn(
-                  optionCls,
-                  index === active && 'bg-[hsl(var(--hero-search-foreground)/0.06)]',
-                )}
-              >
-                {place}
-              </li>
-            ))}
-          </ul>
-        )}
-      </Field>
-    </div>
+    <Field id={id} label={label}>
+      <PlaceCombobox
+        id={id}
+        kind="AREA"
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="h-auto rounded-none border-0 bg-transparent p-0 text-sm font-semibold outline-none placeholder:font-normal placeholder:text-[hsl(var(--hero-search-muted))] focus-visible:ring-0"
+        classNames={{
+          panel: cn(
+            panelCls,
+            'inset-e-auto w-[min(20rem,calc(100vw-3rem))] text-[hsl(var(--hero-search-foreground))]',
+          ),
+          option: 'px-3 py-2 text-start text-sm',
+          optionActive: 'bg-[hsl(var(--hero-search-foreground)/0.06)]',
+          status: 'text-[hsl(var(--hero-search-muted))]',
+        }}
+      />
+    </Field>
   );
 }
 

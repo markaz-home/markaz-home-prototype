@@ -157,6 +157,8 @@ UAE PASS.
 
 The email/password signup creates the existing `auth.users` and `public.profiles` rows.
 Explicit linking adds a `custom:uae-pass` `auth.identities` row to that same Auth user.
+An optional mobile entered directly by the customer on the MARKAZ Profile is stored separately as
+contact data; it is never used to match or link the UAE PASS identity (ADR-0032).
 For OAuth identities,
 Supabase stores provider identity metadata in `auth.identities.identity_data` and may
 also copy it into Auth user metadata. With UAE PASS's general-profile scope, that
