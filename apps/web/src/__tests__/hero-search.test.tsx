@@ -82,10 +82,7 @@ vi.mock('@/trpc/react', () => ({
   },
 }));
 
-import {
-  HeroSearch,
-  buildPropertySearchQuery,
-} from '@/components/landing/hero-search';
+import { HeroSearch, buildPropertySearchQuery } from '@/components/landing/hero-search';
 
 function renderHero() {
   push.mockClear();
