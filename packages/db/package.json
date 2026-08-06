@@ -15,6 +15,7 @@
     "typecheck": "tsc --noEmit",
     "generate": "drizzle-kit generate",
     "seed": "tsx src/scripts/seed.ts",
+    "seed:catalog": "tsx src/scripts/seed-catalog.ts",
     "test": "vitest run --passWithNoTests",
     "setup:demo": "tsx src/scripts/setup-demo.ts",
     "setup:uae-pass": "tsx src/scripts/setup-uae-pass.ts"
