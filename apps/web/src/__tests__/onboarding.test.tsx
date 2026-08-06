@@ -58,20 +58,46 @@ describe('ProfileSetupForm', () => {
     expect(completeSetupMutate).toHaveBeenCalledTimes(1);
   });
 
-  it('prefills provider details while still requiring MARKAZ consent', async () => {
+  it('shows provider details as a review instead of asking for the profile again', async () => {
     const user = userEvent.setup();
     renderWithIntl(
       <ProfileSetupForm
+        provider="uae-pass"
         initialName="UAE PASS Customer"
         email="customer@example.ae"
+        initialPhone="+971501234567"
         emailVerified
       />,
     );
-    expect(screen.getByLabelText(/Full name/i)).toHaveValue('UAE PASS Customer');
+    expect(screen.getByRole('heading', { name: 'Your details are ready' })).toBeInTheDocument();
+    expect(screen.queryByLabelText(/Full name/i)).not.toBeInTheDocument();
+    expect(screen.getByText('UAE PASS Customer')).toBeInTheDocument();
     expect(screen.getByText('customer@example.ae')).toBeInTheDocument();
-    expect(screen.getByText('Verified')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Save and continue' }));
+    expect(screen.getByText('+971501234567')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Agree and continue' }));
     expect(completeSetupMutate).not.toHaveBeenCalled();
+
+    await user.click(screen.getByLabelText(/Terms of Use/i));
+    await user.click(screen.getByLabelText(/Privacy Policy/i));
+    await user.click(screen.getByRole('button', { name: 'Agree and continue' }));
+    expect(completeSetupMutate).toHaveBeenCalledWith({
+      fullName: 'UAE PASS Customer',
+      acceptTerms: true,
+      acceptPrivacy: true,
+    });
+  });
+
+  it('asks for a name only when the provider did not supply one', () => {
+    renderWithIntl(
+      <ProfileSetupForm
+        provider="uae-pass"
+        email="customer@example.ae"
+        initialPhone="+971501234567"
+        emailVerified
+      />,
+    );
+    expect(screen.getByRole('heading', { name: 'Just one detail needed' })).toBeInTheDocument();
+    expect(screen.getByLabelText(/Full name/i)).toBeInTheDocument();
   });
 
   it('continues every completed profile directly to the dashboard', () => {

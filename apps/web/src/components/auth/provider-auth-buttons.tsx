@@ -1,11 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Button } from '@markaz/ui';
 import { createSupabaseBrowserClient } from '@markaz/auth/browser';
 
 type Provider = 'uae-pass' | 'google';
+
+const providerButtonClass =
+  'relative h-12 w-full justify-center overflow-hidden px-14 text-sm sm:text-base';
 
 export interface ProviderAuthButtonsProps {
   intent: 'sign-in' | 'sign-up';
@@ -62,11 +66,21 @@ export function ProviderAuthButtons({
         <Button
           type="button"
           variant="outline"
-          className="w-full"
+          className={`${providerButtonClass} border-white/30 bg-black text-white hover:bg-white/5 hover:text-white`}
           loading={loading === 'uae-pass'}
           disabled={loading !== null && loading !== 'uae-pass'}
           onClick={() => start('uae-pass')}
         >
+          {loading !== 'uae-pass' ? (
+            <Image
+              src="/auth-providers/uae-pass.svg"
+              alt=""
+              width={40}
+              height={40}
+              className="absolute start-1.5 h-9 w-9 shrink-0"
+              aria-hidden
+            />
+          ) : null}
           {loading === 'uae-pass' ? t('redirectingUaePass') : t('continueUaePass')}
         </Button>
       ) : null}
@@ -75,11 +89,21 @@ export function ProviderAuthButtons({
         <Button
           type="button"
           variant="outline"
-          className="w-full"
+          className={`${providerButtonClass} border-[#8e918f] bg-[#131314] text-[#e3e3e3] hover:bg-[#1f1f20] hover:text-white`}
           loading={loading === 'google'}
           disabled={loading !== null && loading !== 'google'}
           onClick={() => start('google')}
         >
+          {loading !== 'google' ? (
+            <Image
+              src="/auth-providers/google.svg"
+              alt=""
+              width={40}
+              height={40}
+              className="absolute start-1 h-10 w-10 shrink-0"
+              aria-hidden
+            />
+          ) : null}
           {loading === 'google' ? t('redirectingGoogle') : t('continueGoogle')}
         </Button>
       ) : null}

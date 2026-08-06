@@ -222,7 +222,20 @@
     "submitting": "جارٍ حفظ الملف الشخصي…",
     "reassurance": "نطلب فقط المعلومات اللازمة لإعداد حسابك في Markaz.",
     "verifiedEmail": "تم التحقق",
-    "emailProvided": "تم تقديمه"
+    "emailProvided": "تم تقديمه",
+    "providerReviewTitle": "تفاصيلك جاهزة",
+    "providerReviewDescription": "أضفنا تفاصيل الحساب التي شاركتها {provider}. وافق على شروط MARKAZ وسياسة الخصوصية للمتابعة.",
+    "providerMissingTitle": "نحتاج إلى تفصيل واحد فقط",
+    "providerMissingDescription": "لم تشارك {provider} اسمك الكامل. أضفه أدناه، ثم وافق على شروط MARKAZ وسياسة الخصوصية.",
+    "detailsFrom": "تفاصيل من {provider}",
+    "provided": "تم تقديمه",
+    "email": "البريد الإلكتروني",
+    "mobileNumber": "رقم الهاتف المحمول",
+    "uaePassProvider": "UAE PASS",
+    "googleProvider": "Google",
+    "providerSubmit": "الموافقة والمتابعة",
+    "providerSubmitting": "جارٍ المتابعة…",
+    "providerReassurance": "يمكنك تحديث تفاصيل الاتصال الاختيارية لاحقًا من الملف الشخصي."
   },
   "session": {
     "expiredTitle": "انتهت صلاحية جلستك",
@@ -336,7 +349,10 @@
     "latestOfferTitle": "أحدث عرض",
     "offerMadeBy": "قدّمت عرضًا بقيمة {amount}",
     "offerReceivedOn": "عرض مستلم — {amount}",
-    "recommendedTitle": "مقترحة لك",
+    "recommendedTitle": "اكتشف عقارات على MARKAZ",
+    "discoveryEmptyTitle": "عقارات MARKAZ جديدة قادمة قريبًا",
+    "discoveryEmptyBody": "ستظهر هنا إعلانات العملاء الموثّقة فور نشرها. يمكنك تصفّح السوق الحالي أو العودة قريبًا.",
+    "discoveryEmptyCta": "تصفّح إعلانات MARKAZ",
     "viewAll": "عرض الكل",
     "seeAll": "عرض الكل",
     "summariesPartialError": "تعذّر تحميل بعض النشاط. نعرض المتاح."

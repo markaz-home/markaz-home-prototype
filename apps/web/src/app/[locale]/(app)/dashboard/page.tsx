@@ -1,12 +1,12 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
-import { ArrowRight, Building2, Heart, Receipt, ArrowLeftRight } from 'lucide-react';
+import { ArrowRight, Building2, Compass, Heart, Receipt, ArrowLeftRight } from 'lucide-react';
 import { Alert, Button, Card, CardContent, cn } from '@markaz/ui';
 import { isThreadActionable, isTerminal } from '@markaz/domain';
 import { Link } from '@/i18n/navigation';
 import { getSession } from '@/server/session';
 import { getServerApi } from '@/server/api';
 import { formatAed } from '@/lib/format';
-import { isFreshDashboard } from '@/lib/dashboard-state';
+import { isFreshDashboard, selectDashboardRecommendations } from '@/lib/dashboard-state';
 import { PropertyCard } from '@/components/marketplace/property-card';
 import { OfferStatusBadge } from '@/components/offers/shared';
 import { AccountSetupPrompt } from '@/components/account-setup-prompt';
@@ -49,7 +49,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
       api.offers.getBuyerThreads(),
       api.offers.getSellerInbox(),
       api.transactions.listMine(),
-      api.marketplace.featured(),
+      api.marketplace.search({ sort: 'NEWEST', page: 1 }).then((result) => result.items),
       api.marketplace.saved.publicIds(),
       api.marketplace.myLivePublicIds(),
     ]);
@@ -61,7 +61,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
   const buyerThreads = settled(buyerR, [], failures);
   const sellerThreads = settled(sellerR, [], failures);
   const transactions = settled(txR, [], failures);
-  const featured = settled(featuredR, [], failures);
+  const discoveryListings = settled(featuredR, [], failures);
   const savedIds = new Set(settled(savedIdsR, [] as string[], failures));
   const ownedIds = new Set(settled(ownedIdsR, [] as string[], failures));
 
@@ -75,10 +75,9 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
       b.lastActivityAt.localeCompare(a.lastActivityAt),
     )[0] ?? null;
   const draft = listings.find((l) => l.state !== 'LIVE' && !l.ready) ?? null;
-  // Never recommend the customer their own listing (§20: you cannot offer on it).
-  const recommended = featured.filter(
-    (c): c is typeof c & { publicId: string } => !!c.publicId && !ownedIds.has(c.publicId),
-  );
+  // Pull from a full marketplace page before removing the customer's listings;
+  // otherwise three newest self-owned cards can incorrectly empty the row.
+  const recommended = selectDashboardRecommendations(discoveryListings, ownedIds);
 
   const isFresh = isFreshDashboard(
     {
@@ -284,6 +283,28 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
               />
             ))}
           </div>
+        </Section>
+      ) : !isFresh && !failures.any ? (
+        <Section title={t('recommendedTitle')}>
+          <Card className="border-primary/25 bg-gradient-to-br from-primary/10 via-card/60 to-card/30 overflow-hidden">
+            <CardContent className="flex flex-col gap-5 pt-6 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex max-w-2xl items-start gap-4">
+                <span className="border-primary/30 bg-primary/10 text-primary grid h-11 w-11 shrink-0 place-items-center rounded-full border">
+                  <Compass className="h-5 w-5" aria-hidden />
+                </span>
+                <div>
+                  <h3 className="font-display text-xl">{t('discoveryEmptyTitle')}</h3>
+                  <p className="text-muted-foreground mt-1 text-sm">{t('discoveryEmptyBody')}</p>
+                </div>
+              </div>
+              <Button asChild variant="outline" className="shrink-0 rounded-full">
+                <Link href="/properties">
+                  {t('discoveryEmptyCta')}
+                  <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
         </Section>
       ) : null}
     </div>

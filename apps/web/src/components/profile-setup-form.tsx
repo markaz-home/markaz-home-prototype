@@ -15,10 +15,14 @@ export function ProfileSetupForm({
   email,
   emailVerified = false,
   initialName = '',
+  initialPhone,
+  provider,
 }: {
   email?: string | null;
   emailVerified?: boolean;
   initialName?: string | null;
+  initialPhone?: string | null;
+  provider?: 'uae-pass' | 'google' | null;
 }) {
   const t = useTranslations('profile');
   const tv = useTranslations('validation');
@@ -47,6 +51,11 @@ export function ProfileSetupForm({
   });
 
   const fe = (c?: string) => (c ? tv(FIELD_ERROR_KEYS[c] ?? 'unexpectedError') : undefined);
+  const providerName = provider
+    ? t(provider === 'uae-pass' ? 'uaePassProvider' : 'googleProvider')
+    : null;
+  const hasProviderName = !!provider && !!initialName?.trim();
+  const providerReview = !!provider && hasProviderName;
   // Setup-status resume variant (spec §9.7): account details needs attention.
   const statuses: StepStatus[] = ['action', 'complete'];
 
@@ -54,13 +63,58 @@ export function ProfileSetupForm({
     <AuthShell narrow>
       <div className="space-y-6">
         <AuthHeading
-          title={t('title')}
-          description={t('descriptionOne')}
+          title={
+            providerReview ? t('providerReviewTitle') : provider ? t('providerMissingTitle') : t('title')
+          }
+          description={
+            providerReview
+              ? t('providerReviewDescription', { provider: providerName })
+              : provider
+                ? t('providerMissingDescription', { provider: providerName })
+                : t('descriptionOne')
+          }
           progress={<AuthProgress current={0} statuses={statuses} />}
         />
         {saveError ? <Alert variant="destructive">{saveError}</Alert> : null}
 
-        {email ? (
+        {provider ? (
+          <div className="bg-muted/30 overflow-hidden rounded-md border">
+            <div className="flex items-center justify-between gap-3 border-b px-4 py-3">
+              <p className="text-sm font-semibold">{t('detailsFrom', { provider: providerName })}</p>
+              <StatusBadge tone="success">{t('provided')}</StatusBadge>
+            </div>
+            <dl className="divide-y">
+              {hasProviderName ? (
+                <div className="grid gap-1 px-4 py-3 sm:grid-cols-[8rem_1fr] sm:items-center">
+                  <dt className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                    {ts('fullName')}
+                  </dt>
+                  <dd className="text-sm font-medium">{initialName}</dd>
+                </div>
+              ) : null}
+              {email ? (
+                <div className="grid gap-1 px-4 py-3 sm:grid-cols-[8rem_1fr] sm:items-center">
+                  <dt className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                    {t('email')}
+                  </dt>
+                  <dd className="text-sm font-medium" dir="ltr">
+                    {email}
+                  </dd>
+                </div>
+              ) : null}
+              {initialPhone ? (
+                <div className="grid gap-1 px-4 py-3 sm:grid-cols-[8rem_1fr] sm:items-center">
+                  <dt className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                    {t('mobileNumber')}
+                  </dt>
+                  <dd className="text-sm font-medium" dir="ltr">
+                    {initialPhone}
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+          </div>
+        ) : email ? (
           <div className="bg-muted/40 flex items-center justify-between rounded-md border px-3 py-2 text-sm">
             <span className="text-muted-foreground" dir="ltr">
               {email}
@@ -79,20 +133,24 @@ export function ProfileSetupForm({
           className="space-y-5"
           noValidate
         >
-          <FormField
-            id="fullName"
-            label={ts('fullName')}
-            error={fe(errors.fullName?.message)}
-            required
-          >
-            <Input
+          {hasProviderName ? (
+            <input type="hidden" {...register('fullName')} />
+          ) : (
+            <FormField
               id="fullName"
-              autoComplete="name"
-              placeholder={ts('fullNamePlaceholder')}
-              aria-invalid={!!errors.fullName}
-              {...register('fullName')}
-            />
-          </FormField>
+              label={ts('fullName')}
+              error={fe(errors.fullName?.message)}
+              required
+            >
+              <Input
+                id="fullName"
+                autoComplete="name"
+                placeholder={ts('fullNamePlaceholder')}
+                aria-invalid={!!errors.fullName}
+                {...register('fullName')}
+              />
+            </FormField>
+          )}
 
           <label className="flex items-start gap-3 text-sm">
             <input
@@ -124,9 +182,13 @@ export function ProfileSetupForm({
           ) : null}
 
           <Button type="submit" className="w-full" loading={mutation.isPending}>
-            {mutation.isPending ? t('submitting') : t('submit')}
+            {mutation.isPending
+              ? t(provider ? 'providerSubmitting' : 'submitting')
+              : t(provider ? 'providerSubmit' : 'submit')}
           </Button>
-          <p className="text-muted-foreground text-center text-xs">{t('reassurance')}</p>
+          <p className="text-muted-foreground text-center text-xs">
+            {t(provider ? 'providerReassurance' : 'reassurance')}
+          </p>
         </form>
       </div>
     </AuthShell>

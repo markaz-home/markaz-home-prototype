@@ -107,15 +107,13 @@ content_path = "./supabase/templates/magic_link.html"
 subject = "Confirm your new MARKAZ Home email"
 content_path = "./supabase/templates/email_change.html"
 
-# Google is configured per environment after a Google OAuth web client exists.
-# To test locally, add the following active block and provide the secret in the
-# shell before restarting Supabase. It stays commented so the default stack does
-# not require third-party credentials:
-# [auth.external.google]
-# enabled = true
-# client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
-# secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
-# skip_nonce_check = false
+# Google credentials are injected from the local shell/hosted Auth provider
+# configuration and are never committed to this repository.
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
+skip_nonce_check = false
 
 # We never send SMS in this prototype.
 [auth.sms]
