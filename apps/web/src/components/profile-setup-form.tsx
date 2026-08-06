@@ -64,7 +64,11 @@ export function ProfileSetupForm({
       <div className="space-y-6">
         <AuthHeading
           title={
-            providerReview ? t('providerReviewTitle') : provider ? t('providerMissingTitle') : t('title')
+            providerReview
+              ? t('providerReviewTitle')
+              : provider
+                ? t('providerMissingTitle')
+                : t('title')
           }
           description={
             providerReview
@@ -80,7 +84,9 @@ export function ProfileSetupForm({
         {provider ? (
           <div className="bg-muted/30 overflow-hidden rounded-md border">
             <div className="flex items-center justify-between gap-3 border-b px-4 py-3">
-              <p className="text-sm font-semibold">{t('detailsFrom', { provider: providerName })}</p>
+              <p className="text-sm font-semibold">
+                {t('detailsFrom', { provider: providerName })}
+              </p>
               <StatusBadge tone="success">{t('provided')}</StatusBadge>
             </div>
             <dl className="divide-y">

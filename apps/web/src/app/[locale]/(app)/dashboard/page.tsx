@@ -286,7 +286,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
         </Section>
       ) : !isFresh && !failures.any ? (
         <Section title={t('recommendedTitle')}>
-          <Card className="border-primary/25 bg-gradient-to-br from-primary/10 via-card/60 to-card/30 overflow-hidden">
+          <Card className="border-primary/25 from-primary/10 via-card/60 to-card/30 overflow-hidden bg-gradient-to-br">
             <CardContent className="flex flex-col gap-5 pt-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex max-w-2xl items-start gap-4">
                 <span className="border-primary/30 bg-primary/10 text-primary grid h-11 w-11 shrink-0 place-items-center rounded-full border">

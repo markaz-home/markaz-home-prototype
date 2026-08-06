@@ -12,11 +12,7 @@ export default async function SignInPage({ params }: { params: Promise<{ locale:
   const googleEnabled = await isGoogleAuthEnabled();
   return (
     <Suspense>
-      <SignInForm
-        uaePassStaging={uaePassStaging}
-        googleEnabled={googleEnabled}
-        locale={locale}
-      />
+      <SignInForm uaePassStaging={uaePassStaging} googleEnabled={googleEnabled} locale={locale} />
     </Suspense>
   );
 }
