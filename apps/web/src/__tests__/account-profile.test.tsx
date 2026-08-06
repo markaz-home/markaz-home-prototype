@@ -44,6 +44,8 @@ const baseProps = {
   phoneVerified: false,
   locale: 'en',
   emailVerified: true,
+  emailPasswordLinked: true,
+  googleLinked: false,
   uaePassLinked: false,
   uaePassSyncPending: false,
   uaePassStaging: true,
@@ -73,6 +75,14 @@ describe('AccountProfile', () => {
     expect(
       screen.queryByText('Your identities stay attached to one account'),
     ).not.toBeInTheDocument();
+  });
+
+  it('shows the provider identity without claiming a password exists', () => {
+    renderWithIntl(<AccountProfile {...baseProps} emailPasswordLinked={false} googleLinked />);
+
+    expect(screen.queryByText('Email and password')).not.toBeInTheDocument();
+    expect(screen.getByText('Google')).toBeInTheDocument();
+    expect(screen.getByText('Linked')).toBeInTheDocument();
   });
 
   it('edits and normalizes optional mobile contact details', async () => {

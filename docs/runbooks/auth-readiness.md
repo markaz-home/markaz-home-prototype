@@ -62,11 +62,15 @@ by SQL and never seed shared customer accounts.
 
 ## UAE PASS
 
-UAE PASS is optional and must first be linked from the authenticated Profile page.
+UAE PASS is optional and can create a CUSTOMER or be linked from an authenticated Profile.
 `UAE_PASS_MODE=simulated` is the safe default. Staging requires issued client credentials, the UAE
-PASS staging app/test account, registered callbacks, manual identity linking, the Before User Created
-hook, and an explicit `UAE_PASS_ALLOW_REMOTE_SETUP=true` only during approved setup. Production UAE
-PASS endpoints and credentials are not implemented or approved.
+PASS staging app/test account, registered callbacks, manual identity linking for existing accounts,
+and an explicit `UAE_PASS_ALLOW_REMOTE_SETUP=true` only during approved setup. Production UAE PASS
+endpoints and credentials are not implemented or approved.
+
+Google remains hidden until the matching Google OAuth client and Supabase Auth provider are
+configured; the application discovers the enabled provider automatically. See
+`docs/integrations/google-auth.md`.
 
 ## Production blockers
 

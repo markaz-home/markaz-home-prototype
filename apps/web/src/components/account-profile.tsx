@@ -31,6 +31,8 @@ interface AccountProfileProps {
   phoneVerified: boolean;
   locale: string;
   emailVerified: boolean;
+  emailPasswordLinked: boolean;
+  googleLinked: boolean;
   uaePassLinked: boolean;
   uaePassSyncPending: boolean;
   uaePassStaging: boolean;
@@ -44,6 +46,8 @@ export function AccountProfile({
   phoneVerified,
   locale,
   emailVerified,
+  emailPasswordLinked,
+  googleLinked,
   uaePassLinked,
   uaePassSyncPending,
   uaePassStaging,
@@ -255,13 +259,25 @@ export function AccountProfile({
             </div>
           </CardHeader>
           <CardContent className="divide-border/70 divide-y p-0">
-            <SignInMethod
-              icon={<Mail className="h-5 w-5" aria-hidden />}
-              title={t('emailMethodTitle')}
-              description={email ?? t('emailMethodDescription')}
-              status={emailVerified ? t('verified') : t('verificationRequired')}
-              statusTone={emailVerified ? 'success' : 'warning'}
-            />
+            {emailPasswordLinked ? (
+              <SignInMethod
+                icon={<Mail className="h-5 w-5" aria-hidden />}
+                title={t('emailMethodTitle')}
+                description={email ?? t('emailMethodDescription')}
+                status={emailVerified ? t('verified') : t('verificationRequired')}
+                statusTone={emailVerified ? 'success' : 'warning'}
+              />
+            ) : null}
+
+            {googleLinked ? (
+              <SignInMethod
+                icon={<UserRound className="h-5 w-5" aria-hidden />}
+                title={t('googleMethodTitle')}
+                description={email ?? t('googleMethodDescription')}
+                status={t('linked')}
+                statusTone="success"
+              />
+            ) : null}
 
             <div className="space-y-4 p-5 sm:p-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start">

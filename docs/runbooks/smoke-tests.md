@@ -20,10 +20,12 @@ production without approval.
 - [ ] Landing page, signup, login, marketplace, and a property detail load in English and Arabic.
 - [ ] Signup → email code → welcome → dashboard works; incomplete profile metadata uses the profile
       fallback before the dashboard.
-- [ ] Profile links UAE PASS to the existing verified account; that identity subsequently signs in to
-      the same dashboard without appearing in the signup journey.
-- [ ] An unknown UAE PASS sign-in creates no Auth/profile row and returns safe email sign-in → Profile
-      linking guidance.
+- [ ] A new UAE PASS identity creates exactly one CUSTOMER/Auth profile and opens prefilled Profile Setup.
+- [ ] Provider onboarding records MARKAZ Terms/Privacy once and reaches Dashboard.
+- [ ] Returning with the same UAE PASS identity resolves the same Auth/profile ID.
+- [ ] An existing password customer can link UAE PASS and still resolves the same Auth/profile ID.
+- [ ] Google signup/sign-in resolves one CUSTOMER when that environment enables Google.
+- [ ] A provider identity collision shows safe copy and creates no duplicate profile.
 - [ ] Recovery link → reset → forced fresh sign-in works.
 - [ ] Anonymous/private route guards redirect safely.
 - [ ] Customer can create a listing, upload an approved fictional document/photo, and reach readiness.

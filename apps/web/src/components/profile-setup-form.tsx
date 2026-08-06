@@ -11,7 +11,15 @@ import { AuthShell, AuthHeading } from '@/components/auth/auth-shell';
 import { AuthProgress, type StepStatus } from '@/components/auth/auth-progress';
 import { FIELD_ERROR_KEYS } from '@/components/auth/error-keys';
 
-export function ProfileSetupForm({ email }: { email?: string | null }) {
+export function ProfileSetupForm({
+  email,
+  emailVerified = false,
+  initialName = '',
+}: {
+  email?: string | null;
+  emailVerified?: boolean;
+  initialName?: string | null;
+}) {
   const t = useTranslations('profile');
   const tv = useTranslations('validation');
   const ts = useTranslations('signup');
@@ -24,7 +32,11 @@ export function ProfileSetupForm({ email }: { email?: string | null }) {
     formState: { errors },
   } = useForm<ProfileSetupInput>({
     resolver: zodResolver(profileSetupSchema),
-    defaultValues: { fullName: '', acceptTerms: false as never, acceptPrivacy: false as never },
+    defaultValues: {
+      fullName: initialName ?? '',
+      acceptTerms: false as never,
+      acceptPrivacy: false as never,
+    },
   });
 
   const mutation = trpc.profile.completeSetup.useMutation({
@@ -53,7 +65,9 @@ export function ProfileSetupForm({ email }: { email?: string | null }) {
             <span className="text-muted-foreground" dir="ltr">
               {email}
             </span>
-            <StatusBadge tone="success">{t('verifiedEmail')}</StatusBadge>
+            <StatusBadge tone={emailVerified ? 'success' : 'neutral'}>
+              {emailVerified ? t('verifiedEmail') : t('emailProvided')}
+            </StatusBadge>
           </div>
         ) : null}
 

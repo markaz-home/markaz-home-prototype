@@ -174,6 +174,16 @@
     "verifyBody": "Your account setup is not complete. Enter the verification code sent to your email.",
     "resuming": "Resuming your account setup…"
   },
+  "providerAuth": {
+    "continueUaePass": "Continue with UAE PASS Staging",
+    "continueGoogle": "Continue with Google",
+    "redirectingUaePass": "Redirecting to UAE PASS…",
+    "redirectingGoogle": "Redirecting to Google…",
+    "or": "or",
+    "error": "We could not continue with that sign-in method. Try again or use email and password.",
+    "cancelled": "Provider sign-in was cancelled. You can try again or use email and password.",
+    "conflict": "That sign-in identity is already connected to another account. Sign in to your existing account or contact Markaz support."
+  },
   "forgot": {
     "title": "Reset your password",
     "description": "Enter the email address for your Markaz account.",
@@ -208,7 +218,8 @@
     "submit": "Save and continue",
     "submitting": "Saving profile…",
     "reassurance": "We only ask for information needed to set up your Markaz account.",
-    "verifiedEmail": "Verified"
+    "verifiedEmail": "Verified",
+    "emailProvided": "Provided"
   },
   "session": {
     "expiredTitle": "Your session has expired",
@@ -422,6 +433,8 @@
     "methodsDescription": "Manage how you sign in to MARKAZ.",
     "emailMethodTitle": "Email and password",
     "emailMethodDescription": "Your verified MARKAZ email account.",
+    "googleMethodTitle": "Google",
+    "googleMethodDescription": "Your linked Google account.",
     "verified": "Verified",
     "verificationRequired": "Verification required",
     "uaePassMethodTitle": "UAE PASS Staging",

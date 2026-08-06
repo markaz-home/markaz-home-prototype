@@ -92,6 +92,22 @@ describe('profile completeness + post-auth routing', () => {
       'profile-setup',
     );
   });
+  it('routes a provider-authenticated user to profile setup without a password-email gate', () => {
+    expect(
+      resolvePostAuthDestination({
+        emailVerified: false,
+        providerAuthenticated: true,
+        profile: null,
+      }),
+    ).toBe('profile-setup');
+    expect(
+      resolvePostAuthDestination({
+        emailVerified: false,
+        providerAuthenticated: true,
+        profile: { ...complete, identityVerificationStatus: 'VERIFIED_STAGING' },
+      }),
+    ).toBe('dashboard');
+  });
   it('routes a verified incomplete profile to profile setup', () => {
     expect(
       resolvePostAuthDestination({

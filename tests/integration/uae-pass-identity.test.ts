@@ -49,7 +49,7 @@ d('UAE PASS Staging identity synchronization', () => {
       log: logger,
     } as Context);
 
-  it('allows email signup but rejects standalone UAE PASS user creation', async () => {
+  it('allows both email and first-time UAE PASS account creation', async () => {
     const [emailResult] = await asService(
       (tx) =>
         tx`select public.hook_prevent_unlinked_uae_pass_signup(
@@ -64,11 +64,7 @@ d('UAE PASS Staging identity synchronization', () => {
     );
 
     expect((emailResult as { result: Record<string, unknown> }).result).toEqual({});
-    expect(
-      (uaePassResult as { result: { error: { http_code: number; message: string } } }).result,
-    ).toEqual({
-      error: { http_code: 403, message: 'MARKAZ_UAE_PASS_NOT_LINKED' },
-    });
+    expect((uaePassResult as { result: Record<string, unknown> }).result).toEqual({});
   });
 
   it('exposes the signup hook only to Supabase Auth', async () => {
@@ -136,7 +132,14 @@ d('UAE PASS Staging identity synchronization', () => {
              (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
            values
              (${`uae-pass-${userId}`}, ${userId},
-              ${tx.json({ sub: `uae-pass-${userId}`, email })},
+              ${tx.json({
+                sub: `uae-pass-${userId}`,
+                uuid: userId,
+                email,
+                fullnameEN: 'Provider Name Must Not Overwrite',
+                mobile: '971501234567',
+                idn: '784000000000000',
+              })},
               'custom:uae-pass', now(), now(), now())`,
     );
 
@@ -147,6 +150,9 @@ d('UAE PASS Staging identity synchronization', () => {
     expect(first.identityVerificationStatus).toBe('VERIFIED_STAGING');
     expect(second.identityVerificationStatus).toBe('VERIFIED_STAGING');
     expect(first.onboardingCompletedAt).not.toBeNull();
+    expect(first.fullName).toBe('Integration uae_pass_link');
+    expect(first.phoneE164).toBe('+971501234567');
+    expect(first.phoneVerificationSource).toBe('UAE_PASS');
 
     const auditRows = await asService(
       (tx) =>

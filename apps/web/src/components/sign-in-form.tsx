@@ -10,14 +10,17 @@ import { createSupabaseBrowserClient } from '@markaz/auth/browser';
 import { Link, useRouter } from '@/i18n/navigation';
 import { AuthShell, AuthHeading } from '@/components/auth/auth-shell';
 import { PasswordField } from '@/components/auth/password-field';
+import { ProviderAuthButtons } from '@/components/auth/provider-auth-buttons';
 import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
 import { resolvePostSignInDestination } from '@/lib/auth-redirect';
 
 export function SignInForm({
   uaePassStaging = false,
+  googleEnabled = false,
   locale = 'en',
 }: {
   uaePassStaging?: boolean;
+  googleEnabled?: boolean;
   locale?: string;
 }) {
   const t = useTranslations('signin');
@@ -25,48 +28,22 @@ export function SignInForm({
   const ta = useTranslations('auth');
   const ts = useTranslations('session');
   const tf = useTranslations('signup');
-  const tu = useTranslations('uaePass');
+  const tp = useTranslations('providerAuth');
   const router = useRouter();
   const params = useSearchParams();
   const [supabase] = useState(() => createSupabaseBrowserClient());
   const [formError, setFormError] = useState<string | null>(null);
-  const [uaeLoading, setUaeLoading] = useState(false);
   const sessionExpired = params.get('notice') === 'session-expired';
-  // Error redirected here by /auth/callback (provider failure or cancellation).
+  // Safe marker redirected here by /auth/callback. Provider details are never reflected.
   const callbackError = params.get('error');
-  const uaePassNotLinked = callbackError === 'uae_pass_not_linked';
-  const uaePassError =
-    callbackError === 'uae_pass_cancelled'
-      ? tu('cancelled')
-      : callbackError === 'uae_pass'
-        ? tu('error')
-        : null;
-
-  // UAE PASS Staging (POC): a REAL staging OAuth login via the Supabase custom OAuth
-  // provider `custom:uae-pass`. Supabase handles the exchange + session; on return
-  // /auth/callback exchanges the code. Never available in simulated mode.
-  async function onUaePass() {
-    setFormError(null);
-    setUaeLoading(true);
-    const postSignInDestination = resolvePostSignInDestination(params.get('next'));
-    const callbackParams = new URLSearchParams({ locale });
-    if (postSignInDestination !== '/dashboard') {
-      callbackParams.set('next', postSignInDestination);
-    }
-    const { error } = await supabase.auth.signInWithOAuth({
-      // supabase-js 2.47's Provider union predates custom providers; the identifier
-      // is the public `custom:<name>` slug, not a secret.
-      provider: 'custom:uae-pass' as 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?${callbackParams.toString()}`,
-      },
-    });
-    if (error) {
-      setFormError(tu('error'));
-      setUaeLoading(false);
-    }
-    // On success the browser is redirected to UAE PASS by Supabase.
-  }
+  const providerError =
+    callbackError === 'provider_cancelled'
+      ? tp('cancelled')
+      : callbackError === 'provider_conflict'
+        ? tp('conflict')
+        : callbackError === 'provider_error'
+          ? tp('error')
+          : null;
 
   const {
     register,
@@ -109,13 +86,17 @@ export function SignInForm({
           </Alert>
         ) : null}
         <AuthHeading title={t('title')} description={t('description')} />
-        {uaePassNotLinked ? (
-          <Alert variant="warning" title={tu('notLinkedTitle')}>
-            {tu('notLinkedBody')}
-          </Alert>
-        ) : null}
-        {uaePassError ? <Alert variant="destructive">{uaePassError}</Alert> : null}
+        {providerError ? <Alert variant="destructive">{providerError}</Alert> : null}
         {formError ? <Alert variant="destructive">{formError}</Alert> : null}
+
+        <ProviderAuthButtons
+          intent="sign-in"
+          locale={locale}
+          googleEnabled={googleEnabled}
+          uaePassEnabled={uaePassStaging}
+          next={resolvePostSignInDestination(params.get('next'))}
+          onError={(message) => setFormError(message || null)}
+        />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
           <FormField id="email" label={tf('email')} error={fe(errors.email?.message)} required>
@@ -166,25 +147,6 @@ export function SignInForm({
             </Link>
           </p>
         </form>
-
-        {uaePassStaging ? (
-          <div className="space-y-3">
-            <div className="flex items-center gap-3" aria-hidden>
-              <span className="bg-border h-px flex-1" />
-              <span className="text-muted-foreground text-xs uppercase">{tu('or')}</span>
-              <span className="bg-border h-px flex-1" />
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              loading={uaeLoading}
-              onClick={onUaePass}
-            >
-              {uaeLoading ? tu('starting') : tu('button')}
-            </Button>
-          </div>
-        ) : null}
       </div>
     </AuthShell>
   );

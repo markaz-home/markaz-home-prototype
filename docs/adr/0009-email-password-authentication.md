@@ -73,8 +73,9 @@ supabase.auth.signUp({
 The user is routed to `/[locale]/verify-email`, where they enter the 6-digit
 code from the **`confirmation`** email template and the app calls
 `verifyOtp({ type: 'signup' })`. On success the customer sees the Welcome state
-and continues directly to the dashboard. UAE PASS is an optional sign-in method,
-not an onboarding requirement (ADR-0030).
+and continues directly to the dashboard. UAE PASS and Google are alternative,
+optional account-creation/sign-in methods; neither is an onboarding requirement
+(ADR-0030 / ADR-0033).
 
 `enable_confirmations = true` in `supabase/config.toml`; the `confirmation.html`
 template carries the 6-digit `{{ .Token }}`. Confirmation is intentionally **not**

@@ -12,6 +12,8 @@ export const POST_AUTH_PATHS: Record<PostAuthDestination, string> = {
 export interface PostAuthState {
   /** Whether the Supabase Auth email is confirmed (user.email_confirmed_at). */
   emailVerified: boolean;
+  /** A successful trusted OAuth authentication can start onboarding without a password email. */
+  providerAuthenticated?: boolean;
   profile: Pick<
     Profile,
     'fullName' | 'termsAcceptedAt' | 'privacyAcceptedAt' | 'identityVerificationStatus'
@@ -22,15 +24,15 @@ export interface PostAuthState {
  * Decide where an authenticated user should land. Centralised + fully tested.
  *
  *   email/password email not verified → verify-email
- *   verified, profile incomplete → profile-setup (fallback; normal path fills it at sign-up)
- *   verified, profile complete → dashboard
+ *   provider-authenticated or email-verified, profile incomplete → profile-setup
+ *   provider-authenticated or email-verified, profile complete → dashboard
  *
- * UAE PASS remains an optional sign-in provider, not a post-sign-up onboarding
- * requirement. It can only be linked to an existing email-verified account, so
- * every customer session follows the same email-verification boundary.
+ * UAE PASS and Google are optional account-creation/sign-in methods. Their
+ * provider authentication replaces the password-email gate, but never replaces
+ * MARKAZ profile completion or Terms/Privacy consent.
  */
 export function resolvePostAuthDestination(state: PostAuthState): PostAuthDestination {
-  if (!state.emailVerified) return 'verify-email';
+  if (!state.emailVerified && !state.providerAuthenticated) return 'verify-email';
   if (!state.profile || !isProfileComplete(state.profile)) return 'profile-setup';
   return 'dashboard';
 }

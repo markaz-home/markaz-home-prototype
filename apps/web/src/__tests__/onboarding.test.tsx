@@ -58,6 +58,22 @@ describe('ProfileSetupForm', () => {
     expect(completeSetupMutate).toHaveBeenCalledTimes(1);
   });
 
+  it('prefills provider details while still requiring MARKAZ consent', async () => {
+    const user = userEvent.setup();
+    renderWithIntl(
+      <ProfileSetupForm
+        initialName="UAE PASS Customer"
+        email="customer@example.ae"
+        emailVerified
+      />,
+    );
+    expect(screen.getByLabelText(/Full name/i)).toHaveValue('UAE PASS Customer');
+    expect(screen.getByText('customer@example.ae')).toBeInTheDocument();
+    expect(screen.getByText('Verified')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Save and continue' }));
+    expect(completeSetupMutate).not.toHaveBeenCalled();
+  });
+
   it('continues every completed profile directly to the dashboard', () => {
     renderWithIntl(<ProfileSetupForm />);
     completeSetupOnSuccess?.();

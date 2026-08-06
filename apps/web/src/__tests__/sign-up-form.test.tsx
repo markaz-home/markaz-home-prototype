@@ -4,10 +4,11 @@ import userEvent from '@testing-library/user-event';
 import { renderWithIntl } from './test-utils';
 
 const signUp = vi.fn();
+const signInWithOAuth = vi.fn();
 const push = vi.fn();
 
 vi.mock('@markaz/auth/browser', () => ({
-  createSupabaseBrowserClient: () => ({ auth: { signUp } }),
+  createSupabaseBrowserClient: () => ({ auth: { signUp, signInWithOAuth } }),
 }));
 vi.mock('@/i18n/navigation', () => ({
   useRouter: () => ({ push, replace: vi.fn(), refresh: vi.fn() }),
@@ -29,6 +30,7 @@ beforeEach(() => {
   signUp
     .mockReset()
     .mockResolvedValue({ data: { user: { identities: [{ id: 'x' }] } }, error: null });
+  signInWithOAuth.mockReset().mockResolvedValue({ error: null });
   push.mockReset();
 });
 
@@ -50,6 +52,30 @@ describe('SignUpForm', () => {
     await user.click(screen.getByRole('checkbox', { name: /Terms & Conditions.*Privacy Policy/i }));
     await user.click(screen.getByRole('button', { name: 'Create account' }));
     await waitFor(() => expect(signUp).not.toHaveBeenCalled());
+  });
+
+  it('offers UAE PASS and Google as first-time account creation methods when enabled', () => {
+    renderWithIntl(<SignUpForm uaePassEnabled googleEnabled locale="en" />);
+    expect(screen.getByRole('button', { name: /Continue with UAE PASS Staging/i })).toBeVisible();
+    expect(screen.getByRole('button', { name: /Continue with Google/i })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Create account' })).toBeVisible();
+  });
+
+  it.each([
+    ['UAE PASS Staging', 'custom:uae-pass', 'uae-pass'],
+    ['Google', 'google', 'google'],
+  ])('starts %s signup through the shared OAuth callback', async (label, provider, marker) => {
+    const user = userEvent.setup();
+    renderWithIntl(<SignUpForm uaePassEnabled googleEnabled locale="ar" />);
+    await user.click(
+      screen.getByRole('button', { name: new RegExp(`Continue with ${label}`, 'i') }),
+    );
+    await waitFor(() => expect(signInWithOAuth).toHaveBeenCalledTimes(1));
+    const request = signInWithOAuth.mock.calls[0]![0];
+    expect(request.provider).toBe(provider);
+    expect(request.options.redirectTo).toContain('intent=sign-up');
+    expect(request.options.redirectTo).toContain('locale=ar');
+    expect(request.options.redirectTo).toContain(`provider=${marker}`);
   });
 
   it('rejects a password mismatch', async () => {

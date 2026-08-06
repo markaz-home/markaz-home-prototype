@@ -4,10 +4,10 @@
 > production identity verification, **not** "government verified", and **does not
 > verify property ownership**. UAE PASS confirms identity only.
 
-UAE PASS is an **optional linked sign-in method**. A customer first creates and verifies
-the normal email/password account, then links UAE PASS from **Profile → Sign-in methods**.
-After that, UAE PASS is offered alongside email/password on Sign In. It is not a required
-signup step and does not replace Supabase authentication.
+UAE PASS is an optional **account-creation and sign-in method**. A new customer may start
+with UAE PASS, review the approved profile details MARKAZ received, and accept MARKAZ
+Terms/Privacy. Existing email/password customers may still link UAE PASS from
+**Profile → Sign-in methods**. UAE PASS is never a mandatory onboarding checkpoint.
 
 ## How it works (architecture)
 
@@ -18,27 +18,25 @@ email/password. We do **not** hand-roll a session, mint custom JWTs, or use the
 service-role key during login.
 
 ```
-Authenticated Profile → "Link UAE PASS Staging"
-  → supabase.auth.linkIdentity({ provider: 'custom:uae-pass', redirectTo: /auth/callback?flow=link })
+Sign Up or Sign In → "Continue with UAE PASS Staging"
+  → supabase.auth.signInWithOAuth({ provider: 'custom:uae-pass' })
   → GoTrue /authorize?provider=custom:uae-pass  →  UAE PASS staging login
   → GoTrue /auth/v1/callback (token + userinfo, account resolution by `sub`)
   → app /auth/callback?code=…  → exchangeCodeForSession → standard Supabase session
-  → Profile renders the completed Auth link immediately
-  → sync_uae_pass_staging_identity verifies auth.identities and records the
-    profile/audit result on an idempotent, lock-bounded retry path
-  → Profile displays the linked sign-in method
+  → known subject: same Supabase user/session
+  → new subject: one auth.users row + one CUSTOMER profile
+  → sync_uae_pass_staging_identity verifies auth.identities, fills only missing
+    approved profile fields, and records the audit result
+  → incomplete profile/consent → Profile Setup; complete profile → Dashboard
 
-Later Sign In → "Continue with UAE PASS Staging"
-  → known subject: the same Supabase user/session → dashboard
-  → unknown subject: Before User Created hook rejects account creation
-  → email Sign In → Profile → Link UAE PASS
+Existing authenticated Profile → "Link UAE PASS Staging"
+  → supabase.auth.linkIdentity({ provider: 'custom:uae-pass', redirectTo: /auth/callback?flow=link })
+  → the same auth.users/profile row gains the provider identity
 ```
 
-- **First-time linking** requires an authenticated, email-verified customer and explicit
-  user action. Manual linking is enabled only for that purpose.
-- **Repeat** sign-ins with the linked UAE PASS subject (`sub`) resolve to the same account.
-- **Unknown** subjects cannot create standalone/email-less users. The configured Before
-  User Created hook returns a safe, non-enumerating rejection before insertion.
+- **New** subjects create a CUSTOMER and must complete MARKAZ profile consent.
+- **Repeat** sign-ins with the same UAE PASS subject (`sub`) resolve to the same account.
+- **Existing-account linking** remains an explicit authenticated action.
 - Email/password customers verify the six-digit email code and continue directly
   to the dashboard. UAE PASS is not repeated as an onboarding step (ADR-0030).
 
@@ -144,22 +142,19 @@ UAE PASS.
 
 ### Expected cancellation / failure flows
 
-- **Cancel** at UAE PASS → `/[locale]/sign-in?error=uae_pass_cancelled` with a safe,
+- **Cancel** at UAE PASS → `/[locale]/sign-in?error=provider_cancelled` with a safe,
   recoverable message; email/password still available.
-- **Token/UserInfo/exchange failure** → `/[locale]/sign-in?error=uae_pass` (generic,
+- **Token/UserInfo/exchange failure** → `/[locale]/sign-in?error=provider_error` (generic,
   safe). The authorization code is never reflected back into any URL.
-- **Unknown identity at Sign In** → the Auth hook creates no user and returns a safe
-  instruction to sign in with email, then link from Profile.
 - **Identity already linked elsewhere** → Profile shows safe support guidance; no account
   or identity is moved automatically.
 
 ## What is stored
 
-The email/password signup creates the existing `auth.users` and `public.profiles` rows.
-Explicit linking adds a `custom:uae-pass` `auth.identities` row to that same Auth user.
-An optional mobile entered directly by the customer on the MARKAZ Profile is stored separately as
-contact data; it is never used to match or link the UAE PASS identity (ADR-0032).
-For OAuth identities,
+First-time UAE PASS authentication creates one `auth.users`, one `public.profiles`, and one
+`custom:uae-pass` `auth.identities` row. MARKAZ projects only missing full name, email, and
+mobile into the application profile; mobile is normalized and records UAE PASS verification
+provenance. It is never used to match or link the identity (ADR-0032 / ADR-0033). For OAuth identities,
 Supabase stores provider identity metadata in `auth.identities.identity_data` and may
 also copy it into Auth user metadata. With UAE PASS's general-profile scope, that
 metadata can include names, mobile, nationality, and Emirates ID for some account
@@ -167,7 +162,7 @@ types. It is protected inside the Auth schema, but it is still persisted data.
 
 ## What is deliberately **NOT** stored
 
-MARKAZ application tables do not copy UAE PASS profile attributes, provider access
+MARKAZ application tables do not copy Emirates ID, nationality, gender, provider access
 tokens, provider refresh tokens, or authorization codes, and application code does not
 log them. Supabase does not persist provider tokens in the project database, but normal
 Supabase session access/refresh tokens are necessarily stored in SSR cookies to keep the
@@ -199,13 +194,12 @@ contract or a reviewed UserInfo-minimizing adapter before onboarding.
 ## Account-linking boundary
 
 - Repeat UAE PASS sign-ins resolve by provider **subject**, not by an app-supplied email.
-- The public UAE PASS response does not advertise `email_verified`, so MARKAZ never relies
-  on provider email for automatic merging.
+- The public UAE PASS response does not advertise `email_verified`; application code never
+  performs an email/phone merge. Supabase Auth remains responsible for its own provider
+  identity-resolution rules.
 - `auth.linkIdentity()` is available only to an already authenticated customer. The
   database sync independently verifies `auth.uid()` and `auth.identities`.
-- The Before User Created hook blocks the standalone OAuth CreateAccount path. It does not
-  run when GoTrue is linking to an authenticated target user or signing in an existing
-  linked subject.
+- Provider identity conflicts fail safely; MARKAZ never moves an identity between users.
 
 ## UAE PASS does not prove property ownership
 

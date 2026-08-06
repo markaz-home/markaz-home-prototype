@@ -57,16 +57,9 @@ enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
 enable_signup = true
 enable_anonymous_sign_ins = false
-# UAE PASS may only be linked by an already authenticated, email-verified customer.
+# Existing customers may explicitly link additional OAuth identities.
 # The hosted project must mirror this setting in Authentication > Settings.
 enable_manual_linking = true
-
-# Keep UAE PASS login-only: an unknown provider subject must not create a second,
-# email-less Auth user. Existing linked identities bypass user creation and are
-# therefore unaffected by this hook.
-[auth.hook.before_user_created]
-enabled = true
-uri = "pg-functions://postgres/public/hook_prevent_unlinked_uae_pass_signup"
 
 # End customer and Admin sessions after 30 minutes without a token refresh.
 # Hosted Supabase projects must mirror this Auth Sessions setting separately.
@@ -113,6 +106,16 @@ content_path = "./supabase/templates/magic_link.html"
 [auth.email.template.email_change]
 subject = "Confirm your new MARKAZ Home email"
 content_path = "./supabase/templates/email_change.html"
+
+# Google is configured per environment after a Google OAuth web client exists.
+# To test locally, add the following active block and provide the secret in the
+# shell before restarting Supabase. It stays commented so the default stack does
+# not require third-party credentials:
+# [auth.external.google]
+# enabled = true
+# client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+# secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
+# skip_nonce_check = false
 
 # We never send SMS in this prototype.
 [auth.sms]

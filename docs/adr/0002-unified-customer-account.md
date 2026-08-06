@@ -31,8 +31,9 @@ policies, not by app-level journey guards.
 
 ## Consequences
 
-- Simpler onboarding: landing → email → OTP → profile setup when needed → dashboard, with no role
-  fork. UAE PASS is an optional sign-in provider, not a required onboarding step (ADR-0030).
+- Simpler onboarding: email/password + OTP or an enabled provider → profile setup when needed →
+  dashboard, with no role fork. UAE PASS and Google are optional authentication providers, not
+  required onboarding steps (ADR-0030 / ADR-0033).
 - Simpler authorization surface: ownership-based RLS replaces a matrix of
   per-role/per-journey guards.
 - The same dashboard serves both selling and buying activity for a customer.

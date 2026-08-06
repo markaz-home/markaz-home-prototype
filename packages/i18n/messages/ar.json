@@ -177,6 +177,16 @@
     "verifyBody": "لم يكتمل إعداد حسابك. أدخل رمز التحقق المُرسَل إلى بريدك الإلكتروني.",
     "resuming": "جارٍ استئناف إعداد حسابك…"
   },
+  "providerAuth": {
+    "continueUaePass": "المتابعة باستخدام UAE PASS التجريبي",
+    "continueGoogle": "المتابعة باستخدام Google",
+    "redirectingUaePass": "جارٍ التحويل إلى UAE PASS…",
+    "redirectingGoogle": "جارٍ التحويل إلى Google…",
+    "or": "أو",
+    "error": "تعذّرت المتابعة باستخدام طريقة تسجيل الدخول هذه. حاول مجددًا أو استخدم البريد الإلكتروني وكلمة المرور.",
+    "cancelled": "تم إلغاء تسجيل الدخول. يمكنك المحاولة مجددًا أو استخدام البريد الإلكتروني وكلمة المرور.",
+    "conflict": "هوية تسجيل الدخول هذه مرتبطة بحساب آخر. سجّل الدخول إلى حسابك الحالي أو تواصل مع دعم Markaz."
+  },
   "forgot": {
     "title": "إعادة تعيين كلمة المرور",
     "description": "أدخل عنوان البريد الإلكتروني لحسابك في Markaz.",
@@ -211,7 +221,8 @@
     "submit": "حفظ ومتابعة",
     "submitting": "جارٍ حفظ الملف الشخصي…",
     "reassurance": "نطلب فقط المعلومات اللازمة لإعداد حسابك في Markaz.",
-    "verifiedEmail": "تم التحقق"
+    "verifiedEmail": "تم التحقق",
+    "emailProvided": "تم تقديمه"
   },
   "session": {
     "expiredTitle": "انتهت صلاحية جلستك",
@@ -425,6 +436,8 @@
     "methodsDescription": "أدر طرق تسجيل الدخول إلى MARKAZ.",
     "emailMethodTitle": "البريد الإلكتروني وكلمة المرور",
     "emailMethodDescription": "حساب بريد MARKAZ الموثّق.",
+    "googleMethodTitle": "Google",
+    "googleMethodDescription": "حساب Google المرتبط بك.",
     "verified": "موثّق",
     "verificationRequired": "التحقق مطلوب",
     "uaePassMethodTitle": "UAE PASS (بيئة الاختبار)",

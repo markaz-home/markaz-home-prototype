@@ -1,9 +1,12 @@
 # ADR-0031 — UAE PASS uses explicit account linking
 
-- **Status:** Accepted
+- **Status:** Superseded by ADR-0033
 - **Date:** 2026-08-03
 
 ## Context
+
+> Historical decision. ADR-0033 retains explicit linking for existing accounts but allows a new
+> UAE PASS subject to create a CUSTOMER and complete MARKAZ onboarding.
 
 The public UAE PASS staging UserInfo response includes an optional email but does not
 advertise an `email_verified` claim. A first-time Supabase custom-provider sign-in can
