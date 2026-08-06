@@ -18,12 +18,21 @@ import { AuthShell, AuthHeading } from '@/components/auth/auth-shell';
 import { AuthProgress } from '@/components/auth/auth-progress';
 import { PasswordField } from '@/components/auth/password-field';
 import { PasswordChecklist } from '@/components/auth/password-checklist';
+import { ProviderAuthButtons } from '@/components/auth/provider-auth-buttons';
 import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
 
 /** Placeholder legal destinations, matching the (auth) layout footer. */
 const LEGAL = { terms: '#terms', privacy: '#privacy' };
 
-export function SignUpForm() {
+export function SignUpForm({
+  googleEnabled = false,
+  uaePassEnabled = false,
+  locale = 'en',
+}: {
+  googleEnabled?: boolean;
+  uaePassEnabled?: boolean;
+  locale?: string;
+}) {
   const t = useTranslations('signup');
   const tv = useTranslations('validation');
   const ta = useTranslations('auth');
@@ -119,6 +128,14 @@ export function SignUpForm() {
           </Alert>
         ) : null}
         {formError ? <Alert variant="destructive">{formError}</Alert> : null}
+
+        <ProviderAuthButtons
+          intent="sign-up"
+          locale={locale}
+          googleEnabled={googleEnabled}
+          uaePassEnabled={uaePassEnabled}
+          onError={(message) => setFormError(message || null)}
+        />
 
         <form
           onSubmit={handleSubmit(onSubmit, (formErrors) => {

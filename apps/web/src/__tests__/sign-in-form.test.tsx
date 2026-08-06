@@ -62,6 +62,8 @@ describe('SignInForm', () => {
     expect(arg.provider).toBe('custom:uae-pass');
     expect(arg.options.redirectTo).toContain('/auth/callback');
     expect(arg.options.redirectTo).toContain('locale=ar');
+    expect(arg.options.redirectTo).toContain('intent=sign-in');
+    expect(arg.options.redirectTo).toContain('provider=uae-pass');
     // Password sign-in must not have been triggered.
     expect(signInWithPassword).not.toHaveBeenCalled();
   });
@@ -75,20 +77,19 @@ describe('SignInForm', () => {
     expect(arg.options.redirectTo).toContain('next=%2Fsell');
   });
 
-  it('guides an unlinked UAE PASS user to email sign-in and then Profile', async () => {
-    getSearchParams.mockReturnValue(
-      new URLSearchParams('error=uae_pass_not_linked&next=%2Faccount%2Fprofile'),
-    );
+  it('offers Google when the environment enables it', async () => {
     const user = userEvent.setup();
+    renderWithIntl(<SignInForm googleEnabled locale="en" />);
+    await user.click(screen.getByRole('button', { name: /Continue with Google/i }));
+    const arg = signInWithOAuth.mock.calls[0]![0];
+    expect(arg.provider).toBe('google');
+    expect(arg.options.redirectTo).toContain('provider=google');
+  });
+
+  it('shows a safe identity conflict without exposing provider details', () => {
+    getSearchParams.mockReturnValue(new URLSearchParams('error=provider_conflict'));
     renderWithIntl(<SignInForm uaePassStaging locale="en" />);
-
-    expect(screen.getByText("UAE PASS isn't linked yet")).toBeInTheDocument();
-    expect(screen.getByText(/link UAE PASS from Profile/i)).toBeInTheDocument();
-
-    await user.type(screen.getByLabelText(/Email address/i), 'customer-a@markaz.demo');
-    await user.type(screen.getByLabelText(/^Password/), 'Aa1!aaaa');
-    await user.click(screen.getByRole('button', { name: 'Sign in' }));
-    await waitFor(() => expect(replace).toHaveBeenCalledWith('/account/profile'));
+    expect(screen.getByText(/already connected to another account/i)).toBeInTheDocument();
   });
 
   it('validates an invalid email without calling the provider', async () => {

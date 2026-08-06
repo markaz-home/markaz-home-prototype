@@ -33,6 +33,8 @@ describe('validateEnvironment', () => {
     const result = validateEnvironment(validLocal, { app: 'web' });
     assert.equal(result.app, 'web');
     assert.equal(result.uaePassMode, 'simulated');
+    assert.equal(result.googleAuthEnabled, false);
+    assert.equal(result.googleAuthMode, 'auto');
     assert.ok(result.warnings.some((warning) => warning.includes('BayutAPI')));
   });
 
@@ -64,6 +66,19 @@ describe('validateEnvironment', () => {
   it('requires UAE PASS credentials only when staging mode is enabled', () => {
     assert.ok(
       issuesFor({ UAE_PASS_MODE: 'staging' }).some((issue) => issue.includes('UAE_PASS_CLIENT_ID')),
+    );
+  });
+
+  it('validates the server-controlled Google provider visibility flag', () => {
+    assert.ok(
+      issuesFor({ GOOGLE_AUTH_ENABLED: 'sometimes' }).some((issue) =>
+        issue.includes('GOOGLE_AUTH_ENABLED'),
+      ),
+    );
+    assert.equal(issuesFor({ GOOGLE_AUTH_ENABLED: 'true' }).length, 0);
+    assert.equal(
+      validateEnvironment({ ...validLocal, GOOGLE_AUTH_ENABLED: 'false' }).googleAuthMode,
+      'forced-disabled',
     );
   });
 

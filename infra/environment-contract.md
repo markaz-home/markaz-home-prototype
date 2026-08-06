@@ -56,6 +56,7 @@ These must **never** be exposed to the browser (no `NEXT_PUBLIC_` prefix):
 - `DIRECT_DATABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY` — trusted server ops only; **never** used to serve a
   customer-scoped request (ADR 0004).
+- `UAE_PASS_CLIENT_ID`, `UAE_PASS_CLIENT_SECRET` — only when staging is enabled.
 
 Browser-safe (`NEXT_PUBLIC_`): `NEXT_PUBLIC_WEB_URL`, `NEXT_PUBLIC_ADMIN_URL`,
 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,

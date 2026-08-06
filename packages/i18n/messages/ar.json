@@ -177,6 +177,16 @@
     "verifyBody": "لم يكتمل إعداد حسابك. أدخل رمز التحقق المُرسَل إلى بريدك الإلكتروني.",
     "resuming": "جارٍ استئناف إعداد حسابك…"
   },
+  "providerAuth": {
+    "continueUaePass": "المتابعة باستخدام UAE PASS التجريبي",
+    "continueGoogle": "المتابعة باستخدام Google",
+    "redirectingUaePass": "جارٍ التحويل إلى UAE PASS…",
+    "redirectingGoogle": "جارٍ التحويل إلى Google…",
+    "or": "أو",
+    "error": "تعذّرت المتابعة باستخدام طريقة تسجيل الدخول هذه. حاول مجددًا أو استخدم البريد الإلكتروني وكلمة المرور.",
+    "cancelled": "تم إلغاء تسجيل الدخول. يمكنك المحاولة مجددًا أو استخدام البريد الإلكتروني وكلمة المرور.",
+    "conflict": "هوية تسجيل الدخول هذه مرتبطة بحساب آخر. سجّل الدخول إلى حسابك الحالي أو تواصل مع دعم Markaz."
+  },
   "forgot": {
     "title": "إعادة تعيين كلمة المرور",
     "description": "أدخل عنوان البريد الإلكتروني لحسابك في Markaz.",
@@ -211,7 +221,21 @@
     "submit": "حفظ ومتابعة",
     "submitting": "جارٍ حفظ الملف الشخصي…",
     "reassurance": "نطلب فقط المعلومات اللازمة لإعداد حسابك في Markaz.",
-    "verifiedEmail": "تم التحقق"
+    "verifiedEmail": "تم التحقق",
+    "emailProvided": "تم تقديمه",
+    "providerReviewTitle": "تفاصيلك جاهزة",
+    "providerReviewDescription": "أضفنا تفاصيل الحساب التي شاركتها {provider}. وافق على شروط MARKAZ وسياسة الخصوصية للمتابعة.",
+    "providerMissingTitle": "نحتاج إلى تفصيل واحد فقط",
+    "providerMissingDescription": "لم تشارك {provider} اسمك الكامل. أضفه أدناه، ثم وافق على شروط MARKAZ وسياسة الخصوصية.",
+    "detailsFrom": "تفاصيل من {provider}",
+    "provided": "تم تقديمه",
+    "email": "البريد الإلكتروني",
+    "mobileNumber": "رقم الهاتف المحمول",
+    "uaePassProvider": "UAE PASS",
+    "googleProvider": "Google",
+    "providerSubmit": "الموافقة والمتابعة",
+    "providerSubmitting": "جارٍ المتابعة…",
+    "providerReassurance": "يمكنك تحديث تفاصيل الاتصال الاختيارية لاحقًا من الملف الشخصي."
   },
   "session": {
     "expiredTitle": "انتهت صلاحية جلستك",
@@ -325,7 +349,10 @@
     "latestOfferTitle": "أحدث عرض",
     "offerMadeBy": "قدّمت عرضًا بقيمة {amount}",
     "offerReceivedOn": "عرض مستلم — {amount}",
-    "recommendedTitle": "مقترحة لك",
+    "recommendedTitle": "اكتشف عقارات على MARKAZ",
+    "discoveryEmptyTitle": "عقارات MARKAZ جديدة قادمة قريبًا",
+    "discoveryEmptyBody": "ستظهر هنا إعلانات العملاء الموثّقة فور نشرها. يمكنك تصفّح السوق الحالي أو العودة قريبًا.",
+    "discoveryEmptyCta": "تصفّح إعلانات MARKAZ",
     "viewAll": "عرض الكل",
     "seeAll": "عرض الكل",
     "summariesPartialError": "تعذّر تحميل بعض النشاط. نعرض المتاح."
@@ -425,6 +452,8 @@
     "methodsDescription": "أدر طرق تسجيل الدخول إلى MARKAZ.",
     "emailMethodTitle": "البريد الإلكتروني وكلمة المرور",
     "emailMethodDescription": "حساب بريد MARKAZ الموثّق.",
+    "googleMethodTitle": "Google",
+    "googleMethodDescription": "حساب Google المرتبط بك.",
     "verified": "موثّق",
     "verificationRequired": "التحقق مطلوب",
     "uaePassMethodTitle": "UAE PASS (بيئة الاختبار)",

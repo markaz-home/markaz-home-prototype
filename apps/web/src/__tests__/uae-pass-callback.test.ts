@@ -49,34 +49,34 @@ describe('/auth/callback (UAE PASS sign-in)', () => {
   });
 
   it('returns cancellation to sign-in without exchanging a code', async () => {
-    const res = await GET(req('?error=access_denied&locale=en'));
+    const res = await GET(req('?error=access_denied&locale=en&provider=uae-pass'));
     expect(exchangeCodeForSession).not.toHaveBeenCalled();
     const url = locationOf(res);
     expect(url.pathname).toBe('/en/sign-in');
-    expect(url.searchParams.get('error')).toBe('uae_pass_cancelled');
+    expect(url.searchParams.get('error')).toBe('provider_cancelled');
   });
 
   it('maps provider failures to a generic sign-in error', async () => {
     const res = await GET(req('?error=server_error&error_code=provider_detail&locale=en'));
     expect(exchangeCodeForSession).not.toHaveBeenCalled();
-    expect(locationOf(res).searchParams.get('error')).toBe('uae_pass');
+    expect(locationOf(res).searchParams.get('error')).toBe('provider_error');
   });
 
-  it('returns an unknown UAE PASS identity to email sign-in and then Profile', async () => {
+  it('treats the retired login-only hook marker as a generic provider failure', async () => {
     const res = await GET(
       req('?error=access_denied&error_description=MARKAZ_UAE_PASS_NOT_LINKED&locale=en'),
     );
     expect(exchangeCodeForSession).not.toHaveBeenCalled();
     const url = locationOf(res);
     expect(url.pathname).toBe('/en/sign-in');
-    expect(url.searchParams.get('error')).toBe('uae_pass_not_linked');
-    expect(url.searchParams.get('next')).toBe('/account/profile');
+    expect(url.searchParams.get('error')).toBe('provider_error');
+    expect(url.searchParams.get('next')).toBeNull();
   });
 
   it('handles a missing code safely', async () => {
     const res = await GET(req('?locale=en'));
     expect(exchangeCodeForSession).not.toHaveBeenCalled();
-    expect(locationOf(res).searchParams.get('error')).toBe('uae_pass');
+    expect(locationOf(res).searchParams.get('error')).toBe('provider_error');
   });
 
   it('does not reflect a failed authorization code or provider detail', async () => {
@@ -84,9 +84,9 @@ describe('/auth/callback (UAE PASS sign-in)', () => {
     const res = await GET(req('?code=abc123&locale=en'));
     const url = locationOf(res);
     expect(url.pathname).toBe('/en/sign-in');
-    expect(url.searchParams.get('error')).toBe('uae_pass');
+    expect(url.searchParams.get('error')).toBe('provider_error');
     expect(url.search).not.toContain('abc123');
-    expect(url.search).not.toContain('provider');
+    expect(url.search).not.toContain('detail');
   });
 
   it('completes an authenticated identity link and returns to Profile', async () => {
@@ -96,6 +96,18 @@ describe('/auth/callback (UAE PASS sign-in)', () => {
     const url = locationOf(res);
     expect(url.pathname).toBe('/en/account/profile');
     expect(url.searchParams.get('uae_pass')).toBe('uae_pass_linked');
+  });
+
+  it('synchronizes provider-owned UAE PASS profile fields after first-time authentication', async () => {
+    const res = await GET(req('?code=abc123&locale=en&provider=uae-pass&intent=sign-up'));
+    expect(exchangeCodeForSession).toHaveBeenCalledWith('abc123');
+    expect(rpc).toHaveBeenCalledWith('sync_uae_pass_staging_identity');
+    expect(locationOf(res).pathname).toBe('/en/dashboard');
+  });
+
+  it('does not run UAE PASS synchronization for Google', async () => {
+    await GET(req('?code=abc123&locale=en&provider=google&intent=sign-up'));
+    expect(rpc).not.toHaveBeenCalled();
   });
 
   it('returns a cancelled identity link to Profile without changing the account', async () => {

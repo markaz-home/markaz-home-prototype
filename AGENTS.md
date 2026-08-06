@@ -22,8 +22,9 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
 - **Customers can never self-promote to ADMIN** (DB trigger + RLS enforce it).
 - **A customer can never offer on a listing they own** (DB trigger + RLS + API).
 - **Never** use the Supabase service-role/secret key for customer-scoped requests.
-- **Auth is email + password** (Supabase `signInWithPassword`). A **6-digit email
-  code** verifies a new account (`verifyOtp type:signup`); **password recovery uses
+- **Customer auth supports email + password, Google, and UAE PASS** through Supabase
+  Auth. Email/password uses `signInWithPassword`, and a **6-digit email code** verifies
+  a new password account (`verifyOtp type:signup`); **password recovery uses
   the official Supabase LINK** (`resetPasswordForEmail` → email link → `/auth/confirm`
   route handler runs `verifyOtp({ type:'recovery', token_hash })` → reset-password →
   `updateUser` → sign out → fresh sign-in). **Never** build, store, or log any code,
@@ -33,11 +34,11 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   6-cell verification code (one logical input), the full screen inventory (check-email,
   verify success, recovery-sent, password-updated, signed-out, session-expired, error
   panels), and the Operations shell for admin. Reuse `components/auth/*`.
-- **Routing gates on email verification first**: `resolvePostAuthDestination({
-emailVerified, profile })` → verify-email → profile-setup (fallback) → dashboard;
-  unverified/incomplete customers never reach the dashboard. UAE PASS Staging is
-  an optional sign-in method only, never a post-sign-up gate. `requireCustomerStep`
-  enforces this server-side (ADR-0030).
+- **Routing gates on verified authentication first**: email/password sessions require
+  verified email; successfully authenticated Google/UAE PASS sessions may continue to
+  profile-setup. Every path still requires a complete profile plus MARKAZ Terms/Privacy
+  consent before dashboard. UAE PASS is optional and never a mandatory post-sign-up gate.
+  `requireCustomerStep` enforces this server-side (ADR-0030 / ADR-0033).
 - **No public admin sign-up.** Admins are created **only** by the env-driven admin
   bootstrap (`pnpm db:setup` with `BOOTSTRAP_ADMIN_EMAIL`/`BOOTSTRAP_ADMIN_PASSWORD`,
   Supabase Admin API); the admin app requires `account_type === 'ADMIN'` or shows

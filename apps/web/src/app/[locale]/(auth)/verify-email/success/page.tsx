@@ -14,6 +14,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   const session = await getSession();
   const dest = resolvePostAuthDestination({
     emailVerified: session?.emailVerified ?? false,
+    providerAuthenticated: session?.providerAuthenticated ?? false,
     profile: session?.profile ?? null,
   });
   if (!session) redirect(`/${locale}/sign-in`);

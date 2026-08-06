@@ -3,8 +3,8 @@
 - **Status:** Accepted
 - **Date:** 2026-08-02
 
-> ADR-0031 refines the optional sign-in decision: UAE PASS is first linked from an
-> authenticated Profile and unknown provider subjects cannot create standalone users.
+> ADR-0033 supersedes ADR-0031's login-only restriction: UAE PASS remains optional,
+> but a new provider subject may create a CUSTOMER and complete MARKAZ onboarding.
 
 ## Context
 
@@ -25,7 +25,7 @@ a Supabase custom OAuth provider and should remain available.
 - `/onboarding/uae-pass` is retired and redirects safely to Dashboard, whose
   server guard still enforces authentication, email verification, profile
   completeness, and the `CUSTOMER` account boundary.
-- UAE PASS Staging remains an optional Sign In method. Its callback still
+- UAE PASS Staging remains an optional account-creation and Sign In method. Its callback
   establishes a normal Supabase session and honours the existing safe return
   allowlist.
 - The identity-status schema and existing audit history remain available for future regulated

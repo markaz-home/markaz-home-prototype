@@ -19,6 +19,7 @@ import { usePathname, useRouter } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import type { RouterInputs } from '@/trpc/types';
 import { ExternalPropertyCard } from './external-property-card';
+import { shouldShowExternalInventory } from './external-browse';
 import { PropertyCard } from './property-card';
 import { ListboxSelect } from '@/components/ui/listbox-select';
 
@@ -48,6 +49,7 @@ export function MarketplaceBrowse({
   const te = useTranslations('marketplaceEmpty');
   const ter = useTranslations('error');
   const [moreOpen, setMoreOpen] = useState(false);
+  const showExternalInventory = shouldShowExternalInventory(isAuthenticated);
 
   const query = useMemo(() => {
     const o: Record<string, string> = {};
@@ -80,7 +82,7 @@ export function MarketplaceBrowse({
       limit: 12,
       query: query as RouterInputs['marketplace']['search'],
     },
-    { staleTime: 60 * 60 * 1_000 },
+    { enabled: showExternalInventory, staleTime: 60 * 60 * 1_000 },
   );
   const savedIds = trpc.marketplace.saved.publicIds.useQuery(undefined, {
     enabled: isAuthenticated,
@@ -90,8 +92,9 @@ export function MarketplaceBrowse({
   });
   const savedSet = useMemo(() => new Set(savedIds.data ?? []), [savedIds.data]);
   const ownedSet = useMemo(() => new Set(ownedIds.data ?? []), [ownedIds.data]);
-  const externalCards = external.data?.items ?? [];
-  const externalExpected = external.isLoading || externalCards.length > 0;
+  const externalCards = showExternalInventory ? (external.data?.items ?? []) : [];
+  const externalExpected =
+    showExternalInventory && (external.isLoading || externalCards.length > 0);
   const propertyTypeCounts = useMemo(
     () => new Map(facets.data?.propertyTypes.map((item) => [item.value, item.count]) ?? []),
     [facets.data?.propertyTypes],
@@ -488,7 +491,7 @@ export function MarketplaceBrowse({
         </nav>
       )}
 
-      {(external.isLoading || externalCards.length > 0) && (
+      {showExternalInventory && (external.isLoading || externalCards.length > 0) && (
         <section className="mt-12" aria-labelledby="external-properties-title">
           <h2 id="external-properties-title" className="font-display text-2xl font-semibold">
             {t('externalTitle')}

@@ -174,7 +174,7 @@ export function WorkspaceShell({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="border-border/70 bg-background/85 sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b px-4 backdrop-blur md:px-8">
+        <header className="bg-background sticky top-0 z-30 flex h-14 items-center justify-between gap-3 px-4 md:px-8">
           <div className="flex items-center gap-2 md:hidden">
             <Button
               variant="ghost"

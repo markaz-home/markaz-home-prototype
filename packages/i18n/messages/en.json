@@ -174,6 +174,16 @@
     "verifyBody": "Your account setup is not complete. Enter the verification code sent to your email.",
     "resuming": "Resuming your account setup…"
   },
+  "providerAuth": {
+    "continueUaePass": "Continue with UAE PASS Staging",
+    "continueGoogle": "Continue with Google",
+    "redirectingUaePass": "Redirecting to UAE PASS…",
+    "redirectingGoogle": "Redirecting to Google…",
+    "or": "or",
+    "error": "We could not continue with that sign-in method. Try again or use email and password.",
+    "cancelled": "Provider sign-in was cancelled. You can try again or use email and password.",
+    "conflict": "That sign-in identity is already connected to another account. Sign in to your existing account or contact Markaz support."
+  },
   "forgot": {
     "title": "Reset your password",
     "description": "Enter the email address for your Markaz account.",
@@ -208,7 +218,21 @@
     "submit": "Save and continue",
     "submitting": "Saving profile…",
     "reassurance": "We only ask for information needed to set up your Markaz account.",
-    "verifiedEmail": "Verified"
+    "verifiedEmail": "Verified",
+    "emailProvided": "Provided",
+    "providerReviewTitle": "Your details are ready",
+    "providerReviewDescription": "We added the account details shared by {provider}. Accept the MARKAZ Terms and Privacy Policy to continue.",
+    "providerMissingTitle": "Just one detail needed",
+    "providerMissingDescription": "{provider} did not share your full name. Add it below, then accept the MARKAZ Terms and Privacy Policy.",
+    "detailsFrom": "Details from {provider}",
+    "provided": "Provided",
+    "email": "Email",
+    "mobileNumber": "Mobile number",
+    "uaePassProvider": "UAE PASS",
+    "googleProvider": "Google",
+    "providerSubmit": "Agree and continue",
+    "providerSubmitting": "Continuing…",
+    "providerReassurance": "You can update optional contact details later from Profile."
   },
   "session": {
     "expiredTitle": "Your session has expired",
@@ -322,7 +346,10 @@
     "latestOfferTitle": "Latest offer",
     "offerMadeBy": "You offered {amount}",
     "offerReceivedOn": "Offer received — {amount}",
-    "recommendedTitle": "Recommended for you",
+    "recommendedTitle": "Discover on MARKAZ",
+    "discoveryEmptyTitle": "New MARKAZ homes are coming soon",
+    "discoveryEmptyBody": "Verified customer listings will appear here as they go live. You can browse the current marketplace or check back soon.",
+    "discoveryEmptyCta": "Browse MARKAZ listings",
     "viewAll": "View all",
     "seeAll": "See all",
     "summariesPartialError": "Some activity couldn't be loaded. Showing what we have."
@@ -422,6 +449,8 @@
     "methodsDescription": "Manage how you sign in to MARKAZ.",
     "emailMethodTitle": "Email and password",
     "emailMethodDescription": "Your verified MARKAZ email account.",
+    "googleMethodTitle": "Google",
+    "googleMethodDescription": "Your linked Google account.",
     "verified": "Verified",
     "verificationRequired": "Verification required",
     "uaePassMethodTitle": "UAE PASS Staging",

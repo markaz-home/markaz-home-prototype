@@ -29,6 +29,8 @@ export default async function AccountProfilePage({
       phoneVerified={!!profile?.phoneVerifiedAt}
       locale={locale}
       emailVerified={session?.emailVerified ?? false}
+      emailPasswordLinked={session?.emailPasswordAuthenticated ?? false}
+      googleLinked={session?.googleAuthenticated ?? false}
       uaePassLinked={uaePassLinked}
       uaePassSyncPending={uaePassSyncPending}
       uaePassStaging={isUaePassStagingEnabled()}

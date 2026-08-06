@@ -100,9 +100,17 @@ export function getUaePassProviderConfig(): UaePassProviderConfig {
       prompt: 'login',
     },
     // UAE PASS may authenticate a tester by mobile/EID with no email; the profile
-    // trigger tolerates that (migration 08.17). For a generic OAuth2 provider GoTrue
-    // needs the claim mapping to extract the subject + email from UserInfo.
+    // trigger tolerates that (migration 08.17). Map only the approved attributes
+    // MARKAZ needs for account creation. Emirates ID is deliberately excluded.
     emailOptional: true,
-    attributeMapping: { keys: { sub: { name: 'sub' }, email: { name: 'email' } } },
+    attributeMapping: {
+      keys: {
+        sub: { name: 'sub' },
+        email: { name: 'email' },
+        full_name: { name: 'fullnameEN' },
+        phone: { name: 'mobile' },
+        uae_pass_uuid: { name: 'uuid' },
+      },
+    },
   };
 }

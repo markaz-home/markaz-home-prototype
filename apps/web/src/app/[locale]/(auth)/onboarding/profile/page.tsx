@@ -10,5 +10,18 @@ export default async function ProfileOnboardingPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const session = await requireCustomerStep(locale, ['profile-setup']);
-  return <ProfileSetupForm email={session.email} />;
+  const provider = session.uaePassAuthenticated
+    ? 'uae-pass'
+    : session.googleAuthenticated
+      ? 'google'
+      : null;
+  return (
+    <ProfileSetupForm
+      email={session.email}
+      emailVerified={session.emailVerified || session.providerAuthenticated}
+      initialName={session.profile?.fullName}
+      initialPhone={session.profile?.phoneE164}
+      provider={provider}
+    />
+  );
 }

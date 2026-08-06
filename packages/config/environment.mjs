@@ -174,6 +174,14 @@ export function validateEnvironment(env = process.env, { app = 'all' } = {}) {
   }
 
   const demoAuthFallback = validateBoolean(env, 'DEMO_AUTH_FALLBACK', issues);
+  const googleAuthOverride = trimmed(env, 'GOOGLE_AUTH_ENABLED');
+  const googleAuthEnabled = validateBoolean(env, 'GOOGLE_AUTH_ENABLED', issues);
+  const googleAuthMode =
+    googleAuthOverride === 'true'
+      ? 'forced-enabled'
+      : googleAuthOverride === 'false'
+        ? 'forced-disabled'
+        : 'auto';
   validateBoolean(env, 'UAE_PASS_ALLOW_REMOTE_SETUP', issues);
   validateBoolean(env, 'ANALYZE', issues);
   validateBoolean(env, 'PLAYWRIGHT_NO_SERVER', issues);
@@ -181,6 +189,12 @@ export function validateEnvironment(env = process.env, { app = 'all' } = {}) {
     issues.push('DEMO_AUTH_FALLBACK must remain false; the one-click fallback is not implemented.');
   } else {
     warnings.push('DEMO_AUTH_FALLBACK is disabled as required by ADR-0007.');
+  }
+
+  if (googleAuthMode === 'forced-disabled') {
+    warnings.push('Google authentication visibility is forced off by GOOGLE_AUTH_ENABLED.');
+  } else if (googleAuthMode === 'auto') {
+    warnings.push('Google authentication visibility is discovered from Supabase Auth settings.');
   }
 
   const uaePassMode = trimmed(env, 'UAE_PASS_MODE') || 'simulated';
@@ -264,6 +278,8 @@ export function validateEnvironment(env = process.env, { app = 'all' } = {}) {
   return {
     app,
     deploymentEnvironment,
+    googleAuthEnabled,
+    googleAuthMode,
     uaePassMode,
     bayutApiMode,
     warnings: [...new Set(warnings)],

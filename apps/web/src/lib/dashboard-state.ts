@@ -20,3 +20,22 @@ export function isFreshDashboard(counts: DashboardActivityCounts, loadFailed: bo
     counts.transactions === 0
   );
 }
+
+/**
+ * Fill the dashboard discovery row from a broad first-party result set. The
+ * marketplace may return the customer's newest listings first, so limiting to
+ * three before removing owned homes can incorrectly leave the row empty.
+ */
+export function selectDashboardRecommendations<T extends { publicId: string | null }>(
+  cards: readonly T[],
+  ownedIds: ReadonlySet<string>,
+  limit = 3,
+): Array<T & { publicId: string }> {
+  if (limit <= 0) return [];
+  return cards
+    .filter(
+      (card): card is T & { publicId: string } =>
+        typeof card.publicId === 'string' && !ownedIds.has(card.publicId),
+    )
+    .slice(0, limit);
+}
