@@ -37,12 +37,27 @@ runners: workflows could fail to start, fail partway through, remain queued, or 
 observed MARKAZ failures match that incident exactly and should not be logged as confirmed product
 defects.
 
+### Resolution — 2026-08-07
+
+GitHub Actions returned to operational with no unresolved incidents. The complete `main`
+workflow was rerun (attempt 3) against the unchanged commit
+`c81783d6358639d722e6c9b0ab48533883a7e7cd` and passed:
+
+- Run: <https://github.com/markaz-home/markaz-home-prototype/actions/runs/31117827646/attempts/3>
+- `quality (no Docker)`: success (06:50:02–06:52:09 UTC).
+- `full-stack (Supabase + integration + E2E)`: success (06:49:59–07:03:13 UTC) — migrations
+  applied, integration tests passed with zero skips, and both customer web and Admin E2E suites
+  passed.
+- Workflow completed 2026-08-07 07:03:14 UTC. No reproducible assertion failure surfaced, so
+  nothing was added to `DEFECT-LOG.md`.
+
 ### Follow-up required
 
-1. Wait until GitHub reports Actions as operational or the incident as monitoring/resolved.
-2. Rerun the complete `main` workflow against the unchanged commit
-   `c81783d6358639d722e6c9b0ab48533883a7e7cd`.
-3. Require both `quality (no Docker)` and `full-stack (Supabase + integration + E2E)` to pass.
-4. Add the successful replacement run URL and completion time to this entry.
+1. ~~Wait until GitHub reports Actions as operational or the incident as monitoring/resolved.~~ Done.
+2. ~~Rerun the complete `main` workflow against the unchanged commit
+   `c81783d6358639d722e6c9b0ab48533883a7e7cd`.~~ Done (attempt 3).
+3. ~~Require both `quality (no Docker)` and `full-stack (Supabase + integration + E2E)` to pass.~~
+   Both passed.
+4. ~~Add the successful replacement run URL and completion time to this entry.~~ Recorded above.
 5. If the post-recovery run exposes a reproducible assertion failure, investigate it separately
-   and only then add it to `DEFECT-LOG.md`.
+   and only then add it to `DEFECT-LOG.md`. — Not needed; the run passed cleanly.
