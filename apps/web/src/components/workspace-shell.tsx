@@ -174,7 +174,10 @@ export function WorkspaceShell({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="bg-background sticky top-0 z-30 flex h-14 items-center justify-between gap-3 px-4 md:px-8">
+        {/* Nearly transparent + blur so the theme's gradient glow runs uninterrupted
+            behind the icons; scrolled content frosts under it instead of hitting a
+            solid black band. */}
+        <header className="bg-background/40 sticky top-0 z-30 flex h-14 items-center justify-between gap-3 px-4 backdrop-blur-xl md:px-8">
           <div className="flex items-center gap-2 md:hidden">
             <Button
               variant="ghost"
