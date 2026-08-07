@@ -23,6 +23,7 @@
     "db:generate": "pnpm --filter @markaz/db generate",
     "db:migrate": "supabase migration up",
     "db:seed": "pnpm --filter @markaz/db seed",
+    "db:seed:catalog": "pnpm --filter @markaz/db seed:catalog",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:reset": "supabase db reset",
