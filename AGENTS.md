@@ -39,6 +39,13 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   profile-setup. Every path still requires a complete profile plus MARKAZ Terms/Privacy
   consent before dashboard. UAE PASS is optional and never a mandatory post-sign-up gate.
   `requireCustomerStep` enforces this server-side (ADR-0030 / ADR-0033).
+- **Sign Up never silently signs in an established customer**: a Sign-Up-page provider
+  callback that resolves to a complete profile signs out and returns to Sign In with the
+  `already_registered` notice; incomplete accounts continue onboarding (ADR-0033 refinement
+  2026-08-07). Detection uses the authenticated user's own RLS-scoped profile only. Both
+  consent screens (email sign-up and provider profile-setup) share
+  `components/auth/consent-checkbox.tsx` — one checkbox, both consent flags, separate
+  accepted-at timestamps.
 - **No public admin sign-up.** Admins are created **only** by the env-driven admin
   bootstrap (`pnpm db:setup` with `BOOTSTRAP_ADMIN_EMAIL`/`BOOTSTRAP_ADMIN_PASSWORD`,
   Supabase Admin API); the admin app requires `account_type === 'ADMIN'` or shows

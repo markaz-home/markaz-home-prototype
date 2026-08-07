@@ -52,8 +52,7 @@ describe('ProfileSetupForm', () => {
     const user = userEvent.setup();
     renderWithIntl(<ProfileSetupForm />);
     await user.type(screen.getByLabelText(/Full name/i), 'Demo Customer');
-    await user.click(screen.getByLabelText(/Terms of Use/i));
-    await user.click(screen.getByLabelText(/Privacy Policy/i));
+    await user.click(screen.getByRole('checkbox', { name: /Terms & Conditions.*Privacy Policy/i }));
     await user.click(screen.getByRole('button', { name: 'Save and continue' }));
     expect(completeSetupMutate).toHaveBeenCalledTimes(1);
   });
@@ -77,8 +76,8 @@ describe('ProfileSetupForm', () => {
     await user.click(screen.getByRole('button', { name: 'Agree and continue' }));
     expect(completeSetupMutate).not.toHaveBeenCalled();
 
-    await user.click(screen.getByLabelText(/Terms of Use/i));
-    await user.click(screen.getByLabelText(/Privacy Policy/i));
+    // One combined control now drives both consent flags (matches sign-up).
+    await user.click(screen.getByRole('checkbox', { name: /Terms & Conditions.*Privacy Policy/i }));
     await user.click(screen.getByRole('button', { name: 'Agree and continue' }));
     expect(completeSetupMutate).toHaveBeenCalledWith({
       fullName: 'UAE PASS Customer',

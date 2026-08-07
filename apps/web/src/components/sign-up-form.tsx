@@ -19,10 +19,8 @@ import { AuthProgress } from '@/components/auth/auth-progress';
 import { PasswordField } from '@/components/auth/password-field';
 import { PasswordChecklist } from '@/components/auth/password-checklist';
 import { ProviderAuthButtons } from '@/components/auth/provider-auth-buttons';
+import { ConsentCheckbox } from '@/components/auth/consent-checkbox';
 import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
-
-/** Placeholder legal destinations, matching the (auth) layout footer. */
-const LEGAL = { terms: '#terms', privacy: '#privacy' };
 
 export function SignUpForm({
   googleEnabled = false,
@@ -111,22 +109,30 @@ export function SignUpForm({
         <AuthHeading title={t('title')} progress={<AuthProgress current={0} />} />
 
         {existing ? (
-          <Alert variant="warning" title={tv('existingAccount')}>
-            <p className="text-muted-foreground mt-1 text-sm">{tv('existingAccountBody')}</p>
-            {/* The way out is an action, not two look-alike links. */}
-            <div className="mt-3 flex flex-wrap items-center gap-3">
-              <Button asChild size="sm" variant="outline">
+          /* The form yields to the warning entirely: the way forward is Sign In,
+             not silently retrying the same details (anti-enumeration copy). */
+          <div className="space-y-5">
+            <Alert variant="warning" title={tv('existingAccount')}>
+              <p className="text-muted-foreground mt-1 text-sm">{tv('existingAccountBody')}</p>
+            </Alert>
+            <div className="space-y-3">
+              <Button asChild className="w-full">
                 <Link href="/sign-in">{ta('signIn')}</Link>
               </Button>
-              <Link
-                href="/forgot-password"
-                className="text-muted-foreground hover:text-foreground text-sm underline-offset-4 hover:underline"
+              <Button asChild variant="outline" className="w-full">
+                <Link href="/forgot-password">{tsi('forgot')}</Link>
+              </Button>
+              <button
+                type="button"
+                onClick={() => setExisting(false)}
+                className="text-muted-foreground hover:text-foreground w-full text-center text-sm underline-offset-4 hover:underline"
               >
-                {tsi('forgot')}
-              </Link>
+                {t('tryDifferentEmail')}
+              </button>
             </div>
-          </Alert>
-        ) : null}
+          </div>
+        ) : (
+          <>
         {formError ? <Alert variant="destructive">{formError}</Alert> : null}
 
         <ProviderAuthButtons
@@ -212,47 +218,11 @@ export function SignUpForm({
             </FormField>
           </div>
 
-          <div className="space-y-2">
-            <label className="flex items-start gap-3 text-sm">
-              <input
-                id="acceptConsent"
-                type="checkbox"
-                checked={acceptedAll}
-                onChange={(event) => setConsent(event.target.checked)}
-                aria-invalid={!!consentError}
-                className="focus-visible:ring-ring mt-0.5 h-4 w-4 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-              />
-              <span>
-                {t.rich('consent', {
-                  terms: (chunks) => (
-                    <a
-                      href={LEGAL.terms}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary underline underline-offset-4"
-                    >
-                      {chunks}
-                    </a>
-                  ),
-                  privacy: (chunks) => (
-                    <a
-                      href={LEGAL.privacy}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary underline underline-offset-4"
-                    >
-                      {chunks}
-                    </a>
-                  ),
-                })}
-              </span>
-            </label>
-            {consentError ? (
-              <p role="alert" className="text-destructive text-xs font-medium">
-                {fe(consentError.message as string | undefined)}
-              </p>
-            ) : null}
-          </div>
+          <ConsentCheckbox
+            checked={acceptedAll}
+            onChange={setConsent}
+            error={fe(consentError?.message as string | undefined)}
+          />
 
           <Button type="submit" className="w-full" loading={isSubmitting}>
             {isSubmitting ? t('submitting') : t('submit')}
@@ -267,6 +237,8 @@ export function SignUpForm({
             </Link>
           </p>
         </form>
+          </>
+        )}
       </div>
     </AuthShell>
   );

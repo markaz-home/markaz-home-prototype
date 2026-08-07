@@ -92,6 +92,13 @@ describe('SignInForm', () => {
     expect(screen.getByText(/already connected to another account/i)).toBeInTheDocument();
   });
 
+  it('welcomes back an established customer bounced from provider sign-up', () => {
+    getSearchParams.mockReturnValue(new URLSearchParams('error=already_registered'));
+    renderWithIntl(<SignInForm uaePassStaging locale="en" />);
+    expect(screen.getByText('You already have a Markaz account')).toBeInTheDocument();
+    expect(screen.getByText(/sign in below to continue/i)).toBeInTheDocument();
+  });
+
   it('validates an invalid email without calling the provider', async () => {
     const user = userEvent.setup();
     renderWithIntl(<SignInForm />);

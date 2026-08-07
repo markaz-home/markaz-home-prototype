@@ -36,6 +36,7 @@ export function SignInForm({
   const sessionExpired = params.get('notice') === 'session-expired';
   // Safe marker redirected here by /auth/callback. Provider details are never reflected.
   const callbackError = params.get('error');
+  const alreadyRegistered = callbackError === 'already_registered';
   const providerError =
     callbackError === 'provider_cancelled'
       ? tp('cancelled')
@@ -86,6 +87,11 @@ export function SignInForm({
           </Alert>
         ) : null}
         <AuthHeading title={t('title')} description={t('description')} />
+        {alreadyRegistered ? (
+          <Alert variant="warning" title={tp('alreadyRegisteredTitle')}>
+            {tp('alreadyRegisteredBody')}
+          </Alert>
+        ) : null}
         {providerError ? <Alert variant="destructive">{providerError}</Alert> : null}
         {formError ? <Alert variant="destructive">{formError}</Alert> : null}
 

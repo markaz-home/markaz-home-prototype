@@ -105,8 +105,16 @@ describe('SignUpForm', () => {
     renderWithIntl(<SignUpForm />);
     await fillValid(user);
     await user.click(screen.getByRole('button', { name: 'Create account' }));
+    // The warning replaces the form: Sign In is the way forward.
     expect(await screen.findByText(/We could not create a new account/)).toBeInTheDocument();
+    expect(screen.getByText('Sign in')).toBeInTheDocument();
+    expect(screen.getByText('Forgot password?')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Create account' })).not.toBeInTheDocument();
     expect(push).not.toHaveBeenCalled();
+
+    // "Use a different email address" restores the form.
+    await user.click(screen.getByRole('button', { name: 'Use a different email address' }));
+    expect(screen.getByRole('button', { name: 'Create account' })).toBeInTheDocument();
   });
 
   it('renders Arabic', () => {
