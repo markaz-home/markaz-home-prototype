@@ -9,6 +9,7 @@ import { trpc } from '@/trpc/react';
 import { useRouter } from '@/i18n/navigation';
 import { AuthShell, AuthHeading } from '@/components/auth/auth-shell';
 import { AuthProgress, type StepStatus } from '@/components/auth/auth-progress';
+import { ConsentCheckbox } from '@/components/auth/consent-checkbox';
 import { FIELD_ERROR_KEYS } from '@/components/auth/error-keys';
 
 export function ProfileSetupForm({
@@ -33,6 +34,8 @@ export function ProfileSetupForm({
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<ProfileSetupInput>({
     resolver: zodResolver(profileSetupSchema),
@@ -42,6 +45,15 @@ export function ProfileSetupForm({
       acceptPrivacy: false as never,
     },
   });
+
+  // Same combined control as the email sign-up form: one checkbox, both consent
+  // flags (separate accepted-at timestamps are still recorded server-side).
+  const acceptedAll = !!watch('acceptTerms') && !!watch('acceptPrivacy');
+  const consentError = errors.acceptTerms ?? errors.acceptPrivacy;
+  function setConsent(accepted: boolean) {
+    setValue('acceptTerms', accepted as never, { shouldValidate: true });
+    setValue('acceptPrivacy', accepted as never, { shouldValidate: true });
+  }
 
   const mutation = trpc.profile.completeSetup.useMutation({
     onSuccess: () => {
@@ -158,34 +170,11 @@ export function ProfileSetupForm({
             </FormField>
           )}
 
-          <label className="flex items-start gap-3 text-sm">
-            <input
-              id="acceptTerms"
-              type="checkbox"
-              className="accent-primary focus-visible:ring-ring mt-1 h-4 w-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-              {...register('acceptTerms')}
-            />
-            <span>{ts('terms')}</span>
-          </label>
-          {errors.acceptTerms ? (
-            <p role="alert" className="text-destructive text-xs font-medium">
-              {fe(errors.acceptTerms.message)}
-            </p>
-          ) : null}
-          <label className="flex items-start gap-3 text-sm">
-            <input
-              id="acceptPrivacy"
-              type="checkbox"
-              className="accent-primary focus-visible:ring-ring mt-1 h-4 w-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-              {...register('acceptPrivacy')}
-            />
-            <span>{ts('privacy')}</span>
-          </label>
-          {errors.acceptPrivacy ? (
-            <p role="alert" className="text-destructive text-xs font-medium">
-              {fe(errors.acceptPrivacy.message)}
-            </p>
-          ) : null}
+          <ConsentCheckbox
+            checked={acceptedAll}
+            onChange={setConsent}
+            error={fe(consentError?.message)}
+          />
 
           <Button type="submit" className="w-full" loading={mutation.isPending}>
             {mutation.isPending

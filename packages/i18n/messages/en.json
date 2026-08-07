@@ -113,7 +113,8 @@
     "submit": "Create account",
     "submitting": "Creating account…",
     "existing": "Already have an account?",
-    "security": "Your account details are protected using secure authentication."
+    "security": "Your account details are protected using secure authentication.",
+    "tryDifferentEmail": "Use a different email address"
   },
   "password": {
     "show": "Show password",
@@ -182,7 +183,9 @@
     "or": "or",
     "error": "We could not continue with that sign-in method. Try again or use email and password.",
     "cancelled": "Provider sign-in was cancelled. You can try again or use email and password.",
-    "conflict": "That sign-in identity is already connected to another account. Sign in to your existing account or contact Markaz support."
+    "conflict": "That sign-in identity is already connected to another account. Sign in to your existing account or contact Markaz support.",
+    "alreadyRegisteredTitle": "You already have a Markaz account",
+    "alreadyRegisteredBody": "That sign-in method belongs to an existing account, so we brought you here instead of creating a new one. Sign in below to continue."
   },
   "forgot": {
     "title": "Reset your password",

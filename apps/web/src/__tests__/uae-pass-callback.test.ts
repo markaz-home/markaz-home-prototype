@@ -2,8 +2,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const exchangeCodeForSession = vi.fn();
 const rpc = vi.fn();
+const getUser = vi.fn();
+const signOut = vi.fn();
 vi.mock('@markaz/auth/server', () => ({
-  createSupabaseServerClient: async () => ({ auth: { exchangeCodeForSession }, rpc }),
+  createSupabaseServerClient: async () => ({
+    auth: { exchangeCodeForSession, getUser, signOut },
+    rpc,
+  }),
+}));
+const loadOwnProfileRow = vi.fn();
+vi.mock('@markaz/db', () => ({
+  loadOwnProfileRow: (...args: unknown[]) => loadOwnProfileRow(...args),
 }));
 
 import { GET } from '@/app/auth/callback/route';
@@ -16,6 +25,9 @@ const locationOf = (res: Response) => new URL(res.headers.get('location') ?? '',
 beforeEach(() => {
   exchangeCodeForSession.mockReset().mockResolvedValue({ error: null });
   rpc.mockReset().mockResolvedValue({ error: null });
+  getUser.mockReset().mockResolvedValue({ data: { user: { id: 'user-1', email: 'c@x.ae' } } });
+  signOut.mockReset().mockResolvedValue({ error: null });
+  loadOwnProfileRow.mockReset().mockResolvedValue(null);
 });
 
 describe('/auth/callback (UAE PASS sign-in)', () => {
@@ -134,5 +146,49 @@ describe('/auth/callback (UAE PASS sign-in)', () => {
     const url = locationOf(res);
     expect(url.pathname).toBe('/en/account/profile');
     expect(url.searchParams.get('uae_pass')).toBe('uae_pass_linked');
+  });
+});
+
+describe('/auth/callback (sign-up intent, ADR-0033 refinement 2026-08-07)', () => {
+  const completeProfile = {
+    fullName: 'Existing Customer',
+    termsAcceptedAt: new Date('2026-08-01T00:00:00Z'),
+    privacyAcceptedAt: new Date('2026-08-01T00:00:00Z'),
+  };
+
+  it('signs out an established customer and returns to sign-in with a notice', async () => {
+    loadOwnProfileRow.mockResolvedValue(completeProfile);
+    const res = await GET(req('?code=abc123&locale=en&intent=sign-up&provider=uae-pass'));
+    expect(signOut).toHaveBeenCalledTimes(1);
+    const url = locationOf(res);
+    expect(url.pathname).toBe('/en/sign-in');
+    expect(url.searchParams.get('error')).toBe('already_registered');
+    // The bounce happens before provider profile synchronization.
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it('lets a new provider identity continue to onboarding', async () => {
+    loadOwnProfileRow.mockResolvedValue(null);
+    const res = await GET(req('?code=abc123&locale=en&intent=sign-up&provider=uae-pass'));
+    expect(signOut).not.toHaveBeenCalled();
+    expect(locationOf(res).pathname).toBe('/en/dashboard');
+  });
+
+  it('lets an incomplete account (abandoned first attempt) resume onboarding', async () => {
+    loadOwnProfileRow.mockResolvedValue({
+      fullName: 'Existing Customer',
+      termsAcceptedAt: null,
+      privacyAcceptedAt: null,
+    });
+    const res = await GET(req('?code=abc123&locale=en&intent=sign-up&provider=google'));
+    expect(signOut).not.toHaveBeenCalled();
+    expect(locationOf(res).pathname).toBe('/en/dashboard');
+  });
+
+  it('never bounces a sign-in intent, even for an established customer', async () => {
+    loadOwnProfileRow.mockResolvedValue(completeProfile);
+    const res = await GET(req('?code=abc123&locale=en&intent=sign-in&provider=uae-pass'));
+    expect(signOut).not.toHaveBeenCalled();
+    expect(locationOf(res).pathname).toBe('/en/dashboard');
   });
 });

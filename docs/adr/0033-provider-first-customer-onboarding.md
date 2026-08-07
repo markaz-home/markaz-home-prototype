@@ -21,6 +21,13 @@ supported. All three paths must converge on one `auth.users` identity owner and 
 
 - Sign Up and Sign In expose the same enabled provider actions: **Continue with UAE PASS** and
   **Continue with Google**. A provider subject signs in when known and creates a CUSTOMER when new.
+- **Refinement (2026-08-07):** a Sign-Up-page provider action that resolves to an **established**
+  customer (complete profile: name + both consents) does not silently sign in. The callback ends
+  the session and returns to Sign In with an `already_registered` notice ("You already have a
+  Markaz account"), keeping Sign Up semantically "create an account". Detection uses only the
+  authenticated user's own RLS-scoped profile — never a browser-supplied email or phone — so the
+  anti-enumeration stance is unchanged. Incomplete accounts (an abandoned first attempt) continue
+  to onboarding, and Sign-In-page provider actions are unaffected.
 - Supabase Auth owns provider subject resolution and canonical `auth.identities` rows. MARKAZ never
   resolves or merges identities from a browser-supplied email, phone, or Emirates ID.
 - Google uses its provider subject. UAE PASS uses its canonical provider subject and retains the

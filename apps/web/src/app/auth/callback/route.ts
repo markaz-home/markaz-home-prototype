@@ -1,5 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@markaz/auth/server';
+import { loadOwnProfileRow } from '@markaz/db';
+import { isProfileComplete } from '@markaz/domain';
 import { isLocale, defaultLocale } from '@markaz/i18n';
 import { resolvePostSignInDestination } from '@/lib/auth-redirect';
 import {
@@ -29,6 +31,7 @@ export async function GET(request: NextRequest) {
   const locale = localeParam && isLocale(localeParam) ? localeParam : defaultLocale;
   const destination = resolvePostSignInDestination(searchParams.get('next'));
   const isIdentityLink = searchParams.get('flow') === 'link';
+  const isSignUpIntent = searchParams.get('intent') === 'sign-up';
   const providerParam = searchParams.get('provider');
   const provider =
     providerParam === 'uae-pass' || providerParam === 'google' ? providerParam : null;
@@ -81,6 +84,32 @@ export async function GET(request: NextRequest) {
     // records are synchronized after Profile renders so a transient database lock
     // cannot hold this callback open or misreport a completed link as a failure.
     return backToProfile('uae_pass_linked');
+  }
+
+  if (isSignUpIntent) {
+    // Sign-up-page entry that resolved to an ESTABLISHED customer (profile
+    // complete: name + both consents). Per the 2026-08-07 ADR-0033 refinement,
+    // an established account never re-enters sign-up: end this session and send
+    // them to Sign In with a clear notice. Detection uses only the authenticated
+    // user's own RLS-scoped profile — never a browser-supplied email or phone.
+    // Incomplete accounts (e.g. an abandoned first attempt) continue onboarding.
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      const profile = await loadOwnProfileRow({ id: user.id, email: user.email ?? undefined });
+      if (
+        profile &&
+        isProfileComplete({
+          fullName: profile.fullName,
+          termsAcceptedAt: profile.termsAcceptedAt?.toISOString() ?? null,
+          privacyAcceptedAt: profile.privacyAcceptedAt?.toISOString() ?? null,
+        })
+      ) {
+        await supabase.auth.signOut();
+        return backToSignIn('already_registered');
+      }
+    }
   }
 
   if (provider === 'uae-pass') {

@@ -19,10 +19,8 @@ import { AuthProgress } from '@/components/auth/auth-progress';
 import { PasswordField } from '@/components/auth/password-field';
 import { PasswordChecklist } from '@/components/auth/password-checklist';
 import { ProviderAuthButtons } from '@/components/auth/provider-auth-buttons';
+import { ConsentCheckbox } from '@/components/auth/consent-checkbox';
 import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
-
-/** Placeholder legal destinations, matching the (auth) layout footer. */
-const LEGAL = { terms: '#terms', privacy: '#privacy' };
 
 export function SignUpForm({
   googleEnabled = false,
@@ -111,162 +109,136 @@ export function SignUpForm({
         <AuthHeading title={t('title')} progress={<AuthProgress current={0} />} />
 
         {existing ? (
-          <Alert variant="warning" title={tv('existingAccount')}>
-            <p className="text-muted-foreground mt-1 text-sm">{tv('existingAccountBody')}</p>
-            {/* The way out is an action, not two look-alike links. */}
-            <div className="mt-3 flex flex-wrap items-center gap-3">
-              <Button asChild size="sm" variant="outline">
+          /* The form yields to the warning entirely: the way forward is Sign In,
+             not silently retrying the same details (anti-enumeration copy). */
+          <div className="space-y-5">
+            <Alert variant="warning" title={tv('existingAccount')}>
+              <p className="text-muted-foreground mt-1 text-sm">{tv('existingAccountBody')}</p>
+            </Alert>
+            <div className="space-y-3">
+              <Button asChild className="w-full">
                 <Link href="/sign-in">{ta('signIn')}</Link>
               </Button>
-              <Link
-                href="/forgot-password"
-                className="text-muted-foreground hover:text-foreground text-sm underline-offset-4 hover:underline"
+              <Button asChild variant="outline" className="w-full">
+                <Link href="/forgot-password">{tsi('forgot')}</Link>
+              </Button>
+              <button
+                type="button"
+                onClick={() => setExisting(false)}
+                className="text-muted-foreground hover:text-foreground w-full text-center text-sm underline-offset-4 hover:underline"
               >
-                {tsi('forgot')}
-              </Link>
+                {t('tryDifferentEmail')}
+              </button>
             </div>
-          </Alert>
-        ) : null}
-        {formError ? <Alert variant="destructive">{formError}</Alert> : null}
-
-        <ProviderAuthButtons
-          intent="sign-up"
-          locale={locale}
-          googleEnabled={googleEnabled}
-          uaePassEnabled={uaePassEnabled}
-          onError={(message) => setFormError(message || null)}
-        />
-
-        <form
-          onSubmit={handleSubmit(onSubmit, (formErrors) => {
-            setSubmitted(true);
-            // react-hook-form focuses the first invalid registered field. The
-            // consent box is controlled (it writes both flags), so focus it here
-            // when it is the only thing left to fix.
-            const fieldInvalid = ['fullName', 'email', 'password', 'confirmPassword'].some(
-              (key) => key in formErrors,
-            );
-            if (!fieldInvalid && (formErrors.acceptTerms || formErrors.acceptPrivacy)) {
-              document.getElementById('acceptConsent')?.focus();
-            }
-          })}
-          className="space-y-3"
-          noValidate
-        >
-          <div className="space-y-3">
-            <FormField
-              id="fullName"
-              label={t('fullName')}
-              error={fe(errors.fullName?.message)}
-              required
-            >
-              <Input
-                id="fullName"
-                autoComplete="name"
-                placeholder={t('fullNamePlaceholder')}
-                aria-invalid={!!errors.fullName}
-                {...register('fullName')}
-              />
-            </FormField>
-
-            <FormField id="email" label={t('email')} error={fe(errors.email?.message)} required>
-              <Input
-                id="email"
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                dir="ltr"
-                placeholder={t('emailPlaceholder')}
-                aria-invalid={!!errors.email}
-                {...register('email')}
-              />
-            </FormField>
-
-            <FormField id="password" label={t('password')} error={passwordFieldError} required>
-              <PasswordField
-                id="password"
-                autoComplete="new-password"
-                dir="ltr"
-                placeholder={t('passwordPlaceholder')}
-                aria-invalid={!!errors.password}
-                {...register('password')}
-              />
-            </FormField>
-
-            <PasswordChecklist password={password} submitted={submitted} />
-
-            <FormField
-              id="confirmPassword"
-              label={t('confirmPassword')}
-              error={fe(errors.confirmPassword?.message)}
-              required
-            >
-              <PasswordField
-                id="confirmPassword"
-                autoComplete="new-password"
-                dir="ltr"
-                placeholder={t('confirmPasswordPlaceholder')}
-                aria-invalid={!!errors.confirmPassword}
-                {...register('confirmPassword')}
-              />
-            </FormField>
           </div>
+        ) : (
+          <>
+            {formError ? <Alert variant="destructive">{formError}</Alert> : null}
 
-          <div className="space-y-2">
-            <label className="flex items-start gap-3 text-sm">
-              <input
-                id="acceptConsent"
-                type="checkbox"
+            <ProviderAuthButtons
+              intent="sign-up"
+              locale={locale}
+              googleEnabled={googleEnabled}
+              uaePassEnabled={uaePassEnabled}
+              onError={(message) => setFormError(message || null)}
+            />
+
+            <form
+              onSubmit={handleSubmit(onSubmit, (formErrors) => {
+                setSubmitted(true);
+                // react-hook-form focuses the first invalid registered field. The
+                // consent box is controlled (it writes both flags), so focus it here
+                // when it is the only thing left to fix.
+                const fieldInvalid = ['fullName', 'email', 'password', 'confirmPassword'].some(
+                  (key) => key in formErrors,
+                );
+                if (!fieldInvalid && (formErrors.acceptTerms || formErrors.acceptPrivacy)) {
+                  document.getElementById('acceptConsent')?.focus();
+                }
+              })}
+              className="space-y-3"
+              noValidate
+            >
+              <div className="space-y-3">
+                <FormField
+                  id="fullName"
+                  label={t('fullName')}
+                  error={fe(errors.fullName?.message)}
+                  required
+                >
+                  <Input
+                    id="fullName"
+                    autoComplete="name"
+                    placeholder={t('fullNamePlaceholder')}
+                    aria-invalid={!!errors.fullName}
+                    {...register('fullName')}
+                  />
+                </FormField>
+
+                <FormField id="email" label={t('email')} error={fe(errors.email?.message)} required>
+                  <Input
+                    id="email"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    dir="ltr"
+                    placeholder={t('emailPlaceholder')}
+                    aria-invalid={!!errors.email}
+                    {...register('email')}
+                  />
+                </FormField>
+
+                <FormField id="password" label={t('password')} error={passwordFieldError} required>
+                  <PasswordField
+                    id="password"
+                    autoComplete="new-password"
+                    dir="ltr"
+                    placeholder={t('passwordPlaceholder')}
+                    aria-invalid={!!errors.password}
+                    {...register('password')}
+                  />
+                </FormField>
+
+                <PasswordChecklist password={password} submitted={submitted} />
+
+                <FormField
+                  id="confirmPassword"
+                  label={t('confirmPassword')}
+                  error={fe(errors.confirmPassword?.message)}
+                  required
+                >
+                  <PasswordField
+                    id="confirmPassword"
+                    autoComplete="new-password"
+                    dir="ltr"
+                    placeholder={t('confirmPasswordPlaceholder')}
+                    aria-invalid={!!errors.confirmPassword}
+                    {...register('confirmPassword')}
+                  />
+                </FormField>
+              </div>
+
+              <ConsentCheckbox
                 checked={acceptedAll}
-                onChange={(event) => setConsent(event.target.checked)}
-                aria-invalid={!!consentError}
-                className="focus-visible:ring-ring mt-0.5 h-4 w-4 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                onChange={setConsent}
+                error={fe(consentError?.message as string | undefined)}
               />
-              <span>
-                {t.rich('consent', {
-                  terms: (chunks) => (
-                    <a
-                      href={LEGAL.terms}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary underline underline-offset-4"
-                    >
-                      {chunks}
-                    </a>
-                  ),
-                  privacy: (chunks) => (
-                    <a
-                      href={LEGAL.privacy}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary underline underline-offset-4"
-                    >
-                      {chunks}
-                    </a>
-                  ),
-                })}
-              </span>
-            </label>
-            {consentError ? (
-              <p role="alert" className="text-destructive text-xs font-medium">
-                {fe(consentError.message as string | undefined)}
-              </p>
-            ) : null}
-          </div>
 
-          <Button type="submit" className="w-full" loading={isSubmitting}>
-            {isSubmitting ? t('submitting') : t('submit')}
-          </Button>
-          <p className="text-muted-foreground text-center text-sm">
-            {t('existing')}{' '}
-            <Link
-              href="/sign-in"
-              className="text-primary font-medium underline-offset-4 hover:underline"
-            >
-              {ta('signIn')}
-            </Link>
-          </p>
-        </form>
+              <Button type="submit" className="w-full" loading={isSubmitting}>
+                {isSubmitting ? t('submitting') : t('submit')}
+              </Button>
+              <p className="text-muted-foreground text-center text-sm">
+                {t('existing')}{' '}
+                <Link
+                  href="/sign-in"
+                  className="text-primary font-medium underline-offset-4 hover:underline"
+                >
+                  {ta('signIn')}
+                </Link>
+              </p>
+            </form>
+          </>
+        )}
       </div>
     </AuthShell>
   );
