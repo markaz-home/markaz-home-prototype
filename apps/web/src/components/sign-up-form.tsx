@@ -133,110 +133,110 @@ export function SignUpForm({
           </div>
         ) : (
           <>
-        {formError ? <Alert variant="destructive">{formError}</Alert> : null}
+            {formError ? <Alert variant="destructive">{formError}</Alert> : null}
 
-        <ProviderAuthButtons
-          intent="sign-up"
-          locale={locale}
-          googleEnabled={googleEnabled}
-          uaePassEnabled={uaePassEnabled}
-          onError={(message) => setFormError(message || null)}
-        />
+            <ProviderAuthButtons
+              intent="sign-up"
+              locale={locale}
+              googleEnabled={googleEnabled}
+              uaePassEnabled={uaePassEnabled}
+              onError={(message) => setFormError(message || null)}
+            />
 
-        <form
-          onSubmit={handleSubmit(onSubmit, (formErrors) => {
-            setSubmitted(true);
-            // react-hook-form focuses the first invalid registered field. The
-            // consent box is controlled (it writes both flags), so focus it here
-            // when it is the only thing left to fix.
-            const fieldInvalid = ['fullName', 'email', 'password', 'confirmPassword'].some(
-              (key) => key in formErrors,
-            );
-            if (!fieldInvalid && (formErrors.acceptTerms || formErrors.acceptPrivacy)) {
-              document.getElementById('acceptConsent')?.focus();
-            }
-          })}
-          className="space-y-3"
-          noValidate
-        >
-          <div className="space-y-3">
-            <FormField
-              id="fullName"
-              label={t('fullName')}
-              error={fe(errors.fullName?.message)}
-              required
+            <form
+              onSubmit={handleSubmit(onSubmit, (formErrors) => {
+                setSubmitted(true);
+                // react-hook-form focuses the first invalid registered field. The
+                // consent box is controlled (it writes both flags), so focus it here
+                // when it is the only thing left to fix.
+                const fieldInvalid = ['fullName', 'email', 'password', 'confirmPassword'].some(
+                  (key) => key in formErrors,
+                );
+                if (!fieldInvalid && (formErrors.acceptTerms || formErrors.acceptPrivacy)) {
+                  document.getElementById('acceptConsent')?.focus();
+                }
+              })}
+              className="space-y-3"
+              noValidate
             >
-              <Input
-                id="fullName"
-                autoComplete="name"
-                placeholder={t('fullNamePlaceholder')}
-                aria-invalid={!!errors.fullName}
-                {...register('fullName')}
+              <div className="space-y-3">
+                <FormField
+                  id="fullName"
+                  label={t('fullName')}
+                  error={fe(errors.fullName?.message)}
+                  required
+                >
+                  <Input
+                    id="fullName"
+                    autoComplete="name"
+                    placeholder={t('fullNamePlaceholder')}
+                    aria-invalid={!!errors.fullName}
+                    {...register('fullName')}
+                  />
+                </FormField>
+
+                <FormField id="email" label={t('email')} error={fe(errors.email?.message)} required>
+                  <Input
+                    id="email"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    dir="ltr"
+                    placeholder={t('emailPlaceholder')}
+                    aria-invalid={!!errors.email}
+                    {...register('email')}
+                  />
+                </FormField>
+
+                <FormField id="password" label={t('password')} error={passwordFieldError} required>
+                  <PasswordField
+                    id="password"
+                    autoComplete="new-password"
+                    dir="ltr"
+                    placeholder={t('passwordPlaceholder')}
+                    aria-invalid={!!errors.password}
+                    {...register('password')}
+                  />
+                </FormField>
+
+                <PasswordChecklist password={password} submitted={submitted} />
+
+                <FormField
+                  id="confirmPassword"
+                  label={t('confirmPassword')}
+                  error={fe(errors.confirmPassword?.message)}
+                  required
+                >
+                  <PasswordField
+                    id="confirmPassword"
+                    autoComplete="new-password"
+                    dir="ltr"
+                    placeholder={t('confirmPasswordPlaceholder')}
+                    aria-invalid={!!errors.confirmPassword}
+                    {...register('confirmPassword')}
+                  />
+                </FormField>
+              </div>
+
+              <ConsentCheckbox
+                checked={acceptedAll}
+                onChange={setConsent}
+                error={fe(consentError?.message as string | undefined)}
               />
-            </FormField>
 
-            <FormField id="email" label={t('email')} error={fe(errors.email?.message)} required>
-              <Input
-                id="email"
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                dir="ltr"
-                placeholder={t('emailPlaceholder')}
-                aria-invalid={!!errors.email}
-                {...register('email')}
-              />
-            </FormField>
-
-            <FormField id="password" label={t('password')} error={passwordFieldError} required>
-              <PasswordField
-                id="password"
-                autoComplete="new-password"
-                dir="ltr"
-                placeholder={t('passwordPlaceholder')}
-                aria-invalid={!!errors.password}
-                {...register('password')}
-              />
-            </FormField>
-
-            <PasswordChecklist password={password} submitted={submitted} />
-
-            <FormField
-              id="confirmPassword"
-              label={t('confirmPassword')}
-              error={fe(errors.confirmPassword?.message)}
-              required
-            >
-              <PasswordField
-                id="confirmPassword"
-                autoComplete="new-password"
-                dir="ltr"
-                placeholder={t('confirmPasswordPlaceholder')}
-                aria-invalid={!!errors.confirmPassword}
-                {...register('confirmPassword')}
-              />
-            </FormField>
-          </div>
-
-          <ConsentCheckbox
-            checked={acceptedAll}
-            onChange={setConsent}
-            error={fe(consentError?.message as string | undefined)}
-          />
-
-          <Button type="submit" className="w-full" loading={isSubmitting}>
-            {isSubmitting ? t('submitting') : t('submit')}
-          </Button>
-          <p className="text-muted-foreground text-center text-sm">
-            {t('existing')}{' '}
-            <Link
-              href="/sign-in"
-              className="text-primary font-medium underline-offset-4 hover:underline"
-            >
-              {ta('signIn')}
-            </Link>
-          </p>
-        </form>
+              <Button type="submit" className="w-full" loading={isSubmitting}>
+                {isSubmitting ? t('submitting') : t('submit')}
+              </Button>
+              <p className="text-muted-foreground text-center text-sm">
+                {t('existing')}{' '}
+                <Link
+                  href="/sign-in"
+                  className="text-primary font-medium underline-offset-4 hover:underline"
+                >
+                  {ta('signIn')}
+                </Link>
+              </p>
+            </form>
           </>
         )}
       </div>
