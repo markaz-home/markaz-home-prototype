@@ -64,7 +64,7 @@ test('axe: transaction workspace (early stage)', async ({ page }) => {
   const listingId = (await createLiveListing(seller.id, { askingPrice: 2_000_000 })).id;
   const txId = await acceptedTransaction(buyer.id, seller.id, listingId);
   await signIn(page, buyer);
-  await page.goto(`/en/transactions/${txId}`);
+  await page.goto(`/en/transactions/${txId}/confirm`);
   await assertNoSeriousViolations(page, 'workspace-early');
 });
 
@@ -74,7 +74,7 @@ test('axe: deposit simulation', async ({ page }) => {
   const txId = await acceptedTransaction(buyer.id, seller.id, listingId);
   await driveToDeposit(txId, buyer.id, seller.id);
   await signIn(page, buyer);
-  await page.goto(`/en/transactions/${txId}`);
+  await page.goto(`/en/transactions/${txId}/deposit`);
   await assertNoSeriousViolations(page, 'deposit');
 });
 
@@ -84,7 +84,7 @@ test('axe: document checklist', async ({ page }) => {
   const txId = await acceptedTransaction(buyer.id, seller.id, listingId);
   await driveToDocuments(txId, buyer.id, seller.id);
   await signIn(page, buyer);
-  await page.goto(`/en/transactions/${txId}`);
+  await page.goto(`/en/transactions/${txId}/documents`);
   await assertNoSeriousViolations(page, 'documents');
 });
 
@@ -94,6 +94,6 @@ test('axe: transaction workspace (completion stage)', async ({ page }) => {
   const txId = await acceptedTransaction(buyer.id, seller.id, listingId);
   await driveToCompletion(txId, buyer.id, seller.id);
   await signIn(page, buyer);
-  await page.goto(`/en/transactions/${txId}`);
+  await page.goto(`/en/transactions/${txId}/completion`);
   await assertNoSeriousViolations(page, 'workspace-completion');
 });
