@@ -73,10 +73,14 @@ afterAll(async () => {
   await closeConnections();
 });
 
-async function driveToLive(a: ReturnType<typeof callerFor>, ownerId: string): Promise<string> {
+async function driveToLive(
+  a: ReturnType<typeof callerFor>,
+  ownerId: string,
+  details: typeof VALID_DETAILS = VALID_DETAILS,
+): Promise<string> {
   const { listingId } = await a.listing.create();
   created.push(listingId);
-  await a.listing.saveDetails({ listingId, ...VALID_DETAILS });
+  await a.listing.saveDetails({ listingId, ...details });
   await a.listing.document.register({
     listingId,
     documentType: 'TITLE_DEED',
@@ -175,22 +179,32 @@ d('publication → marketplace', () => {
   });
 
   it('search filters + sort work over the public view', async () => {
+    const a = callerFor(customerA);
+    const facetArea = `MARKAZ Facet ${customerA}`;
+    await driveToLive(a, customerA, {
+      ...VALID_DETAILS,
+      community: facetArea,
+      buildingOrProject: 'Facet Test Residence',
+    });
+
     const anon = anonCaller();
     const apts = await anon.marketplace.search({
+      area: facetArea,
       propertyType: 'APARTMENT',
       sort: 'PRICE_ASC',
     });
     expect(apts.items.every((i) => i.propertyType === 'APARTMENT')).toBe(true);
-    const none = await anon.marketplace.search({ minPrice: 999_000_000 });
+    const none = await anon.marketplace.search({ area: facetArea, minPrice: 999_000_000 });
     expect(none.items.length).toBe(0);
-    const facets = await anon.marketplace.facets({});
+    const facets = await anon.marketplace.facets({ area: facetArea });
     expect(facets.propertyTypes.every((facet) => typeof facet.count === 'number')).toBe(true);
     expect(facets.communities.every((facet) => facet.count > 0)).toBe(true);
-    const twoPlusBedrooms = await anon.marketplace.search({ bedrooms: '2' });
+    const twoPlusBedrooms = await anon.marketplace.search({ area: facetArea, bedrooms: '2' });
     expect(facets.bedrooms.find((facet) => facet.value === '2')?.count).toBe(
       twoPlusBedrooms.pagination.total,
     );
     const oneToThreeMillion = await anon.marketplace.search({
+      area: facetArea,
       minPrice: 1_000_000,
       maxPrice: 2_999_999,
     });
