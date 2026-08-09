@@ -1,6 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import { isUaePassStagingEnabled } from '@markaz/auth/uae-pass/server';
 import { AccountProfile } from '@/components/account-profile';
+import { resolveCustomerEmail } from '@/lib/customer-email';
 import { parseUaePassProfileNotice } from '@/lib/uae-pass-link';
 import { getSession } from '@/server/session';
 
@@ -24,7 +25,7 @@ export default async function AccountProfilePage({
   return (
     <AccountProfile
       fullName={profile?.fullName ?? null}
-      email={session?.email ?? profile?.email ?? null}
+      email={resolveCustomerEmail(session?.email, profile?.email)}
       phoneE164={profile?.phoneE164 ?? null}
       phoneVerified={!!profile?.phoneVerifiedAt}
       locale={locale}

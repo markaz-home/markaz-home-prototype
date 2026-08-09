@@ -1,6 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import { requireCustomerStep } from '@/server/session';
 import { ProfileSetupForm } from '@/components/profile-setup-form';
+import { resolveCustomerEmail } from '@/lib/customer-email';
 
 export default async function ProfileOnboardingPage({
   params,
@@ -13,7 +14,7 @@ export default async function ProfileOnboardingPage({
   const provider = session.uaePassAuthenticated ? 'uae-pass' : null;
   return (
     <ProfileSetupForm
-      email={session.email}
+      email={resolveCustomerEmail(session.email, session.profile?.email)}
       emailVerified={session.emailVerified || session.providerAuthenticated}
       initialName={session.profile?.fullName}
       initialPhone={session.profile?.phoneE164}
