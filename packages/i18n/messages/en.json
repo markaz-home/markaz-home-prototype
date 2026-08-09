@@ -177,9 +177,7 @@
   },
   "providerAuth": {
     "continueUaePass": "Continue with UAE PASS Staging",
-    "continueGoogle": "Continue with Google",
     "redirectingUaePass": "Redirecting to UAE PASS…",
-    "redirectingGoogle": "Redirecting to Google…",
     "or": "or",
     "error": "We could not continue with that sign-in method. Try again or use email and password.",
     "cancelled": "Provider sign-in was cancelled. You can try again or use email and password.",
@@ -232,7 +230,6 @@
     "email": "Email",
     "mobileNumber": "Mobile number",
     "uaePassProvider": "UAE PASS",
-    "googleProvider": "Google",
     "providerSubmit": "Agree and continue",
     "providerSubmitting": "Continuing…",
     "providerReassurance": "You can update optional contact details later from Profile."
@@ -452,8 +449,6 @@
     "methodsDescription": "Manage how you sign in to MARKAZ.",
     "emailMethodTitle": "Email and password",
     "emailMethodDescription": "Your verified MARKAZ email account.",
-    "googleMethodTitle": "Google",
-    "googleMethodDescription": "Your linked Google account.",
     "verified": "Verified",
     "verificationRequired": "Verification required",
     "uaePassMethodTitle": "UAE PASS Staging",

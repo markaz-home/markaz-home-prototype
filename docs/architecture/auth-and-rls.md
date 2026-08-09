@@ -2,8 +2,8 @@
 
 ## Authentication flow
 
-Authentication is **email + password, Google, or UAE PASS** via Supabase Auth
-(ADR 0009 / ADR 0033). A 6-digit email code is retained **only** for a new
+Authentication is **email + password or UAE PASS** via Supabase Auth
+(ADR 0009 / ADR 0033 / ADR 0034). A 6-digit email code is retained **only** for a new
 email/password account's email verification; password
 recovery uses the **official Supabase recovery LINK** (not a code). Neither is the
 sign-in credential, and SMS is never used. Codes, links, and tokens are generated
@@ -20,8 +20,8 @@ privacy_accepted } } })` → `/[locale]/verify-email` (6-digit `confirmation` co
 → `verifyOtp({ type:'signup' })` → Welcome → dashboard.
 
 The email/password path hydrates `full_name` + consent from Auth metadata via
-`handle_new_user`, so **profile-setup is a fallback only** for that method. Google
-or UAE PASS may instead create the account first; approved attributes prefill Profile
+`handle_new_user`, so **profile-setup is a fallback only** for that method. UAE PASS
+may instead create the account first; approved attributes prefill Profile
 Setup, which still collects MARKAZ Terms/Privacy consent (ADR 0033). Existing customers
 may link UAE PASS later from Profile. Dashboard offers a dismissible, non-blocking
 account-setup prompt to add an optional contact mobile and link UAE PASS (ADR 0032).
@@ -35,7 +35,7 @@ it is an admin. `email_not_confirmed` is the one case acted on: it routes to
 `verify-email`. A returning verified customer with a complete profile goes
 straight to the dashboard.
 
-A customer may instead use Google or UAE PASS Staging. A new provider subject creates
+A customer may instead use UAE PASS Staging. A new provider subject creates
 one CUSTOMER profile and continues through MARKAZ profile/consent completion; a known
 subject returns to the same `auth.users` row. Application code never joins identities by
 phone, Emirates ID, or browser claims.

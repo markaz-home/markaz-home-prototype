@@ -7,8 +7,7 @@ try {
   const result = validateEnvironment(process.env, { app });
   console.log(
     `Configuration valid for ${result.app} (${result.deploymentEnvironment}); ` +
-      `UAE PASS=${result.uaePassMode}, Google=${result.googleAuthMode}, ` +
-      `BayutAPI=${result.bayutApiMode}.`,
+      `UAE PASS=${result.uaePassMode}, BayutAPI=${result.bayutApiMode}.`,
   );
   for (const warning of result.warnings) console.warn(`Configuration notice: ${warning}`);
 } catch (error) {

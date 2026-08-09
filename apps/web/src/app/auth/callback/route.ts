@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '@markaz/auth/server';
+import { createSupabaseServerClient, getAuthProviderIds } from '@markaz/auth/server';
 import { loadOwnProfileRow } from '@markaz/db';
 import { isProfileComplete } from '@markaz/domain';
 import { isLocale, defaultLocale } from '@markaz/i18n';
@@ -11,8 +11,7 @@ import {
 } from '@/lib/uae-pass-link';
 
 /**
- * OAuth code-exchange callback (PKCE). Used by UAE PASS and Google. Supabase Auth
- * (GoTrue) has already completed the
+ * UAE PASS OAuth code-exchange callback (PKCE). Supabase Auth (GoTrue) has already completed the
  * provider round-trip and account resolution (by provider subject) and redirected
  * here with `?code=`; we exchange it for a STANDARD Supabase SSR session.
  * `auth.uid()` / RLS then work exactly as for email-password sign-in.
@@ -33,8 +32,7 @@ export async function GET(request: NextRequest) {
   const isIdentityLink = searchParams.get('flow') === 'link';
   const isSignUpIntent = searchParams.get('intent') === 'sign-up';
   const providerParam = searchParams.get('provider');
-  const provider =
-    providerParam === 'uae-pass' || providerParam === 'google' ? providerParam : null;
+  const provider = providerParam === 'uae-pass' ? providerParam : null;
 
   const backToSignIn = (reason: string, next?: string) => {
     const params = new URLSearchParams({ error: reason });
@@ -61,7 +59,10 @@ export async function GET(request: NextRequest) {
           : 'provider_error',
     );
   }
-  if (!code)
+  // Email/password confirmation and recovery use /auth/confirm, not this route.
+  // Refuse every non-UAE-PASS OAuth callback before exchanging its code so a
+  // hosted provider accidentally left enabled cannot establish an app session.
+  if (!code || (!isIdentityLink && provider !== 'uae-pass'))
     return isIdentityLink ? backToProfile('uae_pass_error') : backToSignIn('provider_error');
 
   const supabase = await createSupabaseServerClient();
@@ -76,6 +77,20 @@ export async function GET(request: NextRequest) {
             ? 'provider_conflict'
             : 'provider_error',
         );
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const hasUaePassIdentity =
+    !!user &&
+    (getAuthProviderIds(user).includes('custom:uae-pass') ||
+      user.identities?.some((identity) => identity.provider === 'custom:uae-pass'));
+  if (!hasUaePassIdentity) {
+    // Defence in depth against a forged callback marker. The provider is also
+    // disabled in Supabase config, but the application never trusts that alone.
+    await supabase.auth.signOut();
+    return isIdentityLink ? backToProfile('uae_pass_error') : backToSignIn('provider_error');
   }
 
   if (isIdentityLink) {
@@ -93,9 +108,6 @@ export async function GET(request: NextRequest) {
     // them to Sign In with a clear notice. Detection uses only the authenticated
     // user's own RLS-scoped profile — never a browser-supplied email or phone.
     // Incomplete accounts (e.g. an abandoned first attempt) continue onboarding.
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
     if (user) {
       const profile = await loadOwnProfileRow({ id: user.id, email: user.email ?? undefined });
       if (

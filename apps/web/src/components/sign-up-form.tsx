@@ -23,11 +23,9 @@ import { ConsentCheckbox } from '@/components/auth/consent-checkbox';
 import { FIELD_ERROR_KEYS, AUTH_ERROR_KEYS } from '@/components/auth/error-keys';
 
 export function SignUpForm({
-  googleEnabled = false,
   uaePassEnabled = false,
   locale = 'en',
 }: {
-  googleEnabled?: boolean;
   uaePassEnabled?: boolean;
   locale?: string;
 }) {
@@ -138,7 +136,6 @@ export function SignUpForm({
             <ProviderAuthButtons
               intent="sign-up"
               locale={locale}
-              googleEnabled={googleEnabled}
               uaePassEnabled={uaePassEnabled}
               onError={(message) => setFormError(message || null)}
             />

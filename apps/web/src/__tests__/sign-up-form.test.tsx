@@ -54,28 +54,22 @@ describe('SignUpForm', () => {
     await waitFor(() => expect(signUp).not.toHaveBeenCalled());
   });
 
-  it('offers UAE PASS and Google as first-time account creation methods when enabled', () => {
-    renderWithIntl(<SignUpForm uaePassEnabled googleEnabled locale="en" />);
+  it('offers UAE PASS alongside email/password account creation when enabled', () => {
+    renderWithIntl(<SignUpForm uaePassEnabled locale="en" />);
     expect(screen.getByRole('button', { name: /Continue with UAE PASS Staging/i })).toBeVisible();
-    expect(screen.getByRole('button', { name: /Continue with Google/i })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Create account' })).toBeVisible();
   });
 
-  it.each([
-    ['UAE PASS Staging', 'custom:uae-pass', 'uae-pass'],
-    ['Google', 'google', 'google'],
-  ])('starts %s signup through the shared OAuth callback', async (label, provider, marker) => {
+  it('starts UAE PASS signup through the shared OAuth callback', async () => {
     const user = userEvent.setup();
-    renderWithIntl(<SignUpForm uaePassEnabled googleEnabled locale="ar" />);
-    await user.click(
-      screen.getByRole('button', { name: new RegExp(`Continue with ${label}`, 'i') }),
-    );
+    renderWithIntl(<SignUpForm uaePassEnabled locale="ar" />);
+    await user.click(screen.getByRole('button', { name: /Continue with UAE PASS Staging/i }));
     await waitFor(() => expect(signInWithOAuth).toHaveBeenCalledTimes(1));
     const request = signInWithOAuth.mock.calls[0]![0];
-    expect(request.provider).toBe(provider);
+    expect(request.provider).toBe('custom:uae-pass');
     expect(request.options.redirectTo).toContain('intent=sign-up');
     expect(request.options.redirectTo).toContain('locale=ar');
-    expect(request.options.redirectTo).toContain(`provider=${marker}`);
+    expect(request.options.redirectTo).toContain('provider=uae-pass');
   });
 
   it('rejects a password mismatch', async () => {

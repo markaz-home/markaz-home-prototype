@@ -180,9 +180,7 @@
   },
   "providerAuth": {
     "continueUaePass": "المتابعة باستخدام UAE PASS التجريبي",
-    "continueGoogle": "المتابعة باستخدام Google",
     "redirectingUaePass": "جارٍ التحويل إلى UAE PASS…",
-    "redirectingGoogle": "جارٍ التحويل إلى Google…",
     "or": "أو",
     "error": "تعذّرت المتابعة باستخدام طريقة تسجيل الدخول هذه. حاول مجددًا أو استخدم البريد الإلكتروني وكلمة المرور.",
     "cancelled": "تم إلغاء تسجيل الدخول. يمكنك المحاولة مجددًا أو استخدام البريد الإلكتروني وكلمة المرور.",
@@ -235,7 +233,6 @@
     "email": "البريد الإلكتروني",
     "mobileNumber": "رقم الهاتف المحمول",
     "uaePassProvider": "UAE PASS",
-    "googleProvider": "Google",
     "providerSubmit": "الموافقة والمتابعة",
     "providerSubmitting": "جارٍ المتابعة…",
     "providerReassurance": "يمكنك تحديث تفاصيل الاتصال الاختيارية لاحقًا من الملف الشخصي."
@@ -455,8 +452,6 @@
     "methodsDescription": "أدر طرق تسجيل الدخول إلى MARKAZ.",
     "emailMethodTitle": "البريد الإلكتروني وكلمة المرور",
     "emailMethodDescription": "حساب بريد MARKAZ الموثّق.",
-    "googleMethodTitle": "Google",
-    "googleMethodDescription": "حساب Google المرتبط بك.",
     "verified": "موثّق",
     "verificationRequired": "التحقق مطلوب",
     "uaePassMethodTitle": "UAE PASS (بيئة الاختبار)",
