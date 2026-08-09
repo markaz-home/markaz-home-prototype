@@ -387,7 +387,13 @@ async function sendWithResend(
       // the same subject are never collapsed together by the provider.
       'Idempotency-Key': `markaz-notification-${idempotencyKey}`,
     },
-    body: JSON.stringify({ from, to: [to], subject: email.subject, html: email.html, text: email.text }),
+    body: JSON.stringify({
+      from,
+      to: [to],
+      subject: email.subject,
+      html: email.html,
+      text: email.text,
+    }),
   });
   if (!response.ok) throw new Error(`EMAIL_PROVIDER_${response.status}`);
   const body = (await response.json()) as { id?: unknown };
@@ -407,9 +413,7 @@ function actionUrlFor(context: DeliveryContext, locale: string): string {
 
 /** Called only by the authenticated cron route. Returns counts, never PII. */
 export async function processNotificationEmailOutbox(limit = 20) {
-  const reminderHours = Number(
-    process.env.TRANSACTION_REMINDER_HOURS ?? DEFAULT_REMINDER_HOURS,
-  );
+  const reminderHours = Number(process.env.TRANSACTION_REMINDER_HOURS ?? DEFAULT_REMINDER_HOURS);
   await getDirectDb().execute(
     sql`select private.queue_due_transaction_reminders(${reminderHours})`,
   );

@@ -34,8 +34,7 @@ export const threadOffersRouter = router({
     const s = await loadSummary(ctx.tx, t.listingId);
     if (!s) throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_FOUND' });
     const cur = await currentProposal(ctx.tx, t.currentProposalId);
-    const transaction =
-      t.status === 'ACCEPTED' ? await acceptedTransaction(ctx.tx, t.id) : null;
+    const transaction = t.status === 'ACCEPTED' ? await acceptedTransaction(ctx.tx, t.id) : null;
     const eventRows = await ctx.tx
       .select()
       .from(offerEvents)

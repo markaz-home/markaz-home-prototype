@@ -1,8 +1,4 @@
-import {
-  TRANSACTION_STAGES,
-  type TransactionStage,
-  type TransactionStatus,
-} from '@markaz/domain';
+import { TRANSACTION_STAGES, type TransactionStage, type TransactionStatus } from '@markaz/domain';
 
 export const TRANSACTION_STAGE_ROUTES = [
   { stage: 'CONFIRMATION', slug: 'confirm' },

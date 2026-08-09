@@ -140,12 +140,14 @@ d('offer negotiation (live DB)', () => {
     let thread = await threadRow(threadId);
     await asUser(
       seller,
-      (tx) => tx`select public.submit_counter(${threadId}::uuid, 750000, null, ${thread.version as number})`,
+      (tx) =>
+        tx`select public.submit_counter(${threadId}::uuid, 750000, null, ${thread.version as number})`,
     );
     thread = await threadRow(threadId);
     await asUser(
       buyer3,
-      (tx) => tx`select public.submit_counter(${threadId}::uuid, 725000, null, ${thread.version as number})`,
+      (tx) =>
+        tx`select public.submit_counter(${threadId}::uuid, 725000, null, ${thread.version as number})`,
     );
     await asUser(seller, (tx) => tx`select public.mark_offer_viewed(${threadId}::uuid)`);
     rows = await asService(

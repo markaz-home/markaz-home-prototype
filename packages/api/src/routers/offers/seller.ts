@@ -120,8 +120,7 @@ export const sellerOffersRouter = router({
       const availability = resolveAvailability({
         listingState: s.state,
         hasAcceptedOffer: threads.some(
-          (thread) =>
-            thread.status === 'ACCEPTED' && thread.transaction?.status !== 'CANCELLED',
+          (thread) => thread.status === 'ACCEPTED' && thread.transaction?.status !== 'CANCELLED',
         ),
       });
       return {

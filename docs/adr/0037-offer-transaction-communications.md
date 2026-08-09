@@ -37,5 +37,7 @@ no reminder policy.
 Customers receive detailed real-time activity cards and branded, event-specific email without
 making network calls inside state-transition transactions. Delivery is durable and retryable;
 viewing remains low-noise and in-app only. Production delivery requires the Resend provider,
-sender domain, and cron secret to be configured. Arabic transactional copy remains draft pending
+sender domain, and cron secret to be configured. The current Vercel Hobby deployment invokes the
+outbox once daily at 08:00 Asia/Dubai; move to a frequent approved scheduler before treating email
+as near-real-time. Arabic transactional copy remains draft pending
 review.

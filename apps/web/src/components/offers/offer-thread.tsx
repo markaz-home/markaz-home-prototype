@@ -114,9 +114,7 @@ export function OfferThread({ threadId }: { threadId: string }) {
             {title}
           </h1>
           <OfferStatusBadge statusKey={thread.statusKey} />
-          {thread.transaction ? (
-            <TransactionOutcomeBadge transaction={thread.transaction} />
-          ) : null}
+          {thread.transaction ? <TransactionOutcomeBadge transaction={thread.transaction} /> : null}
         </div>
         <p className="text-muted-foreground">
           {[thread.property.community, thread.property.emirate].filter(Boolean).join(' · ')}
@@ -153,18 +151,18 @@ export function OfferThread({ threadId }: { threadId: string }) {
 
         {thread.status !== 'ACCEPTED' ? (
           <aside className="lg:sticky lg:top-20 lg:self-start">
-          <DecisionPanel
-            thread={thread}
-            threadId={threadId}
-            onDone={(key) => {
-              setAnnounce(key ? t(`announce.${key}` as 'announce.accepted') : '');
-              void utils.offers.getThread.invalidate({ threadId });
-              void utils.offers.getBuyerThreads.invalidate();
-              void utils.offers.getSellerInbox.invalidate();
-              void utils.offers.getUnreadCounts.invalidate();
-            }}
-            onError={(e) => setAnnounce(errMsg(e))}
-          />
+            <DecisionPanel
+              thread={thread}
+              threadId={threadId}
+              onDone={(key) => {
+                setAnnounce(key ? t(`announce.${key}` as 'announce.accepted') : '');
+                void utils.offers.getThread.invalidate({ threadId });
+                void utils.offers.getBuyerThreads.invalidate();
+                void utils.offers.getSellerInbox.invalidate();
+                void utils.offers.getUnreadCounts.invalidate();
+              }}
+              onError={(e) => setAnnounce(errMsg(e))}
+            />
           </aside>
         ) : null}
       </div>
@@ -184,7 +182,9 @@ function TransactionOutcomeBadge({
   return (
     <Badge
       variant="outline"
-      className={closed ? 'border-destructive/40 text-destructive' : 'border-primary/35 text-primary'}
+      className={
+        closed ? 'border-destructive/40 text-destructive' : 'border-primary/35 text-primary'
+      }
     >
       {t(transaction.statusKey as 'status.cancelled')}
     </Badge>
@@ -432,9 +432,7 @@ function CancelledAcceptedPanel({ thread }: { thread: ThreadData }) {
     <Card className="border-destructive/30 bg-destructive/5">
       <CardContent className="flex flex-col gap-5 pt-6 md:flex-row md:items-center">
         <div className="min-w-0 flex-1">
-          <h2 className="font-display text-2xl">
-            {t('cancellation.cancelledTitle')}
-          </h2>
+          <h2 className="font-display text-2xl">{t('cancellation.cancelledTitle')}</h2>
           <p className="text-muted-foreground mt-2 text-sm leading-6">
             {t(
               thread.perspective === 'SELLER'

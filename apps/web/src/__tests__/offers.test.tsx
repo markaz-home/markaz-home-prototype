@@ -244,7 +244,9 @@ describe('OfferThread', () => {
     renderWithIntl(<OfferThread threadId="t1" />);
     expect(screen.getByText('Offer accepted', { selector: 'p' })).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: /shared transaction is ready for both buyer and seller/i }),
+      screen.getByRole('heading', {
+        name: /shared transaction is ready for both buyer and seller/i,
+      }),
     ).toBeInTheDocument();
     expect(
       screen.getByText(/transaction setup will continue in the next stage/i),
@@ -273,9 +275,7 @@ describe('OfferThread', () => {
     renderWithIntl(<OfferThread threadId="t1" />);
 
     expect(screen.getByRole('heading', { name: 'Transaction cancelled' })).toBeInTheDocument();
-    expect(
-      screen.queryByRole('heading', { name: /shared transaction is ready/i }),
-    ).toBeNull();
+    expect(screen.queryByRole('heading', { name: /shared transaction is ready/i })).toBeNull();
     expect(screen.getByRole('link', { name: 'View transaction' })).toHaveAttribute(
       'href',
       '/transactions/tx1',

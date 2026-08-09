@@ -57,10 +57,10 @@ to ignore cancelled transactions (spec §31).
 
 ## Final routes
 
-| Route                                            | Who         | Purpose                            |
-| ------------------------------------------------ | ----------- | ---------------------------------- |
-| `/[locale]/transactions`                         | participant | My Transactions dashboard          |
-| `/[locale]/transactions/[transactionId]/[stage]` | participant | Focused shared stage workspace      |
+| Route                                            | Who         | Purpose                        |
+| ------------------------------------------------ | ----------- | ------------------------------ |
+| `/[locale]/transactions`                         | participant | My Transactions dashboard      |
+| `/[locale]/transactions/[transactionId]/[stage]` | participant | Focused shared stage workspace |
 
 The six stage slugs are `confirm`, `deposit`, `documents`, `checks`, `transfer`, and
 `completion`. They are focused views over the same shared transaction record.

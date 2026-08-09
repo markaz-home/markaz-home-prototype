@@ -124,9 +124,7 @@ export function CancellationPending({ d, refresh }: { d: Detail; refresh: () => 
           </div>
         ) : null}
         {iRequested ? (
-          <p className="text-primary text-xs font-medium">
-            {t('cancellation.waitingForResponse')}
-          </p>
+          <p className="text-primary text-xs font-medium">{t('cancellation.waitingForResponse')}</p>
         ) : null}
       </CardContent>
     </Card>

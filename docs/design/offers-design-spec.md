@@ -539,16 +539,16 @@ Offer submitted
 
 ## 11.1 Seller entry-point treatment
 
-| Entry                         | Behaviour                                  |
-| ----------------------------- | ------------------------------------------ |
-| My Listings                   | Show `View offers` and action-needed count |
-| Live listing management       | Offers summary panel                       |
-| Offers tab                    | Cross-listing inbox                        |
-| Listing-specific route        | Comparison view for one listing            |
-| Notification                  | Deep link to relevant thread               |
-| Below-threshold offer         | Visible in filter and notifies normally   |
-| Return after sign-out         | Safe authenticated return                  |
-| Buyer counter                 | Thread opens with response needed          |
+| Entry                   | Behaviour                                  |
+| ----------------------- | ------------------------------------------ |
+| My Listings             | Show `View offers` and action-needed count |
+| Live listing management | Offers summary panel                       |
+| Offers tab              | Cross-listing inbox                        |
+| Listing-specific route  | Comparison view for one listing            |
+| Notification            | Deep link to relevant thread               |
+| Below-threshold offer   | Visible in filter and notifies normally    |
+| Return after sign-out   | Safe authenticated return                  |
+| Buyer counter           | Thread opens with response needed          |
 
 ---
 

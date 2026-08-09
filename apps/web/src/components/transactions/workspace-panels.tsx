@@ -68,7 +68,10 @@ export function ProgressTracker({
         return (
           <li key={s} aria-current={selected ? 'step' : undefined}>
             {i <= stageIndex ? (
-              <Link href={`/transactions/${transactionId}/${slugForStage(s)}`} className={className}>
+              <Link
+                href={`/transactions/${transactionId}/${slugForStage(s)}`}
+                className={className}
+              >
                 {i + 1}. {t(`stage.${s}`)}
               </Link>
             ) : (
@@ -258,7 +261,10 @@ export function ParticipantProgress({ d, stage }: { d: Detail; stage: Transactio
                     </span>
                   </span>
                   {s.complete ? (
-                    <Check className="text-success h-5 w-5" aria-label={t('participants.complete')} />
+                    <Check
+                      className="text-success h-5 w-5"
+                      aria-label={t('participants.complete')}
+                    />
                   ) : (
                     <Circle className="text-muted-foreground h-4 w-4" aria-hidden />
                   )}
@@ -266,7 +272,10 @@ export function ParticipantProgress({ d, stage }: { d: Detail; stage: Transactio
                 {s.tasks.length > 0 ? (
                   <div className="space-y-2">
                     {s.tasks.map((task) => (
-                      <div key={task.code} className="flex items-center justify-between gap-3 text-xs">
+                      <div
+                        key={task.code}
+                        className="flex items-center justify-between gap-3 text-xs"
+                      >
                         <span dir="auto" className="text-muted-foreground truncate">
                           {t(`taskLabel.${task.code}` as 'taskLabel.BUYER_CONFIRM_DETAILS')}
                         </span>
@@ -309,7 +318,10 @@ export function Timeline({ d }: { d: Detail }) {
                   className="bg-border absolute start-[0.4375rem] top-3 h-[calc(100%-0.25rem)] w-px"
                 />
               ) : null}
-              <span className="border-primary bg-background relative z-10 mt-1 h-3 w-3 rounded-full border-2" aria-hidden />
+              <span
+                className="border-primary bg-background relative z-10 mt-1 h-3 w-3 rounded-full border-2"
+                aria-hidden
+              />
               <span>
                 <p dir="auto">{t(`timeline.${e.type}` as 'timeline.TRANSACTION_CREATED')}</p>
                 <time dateTime={e.createdAt} dir="ltr" className="text-muted-foreground text-xs">

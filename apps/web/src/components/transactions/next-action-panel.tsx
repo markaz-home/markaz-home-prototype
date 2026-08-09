@@ -151,10 +151,7 @@ export function NextActionPanel({
       </ActionCard>,
     );
   }
-  if (
-    stage === 'DOCUMENTS' &&
-    (my('BUYER_REVIEW_SUMMARY') || my('SELLER_REVIEW_SUMMARY'))
-  ) {
+  if (stage === 'DOCUMENTS' && (my('BUYER_REVIEW_SUMMARY') || my('SELLER_REVIEW_SUMMARY'))) {
     controls.push(
       <ActionCard key="summary" title={t('documents.summaryTitle')}>
         <p className="text-muted-foreground text-sm">{t('documents.summaryDisclosure')}</p>
@@ -209,10 +206,7 @@ export function NextActionPanel({
       </ActionCard>,
     );
   }
-  if (
-    stage === 'TRANSFER' &&
-    (my('BUYER_CONFIRM_READINESS') || my('SELLER_CONFIRM_READINESS'))
-  ) {
+  if (stage === 'TRANSFER' && (my('BUYER_CONFIRM_READINESS') || my('SELLER_CONFIRM_READINESS'))) {
     controls.push(
       <ActionCard key="ready" title={t('transfer.title')}>
         <p className="text-muted-foreground text-sm">

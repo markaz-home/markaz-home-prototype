@@ -186,13 +186,7 @@ export function toSellerThread(args: {
   minNotificationPrice: number | null;
   transaction?: OfferTransactionInput | null;
 }) {
-  const base = baseThread(
-    args.thread,
-    args.current,
-    args.property,
-    'SELLER',
-    args.transaction,
-  );
+  const base = baseThread(args.thread, args.current, args.property, 'SELLER', args.transaction);
   const amount = args.current ? Number(args.current.amountAed) : null;
   return {
     ...base,

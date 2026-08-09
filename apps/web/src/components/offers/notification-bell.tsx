@@ -92,7 +92,7 @@ export function NotificationBell() {
         <DropdownMenuSeparator className="m-0" />
         <button
           type="button"
-          className="text-primary w-full px-4 py-3 text-center text-sm font-medium hover:bg-foreground/5"
+          className="text-primary hover:bg-foreground/5 w-full px-4 py-3 text-center text-sm font-medium"
           onClick={() => router.push('/account/notifications')}
         >
           {t('viewAll')}

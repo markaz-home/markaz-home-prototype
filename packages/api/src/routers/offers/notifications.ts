@@ -82,10 +82,7 @@ export const notificationsOffersRouter = router({
           });
         }
       }
-      const transactionContext = new Map<
-        string,
-        { listingId: string; amountAed: number | null }
-      >();
+      const transactionContext = new Map<string, { listingId: string; amountAed: number | null }>();
       if (transactionIds.length > 0) {
         const transactionRows = await ctx.tx
           .select({
@@ -115,13 +112,8 @@ export const notificationsOffersRouter = router({
           amountAed: n.amountAed ?? fallback?.amountAed ?? null,
         };
       });
-      const listingIds = [
-        ...new Set(resolved.flatMap((n) => (n.listingId ? [n.listingId] : []))),
-      ];
-      const propertyByListing = new Map<
-        string,
-        ReturnType<typeof offerPropertySummary> | null
-      >();
+      const listingIds = [...new Set(resolved.flatMap((n) => (n.listingId ? [n.listingId] : [])))];
+      const propertyByListing = new Map<string, ReturnType<typeof offerPropertySummary> | null>();
       for (const listingId of listingIds) {
         const summary = await loadSummary(ctx.tx, listingId);
         propertyByListing.set(

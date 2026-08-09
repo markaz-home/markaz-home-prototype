@@ -260,7 +260,9 @@ export function validateEnvironment(env = process.env, { app = 'all' } = {}) {
       if (!trimmed(env, name)) issues.push(`${name} is required when EMAIL_PROVIDER=resend.`);
     }
   } else {
-    warnings.push('Transactional customer email delivery is disabled; outbox rows will remain pending.');
+    warnings.push(
+      'Transactional customer email delivery is disabled; outbox rows will remain pending.',
+    );
   }
   const reminderHours = trimmed(env, 'TRANSACTION_REMINDER_HOURS');
   if (reminderHours) {

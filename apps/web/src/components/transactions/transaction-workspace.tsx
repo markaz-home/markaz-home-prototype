@@ -114,11 +114,7 @@ function Loaded({ d, rt, viewedStage }: { d: Detail; rt: string; viewedStage: Tr
       </header>
 
       <SimulationDisclosure />
-      <ProgressTracker
-        stageIndex={d.stageIndex}
-        transactionId={d.id}
-        viewedStage={viewedStage}
-      />
+      <ProgressTracker stageIndex={d.stageIndex} transactionId={d.id} viewedStage={viewedStage} />
 
       <ParticipantProgress d={d} stage={viewedStage} />
 

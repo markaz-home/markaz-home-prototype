@@ -94,7 +94,10 @@ export function NotificationContent({
         </span>
         <span
           dir="auto"
-          className={cn('mt-0.5 block leading-snug', n.read ? 'text-muted-foreground' : 'font-medium')}
+          className={cn(
+            'mt-0.5 block leading-snug',
+            n.read ? 'text-muted-foreground' : 'font-medium',
+          )}
         >
           {title}
         </span>
@@ -112,8 +115,9 @@ export function NotificationContent({
           </time>
         </span>
       </span>
-      {!n.read ? <span className="bg-primary mt-2 h-2 w-2 shrink-0 rounded-full" aria-hidden /> : null}
+      {!n.read ? (
+        <span className="bg-primary mt-2 h-2 w-2 shrink-0 rounded-full" aria-hidden />
+      ) : null}
     </span>
   );
 }
-

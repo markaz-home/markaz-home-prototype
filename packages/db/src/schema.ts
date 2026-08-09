@@ -671,9 +671,7 @@ export const notificationEmailOutbox = privateSchema.table(
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
-    notificationKey: uniqueIndex('notification_email_outbox_notification_key').on(
-      t.notificationId,
-    ),
+    notificationKey: uniqueIndex('notification_email_outbox_notification_key').on(t.notificationId),
     pendingIdx: index('notification_email_outbox_pending_idx').on(
       t.status,
       t.availableAt,

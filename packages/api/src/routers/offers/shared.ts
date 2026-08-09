@@ -233,8 +233,7 @@ export function matchesBuyerFilter(
   transactionStatus?: TransactionStatus,
 ): boolean {
   const acceptedJourneyClosed =
-    status === 'ACCEPTED' &&
-    (transactionStatus === 'CANCELLED' || transactionStatus === 'FAILED');
+    status === 'ACCEPTED' && (transactionStatus === 'CANCELLED' || transactionStatus === 'FAILED');
   switch (filter) {
     case 'action':
       return status === 'AWAITING_BUYER' && nextActor === 'BUYER';
@@ -243,13 +242,16 @@ export function matchesBuyerFilter(
     case 'accepted':
       return status === 'ACCEPTED' && !acceptedJourneyClosed;
     case 'closed':
-      return acceptedJourneyClosed || [
-        'REJECTED',
-        'WITHDRAWN',
-        'EXPIRED',
-        'CLOSED_OTHER_ACCEPTED',
-        'CLOSED_LISTING_UNAVAILABLE',
-      ].includes(status);
+      return (
+        acceptedJourneyClosed ||
+        [
+          'REJECTED',
+          'WITHDRAWN',
+          'EXPIRED',
+          'CLOSED_OTHER_ACCEPTED',
+          'CLOSED_LISTING_UNAVAILABLE',
+        ].includes(status)
+      );
     default:
       return true;
   }
@@ -262,8 +264,7 @@ export function matchesSellerFilter(
   transactionStatus?: TransactionStatus,
 ): boolean {
   const acceptedJourneyClosed =
-    status === 'ACCEPTED' &&
-    (transactionStatus === 'CANCELLED' || transactionStatus === 'FAILED');
+    status === 'ACCEPTED' && (transactionStatus === 'CANCELLED' || transactionStatus === 'FAILED');
   switch (filter) {
     case 'action':
       return status === 'AWAITING_SELLER' && nextActor === 'SELLER';
@@ -272,13 +273,16 @@ export function matchesSellerFilter(
     case 'accepted':
       return status === 'ACCEPTED' && !acceptedJourneyClosed;
     case 'closed':
-      return acceptedJourneyClosed || [
-        'REJECTED',
-        'WITHDRAWN',
-        'EXPIRED',
-        'CLOSED_OTHER_ACCEPTED',
-        'CLOSED_LISTING_UNAVAILABLE',
-      ].includes(status);
+      return (
+        acceptedJourneyClosed ||
+        [
+          'REJECTED',
+          'WITHDRAWN',
+          'EXPIRED',
+          'CLOSED_OTHER_ACCEPTED',
+          'CLOSED_LISTING_UNAVAILABLE',
+        ].includes(status)
+      );
     default:
       return true;
   }

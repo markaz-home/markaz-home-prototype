@@ -3,7 +3,16 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import { ArrowLeft } from 'lucide-react';
-import { Alert, Badge, Button, Card, CardContent, EmptyState, ErrorState, Skeleton } from '@markaz/ui';
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  EmptyState,
+  ErrorState,
+  Skeleton,
+} from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import { formatAed, formatPct } from '@/lib/format';
