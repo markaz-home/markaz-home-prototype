@@ -107,13 +107,10 @@ content_path = "./supabase/templates/magic_link.html"
 subject = "Confirm your new MARKAZ Home email"
 content_path = "./supabase/templates/email_change.html"
 
-# Google credentials are injected from the local shell/hosted Auth provider
-# configuration and are never committed to this repository.
+# Google authentication is intentionally disabled (ADR-0034). Keep this explicit
+# so `supabase config push` also disables it in linked hosted projects.
 [auth.external.google]
-enabled = true
-client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
-secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
-skip_nonce_check = false
+enabled = false
 
 # We never send SMS in this prototype.
 [auth.sms]

@@ -24,7 +24,6 @@ production without approval.
 - [ ] Provider onboarding records MARKAZ Terms/Privacy once and reaches Dashboard.
 - [ ] Returning with the same UAE PASS identity resolves the same Auth/profile ID.
 - [ ] An existing password customer can link UAE PASS and still resolves the same Auth/profile ID.
-- [ ] Google signup/sign-in resolves one CUSTOMER when that environment enables Google.
 - [ ] A provider identity collision shows safe copy and creates no duplicate profile.
 - [ ] Recovery link → reset → forced fresh sign-in works.
 - [ ] Anonymous/private route guards redirect safely.

@@ -77,15 +77,6 @@ describe('SignInForm', () => {
     expect(arg.options.redirectTo).toContain('next=%2Fsell');
   });
 
-  it('offers Google when the environment enables it', async () => {
-    const user = userEvent.setup();
-    renderWithIntl(<SignInForm googleEnabled locale="en" />);
-    await user.click(screen.getByRole('button', { name: /Continue with Google/i }));
-    const arg = signInWithOAuth.mock.calls[0]![0];
-    expect(arg.provider).toBe('google');
-    expect(arg.options.redirectTo).toContain('provider=google');
-  });
-
   it('shows a safe identity conflict without exposing provider details', () => {
     getSearchParams.mockReturnValue(new URLSearchParams('error=provider_conflict'));
     renderWithIntl(<SignInForm uaePassStaging locale="en" />);

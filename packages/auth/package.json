@@ -11,7 +11,6 @@
     "./browser": "./src/browser.ts",
     "./middleware": "./src/middleware.ts",
     "./session-inactivity": "./src/session-inactivity.ts",
-    "./providers/server": "./src/provider-config-server.ts",
     "./uae-pass": "./src/uae-pass.ts",
     "./uae-pass/server": "./src/uae-pass-server.ts"
   },

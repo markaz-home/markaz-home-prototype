@@ -68,9 +68,7 @@ PASS staging app/test account, registered callbacks, manual identity linking for
 and an explicit `UAE_PASS_ALLOW_REMOTE_SETUP=true` only during approved setup. Production UAE PASS
 endpoints and credentials are not implemented or approved.
 
-Google remains hidden until the matching Google OAuth client and Supabase Auth provider are
-configured; the application discovers the enabled provider automatically. See
-`docs/integrations/google-auth.md`.
+Google authentication is disabled and is not an approved customer sign-in method (ADR-0034).
 
 ## Production blockers
 

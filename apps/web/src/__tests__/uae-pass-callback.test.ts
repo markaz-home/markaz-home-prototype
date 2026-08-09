@@ -9,6 +9,8 @@ vi.mock('@markaz/auth/server', () => ({
     auth: { exchangeCodeForSession, getUser, signOut },
     rpc,
   }),
+  getAuthProviderIds: (user: { app_metadata?: { providers?: string[] } }) =>
+    user.app_metadata?.providers ?? [],
 }));
 const loadOwnProfileRow = vi.fn();
 vi.mock('@markaz/db', () => ({
@@ -25,38 +27,47 @@ const locationOf = (res: Response) => new URL(res.headers.get('location') ?? '',
 beforeEach(() => {
   exchangeCodeForSession.mockReset().mockResolvedValue({ error: null });
   rpc.mockReset().mockResolvedValue({ error: null });
-  getUser.mockReset().mockResolvedValue({ data: { user: { id: 'user-1', email: 'c@x.ae' } } });
+  getUser.mockReset().mockResolvedValue({
+    data: {
+      user: {
+        id: 'user-1',
+        email: 'c@x.ae',
+        app_metadata: { providers: ['custom:uae-pass'] },
+        identities: [{ provider: 'custom:uae-pass' }],
+      },
+    },
+  });
   signOut.mockReset().mockResolvedValue({ error: null });
   loadOwnProfileRow.mockReset().mockResolvedValue(null);
 });
 
 describe('/auth/callback (UAE PASS sign-in)', () => {
   it('exchanges the code and forwards to the localized dashboard', async () => {
-    const res = await GET(req('?code=abc123&locale=en'));
+    const res = await GET(req('?code=abc123&locale=en&provider=uae-pass'));
     expect(exchangeCodeForSession).toHaveBeenCalledWith('abc123');
     expect(locationOf(res).pathname).toBe('/en/dashboard');
   });
 
   it('preserves the Arabic locale', async () => {
-    const res = await GET(req('?code=abc123&locale=ar'));
+    const res = await GET(req('?code=abc123&locale=ar&provider=uae-pass'));
     expect(locationOf(res).pathname).toBe('/ar/dashboard');
   });
 
   it('forwards to an allow-listed post-sign-in destination', async () => {
-    const res = await GET(req('?code=abc123&locale=en&next=%2Fsell'));
+    const res = await GET(req('?code=abc123&locale=en&provider=uae-pass&next=%2Fsell'));
     expect(locationOf(res).pathname).toBe('/en/sell');
   });
 
   it.each(['https%3A%2F%2Fevil.example', '%2Fonboarding%2Fprofile', '%2Fonboarding%2Fuae-pass'])(
     'rejects the unlisted destination %s',
     async (next) => {
-      const res = await GET(req(`?code=abc123&locale=en&next=${next}`));
+      const res = await GET(req(`?code=abc123&locale=en&provider=uae-pass&next=${next}`));
       expect(locationOf(res).pathname).toBe('/en/dashboard');
     },
   );
 
   it('falls back to English for an unknown locale', async () => {
-    const res = await GET(req('?code=abc123&locale=fr'));
+    const res = await GET(req('?code=abc123&locale=fr&provider=uae-pass'));
     expect(locationOf(res).pathname).toBe('/en/dashboard');
   });
 
@@ -93,7 +104,7 @@ describe('/auth/callback (UAE PASS sign-in)', () => {
 
   it('does not reflect a failed authorization code or provider detail', async () => {
     exchangeCodeForSession.mockResolvedValue({ error: new Error('provider detail') });
-    const res = await GET(req('?code=abc123&locale=en'));
+    const res = await GET(req('?code=abc123&locale=en&provider=uae-pass'));
     const url = locationOf(res);
     expect(url.pathname).toBe('/en/sign-in');
     expect(url.searchParams.get('error')).toBe('provider_error');
@@ -117,9 +128,20 @@ describe('/auth/callback (UAE PASS sign-in)', () => {
     expect(locationOf(res).pathname).toBe('/en/dashboard');
   });
 
-  it('does not run UAE PASS synchronization for Google', async () => {
-    await GET(req('?code=abc123&locale=en&provider=google&intent=sign-up'));
+  it('rejects a non-UAE-PASS provider before exchanging its code', async () => {
+    const res = await GET(req('?code=abc123&locale=en&provider=unsupported&intent=sign-up'));
+    expect(exchangeCodeForSession).not.toHaveBeenCalled();
     expect(rpc).not.toHaveBeenCalled();
+    expect(locationOf(res).searchParams.get('error')).toBe('provider_error');
+  });
+
+  it('signs out if the exchanged session does not contain a UAE PASS identity', async () => {
+    getUser.mockResolvedValue({
+      data: { user: { id: 'user-1', app_metadata: { providers: ['unsupported'] } } },
+    });
+    const res = await GET(req('?code=abc123&locale=en&provider=uae-pass'));
+    expect(signOut).toHaveBeenCalledTimes(1);
+    expect(locationOf(res).searchParams.get('error')).toBe('provider_error');
   });
 
   it('returns a cancelled identity link to Profile without changing the account', async () => {
@@ -180,7 +202,7 @@ describe('/auth/callback (sign-up intent, ADR-0033 refinement 2026-08-07)', () =
       termsAcceptedAt: null,
       privacyAcceptedAt: null,
     });
-    const res = await GET(req('?code=abc123&locale=en&intent=sign-up&provider=google'));
+    const res = await GET(req('?code=abc123&locale=en&intent=sign-up&provider=uae-pass'));
     expect(signOut).not.toHaveBeenCalled();
     expect(locationOf(res).pathname).toBe('/en/dashboard');
   });

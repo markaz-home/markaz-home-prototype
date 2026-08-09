@@ -16,11 +16,9 @@ import { resolvePostSignInDestination } from '@/lib/auth-redirect';
 
 export function SignInForm({
   uaePassStaging = false,
-  googleEnabled = false,
   locale = 'en',
 }: {
   uaePassStaging?: boolean;
-  googleEnabled?: boolean;
   locale?: string;
 }) {
   const t = useTranslations('signin');
@@ -98,7 +96,6 @@ export function SignInForm({
         <ProviderAuthButtons
           intent="sign-in"
           locale={locale}
-          googleEnabled={googleEnabled}
           uaePassEnabled={uaePassStaging}
           next={resolvePostSignInDestination(params.get('next'))}
           onError={(message) => setFormError(message || null)}

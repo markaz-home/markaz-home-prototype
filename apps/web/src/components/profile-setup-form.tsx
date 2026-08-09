@@ -23,7 +23,7 @@ export function ProfileSetupForm({
   emailVerified?: boolean;
   initialName?: string | null;
   initialPhone?: string | null;
-  provider?: 'uae-pass' | 'google' | null;
+  provider?: 'uae-pass' | null;
 }) {
   const t = useTranslations('profile');
   const tv = useTranslations('validation');
@@ -63,9 +63,7 @@ export function ProfileSetupForm({
   });
 
   const fe = (c?: string) => (c ? tv(FIELD_ERROR_KEYS[c] ?? 'unexpectedError') : undefined);
-  const providerName = provider
-    ? t(provider === 'uae-pass' ? 'uaePassProvider' : 'googleProvider')
-    : null;
+  const providerName = provider ? t('uaePassProvider') : null;
   const hasProviderName = !!provider && !!initialName?.trim();
   const providerReview = !!provider && hasProviderName;
   // Setup-status resume variant (spec §9.7): account details needs attention.

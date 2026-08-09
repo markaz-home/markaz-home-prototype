@@ -70,13 +70,12 @@ hosting platform or GitHub environment secrets, not in Git.
 
 Integration policy:
 
-| Integration             | `development`                              | `production`                                               |
-| ----------------------- | ------------------------------------------ | ---------------------------------------------------------- |
-| Email/password          | Environment-specific real delivery         | Enable after template and delivery verification            |
-| UAE PASS                | Optional staging signup/sign-in            | Disabled until production provider approval and URLs exist |
-| Google                  | Optional after per-environment OAuth setup | Optional after production OAuth/branding review            |
-| BayutAPI                | Private RapidAPI POC only                  | Disabled until redistribution permission/legal approval    |
-| DLD, Trakheesi, payment | Existing persisted simulation              | Keep simulated until separately approved                   |
+| Integration             | `development`                      | `production`                                               |
+| ----------------------- | ---------------------------------- | ---------------------------------------------------------- |
+| Email/password          | Environment-specific real delivery | Enable after template and delivery verification            |
+| UAE PASS                | Optional staging signup/sign-in    | Disabled until production provider approval and URLs exist |
+| BayutAPI                | Private RapidAPI POC only          | Disabled until redistribution permission/legal approval    |
+| DLD, Trakheesi, payment | Existing persisted simulation      | Keep simulated until separately approved                   |
 
 ## First development deployment
 

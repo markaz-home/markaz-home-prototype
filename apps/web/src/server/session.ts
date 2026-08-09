@@ -16,7 +16,6 @@ export interface SessionContext {
   emailVerified: boolean;
   providerAuthenticated: boolean;
   emailPasswordAuthenticated: boolean;
-  googleAuthenticated: boolean;
   uaePassAuthenticated: boolean;
   profile: Profile | null;
 }
@@ -55,7 +54,6 @@ export const getSession = cache(async (): Promise<SessionContext | null> => {
   if (!user) return null;
   const providerIds = getAuthProviderIds(user);
   const emailPasswordAuthenticated = providerIds.includes('email');
-  const googleAuthenticated = providerIds.includes('google');
   const uaePassAuthenticated = providerIds.includes('custom:uae-pass');
 
   const row = await loadOwnProfileRow({ id: user.id, email: user.email ?? undefined });
@@ -68,9 +66,8 @@ export const getSession = cache(async (): Promise<SessionContext | null> => {
     userId: user.id,
     email: user.email ?? null,
     emailVerified: !!user.email_confirmed_at,
-    providerAuthenticated: googleAuthenticated || uaePassAuthenticated,
+    providerAuthenticated: uaePassAuthenticated,
     emailPasswordAuthenticated,
-    googleAuthenticated,
     // app_metadata is controlled by Supabase Auth. Do not derive this security
     // decision from editable user_metadata or from a browser-provided flag.
     uaePassAuthenticated,

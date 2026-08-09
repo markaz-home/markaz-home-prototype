@@ -22,7 +22,7 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
 - **Customers can never self-promote to ADMIN** (DB trigger + RLS enforce it).
 - **A customer can never offer on a listing they own** (DB trigger + RLS + API).
 - **Never** use the Supabase service-role/secret key for customer-scoped requests.
-- **Customer auth supports email + password, Google, and UAE PASS** through Supabase
+- **Customer auth supports only email + password and UAE PASS** through Supabase
   Auth. Email/password uses `signInWithPassword`, and a **6-digit email code** verifies
   a new password account (`verifyOtp type:signup`); **password recovery uses
   the official Supabase LINK** (`resetPasswordForEmail` → email link → `/auth/confirm`
@@ -35,7 +35,7 @@ Monorepo root is `markaz-home-prototype/`. Run all commands from there.
   verify success, recovery-sent, password-updated, signed-out, session-expired, error
   panels), and the Operations shell for admin. Reuse `components/auth/*`.
 - **Routing gates on verified authentication first**: email/password sessions require
-  verified email; successfully authenticated Google/UAE PASS sessions may continue to
+  verified email; successfully authenticated UAE PASS sessions may continue to
   profile-setup. Every path still requires a complete profile plus MARKAZ Terms/Privacy
   consent before dashboard. UAE PASS is optional and never a mandatory post-sign-up gate.
   `requireCustomerStep` enforces this server-side (ADR-0030 / ADR-0033).

@@ -32,7 +32,6 @@ interface AccountProfileProps {
   locale: string;
   emailVerified: boolean;
   emailPasswordLinked: boolean;
-  googleLinked: boolean;
   uaePassLinked: boolean;
   uaePassSyncPending: boolean;
   uaePassStaging: boolean;
@@ -47,7 +46,6 @@ export function AccountProfile({
   locale,
   emailVerified,
   emailPasswordLinked,
-  googleLinked,
   uaePassLinked,
   uaePassSyncPending,
   uaePassStaging,
@@ -102,7 +100,7 @@ export function AccountProfile({
     setLinking(true);
     const { error } = await supabase.auth.linkIdentity({
       // supabase-js 2.47's Provider union predates custom providers.
-      provider: 'custom:uae-pass' as 'google',
+      provider: 'custom:uae-pass' as never,
       options: {
         redirectTo: `${window.location.origin}/auth/callback?${new URLSearchParams({
           locale,
@@ -266,16 +264,6 @@ export function AccountProfile({
                 description={email ?? t('emailMethodDescription')}
                 status={emailVerified ? t('verified') : t('verificationRequired')}
                 statusTone={emailVerified ? 'success' : 'warning'}
-              />
-            ) : null}
-
-            {googleLinked ? (
-              <SignInMethod
-                icon={<UserRound className="h-5 w-5" aria-hidden />}
-                title={t('googleMethodTitle')}
-                description={email ?? t('googleMethodDescription')}
-                status={t('linked')}
-                statusTone="success"
               />
             ) : null}
 

@@ -27,8 +27,8 @@ export interface PostAuthState {
  *   provider-authenticated or email-verified, profile incomplete → profile-setup
  *   provider-authenticated or email-verified, profile complete → dashboard
  *
- * UAE PASS and Google are optional account-creation/sign-in methods. Their
- * provider authentication replaces the password-email gate, but never replaces
+ * UAE PASS is an optional account-creation/sign-in method. Its provider
+ * authentication replaces the password-email gate, but never replaces
  * MARKAZ profile completion or Terms/Privacy consent.
  */
 export function resolvePostAuthDestination(state: PostAuthState): PostAuthDestination {
