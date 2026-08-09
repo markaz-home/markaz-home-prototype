@@ -92,7 +92,7 @@ test('owner cannot make an offer on their own listing', async ({ page }) => {
   await expect(page.getByText(/your listing|cannot make an offer/i)).toBeVisible();
 });
 
-test('below-threshold offer appears in the seller inbox without a prominent notification', async ({
+test('below-threshold offer remains visible and actionable in the seller inbox', async ({
   browser,
 }) => {
   test.skip(skip, 'full stack required');

@@ -1,5 +1,7 @@
+import { redirect } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
-import { TransactionWorkspace } from '@/components/transactions/transaction-workspace';
+import { getServerApi } from '@/server/api';
+import { slugForStage } from '@/lib/transaction-routes';
 
 export default async function Page({
   params,
@@ -8,5 +10,7 @@ export default async function Page({
 }) {
   const { locale, transactionId } = await params;
   setRequestLocale(locale);
-  return <TransactionWorkspace transactionId={transactionId} />;
+  const api = await getServerApi();
+  const transaction = await api.transactions.get({ transactionId });
+  redirect(`/${locale}/transactions/${transactionId}/${slugForStage(transaction.activeStage)}`);
 }

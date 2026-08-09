@@ -3,17 +3,24 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Card, CardContent } from '@markaz/ui';
-import { PURCHASE_ROUTES } from '@markaz/domain';
+import { PURCHASE_ROUTES, type TransactionStage } from '@markaz/domain';
 import { trpc } from '@/trpc/react';
 import type { RouterOutputs } from '@/trpc/types';
 import { formatAed } from '@/lib/format';
 import { DocumentChecklist } from './document-checklist';
-import { CancellationPending } from './cancellation-panels';
 
 type Detail = RouterOutputs['transactions']['get'];
 
 /** Renders the correct action control(s) for the caller's current actionable tasks. */
-export function NextActionPanel({ d, refresh }: { d: Detail; refresh: () => void }) {
+export function NextActionPanel({
+  d,
+  stage,
+  refresh,
+}: {
+  d: Detail;
+  stage: TransactionStage;
+  refresh: () => void;
+}) {
   const t = useTranslations('transactions');
   const v = d.version;
   const opts = { onSuccess: refresh };
@@ -40,12 +47,8 @@ export function NextActionPanel({ d, refresh }: { d: Detail; refresh: () => void
 
   const controls: React.ReactNode[] = [];
 
-  if (d.status === 'CANCELLATION_PENDING') {
-    return <CancellationPending d={d} refresh={refresh} />;
-  }
-
   // Confirmation
-  if (my('BUYER_CONFIRM_DETAILS') || my('SELLER_CONFIRM_DETAILS')) {
+  if (stage === 'CONFIRMATION' && (my('BUYER_CONFIRM_DETAILS') || my('SELLER_CONFIRM_DETAILS'))) {
     controls.push(
       <ActionCard key="details" title={t('details.title')}>
         <Ack checked={ack} onChange={setAck} label={t('details.confirm')} />
@@ -59,7 +62,7 @@ export function NextActionPanel({ d, refresh }: { d: Detail; refresh: () => void
       </ActionCard>,
     );
   }
-  if (my('BUYER_SELECT_ROUTE')) {
+  if (stage === 'CONFIRMATION' && my('BUYER_SELECT_ROUTE')) {
     controls.push(
       <ActionCard key="route" title={t('route.title')}>
         <p className="text-muted-foreground text-sm">{t('route.help')}</p>
@@ -91,7 +94,7 @@ export function NextActionPanel({ d, refresh }: { d: Detail; refresh: () => void
   }
 
   // Deposit
-  if (my('BUYER_CONFIRM_DEPOSIT')) {
+  if (stage === 'DEPOSIT' && my('BUYER_CONFIRM_DEPOSIT')) {
     controls.push(
       <ActionCard key="deposit" title={t('deposit.title')}>
         <p className="text-muted-foreground text-sm">{t('deposit.body')}</p>
@@ -111,7 +114,7 @@ export function NextActionPanel({ d, refresh }: { d: Detail; refresh: () => void
   }
 
   // Documents
-  if (my('BUYER_FINANCING')) {
+  if (stage === 'DOCUMENTS' && my('BUYER_FINANCING')) {
     controls.push(
       <ActionCard key="fin" title={t('financing.title')}>
         <p className="text-muted-foreground text-sm">{t('financing.disclosure')}</p>
@@ -130,7 +133,7 @@ export function NextActionPanel({ d, refresh }: { d: Detail; refresh: () => void
       </ActionCard>,
     );
   }
-  if (my('BUYER_DOCUMENTS') || my('SELLER_DOCUMENTS')) {
+  if (stage === 'DOCUMENTS' && (my('BUYER_DOCUMENTS') || my('SELLER_DOCUMENTS'))) {
     controls.push(
       <ActionCard key="docs" title={t('documents.title')}>
         <DocumentChecklist
@@ -148,7 +151,10 @@ export function NextActionPanel({ d, refresh }: { d: Detail; refresh: () => void
       </ActionCard>,
     );
   }
-  if (my('BUYER_REVIEW_SUMMARY') || my('SELLER_REVIEW_SUMMARY')) {
+  if (
+    stage === 'DOCUMENTS' &&
+    (my('BUYER_REVIEW_SUMMARY') || my('SELLER_REVIEW_SUMMARY'))
+  ) {
     controls.push(
       <ActionCard key="summary" title={t('documents.summaryTitle')}>
         <p className="text-muted-foreground text-sm">{t('documents.summaryDisclosure')}</p>
@@ -163,7 +169,7 @@ export function NextActionPanel({ d, refresh }: { d: Detail; refresh: () => void
   }
 
   // Due diligence (system, either participant triggers)
-  if (sys('DUE_DILIGENCE')) {
+  if (stage === 'DUE_DILIGENCE' && sys('DUE_DILIGENCE')) {
     controls.push(
       <ActionCard key="checks" title={t('checks.title')}>
         <p className="text-muted-foreground text-sm">{t('checks.disclosure')}</p>
@@ -178,7 +184,7 @@ export function NextActionPanel({ d, refresh }: { d: Detail; refresh: () => void
   }
 
   // Transfer
-  if (my('SELLER_PROPOSE_DATE')) {
+  if (stage === 'TRANSFER' && my('SELLER_PROPOSE_DATE')) {
     controls.push(
       <ActionCard key="date" title={t('transfer.proposeDate')}>
         <p className="text-muted-foreground text-sm">{t('transfer.proposeHelp')}</p>
@@ -203,7 +209,10 @@ export function NextActionPanel({ d, refresh }: { d: Detail; refresh: () => void
       </ActionCard>,
     );
   }
-  if (my('BUYER_CONFIRM_READINESS') || my('SELLER_CONFIRM_READINESS')) {
+  if (
+    stage === 'TRANSFER' &&
+    (my('BUYER_CONFIRM_READINESS') || my('SELLER_CONFIRM_READINESS'))
+  ) {
     controls.push(
       <ActionCard key="ready" title={t('transfer.title')}>
         <p className="text-muted-foreground text-sm">
@@ -218,7 +227,7 @@ export function NextActionPanel({ d, refresh }: { d: Detail; refresh: () => void
       </ActionCard>,
     );
   }
-  if (sys('TRANSFER_APPOINTMENT')) {
+  if (stage === 'TRANSFER' && sys('TRANSFER_APPOINTMENT')) {
     controls.push(
       <ActionCard key="appt" title={t('transfer.title')}>
         <Button
@@ -232,7 +241,10 @@ export function NextActionPanel({ d, refresh }: { d: Detail; refresh: () => void
   }
 
   // Completion
-  if (my('BUYER_CONFIRM_COMPLETION') || my('SELLER_CONFIRM_COMPLETION')) {
+  if (
+    stage === 'COMPLETION' &&
+    (my('BUYER_CONFIRM_COMPLETION') || my('SELLER_CONFIRM_COMPLETION'))
+  ) {
     controls.push(
       <ActionCard key="complete" title={t('completion.title')}>
         <Ack checked={ack} onChange={setAck} label={t('completion.confirm')} />

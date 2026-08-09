@@ -74,6 +74,46 @@ d('transaction lifecycle (live DB)', () => {
     expect((tasks[0] as { n: number }).n).toBe(17);
   });
 
+  it('queues one 24-hour reminder per waiting participant and transaction version', async () => {
+    const listing = await createLiveListing(seller);
+    const thread = await acceptedThread(buyer, seller, listing);
+    const t = await callTx(
+      buyer,
+      (tx) => tx`select * from public.ensure_transaction(${thread}::uuid)`,
+    );
+    await asService(async (tx) => {
+      // Backdate the persisted waiting state without the production updated-at
+      // trigger immediately replacing the fixture timestamp.
+      await tx`alter table public.transactions disable trigger transactions_set_updated_at`;
+      try {
+        await tx`update public.transactions
+                 set updated_at = now() - interval '25 hours'
+                 where id = ${t.id as string}`;
+      } finally {
+        await tx`alter table public.transactions enable trigger transactions_set_updated_at`;
+      }
+    });
+
+    const first = await asService(
+      (tx) => tx`select private.queue_due_transaction_reminders(24) as n`,
+    );
+    expect((first[0] as { n: number }).n).toBe(2);
+    const second = await asService(
+      (tx) => tx`select private.queue_due_transaction_reminders(24) as n`,
+    );
+    expect((second[0] as { n: number }).n).toBe(0);
+
+    const reminders = await asService(
+      (tx) =>
+        tx`select count(*)::int as n
+           from private.notification_email_outbox o
+           join public.notifications n on n.id = o.notification_id
+           where n.kind = 'TRANSACTION_REMINDER'
+             and n.payload->>'transactionId' = ${t.id as string}`,
+    );
+    expect((reminders[0] as { n: number }).n).toBe(2);
+  });
+
   it('rejects transaction creation by a non-participant and from a non-accepted thread', async () => {
     const listing = await createLiveListing(seller);
     const thread = await acceptedThread(buyer, seller, listing);

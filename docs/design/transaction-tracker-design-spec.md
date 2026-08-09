@@ -7,7 +7,7 @@
 **Account type:** `CUSTOMER`  
 **Primary languages:** English and Arabic  
 **Accessibility target:** WCAG 2.2 AA  
-**Last updated:** July 2026
+**Last updated:** 9 August 2026
 
 ---
 
@@ -34,8 +34,10 @@ The MARKAZ transaction experience should feel like a calm shared checklist for a
 ## 1.1 Final product decisions
 
 1. **Automatic, idempotent transaction creation.** Acceptance triggers one transaction for the accepted offer thread and exact accepted proposal. The accepted-state and transaction routes also run a safe `ensure transaction` operation so a transient creation failure cannot create duplicates or strand the user.
-2. **One shared transaction route.** Buyer and seller use the same participant-authorised workspace. Content and actions change by perspective.
-3. **Six grouped stages.** The primary progress tracker uses: Confirm transaction, Deposit, Documents, Demo checks, Transfer, Completion. Detailed tasks sit inside each stage.
+2. **One shared transaction record.** Buyer and seller use the same participant-authorised
+   transaction. Content and actions change by perspective.
+3. **Six focused stage pages.** Confirm transaction, Deposit, Documents, Demo checks, Transfer,
+   and Completion each have a distinct URL while reading the same transaction record.
 4. **Stage plus task model.** A transaction has one overall state, while each task/milestone has its own state and actor. This prevents an unmanageable thirteen-step primary stepper.
 5. **Actor values.** `BUYER`, `SELLER`, `BOTH`, `SYSTEM`, and `NONE` are the only next-actor categories.
 6. **Purchase route is required.** Buyer selects Cash purchase or Financing. Financing remains a simple demo status and never imitates a bank application.
@@ -76,6 +78,7 @@ The MARKAZ transaction experience should feel like a calm shared checklist for a
 - Failed and blocked states
 - Transaction timeline
 - In-app notifications
+- Branded transaction email and 24-hour waiting reminders
 - Realtime refetch behaviour
 - English and draft Arabic
 - Responsive desktop, tablet, and mobile
@@ -96,7 +99,7 @@ The MARKAZ transaction experience should feel like a calm shared checklist for a
 - Agent workflow
 - Full Admin Portal or Admin transaction intervention
 - Disputes
-- Email, SMS, or push notifications
+- SMS or push notifications
 - Real document generation
 - Legal or financial advice
 
@@ -502,18 +505,19 @@ Authenticated Customer
 ├── Offers
 ├── Transactions
 │   ├── My Transactions
-│   └── Transaction Workspace
-│       ├── Overview
-│       ├── Current Stage
-│       ├── Tasks
+│   └── Shared Transaction
+│       ├── Confirm
+│       ├── Deposit
 │       ├── Documents
-│       ├── Timeline
-│       └── Cancellation
+│       ├── Demo checks
+│       ├── Transfer
+│       └── Completion
 ├── My Listings
 └── Notifications
 ```
 
-The workspace is one route with anchored sections and focusable milestone links. It is not a multi-page wizard.
+Each stage is a focused page over the same shared transaction record. The stage tracker provides
+predictable navigation without duplicating authorisation or transaction state.
 
 ---
 
@@ -523,28 +527,23 @@ The workspace is one route with anchored sections and focusable milestone links.
 
 ```text
 /[locale]/transactions
-/[locale]/transactions/[transactionId]
+/[locale]/transactions/[transactionId]/confirm
+/[locale]/transactions/[transactionId]/deposit
+/[locale]/transactions/[transactionId]/documents
+/[locale]/transactions/[transactionId]/checks
+/[locale]/transactions/[transactionId]/transfer
+/[locale]/transactions/[transactionId]/completion
 ```
 
-Supported safe deep links:
+The legacy `/[locale]/transactions/[transactionId]` entry redirects to the current stage.
 
-```text
-/[locale]/transactions/[transactionId]?focus=confirmation
-/[locale]/transactions/[transactionId]?focus=deposit
-/[locale]/transactions/[transactionId]?focus=documents
-/[locale]/transactions/[transactionId]?focus=checks
-/[locale]/transactions/[transactionId]?focus=transfer
-/[locale]/transactions/[transactionId]?focus=completion
-```
-
-## 13.2 Why one workspace route
+## 13.2 Why focused stage routes
 
 - Preserves property and transaction context
-- Avoids fragmented back navigation
 - Supports Realtime refresh consistently
-- Makes mobile progress understandable
+- Makes the next step and mobile progress explicit
 - Reduces duplicated participant authorisation
-- Allows notifications to deep-link to a task without creating many routes
+- Allows notifications and reminders to deep-link to the active work
 
 Uploads and confirmations use dialogs, drawers, or inline panels rather than separate public routes.
 

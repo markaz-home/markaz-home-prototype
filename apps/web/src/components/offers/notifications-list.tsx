@@ -1,30 +1,16 @@
 'use client';
 
 import { Bell } from 'lucide-react';
-import { useFormatter, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { useNotificationChannel } from '@markaz/realtime';
 import { Button, EmptyState } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
-
-const KNOWN = new Set([
-  'OFFER_RECEIVED',
-  'OFFER_COUNTER_SELLER',
-  'OFFER_COUNTER_BUYER',
-  'OFFER_ACCEPTED',
-  'OFFER_REJECTED',
-  'OFFER_WITHDRAWN',
-  'OFFER_CLOSED_OTHER',
-  'OFFER_LISTING_UNAVAILABLE',
-  'OFFER_EXPIRED',
-]);
-
-type Notification = {
-  id: string;
-  kind: string;
-  threadId: string | null;
-  read: boolean;
-  createdAt: string;
-};
+import {
+  NotificationContent,
+  notificationHref,
+  type NotificationItem,
+} from '@/components/notifications/notification-content';
 
 /**
  * Full account notifications surface (offers-design-spec §30). Reads ONLY the
@@ -34,7 +20,6 @@ type Notification = {
  */
 export function NotificationsList() {
   const t = useTranslations('offers.notify');
-  const format = useFormatter();
   const utils = trpc.useUtils();
   const list = trpc.offers.notifications.useQuery({ limit: 50 });
   const counts = trpc.offers.getUnreadCounts.useQuery();
@@ -46,54 +31,23 @@ export function NotificationsList() {
     void utils.offers.notifications.invalidate();
     void utils.offers.getUnreadCounts.invalidate();
   }
+  useNotificationChannel(refresh);
 
-  function label(kind: string): string {
-    return KNOWN.has(kind) ? t(kind as 'OFFER_RECEIVED') : t('view');
-  }
-
-  function Row({ n }: { n: Notification }) {
-    const when = format.dateTime(new Date(n.createdAt), {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    });
-    const body = (
-      <span className="flex items-start gap-3">
-        <span
-          className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.read ? 'bg-transparent' : 'bg-primary'}`}
-          aria-hidden
-        />
-        <span className="flex flex-col gap-0.5">
-          <span dir="auto" className={n.read ? 'text-muted-foreground' : 'font-medium'}>
-            {label(n.kind)}
-          </span>
-          <time dateTime={n.createdAt} dir="ltr" className="text-muted-foreground text-xs">
-            {when}
-          </time>
-        </span>
-      </span>
-    );
+  function Row({ n }: { n: NotificationItem }) {
     const className = `block rounded-lg border p-4 transition-colors ${
       n.read ? 'bg-card' : 'border-primary/30 bg-primary/5'
     }`;
-    // Actionable notifications link into the authorised thread and clear their own unread flag.
-    if (n.threadId) {
-      return (
-        <li>
-          <Link
-            href={`/offers/${n.threadId}`}
-            className={`${className} hover:bg-accent`}
-            onClick={() => {
-              if (!n.read) markRead.mutate({ id: n.id }, { onSuccess: refresh });
-            }}
-          >
-            {body}
-          </Link>
-        </li>
-      );
-    }
     return (
       <li>
-        <div className={className}>{body}</div>
+        <Link
+          href={notificationHref(n)}
+          className={`${className} hover:bg-accent`}
+          onClick={() => {
+            if (!n.read) markRead.mutate({ id: n.id }, { onSuccess: refresh });
+          }}
+        >
+          <NotificationContent notification={n} />
+        </Link>
       </li>
     );
   }

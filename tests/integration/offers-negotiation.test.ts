@@ -2,7 +2,7 @@
  * Week-4 offer negotiation — integration tests against the live local Postgres.
  * Exercises create → counter → accept through the SECURITY DEFINER functions and
  * asserts proposal immutability, other-thread closure, new-offer blocking, and the
- * seller-private below-threshold notification rule.
+ * notification/email delivery rules.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
@@ -44,6 +44,7 @@ d('offer negotiation (live DB)', () => {
   let buyer2: string;
   let buyer3: string;
   let listing: string;
+  let belowThresholdThread: string;
 
   beforeAll(async () => {
     seller = await createPrincipal('seller');
@@ -59,8 +60,8 @@ d('offer negotiation (live DB)', () => {
   });
 
   it('creates a thread in AWAITING_SELLER with the buyer proposal as current', async () => {
-    const threadId = await createOffer(buyer1, listing, 900_000);
-    const t = await threadRow(threadId);
+    belowThresholdThread = await createOffer(buyer1, listing, 900_000);
+    const t = await threadRow(belowThresholdThread);
     expect(t.status).toBe('AWAITING_SELLER');
     expect(t.next_actor).toBe('SELLER');
     expect(t.buyer_user_id).toBe(buyer1);
@@ -80,15 +81,22 @@ d('offer negotiation (live DB)', () => {
     await expectError(() => createOffer(seller, listing, 900_000), /OWN_LISTING/);
   });
 
-  it('does NOT notify the seller for a below-threshold offer, but the offer persists', async () => {
-    // buyer1's 900k offer is below the 1,000,000 threshold.
+  it('notifies and queues exactly one seller email even below the private threshold', async () => {
     const notifs = await asService(
       (tx) =>
-        tx`select count(*)::int as n from public.notifications
-           where recipient_id = ${seller} and kind = 'OFFER_RECEIVED'`,
+        tx`select id from public.notifications
+           where recipient_id = ${seller}
+             and kind = 'OFFER_RECEIVED'
+             and payload->>'threadId' = ${belowThresholdThread}`,
     );
-    expect((notifs[0] as { n: number }).n).toBe(0);
-    // ...yet the below-threshold thread is fully persisted and visible to the seller.
+    expect(notifs).toHaveLength(1);
+    const outbox = await asService(
+      (tx) =>
+        tx`select count(*)::int as n from private.notification_email_outbox
+           where notification_id = ${(notifs[0] as { id: string }).id}`,
+    );
+    expect((outbox[0] as { n: number }).n).toBe(1);
+
     const visible = await asUser(
       seller,
       (tx) => tx`select count(*)::int as n from public.offer_threads where listing_id = ${listing}`,
@@ -97,13 +105,64 @@ d('offer negotiation (live DB)', () => {
   });
 
   it('DOES notify the seller for an at/above-threshold offer', async () => {
-    await createOffer(buyer2, listing, 1_100_000);
+    const threadId = await createOffer(buyer2, listing, 1_100_000);
     const notifs = await asService(
       (tx) =>
         tx`select count(*)::int as n from public.notifications
-           where recipient_id = ${seller} and kind = 'OFFER_RECEIVED'`,
+           where recipient_id = ${seller} and kind = 'OFFER_RECEIVED'
+             and payload->>'threadId' = ${threadId}`,
     );
     expect((notifs[0] as { n: number }).n).toBe(1);
+  });
+
+  it('creates one in-app buyer view receipt per buyer proposal and never an email', async () => {
+    const l = await createLiveListing(seller);
+    const threadId = await createOffer(buyer3, l, 700_000);
+
+    await Promise.all([
+      asUser(seller, (tx) => tx`select public.mark_offer_viewed(${threadId}::uuid)`),
+      asUser(seller, (tx) => tx`select public.mark_offer_viewed(${threadId}::uuid)`),
+    ]);
+    let rows = await asService(
+      (tx) =>
+        tx`select id from public.notifications
+           where recipient_id = ${buyer3} and kind = 'OFFER_VIEWED'
+             and payload->>'threadId' = ${threadId}`,
+    );
+    expect(rows).toHaveLength(1);
+    let outbox = await asService(
+      (tx) =>
+        tx`select count(*)::int as n from private.notification_email_outbox
+           where notification_id = ${(rows[0] as { id: string }).id}`,
+    );
+    expect((outbox[0] as { n: number }).n).toBe(0);
+
+    let thread = await threadRow(threadId);
+    await asUser(
+      seller,
+      (tx) => tx`select public.submit_counter(${threadId}::uuid, 750000, null, ${thread.version as number})`,
+    );
+    thread = await threadRow(threadId);
+    await asUser(
+      buyer3,
+      (tx) => tx`select public.submit_counter(${threadId}::uuid, 725000, null, ${thread.version as number})`,
+    );
+    await asUser(seller, (tx) => tx`select public.mark_offer_viewed(${threadId}::uuid)`);
+    rows = await asService(
+      (tx) =>
+        tx`select id from public.notifications
+           where recipient_id = ${buyer3} and kind = 'OFFER_VIEWED'
+             and payload->>'threadId' = ${threadId}`,
+    );
+    expect(rows).toHaveLength(2);
+    outbox = await asService(
+      (tx) =>
+        tx`select count(*)::int as n from private.notification_email_outbox o
+           join public.notifications n on n.id = o.notification_id
+           where n.recipient_id = ${buyer3} and n.kind = 'OFFER_VIEWED'
+             and n.payload->>'threadId' = ${threadId}`,
+    );
+    expect((outbox[0] as { n: number }).n).toBe(0);
   });
 
   it('preserves full immutable proposal history across a counter', async () => {
@@ -189,6 +248,20 @@ d('offer negotiation (live DB)', () => {
     expect(after.status).toBe('ACCEPTED');
     expect(after.next_actor).toBe('NONE');
     expect(after.accepted_proposal_id).toBe(b.current_proposal_id);
+
+    const transaction = await asService(
+      (tx) => tx`select id from public.transactions where offer_thread_id = ${tB}`,
+    );
+    expect(transaction).toHaveLength(1);
+    const acceptedEmails = await asService(
+      (tx) =>
+        tx`select count(*)::int as n
+           from private.notification_email_outbox o
+           join public.notifications n on n.id = o.notification_id
+           where n.kind = 'TRANSACTION_CREATED'
+             and n.payload->>'transactionId' = ${(transaction[0] as { id: string }).id}`,
+    );
+    expect((acceptedEmails[0] as { n: number }).n).toBe(2);
 
     const other = await threadRow(tA);
     expect(other.status).toBe('CLOSED_OTHER_ACCEPTED');

@@ -29,20 +29,23 @@ redesign offers.
   and status; the UI is driven by tasks, not a single status field.
 - **Server-authoritative state engine** — 12 `SECURITY DEFINER` functions hold every
   consequential transition; customers have read-only RLS.
-- **Idempotent creation** — `ensure_transaction(thread)` (auto on the accepted-offer handoff),
+- **Idempotent creation** — acceptance invokes `ensure_transaction(thread)` at the DB boundary;
+  accepted-offer routes retain an idempotent fallback,
   DB-unique per thread and per proposal.
 - **Simulated flows** — details confirmation (both sides), purchase route (CASH/FINANCING),
   10% demo deposit, document checklist + demo summary review, due-diligence simulation,
   transfer date + readiness + simulated appointment, dual completion confirmation.
 - **Listing treatment** — completion → listing `SOLD_DEMO`; cancellation → listing `PAUSED`
   (never auto-LIVE); cancelled transactions no longer derive `UNDER_OFFER`.
-- **UI** — My Transactions dashboard + shared perspective-aware workspace (tracker,
-  next-action, task list, per-stage action controls, deposit & document-upload panels, timeline,
+- **UI** — My Transactions dashboard + six focused stage URLs over a shared
+  perspective-aware workspace (tracker, buyer/seller progress, next-action, per-stage task list,
+  deposit & document-upload panels, timeline,
   cancellation, and a mobile sticky action bar), the
   "Continue to transaction" handoff on the accepted offer, and a nav action badge.
 - **Notifications / Realtime / audit** — reuse the canonical `notifications` table with
-  `TRANSACTION_*` kinds (validated by a discriminated union); a participant-scoped
-  `transaction:{id}` realtime channel drives authoritative refetch; audit events on every step.
+  detailed `TRANSACTION_*` kinds (validated by a discriminated union); participant and recipient
+  Realtime channels drive authoritative refetch; a durable private outbox delivers branded email
+  and one 24-hour reminder per unchanged waiting version; audit events remain canonical.
 
 ## What was preserved
 
@@ -57,9 +60,10 @@ to ignore cancelled transactions (spec §31).
 | Route                                            | Who         | Purpose                            |
 | ------------------------------------------------ | ----------- | ---------------------------------- |
 | `/[locale]/transactions`                         | participant | My Transactions dashboard          |
-| `/[locale]/transactions/[transactionId]?focus=…` | participant | Shared perspective-aware workspace |
+| `/[locale]/transactions/[transactionId]/[stage]` | participant | Focused shared stage workspace      |
 
-One shared route; sub-steps are `?focus=` anchors, not separate paths (spec §13).
+The six stage slugs are `confirm`, `deposit`, `documents`, `checks`, `transfer`, and
+`completion`. They are focused views over the same shared transaction record.
 
 ## Canonical transaction model (migrations `…0808`–`…0811`, ADR-0019)
 
@@ -72,7 +76,8 @@ identity guard trigger. Read-only customer grants; all writes via SECURITY DEFIN
 
 `ensure_transaction(thread)` validates the thread is `ACCEPTED`, derives buyer/seller/listing
 and the accepted amount from the accepted proposal, and inserts the transaction + tasks +
-`TRANSACTION_CREATED` event + notifications atomically. Idempotent: a second call (either
+`TRANSACTION_CREATED` event + notifications atomically. Acceptance invokes it before returning;
+the CTA only navigates. Idempotent: a second call (either
 participant) returns the same row; the unique index is the backstop.
 
 ## State model & milestones

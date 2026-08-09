@@ -23,6 +23,7 @@ const DEPLOYMENT_ENVIRONMENTS = new Set(['local', 'staging', 'production']);
 const UAE_PASS_MODES = new Set(['simulated', 'staging']);
 const BAYUT_API_MODES = new Set(['disabled', 'rapidapi']);
 const LOCALES = new Set(['en', 'ar']);
+const EMAIL_PROVIDERS = new Set(['disabled', 'resend']);
 
 export class EnvironmentValidationError extends Error {
   constructor(issues) {
@@ -248,6 +249,25 @@ export function validateEnvironment(env = process.env, { app = 'all' } = {}) {
   const serviceName = trimmed(env, 'SERVICE_NAME');
   if (serviceName && !/^[a-zA-Z0-9][a-zA-Z0-9._-]{1,63}$/.test(serviceName)) {
     issues.push('SERVICE_NAME must be 2–64 safe identifier characters.');
+  }
+
+  const emailProvider = trimmed(env, 'EMAIL_PROVIDER') || 'disabled';
+  if (!EMAIL_PROVIDERS.has(emailProvider)) {
+    issues.push('EMAIL_PROVIDER must be disabled or resend.');
+  }
+  if (emailProvider === 'resend') {
+    for (const name of ['RESEND_API_KEY', 'EMAIL_FROM', 'CRON_SECRET']) {
+      if (!trimmed(env, name)) issues.push(`${name} is required when EMAIL_PROVIDER=resend.`);
+    }
+  } else {
+    warnings.push('Transactional customer email delivery is disabled; outbox rows will remain pending.');
+  }
+  const reminderHours = trimmed(env, 'TRANSACTION_REMINDER_HOURS');
+  if (reminderHours) {
+    const parsed = Number(reminderHours);
+    if (!Number.isInteger(parsed) || parsed < 1 || parsed > 168) {
+      issues.push('TRANSACTION_REMINDER_HOURS must be an integer between 1 and 168.');
+    }
   }
 
   for (const bucket of Object.values(CANONICAL_STORAGE_BUCKETS)) {

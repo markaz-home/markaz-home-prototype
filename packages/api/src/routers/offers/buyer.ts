@@ -13,6 +13,7 @@ import {
   resolveExpiry,
   loadSummary,
   currentProposal,
+  acceptedTransaction,
   toThreadInput,
   summaryToProperty,
   matchesBuyerFilter,
@@ -176,7 +177,16 @@ export const buyerOffersRouter = router({
       const summaries = new Map<string, ListingSummaryRow | null>();
       const out = [];
       for (const t of rows) {
-        if (!matchesBuyerFilter(t.status as OfferThreadStatus, t.nextActor, input?.filter ?? 'all'))
+        const transaction =
+          t.status === 'ACCEPTED' ? await acceptedTransaction(ctx.tx, t.id) : null;
+        if (
+          !matchesBuyerFilter(
+            t.status as OfferThreadStatus,
+            t.nextActor,
+            input?.filter ?? 'all',
+            transaction?.status,
+          )
+        )
           continue;
         if (!summaries.has(t.listingId))
           summaries.set(t.listingId, await loadSummary(ctx.tx, t.listingId));
@@ -187,6 +197,7 @@ export const buyerOffersRouter = router({
             thread: toThreadInput(t),
             current: await currentProposal(ctx.tx, t.currentProposalId),
             property: summaryToProperty(s),
+            transaction,
           }),
         );
       }

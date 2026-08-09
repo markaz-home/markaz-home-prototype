@@ -110,6 +110,28 @@ describe('validateEnvironment', () => {
     assert.ok(issues.some((issue) => issue.includes('SLOW_REQUEST_MS')));
   });
 
+  it('requires a complete transactional email configuration and a safe reminder window', () => {
+    const missing = issuesFor({ EMAIL_PROVIDER: 'resend' });
+    assert.ok(missing.some((issue) => issue.includes('RESEND_API_KEY')));
+    assert.ok(missing.some((issue) => issue.includes('EMAIL_FROM')));
+    assert.ok(missing.some((issue) => issue.includes('CRON_SECRET')));
+    assert.ok(
+      issuesFor({ TRANSACTION_REMINDER_HOURS: '0' }).some((issue) =>
+        issue.includes('TRANSACTION_REMINDER_HOURS'),
+      ),
+    );
+
+    const configured = validateEnvironment({
+      ...validLocal,
+      EMAIL_PROVIDER: 'resend',
+      RESEND_API_KEY: 're_test-placeholder',
+      EMAIL_FROM: 'MARKAZ Home <notifications@example.test>',
+      CRON_SECRET: 'test-secret',
+      TRANSACTION_REMINDER_HOURS: '24',
+    });
+    assert.equal(configured.deploymentEnvironment, 'local');
+  });
+
   it('rejects a privileged key in the public Supabase slot', () => {
     assert.ok(
       issuesFor({ NEXT_PUBLIC_SUPABASE_ANON_KEY: 'sb_secret_not-public' }).some((issue) =>

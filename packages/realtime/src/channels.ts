@@ -9,6 +9,7 @@ export const REALTIME_TABLES = {
   offerThreads: 'offer_threads',
   offerEvents: 'offer_events',
   transactionEvents: 'transaction_events',
+  notifications: 'notifications',
   // Week 6: admin operational queues. RLS scopes delivery to admins (admin RLS).
   publicationRequests: 'listing_publication_requests',
   transactions: 'transactions',
@@ -36,5 +37,13 @@ export interface OfferEventRow {
   id: string;
   thread_id: string;
   event_type: string;
+  created_at: string;
+}
+
+export interface NotificationRow {
+  id: string;
+  recipient_id: string;
+  kind: string;
+  read_at: string | null;
   created_at: string;
 }

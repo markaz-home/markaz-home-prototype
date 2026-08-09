@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { ArrowLeft, Hourglass } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Hourglass } from 'lucide-react';
 import {
   Alert,
+  Badge,
   Button,
   Card,
   CardContent,
@@ -93,13 +94,14 @@ export function OfferThread({ threadId }: { threadId: string }) {
     perspective === 'BUYER'
       ? t('thread.buyerTitle', { headline: thread.property.headline })
       : t('thread.sellerTitle', { buyer: t('buyerLabel', { n: buyerLabel ?? '01' }) });
+  const transactionCancelled = thread.transaction?.status === 'CANCELLED';
 
   return (
     <div className="space-y-6">
       <span role="status" aria-live="polite" className="sr-only">
         {announce}
       </span>
-      <nav aria-label="Breadcrumb" className="text-muted-foreground text-sm">
+      <nav aria-label={t('title')} className="text-muted-foreground text-sm">
         <Link href="/offers" className="hover:text-foreground inline-flex items-center gap-1.5">
           <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden />
           {t('title')}
@@ -112,6 +114,9 @@ export function OfferThread({ threadId }: { threadId: string }) {
             {title}
           </h1>
           <OfferStatusBadge statusKey={thread.statusKey} />
+          {thread.transaction ? (
+            <TransactionOutcomeBadge transaction={thread.transaction} />
+          ) : null}
         </div>
         <p className="text-muted-foreground">
           {[thread.property.community, thread.property.emirate].filter(Boolean).join(' · ')}
@@ -123,7 +128,19 @@ export function OfferThread({ threadId }: { threadId: string }) {
         onRefresh={() => void utils.offers.getThread.invalidate({ threadId })}
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+      {thread.status === 'ACCEPTED' ? (
+        transactionCancelled ? (
+          <CancelledAcceptedPanel thread={thread} />
+        ) : (
+          <AcceptedPanel thread={thread} threadId={threadId} />
+        )
+      ) : null}
+
+      <div
+        className={
+          thread.status === 'ACCEPTED' ? 'grid gap-6' : 'grid gap-6 lg:grid-cols-[1fr_360px]'
+        }
+      >
         <div className="space-y-6">
           <CurrentProposal thread={thread} />
           <section aria-labelledby="timeline-h">
@@ -134,7 +151,8 @@ export function OfferThread({ threadId }: { threadId: string }) {
           </section>
         </div>
 
-        <aside className="lg:sticky lg:top-20 lg:self-start">
+        {thread.status !== 'ACCEPTED' ? (
+          <aside className="lg:sticky lg:top-20 lg:self-start">
           <DecisionPanel
             thread={thread}
             threadId={threadId}
@@ -147,13 +165,31 @@ export function OfferThread({ threadId }: { threadId: string }) {
             }}
             onError={(e) => setAnnounce(errMsg(e))}
           />
-        </aside>
+          </aside>
+        ) : null}
       </div>
     </div>
   );
 }
 
 type ThreadData = RouterOutputs['offers']['getThread']['thread'];
+
+function TransactionOutcomeBadge({
+  transaction,
+}: {
+  transaction: NonNullable<ThreadData['transaction']>;
+}) {
+  const t = useTranslations('transactions');
+  const closed = transaction.status === 'CANCELLED' || transaction.status === 'FAILED';
+  return (
+    <Badge
+      variant="outline"
+      className={closed ? 'border-destructive/40 text-destructive' : 'border-primary/35 text-primary'}
+    >
+      {t(transaction.statusKey as 'status.cancelled')}
+    </Badge>
+  );
+}
 
 function CurrentProposal({ thread }: { thread: ThreadData }) {
   const t = useTranslations('offers');
@@ -165,6 +201,14 @@ function CurrentProposal({ thread }: { thread: ThreadData }) {
     : cp.bySide === 'BUYER'
       ? t('thread.proposedByBuyer')
       : t('thread.proposedBySeller');
+  const nextAction =
+    thread.status === 'ACCEPTED'
+      ? t('thread.negotiationComplete')
+      : thread.isActionable
+        ? t('thread.yourTurn')
+        : thread.nextActor === 'BUYER'
+          ? t('thread.waitingBuyer')
+          : t('thread.waitingSeller');
   return (
     <Card>
       <CardContent className="space-y-3 pt-6">
@@ -174,10 +218,15 @@ function CurrentProposal({ thread }: { thread: ThreadData }) {
         </p>
         <AmountComparison comparison={thread.comparison} />
         <dl className="grid grid-cols-2 gap-2 text-sm">
-          <Meta label={t('thread.nextAction')} value={byLabel} />
+          <Meta label={t('thread.proposedByLabel')} value={byLabel} />
+          <Meta label={t('thread.nextAction')} value={nextAction} />
           <Meta
             label={t('askingPrice')}
             value={formatAed(thread.property.askingPriceAed, locale)}
+          />
+          <Meta
+            label={t('thread.submittedAt', { date: formatDateTime(cp.createdAt, locale) })}
+            value=""
           />
           {cp.expiresAt ? (
             <Meta
@@ -223,9 +272,7 @@ function DecisionPanel({
   const [dialog, setDialog] = useState<null | 'counter' | 'accept' | 'reject' | 'withdraw'>(null);
 
   // Closed / terminal states show a calm panel + Week-5 handoff for accepted.
-  if (thread.status === 'ACCEPTED') {
-    return <AcceptedPanel thread={thread} threadId={threadId} />;
-  }
+  if (thread.status === 'ACCEPTED') return null;
   if (thread.status !== 'AWAITING_BUYER' && thread.status !== 'AWAITING_SELLER') {
     return <ClosedPanel thread={thread} />;
   }
@@ -334,34 +381,81 @@ function AcceptedPanel({ thread, threadId }: { thread: ThreadData; threadId: str
   const tt = useTranslations('transactions');
   const router = useRouter();
   const create = trpc.transactions.createFromAcceptedOffer.useMutation({
-    onSuccess: (r) => router.push(`/transactions/${r.transactionId}`),
+    onSuccess: (r) => router.push(`/transactions/${r.transactionId}/confirm`),
   });
   return (
-    <Card>
-      <CardContent className="space-y-3 pt-6">
-        <h2 className="text-lg font-semibold">{t('accept.successTitle')}</h2>
-        <p className="text-muted-foreground text-sm">
-          {thread.perspective === 'SELLER' ? t('accept.sellerSuccess') : t('accept.buyerSuccess')}
-        </p>
-        <NonBindingDisclosure variant="accept" />
-        <div className="flex flex-col gap-2">
-          {/* Week-5 handoff: open the shared transaction workspace (idempotent create). */}
-          <Button
-            loading={create.isPending}
-            onClick={() => create.mutate({ offerThreadId: threadId })}
-          >
-            {tt('continue')}
-          </Button>
+    <Card className="border-success/40 from-success/10 via-card/80 to-primary/10 bg-gradient-to-br">
+      <CardContent className="flex flex-col gap-5 pt-6 md:flex-row md:items-center">
+        <span className="border-success/40 bg-success/10 text-success grid h-12 w-12 shrink-0 place-items-center rounded-full border">
+          <CheckCircle2 className="h-6 w-6" aria-hidden />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-success text-xs font-semibold uppercase tracking-[0.14em]">
+            {t('accept.successTitle')}
+          </p>
+          <h2 className="font-display mt-1 text-2xl">{t('accept.nextStep')}</h2>
+          <p className="text-muted-foreground mt-2 text-sm">
+            {thread.perspective === 'SELLER' ? t('accept.sellerSuccess') : t('accept.buyerSuccess')}
+          </p>
+        </div>
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+          {thread.transaction ? (
+            <Button asChild>
+              <Link href={`/transactions/${thread.transaction.id}`}>
+                {tt('continue')}
+                <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden />
+              </Link>
+            </Button>
+          ) : (
+            /* Legacy fallback: the database handoff is idempotent. */
+            <Button
+              loading={create.isPending}
+              onClick={() => create.mutate({ offerThreadId: threadId })}
+            >
+              {tt('continue')}
+              <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden />
+            </Button>
+          )}
           <Button asChild variant="outline">
             <Link href="/offers">{t('closed.returnOffers')}</Link>
           </Button>
-          {thread.property.publicId ? (
-            <Button asChild variant="ghost">
-              <Link href={`/properties/${thread.property.publicId}/${thread.property.slug ?? ''}`}>
-                {t('closed.viewProperty')}
-              </Link>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CancelledAcceptedPanel({ thread }: { thread: ThreadData }) {
+  const t = useTranslations('transactions');
+  if (!thread.transaction) return null;
+  return (
+    <Card className="border-destructive/30 bg-destructive/5">
+      <CardContent className="flex flex-col gap-5 pt-6 md:flex-row md:items-center">
+        <div className="min-w-0 flex-1">
+          <h2 className="font-display text-2xl">
+            {t('cancellation.cancelledTitle')}
+          </h2>
+          <p className="text-muted-foreground mt-2 text-sm leading-6">
+            {t(
+              thread.perspective === 'SELLER'
+                ? 'cancellation.sellerCancelledBody'
+                : 'cancellation.buyerCancelledBody',
+            )}
+          </p>
+        </div>
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+          <Button asChild>
+            <Link href={`/transactions/${thread.transaction.id}`}>{t('viewWorkspace')}</Link>
+          </Button>
+          {thread.perspective === 'SELLER' ? (
+            <Button asChild variant="outline">
+              <Link href="/sell">{t('cancellation.reviewListing')}</Link>
             </Button>
-          ) : null}
+          ) : (
+            <Button asChild variant="outline">
+              <Link href="/properties">{t('cancellation.browseProperties')}</Link>
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -527,26 +621,60 @@ function AcceptDialog({
   onError: (e: unknown) => void;
 }) {
   const t = useTranslations('offers');
+  const tt = useTranslations('transactions');
   const locale = useLocale();
+  const router = useRouter();
   const isBuyer = thread.perspective === 'BUYER';
   const accept = (
     isBuyer ? trpc.offers.acceptSellerCounter : trpc.offers.acceptBuyerProposal
   ).useMutation();
   const amount = thread.currentProposal?.amountAed ?? 0;
+  const [transactionId, setTransactionId] = useState<string | null>(null);
 
   async function go() {
     if (!thread.currentProposal) return;
     try {
-      await accept.mutateAsync({
+      const result = await accept.mutateAsync({
         threadId,
         proposalId: thread.currentProposal.id,
         expectedVersion: thread.version,
       });
-      onDone();
+      setTransactionId(result.transactionId);
     } catch (e) {
       onError(e);
       onClose();
     }
+  }
+
+  if (transactionId) {
+    return (
+      <Dialog open onOpenChange={(open) => !open && onDone()}>
+        <DialogContent>
+          <div className="text-center">
+            <span className="border-success/40 bg-success/10 text-success mx-auto grid h-14 w-14 place-items-center rounded-full border">
+              <CheckCircle2 className="h-7 w-7" aria-hidden />
+            </span>
+            <DialogHeader className="mt-4">
+              <DialogTitle>{t('accept.successTitle')}</DialogTitle>
+            </DialogHeader>
+            <p className="text-muted-foreground mt-3 text-sm leading-6">{t('accept.nextStep')}</p>
+            <p className="mt-3 text-xl font-semibold" dir="ltr">
+              {formatAed(amount, locale)}
+            </p>
+          </div>
+          <NonBindingDisclosure variant="accept" />
+          <DialogFooter>
+            <Button variant="outline" onClick={onDone}>
+              {t('accept.continueLater')}
+            </Button>
+            <Button onClick={() => router.push(`/transactions/${transactionId}/confirm`)}>
+              {tt('continue')}
+              <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
   }
 
   return (

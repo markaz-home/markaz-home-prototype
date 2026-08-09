@@ -2,6 +2,7 @@
 
 import { Bell } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useNotificationChannel } from '@markaz/realtime';
 import {
   Button,
   DropdownMenu,
@@ -13,36 +14,32 @@ import {
 } from '@markaz/ui';
 import { useRouter } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
+import {
+  NotificationContent,
+  notificationHref,
+  type NotificationItem,
+} from '@/components/notifications/notification-content';
 
-const KNOWN = new Set([
-  'OFFER_RECEIVED',
-  'OFFER_COUNTER_SELLER',
-  'OFFER_COUNTER_BUYER',
-  'OFFER_ACCEPTED',
-  'OFFER_REJECTED',
-  'OFFER_WITHDRAWN',
-  'OFFER_CLOSED_OTHER',
-  'OFFER_LISTING_UNAVAILABLE',
-  'OFFER_EXPIRED',
-]);
-
-/** Header notification bell with unread count + compact menu (offers-design-spec §30).
- * No amounts in the header menu — those appear after entering the authorised thread. */
+/** Header notification bell with unread count + compact, event-specific context. */
 export function NotificationBell() {
   const t = useTranslations('offers.notify');
   const router = useRouter();
   const utils = trpc.useUtils();
   const counts = trpc.offers.getUnreadCounts.useQuery(undefined, { refetchInterval: 60_000 });
-  const list = trpc.offers.notifications.useQuery({ limit: 12 });
+  const list = trpc.offers.notifications.useQuery({ limit: 12 }, { refetchInterval: 60_000 });
   const markRead = trpc.offers.markNotificationRead.useMutation();
   const markAll = trpc.offers.markAllNotificationsRead.useMutation();
   const unread = counts.data?.unread ?? 0;
 
-  async function open(id: string, threadId: string | null) {
-    await markRead.mutateAsync({ id }).catch(() => {});
+  const refresh = () => {
     void utils.offers.getUnreadCounts.invalidate();
     void utils.offers.notifications.invalidate();
-    if (threadId) router.push(`/offers/${threadId}`);
+  };
+  useNotificationChannel(refresh);
+
+  function open(n: NotificationItem) {
+    router.push(notificationHref(n));
+    if (!n.read) markRead.mutate({ id: n.id }, { onSettled: refresh });
   }
 
   return (
@@ -62,17 +59,16 @@ export function NotificationBell() {
           ) : null}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-80">
+      <DropdownMenuContent className="w-[min(25rem,calc(100vw-1.5rem))] p-0">
         <div className="flex items-center justify-between">
           <DropdownMenuLabel>{t('title')}</DropdownMenuLabel>
           {unread > 0 ? (
             <button
               type="button"
-              className="text-primary me-2 text-xs underline"
+              className="text-primary me-4 text-xs underline"
               onClick={async () => {
                 await markAll.mutateAsync().catch(() => {});
-                void utils.offers.getUnreadCounts.invalidate();
-                void utils.offers.notifications.invalidate();
+                refresh();
               }}
             >
               {t('markAllRead')}
@@ -81,23 +77,26 @@ export function NotificationBell() {
         </div>
         <DropdownMenuSeparator />
         {!list.data || list.data.length === 0 ? (
-          <p className="text-muted-foreground px-2 py-6 text-center text-sm">{t('empty')}</p>
+          <p className="text-muted-foreground px-4 py-8 text-center text-sm">{t('empty')}</p>
         ) : (
           list.data.map((n) => (
             <DropdownMenuItem
               key={n.id}
-              onSelect={() => void open(n.id, n.threadId)}
-              className={n.read ? 'opacity-70' : 'font-medium'}
+              onSelect={() => open(n)}
+              className="border-border/60 block cursor-pointer border-b px-4 py-3 last:border-b-0"
             >
-              <span className="flex items-center gap-2">
-                {!n.read ? (
-                  <span className="bg-primary h-2 w-2 shrink-0 rounded-full" aria-hidden />
-                ) : null}
-                {KNOWN.has(n.kind) ? t(n.kind as 'OFFER_RECEIVED') : t('view')}
-              </span>
+              <NotificationContent notification={n} compact />
             </DropdownMenuItem>
           ))
         )}
+        <DropdownMenuSeparator className="m-0" />
+        <button
+          type="button"
+          className="text-primary w-full px-4 py-3 text-center text-sm font-medium hover:bg-foreground/5"
+          onClick={() => router.push('/account/notifications')}
+        >
+          {t('viewAll')}
+        </button>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithIntl } from './test-utils';
 
@@ -91,6 +91,37 @@ describe('SignUpForm', () => {
     await user.click(screen.getByRole('button', { name: 'Create account' }));
     await waitFor(() => expect(signUp).toHaveBeenCalledTimes(1));
     expect(push).toHaveBeenCalledWith(expect.stringContaining('/sign-up/check-email'));
+  });
+
+  it('makes only one signup request when submit is triggered twice before it resolves', async () => {
+    let resolveSignUp!: (value: unknown) => void;
+    signUp.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveSignUp = resolve;
+        }),
+    );
+    const user = userEvent.setup();
+    renderWithIntl(<SignUpForm />);
+    await fillValid(user);
+
+    const form = screen.getByRole('button', { name: 'Create account' }).closest('form');
+    expect(form).not.toBeNull();
+    act(() => {
+      form!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      form!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
+
+    await waitFor(() => expect(signUp).toHaveBeenCalledTimes(1));
+    await act(async () => {
+      resolveSignUp({ data: { user: { identities: [{ id: 'x' }] } }, error: null });
+    });
+    await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
+
+    act(() => {
+      form!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
+    expect(signUp).toHaveBeenCalledTimes(1);
   });
 
   it('handles an existing email safely (no duplicate)', async () => {

@@ -17,6 +17,7 @@ describe('notification payload validation (§30 / week5 §34)', () => {
         threadId: THREAD,
         transactionId: null,
         listingId: null,
+        amountAed: null,
       });
     }
   });
@@ -28,6 +29,7 @@ describe('notification payload validation (§30 / week5 §34)', () => {
         threadId: null,
         transactionId: TX,
         listingId: null,
+        amountAed: null,
       });
     }
   });
@@ -38,6 +40,7 @@ describe('notification payload validation (§30 / week5 §34)', () => {
       threadId: THREAD,
       transactionId: null,
       listingId: LISTING,
+      amountAed: null,
     });
   });
 
@@ -47,6 +50,7 @@ describe('notification payload validation (§30 / week5 §34)', () => {
       threadId: null,
       transactionId: null,
       listingId: null,
+      amountAed: null,
     });
   });
 
@@ -56,18 +60,21 @@ describe('notification payload validation (§30 / week5 §34)', () => {
       threadId: null,
       transactionId: null,
       listingId: null,
+      amountAed: null,
     });
     expect(toSafeNotification('TRANSACTION_CREATED', { transactionId: 'nope' })).toEqual({
       kind: 'UNKNOWN',
       threadId: null,
       transactionId: null,
       listingId: null,
+      amountAed: null,
     });
     expect(toSafeNotification('TRANSACTION_CREATED', null)).toEqual({
       kind: 'UNKNOWN',
       threadId: null,
       transactionId: null,
       listingId: null,
+      amountAed: null,
     });
   });
 
@@ -82,6 +89,7 @@ describe('notification payload validation (§30 / week5 §34)', () => {
       threadId: null,
       transactionId: TX,
       listingId: null,
+      amountAed: null,
     });
   });
 });

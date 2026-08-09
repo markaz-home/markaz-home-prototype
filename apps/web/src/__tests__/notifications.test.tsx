@@ -52,6 +52,7 @@ vi.mock('@/trpc/react', () => ({
     },
   },
 }));
+vi.mock('@markaz/realtime', () => ({ useNotificationChannel: () => ({ status: 'connected' }) }));
 
 import { NotificationsList } from '@/components/offers/notifications-list';
 

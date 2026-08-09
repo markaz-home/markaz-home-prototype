@@ -72,4 +72,25 @@ describe('offer projection privacy (§37)', () => {
     expect(s.headline).toMatch(/2-bedroom apartment in Marina Gate/i);
     expect(s.askingPriceAed).toBe(2_400_000);
   });
+
+  it('projects the linked transaction outcome without changing the accepted offer record', () => {
+    const v = toBuyerThread({
+      thread: {
+        ...thread,
+        status: 'ACCEPTED',
+        nextActor: 'NONE',
+        acceptedProposalId: 'p1',
+      },
+      current,
+      property,
+      transaction: { id: 'tx1', status: 'CANCELLED' },
+    });
+
+    expect(v.status).toBe('ACCEPTED');
+    expect(v.transaction).toEqual({
+      id: 'tx1',
+      status: 'CANCELLED',
+      statusKey: 'status.cancelled',
+    });
+  });
 });

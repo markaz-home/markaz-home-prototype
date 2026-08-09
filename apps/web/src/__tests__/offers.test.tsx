@@ -147,6 +147,35 @@ describe('OffersHub', () => {
     expect(screen.getByText('Waiting for seller')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /view offer/i })).toBeInTheDocument();
   });
+
+  it('shows a cancelled transaction as the outcome of its accepted offer', () => {
+    Q.buyerThreads = {
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+      data: [
+        {
+          threadId: 't1',
+          statusKey: 'accepted',
+          isActionable: false,
+          lastActivityAt: new Date().toISOString(),
+          property,
+          currentProposal: { amountAed: 2_250_000 },
+          comparison: { pct: 6.3, direction: 'BELOW' },
+          transaction: { id: 'tx1', status: 'CANCELLED', statusKey: 'status.cancelled' },
+        },
+      ],
+    };
+
+    renderWithIntl(<OffersHub initialView="made" />);
+
+    expect(screen.getByText('Offer accepted')).toBeInTheDocument();
+    expect(screen.getByText('Cancelled')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'View transaction' })).toHaveAttribute(
+      'href',
+      '/transactions/tx1',
+    );
+  });
 });
 
 describe('OfferThread', () => {
@@ -213,11 +242,48 @@ describe('OfferThread', () => {
       },
     };
     renderWithIntl(<OfferThread threadId="t1" />);
-    expect(screen.getByRole('heading', { name: 'Offer accepted' })).toBeInTheDocument();
+    expect(screen.getByText('Offer accepted', { selector: 'p' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /shared transaction is ready for both buyer and seller/i }),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(/transaction setup will continue in the next stage/i),
     ).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /pay deposit|create transaction/i })).toBeNull();
+  });
+
+  it('accepted thread shows the cancelled transaction outcome instead of an active handoff', () => {
+    Q.thread = {
+      isLoading: false,
+      isError: false,
+      data: {
+        thread: {
+          ...baseThread,
+          perspective: 'BUYER',
+          status: 'ACCEPTED',
+          statusKey: 'accepted',
+          nextActor: 'NONE',
+          isActionable: false,
+          transaction: { id: 'tx1', status: 'CANCELLED', statusKey: 'status.cancelled' },
+        },
+        timeline: [],
+      },
+    };
+
+    renderWithIntl(<OfferThread threadId="t1" />);
+
+    expect(screen.getByRole('heading', { name: 'Transaction cancelled' })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: /shared transaction is ready/i }),
+    ).toBeNull();
+    expect(screen.getByRole('link', { name: 'View transaction' })).toHaveAttribute(
+      'href',
+      '/transactions/tx1',
+    );
+    expect(screen.getByRole('link', { name: 'Browse other properties' })).toHaveAttribute(
+      'href',
+      '/properties',
+    );
   });
 
   it('unavailable / forbidden thread uses the unified safe copy', () => {

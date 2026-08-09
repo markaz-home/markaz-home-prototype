@@ -27,7 +27,7 @@ export function OfferTimeline({
 }) {
   const t = useTranslations('offers.thread');
   const locale = useLocale();
-  const buyer = buyerLabel ? `Buyer ${buyerLabel}` : 'Buyer';
+  const buyer = buyerLabel ? t('buyerNumber', { n: buyerLabel }) : t('buyerGeneric');
 
   function copyFor(e: TimelineEvent): string {
     const amount = e.amountAed != null ? formatAed(e.amountAed, locale) : '';
@@ -73,21 +73,22 @@ export function OfferTimeline({
   if (events.length === 0) return null;
 
   return (
-    <ol className="mt-4 space-y-5">
+    <ol className="mt-4">
       {events.map((e, index) => (
-        <li key={e.id} className="relative flex gap-4">
-          {/* The rail is drawn per row and stops at the last one, so no stub
-              hangs below the final event. */}
-          <div className="flex flex-col items-center">
+        <li key={e.id} className="relative grid grid-cols-[0.75rem_1fr] gap-4 pb-6 last:pb-0">
+          {/* One continuous rail joins marker centre to marker centre; row
+              spacing is padding, so it cannot break the visual connection. */}
+          {index < events.length - 1 ? (
             <span
-              className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full border-2 ${markerClass(e)}`}
+              className="bg-border absolute start-[0.3125rem] top-2 h-[calc(100%-0.125rem)] w-px"
               aria-hidden
             />
-            {index < events.length - 1 ? (
-              <span className="bg-border mt-1 w-px flex-1" aria-hidden />
-            ) : null}
-          </div>
-          <div className="min-w-0 pb-1">
+          ) : null}
+          <span
+            className={`relative z-10 mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full border-2 ${markerClass(e)}`}
+            aria-hidden
+          />
+          <div className="min-w-0">
             <p className="text-sm" dir="auto">
               {copyFor(e)}
             </p>

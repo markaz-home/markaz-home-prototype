@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   Button,
+  Badge,
   Card,
   CardContent,
   EmptyState,
@@ -207,13 +208,21 @@ interface CardThread {
   comparison: { pct: number; direction: 'BELOW' | 'ABOVE' | 'EQUAL' } | null;
   buyerLabel?: string;
   threshold?: 'AT_OR_ABOVE' | 'BELOW' | null;
+  transaction?: {
+    id: string;
+    status: string;
+    statusKey: string;
+  } | null;
 }
 
 function OfferCard({ thread, seller = false }: { thread: CardThread; seller?: boolean }) {
   const t = useTranslations('offers');
   const tt = useTranslations('offers.threshold');
+  const tx = useTranslations('transactions');
   const locale = useLocale();
   const p = thread.property;
+  const transactionClosed =
+    thread.transaction?.status === 'CANCELLED' || thread.transaction?.status === 'FAILED';
   return (
     <Card>
       <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
@@ -225,6 +234,18 @@ function OfferCard({ thread, seller = false }: { thread: CardThread; seller?: bo
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <OfferStatusBadge statusKey={thread.statusKey} />
+            {thread.transaction ? (
+              <Badge
+                variant="outline"
+                className={
+                  transactionClosed
+                    ? 'border-destructive/40 text-destructive'
+                    : 'border-primary/35 text-primary'
+                }
+              >
+                {tx(thread.transaction.statusKey as 'status.cancelled')}
+              </Badge>
+            ) : null}
             {seller && thread.buyerLabel ? (
               <span className="text-muted-foreground text-sm">
                 {t('buyerLabel', { n: thread.buyerLabel })} · {t('verifiedCustomer')}
@@ -261,8 +282,18 @@ function OfferCard({ thread, seller = false }: { thread: CardThread; seller?: bo
         </div>
         <div className="shrink-0">
           <Button asChild variant={thread.isActionable ? 'default' : 'outline'}>
-            <Link href={`/offers/${thread.threadId}`}>
-              {thread.isActionable ? t('reviewOffer') : t('viewOffer')}
+            <Link
+              href={
+                transactionClosed && thread.transaction
+                  ? `/transactions/${thread.transaction.id}`
+                  : `/offers/${thread.threadId}`
+              }
+            >
+              {transactionClosed
+                ? tx('viewWorkspace')
+                : thread.isActionable
+                  ? t('reviewOffer')
+                  : t('viewOffer')}
             </Link>
           </Button>
         </div>

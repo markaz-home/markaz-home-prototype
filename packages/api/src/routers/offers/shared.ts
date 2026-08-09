@@ -1,15 +1,21 @@
 import { eq, sql } from 'drizzle-orm';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
-import { offerProposals, type offerThreads, type Tx, execRow } from '@markaz/db';
+import { offerProposals, transactions, type offerThreads, type Tx, execRow } from '@markaz/db';
 import {
   expiryFromOption,
   validateOfferAmount,
   type expiryOptionSchema,
   type OfferSide,
   type OfferThreadStatus,
+  type TransactionStatus,
 } from '@markaz/domain';
-import type { OfferPropertyInput, ProposalInput, ThreadInput } from '../../offer-projection';
+import type {
+  OfferPropertyInput,
+  OfferTransactionInput,
+  ProposalInput,
+  ThreadInput,
+} from '../../offer-projection';
 
 export const ACTIVE_STATUSES = ['DRAFT', 'AWAITING_SELLER', 'AWAITING_BUYER'] as const;
 
@@ -138,6 +144,19 @@ export async function currentProposal(tx: Tx, id: string | null): Promise<Propos
   return p ? toProposalInput(p) : null;
 }
 
+/** Participant-scoped transaction outcome for an accepted offer. */
+export async function acceptedTransaction(
+  tx: Tx,
+  threadId: string,
+): Promise<OfferTransactionInput | null> {
+  const [row] = await tx
+    .select({ id: transactions.id, status: transactions.status })
+    .from(transactions)
+    .where(eq(transactions.offerThreadId, threadId))
+    .limit(1);
+  return row ? { id: row.id, status: row.status as TransactionStatus } : null;
+}
+
 /** Resolve the caller's side on a thread, or throw the unified not-found. */
 export function perspectiveOf(t: typeof offerThreads.$inferSelect, userId: string): OfferSide {
   if (t.buyerUserId === userId) return 'BUYER';
@@ -192,7 +211,15 @@ export async function runAccept(
     await ctx.tx.execute(
       sql`select public.accept_offer(${input.threadId}::uuid, ${input.proposalId}::uuid, ${input.expectedVersion})`,
     );
-    return { ok: true as const };
+    // Acceptance moves BOTH participants into one shared transaction immediately.
+    // The transaction no longer depends on either participant finding/clicking the
+    // handoff button; `ensure_transaction` is idempotent and runs in this same DB tx.
+    const transaction = await execRow<{ id: string }>(
+      ctx.tx,
+      sql`select id::text as id from public.ensure_transaction(${input.threadId}::uuid)`,
+    );
+    if (!transaction?.id) throw new Error('TRANSACTION_NOT_CREATED');
+    return { ok: true as const, transactionId: transaction.id };
   } catch (e) {
     mapOfferError(e);
   }
@@ -203,16 +230,20 @@ export function matchesBuyerFilter(
   status: OfferThreadStatus,
   nextActor: string,
   filter: string,
+  transactionStatus?: TransactionStatus,
 ): boolean {
+  const acceptedJourneyClosed =
+    status === 'ACCEPTED' &&
+    (transactionStatus === 'CANCELLED' || transactionStatus === 'FAILED');
   switch (filter) {
     case 'action':
       return status === 'AWAITING_BUYER' && nextActor === 'BUYER';
     case 'waiting':
       return status === 'AWAITING_SELLER';
     case 'accepted':
-      return status === 'ACCEPTED';
+      return status === 'ACCEPTED' && !acceptedJourneyClosed;
     case 'closed':
-      return [
+      return acceptedJourneyClosed || [
         'REJECTED',
         'WITHDRAWN',
         'EXPIRED',
@@ -228,16 +259,20 @@ export function matchesSellerFilter(
   status: OfferThreadStatus,
   nextActor: string,
   filter: string,
+  transactionStatus?: TransactionStatus,
 ): boolean {
+  const acceptedJourneyClosed =
+    status === 'ACCEPTED' &&
+    (transactionStatus === 'CANCELLED' || transactionStatus === 'FAILED');
   switch (filter) {
     case 'action':
       return status === 'AWAITING_SELLER' && nextActor === 'SELLER';
     case 'waiting':
       return status === 'AWAITING_BUYER';
     case 'accepted':
-      return status === 'ACCEPTED';
+      return status === 'ACCEPTED' && !acceptedJourneyClosed;
     case 'closed':
-      return [
+      return acceptedJourneyClosed || [
         'REJECTED',
         'WITHDRAWN',
         'EXPIRED',

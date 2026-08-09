@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
@@ -38,6 +38,12 @@ export function SignUpForm({
   const [formError, setFormError] = useState<string | null>(null);
   const [existing, setExisting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [signupRequested, setSignupRequested] = useState(false);
+  // `isSubmitting` disables the button on the next render, but two submit events can
+  // still arrive in the same frame (double-click / Enter + click). Supabase treats
+  // each signUp request as a fresh confirmation request, so guard the network call
+  // synchronously to guarantee one verification email per form submission.
+  const signUpInFlight = useRef(false);
 
   const {
     register,
@@ -76,28 +82,40 @@ export function SignUpForm({
     errors.password?.message === 'password_too_long' ? fe('password_too_long') : undefined;
 
   async function onSubmit(data: SignUpInput) {
+    if (signUpInFlight.current) return;
+    signUpInFlight.current = true;
+    let completed = false;
     setFormError(null);
     setExisting(false);
-    const { data: result, error } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: { data: buildSignupMetadata(data) },
-    });
-    if (error) {
-      // Some GoTrue configs return an explicit 422 user_already_exists instead
-      // of the obfuscated empty-identities response — treat it as existing too.
-      if (isExistingAccountError(error)) {
+    try {
+      const { data: result, error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: { data: buildSignupMetadata(data) },
+      });
+      if (error) {
+        // Some GoTrue configs return an explicit 422 user_already_exists instead
+        // of the obfuscated empty-identities response — treat it as existing too.
+        if (isExistingAccountError(error)) {
+          setExisting(true);
+          return;
+        }
+        setFormError(tv(AUTH_ERROR_KEYS[mapAuthError(error)]));
+        return;
+      }
+      if (isLikelyExistingAccount(result.user)) {
         setExisting(true);
         return;
       }
-      setFormError(tv(AUTH_ERROR_KEYS[mapAuthError(error)]));
-      return;
+      // Keep this form locked after Supabase has accepted the request. Even if
+      // navigation is momentarily slow, another click must not request a second
+      // verification code. A fresh page/component can still submit normally.
+      completed = true;
+      setSignupRequested(true);
+      router.push(`/sign-up/check-email?email=${encodeURIComponent(data.email)}`);
+    } finally {
+      if (!completed) signUpInFlight.current = false;
     }
-    if (isLikelyExistingAccount(result.user)) {
-      setExisting(true);
-      return;
-    }
-    router.push(`/sign-up/check-email?email=${encodeURIComponent(data.email)}`);
   }
 
   return (
@@ -221,8 +239,13 @@ export function SignUpForm({
                 error={fe(consentError?.message as string | undefined)}
               />
 
-              <Button type="submit" className="w-full" loading={isSubmitting}>
-                {isSubmitting ? t('submitting') : t('submit')}
+              <Button
+                type="submit"
+                className="w-full"
+                loading={isSubmitting || signupRequested}
+                disabled={signupRequested}
+              >
+                {isSubmitting || signupRequested ? t('submitting') : t('submit')}
               </Button>
               <p className="text-muted-foreground text-center text-sm">
                 {t('existing')}{' '}

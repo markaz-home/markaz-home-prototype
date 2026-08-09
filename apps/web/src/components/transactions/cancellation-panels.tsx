@@ -30,16 +30,39 @@ export function TerminalPanel({ d }: { d: Detail }) {
   // Completion is the end of the journey — it gets a record, not a sentence.
   if (d.status === 'COMPLETED_DEMO') return <CompletionSummary d={d} />;
   if (d.status === 'CANCELLED') {
+    const reason = d.cancellation?.reason
+      ? t(`cancellation.reason.${d.cancellation.reason}` as 'cancellation.reason.OTHER')
+      : null;
     return (
-      <Card>
-        <CardContent className="space-y-3 pt-6">
+      <Card className="border-destructive/30 bg-destructive/5">
+        <CardContent className="space-y-4 pt-6">
           <h2 className="text-lg font-semibold">{t('cancellation.cancelledTitle')}</h2>
-          <p className="text-muted-foreground text-sm">{t('cancellation.cancelledBody')}</p>
-          {d.perspective === 'SELLER' && d.property?.publicId ? (
-            <Button asChild variant="outline">
-              <Link href={`/sell/listings`}>{t('cancellation.reviewListing')}</Link>
-            </Button>
+          <p className="text-muted-foreground text-sm leading-6">
+            {t(
+              d.perspective === 'SELLER'
+                ? 'cancellation.sellerCancelledBody'
+                : 'cancellation.buyerCancelledBody',
+            )}
+          </p>
+          {reason ? (
+            <p className="border-border/70 bg-background/50 rounded-md border px-3 py-2 text-sm">
+              {t('cancellation.reasonSummary', { reason })}
+            </p>
           ) : null}
+          <div className="flex flex-wrap gap-2">
+            {d.perspective === 'SELLER' ? (
+              <Button asChild variant="outline">
+                <Link href="/sell">{t('cancellation.reviewListing')}</Link>
+              </Button>
+            ) : (
+              <Button asChild variant="outline">
+                <Link href="/properties">{t('cancellation.browseProperties')}</Link>
+              </Button>
+            )}
+            <Button asChild variant="outline">
+              <Link href="/transactions">{t('cancellation.backTransactions')}</Link>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );
@@ -57,11 +80,29 @@ export function CancellationPending({ d, refresh }: { d: Detail; refresh: () => 
   const t = useTranslations('transactions');
   const resolve = trpc.transactions.resolveCancellation.useMutation({ onSuccess: refresh });
   const iRequested = d.cancellation?.requestedBySide === d.perspective;
+  const requester =
+    d.cancellation?.requestedBySide === 'BUYER'
+      ? t('participants.buyer')
+      : d.cancellation?.requestedBySide === 'SELLER'
+        ? t('participants.seller')
+        : t('participants.otherParticipant');
+  const reason = d.cancellation?.reason
+    ? t(`cancellation.reason.${d.cancellation.reason}` as 'cancellation.reason.OTHER')
+    : null;
   return (
-    <Card>
-      <CardContent className="space-y-3 pt-6">
+    <Card className="border-primary/35 bg-primary/5">
+      <CardContent className="space-y-4 pt-6">
         <h2 className="font-semibold">{t('cancellation.pendingTitle')}</h2>
-        <p className="text-muted-foreground text-sm">{t('cancellation.pendingBody')}</p>
+        <p className="text-muted-foreground text-sm leading-6">
+          {iRequested
+            ? t('cancellation.pendingRequesterBody')
+            : t('cancellation.pendingResponderBody', { requester })}
+        </p>
+        {reason ? (
+          <p className="border-border/70 bg-background/50 rounded-md border px-3 py-2 text-sm">
+            {t('cancellation.reasonSummary', { reason })}
+          </p>
+        ) : null}
         {!iRequested ? (
           <div className="flex gap-2">
             <Button
@@ -81,6 +122,11 @@ export function CancellationPending({ d, refresh }: { d: Detail; refresh: () => 
               {t('cancellation.decline')}
             </Button>
           </div>
+        ) : null}
+        {iRequested ? (
+          <p className="text-primary text-xs font-medium">
+            {t('cancellation.waitingForResponse')}
+          </p>
         ) : null}
       </CardContent>
     </Card>

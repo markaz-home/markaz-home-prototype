@@ -131,12 +131,11 @@ raises `UNDER_OFFER`.
 ## 11. Threshold privacy
 
 The Week-2 `min_notification_price` is **seller-private**. Classification is server-side
-(`offer_below_threshold`). At/above-threshold offers create a prominent seller notification
-(`OFFER_RECEIVED`); below-threshold offers persist and appear in the seller's list/filters
-but generate **no** prominent notification. The buyer never sees the threshold or the
-classification — the buyer DTO has no threshold field (unit-tested `offer-projection.test.ts`).
-**Verified live** (integration): a below-threshold offer creates **0** `OFFER_RECEIVED`
-notifications yet is visible to the seller; an at/above offer creates exactly **1**.
+(`offer_below_threshold`). Every valid offer now creates exactly one seller notification and
+one durable email job; the private classification still supports seller-side filtering and is
+never exposed to the buyer. The buyer DTO has no threshold field (unit-tested
+`offer-projection.test.ts`). **Verified live** (integration): below- and above-threshold offers
+each create exactly one `OFFER_RECEIVED` notification and one email-outbox job.
 
 ## 12. Notification architecture
 
@@ -148,7 +147,9 @@ notification read does **not** clear an actionable badge. **Verified live** (RLS
 a customer cannot read or insert another user's notifications.
 Payloads are validated on read by a **zod discriminated union** over `kind`
 (`packages/domain/src/notification.ts`, `toSafeNotification`); an unexpected kind or malformed
-payload degrades to a safe `UNKNOWN`/`null` and never forwards extra fields (5 unit tests).
+payload degrades to a safe `UNKNOWN`/`null` and never forwards extra fields. New notifications
+carry allow-listed property/amount context for rich cards. Email-worthy events are copied in the
+same transaction to `private.notification_email_outbox`; view receipts remain in-app only.
 
 ## 13. Realtime architecture
 

@@ -169,7 +169,7 @@ export function classifyThreshold(
   return amount < minNotificationPrice ? 'BELOW' : 'AT_OR_ABOVE';
 }
 
-/** Threshold rule kept from Week 1 (an offer below min triggers no notification). */
+/** Seller-only threshold classification; every valid offer still notifies the seller. */
 export function isBelowThreshold(amount: number, minNotificationPrice: number | null): boolean {
   return classifyThreshold(amount, minNotificationPrice) === 'BELOW';
 }

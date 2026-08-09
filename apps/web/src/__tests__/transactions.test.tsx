@@ -90,6 +90,7 @@ const detail = (over: Record<string, unknown> = {}) => ({
       coverUrl: null,
     },
     acceptedAmountAed: 2_000_000,
+    activeStage: 'CONFIRMATION',
     stageIndex: 0,
     completedStages: 0,
     totalStages: 6,
@@ -153,7 +154,7 @@ describe('TransactionsHub', () => {
     expect(screen.getByText('You are buying')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'View transaction' })).toHaveAttribute(
       'href',
-      '/transactions/tx1',
+      '/transactions/tx1/confirm',
     );
   });
 });
@@ -192,7 +193,7 @@ describe('TransactionWorkspace', () => {
     h.Q.get = detail();
     r(<TransactionWorkspace transactionId="tx1" />);
     expect(screen.getByText(/Transaction process simulated/i)).toBeInTheDocument();
-    expect(screen.getByLabelText('progress')).toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'Transactions' })).toBeInTheDocument();
     // The buyer's confirm-details control is offered.
     const btn = screen.getByRole('button', { name: 'Confirm transaction details' });
     const ack = screen.getByRole('checkbox');
@@ -218,5 +219,81 @@ describe('TransactionWorkspace', () => {
     r(<TransactionWorkspace transactionId="tx1" />);
     expect(screen.getByText('Transaction completed in demo')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /pay|deposit|confirm/i })).toBeNull();
+  });
+
+  it('gives a buyer a clear closed journey with valid next steps after cancellation', () => {
+    h.Q.get = detail({
+      status: 'CANCELLED',
+      statusKey: 'status.cancelled',
+      nextActor: 'NONE',
+      nextActorKey: 'nextActor.none',
+      cancellation: { requestedBySide: 'BUYER', reason: 'BUYER_UNABLE' },
+    });
+
+    r(<TransactionWorkspace transactionId="tx1" />);
+
+    expect(screen.getByRole('heading', { name: 'Transaction cancelled' })).toBeInTheDocument();
+    expect(screen.getByText('Reason: Buyer unable to proceed')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Browse other properties' })).toHaveAttribute(
+      'href',
+      '/properties',
+    );
+    expect(screen.getByRole('link', { name: 'Back to transactions' })).toHaveAttribute(
+      'href',
+      '/transactions',
+    );
+    expect(screen.queryByRole('link', { name: 'Manage paused listing' })).toBeNull();
+  });
+
+  it('links a seller to the real listings route after cancellation', () => {
+    h.Q.get = detail({
+      status: 'CANCELLED',
+      statusKey: 'status.cancelled',
+      nextActor: 'NONE',
+      nextActorKey: 'nextActor.none',
+      perspective: 'SELLER',
+      cancellation: { requestedBySide: 'BUYER', reason: 'BUYER_UNABLE' },
+    });
+
+    r(<TransactionWorkspace transactionId="tx1" />);
+
+    expect(screen.getByRole('link', { name: 'Manage paused listing' })).toHaveAttribute(
+      'href',
+      '/sell',
+    );
+  });
+
+  it('shows the cancellation reason and response actions to the other participant', () => {
+    h.Q.get = detail({
+      status: 'CANCELLATION_PENDING',
+      statusKey: 'status.cancellationPending',
+      nextActor: 'SELLER',
+      nextActorKey: 'nextActor.waitingSeller',
+      perspective: 'SELLER',
+      cancellation: { requestedBySide: 'BUYER', reason: 'BUYER_UNABLE' },
+    });
+
+    r(<TransactionWorkspace transactionId="tx1" />);
+
+    expect(screen.getByText(/Buyer requested cancellation/i)).toBeInTheDocument();
+    expect(screen.getByText('Reason: Buyer unable to proceed')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Confirm cancellation' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Keep transaction active' })).toBeInTheDocument();
+  });
+
+  it('shows the requester that cancellation is awaiting a response', () => {
+    h.Q.get = detail({
+      status: 'CANCELLATION_PENDING',
+      statusKey: 'status.cancellationPending',
+      nextActor: 'SELLER',
+      nextActorKey: 'nextActor.waitingSeller',
+      cancellation: { requestedBySide: 'BUYER', reason: 'BUYER_UNABLE' },
+    });
+
+    r(<TransactionWorkspace transactionId="tx1" />);
+
+    expect(screen.getByText(/Your cancellation request was sent/i)).toBeInTheDocument();
+    expect(screen.getByText(/Waiting for the other participant’s response/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Confirm cancellation' })).toBeNull();
   });
 });

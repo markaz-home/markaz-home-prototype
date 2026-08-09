@@ -10,6 +10,7 @@ import { trpc } from '@/trpc/react';
 import type { RouterOutputs } from '@/trpc/types';
 import { formatAed } from '@/lib/format';
 import { SimulationDisclosure } from './shared';
+import { transactionStageHref } from '@/lib/transaction-routes';
 
 type Filter = 'all' | 'action' | 'waiting' | 'completed' | 'closed';
 const FILTERS: Filter[] = ['all', 'action', 'waiting', 'completed', 'closed'];
@@ -130,7 +131,7 @@ function TransactionCard({ item }: { item: Item }) {
           </p>
         </div>
         <Button asChild className="shrink-0">
-          <Link href={`/transactions/${item.id}`}>{t('viewWorkspace')}</Link>
+          <Link href={transactionStageHref(item.id, item.activeStage)}>{t('viewWorkspace')}</Link>
         </Button>
       </CardContent>
     </Card>

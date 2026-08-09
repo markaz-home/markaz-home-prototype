@@ -1,6 +1,14 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
-import { ArrowRight, Building2, Compass, Heart, Receipt, ArrowLeftRight } from 'lucide-react';
-import { Alert, Button, Card, CardContent, cn } from '@markaz/ui';
+import {
+  ArrowRight,
+  Building2,
+  Clock3,
+  Compass,
+  Heart,
+  Receipt,
+  ArrowLeftRight,
+} from 'lucide-react';
+import { Alert, Badge, Button, Card, CardContent, cn } from '@markaz/ui';
 import { isThreadActionable, isTerminal } from '@markaz/domain';
 import { Link } from '@/i18n/navigation';
 import { getSession } from '@/server/session';
@@ -10,6 +18,7 @@ import { isFreshDashboard, selectDashboardRecommendations } from '@/lib/dashboar
 import { PropertyCard } from '@/components/marketplace/property-card';
 import { OfferStatusBadge } from '@/components/offers/shared';
 import { AccountSetupPrompt } from '@/components/account-setup-prompt';
+import { transactionStageHref } from '@/lib/transaction-routes';
 
 type ListingRow = {
   id: string;
@@ -70,6 +79,11 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
   );
   const activeTransactions = transactions.filter((x) => !isTerminal(x.status));
   const activeTx = activeTransactions[0] ?? null;
+  const activeTxNeedsAction = activeTx
+    ? activeTx.nextActor === 'BOTH' ||
+      (activeTx.perspective === 'BUYER' && activeTx.nextActor === 'BUYER') ||
+      (activeTx.perspective === 'SELLER' && activeTx.nextActor === 'SELLER')
+    : false;
   const latestOffer =
     [...buyerThreads, ...sellerThreads].sort((a, b) =>
       b.lastActivityAt.localeCompare(a.lastActivityAt),
@@ -142,6 +156,42 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
         </Alert>
       ) : null}
 
+      {activeTx ? (
+        <Link
+          href={transactionStageHref(activeTx.id, activeTx.activeStage)}
+          className="border-primary/35 from-primary/15 via-card/80 to-card/50 hover:border-primary/60 block rounded-xl border bg-gradient-to-br p-5 transition-colors md:p-6"
+        >
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+            <span className="border-primary/35 bg-primary/10 text-primary grid h-12 w-12 shrink-0 place-items-center rounded-full border">
+              <Clock3 className="h-5 w-5" aria-hidden />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-primary text-[10px] font-semibold uppercase tracking-[0.16em]">
+                {t('activeTransactionTitle')}
+              </p>
+              <h2 className="font-display mt-1 text-xl">
+                {t(
+                  activeTxNeedsAction
+                    ? 'transactionActionTitle'
+                    : activeTx.nextActor === 'SYSTEM'
+                      ? 'transactionSystemTitle'
+                      : 'transactionWaitingTitle',
+                )}
+              </h2>
+              <p dir="auto" className="mt-2 truncate text-sm font-medium">
+                {activeTx.property?.headline ?? '—'} ·{' '}
+                <span dir="ltr">{formatAed(activeTx.acceptedAmountAed, locale)}</span>
+              </p>
+              <p className="text-muted-foreground mt-1 text-xs">{t('transactionBannerBody')}</p>
+            </div>
+            <span className="bg-primary text-primary-foreground inline-flex shrink-0 items-center justify-center rounded-full px-4 py-2 text-sm font-semibold">
+              {t('continueTransaction')}
+              <ArrowRight className="ms-1.5 h-4 w-4 rtl:rotate-180" aria-hidden />
+            </span>
+          </div>
+        </Link>
+      ) : null}
+
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map(({ icon: Icon, label, value, href }) => (
           <Link
@@ -207,53 +257,15 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
         </Section>
       ) : null}
 
-      {activeTx ? (
-        <Section title={t('activeTransactionTitle')} href="/transactions" hrefLabel={t('viewAll')}>
-          <Link
-            href={`/transactions/${activeTx.id}`}
-            className="border-border/70 bg-card/40 hover:border-primary/40 block rounded-lg border p-5 transition-colors"
-          >
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="min-w-0">
-                <p dir="auto" className="truncate font-medium">
-                  {activeTx.property?.headline ?? '—'}
-                </p>
-                <p className="text-muted-foreground mt-1 text-xs">
-                  {[
-                    formatAed(activeTx.acceptedAmountAed, locale),
-                    activeTx.property?.community,
-                    activeTx.property?.emirate,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </p>
-              </div>
-              <div className="text-start sm:text-end">
-                <span className="border-primary/30 bg-primary/10 text-primary inline-block rounded-full border px-3 py-1 text-xs">
-                  {tt(activeTx.statusKey)}
-                </span>
-                <p className="text-muted-foreground mt-1.5 text-xs">{tt(activeTx.nextActorKey)}</p>
-              </div>
-            </div>
-            <ProgressBar
-              value={
-                activeTx.totalStages ? (activeTx.completedStages / activeTx.totalStages) * 100 : 0
-              }
-            />
-            <p className="text-muted-foreground mt-2 text-[11px]">
-              {tt('progress.stages', {
-                completed: activeTx.completedStages,
-                total: activeTx.totalStages,
-              })}
-            </p>
-          </Link>
-        </Section>
-      ) : null}
-
       {latestOffer ? (
         <Section title={t('latestOfferTitle')} href="/offers" hrefLabel={t('viewAll')}>
           <Link
-            href={`/offers/${latestOffer.threadId}`}
+            href={
+              latestOffer.transaction?.status === 'CANCELLED' ||
+              latestOffer.transaction?.status === 'FAILED'
+                ? `/transactions/${latestOffer.transaction.id}`
+                : `/offers/${latestOffer.threadId}`
+            }
             className="border-border/70 bg-card/40 hover:border-primary/40 flex flex-wrap items-center justify-between gap-3 rounded-lg border p-4 transition-colors"
           >
             <div className="min-w-0">
@@ -266,7 +278,22 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
                 })}
               </p>
             </div>
-            <OfferStatusBadge statusKey={latestOffer.statusKey} />
+            <div className="flex flex-wrap items-center gap-2">
+              <OfferStatusBadge statusKey={latestOffer.statusKey} />
+              {latestOffer.transaction ? (
+                <Badge
+                  variant="outline"
+                  className={
+                    latestOffer.transaction.status === 'CANCELLED' ||
+                    latestOffer.transaction.status === 'FAILED'
+                      ? 'border-destructive/40 text-destructive'
+                      : 'border-primary/35 text-primary'
+                  }
+                >
+                  {tt(latestOffer.transaction.statusKey as 'status.cancelled')}
+                </Badge>
+              ) : null}
+            </div>
           </Link>
         </Section>
       ) : null}

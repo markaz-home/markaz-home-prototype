@@ -1,11 +1,13 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { Check, ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, Circle, UserRound } from 'lucide-react';
 import { Badge, Card, CardContent, cn } from '@markaz/ui';
-import { TRANSACTION_STAGES } from '@markaz/domain';
+import { TRANSACTION_STAGES, type TransactionStage } from '@markaz/domain';
 import { formatDateTime } from '@/lib/format';
 import type { RouterOutputs } from '@/trpc/types';
+import { Link } from '@/i18n/navigation';
+import { slugForStage } from '@/lib/transaction-routes';
 
 type Detail = RouterOutputs['transactions']['get'];
 
@@ -38,25 +40,42 @@ export function MobileActionBar({ d }: { d: Detail }) {
   );
 }
 
-export function ProgressTracker({ stageIndex }: { stageIndex: number }) {
-  const t = useTranslations('transactions.stage');
+export function ProgressTracker({
+  stageIndex,
+  transactionId,
+  viewedStage,
+}: {
+  stageIndex: number;
+  transactionId: string;
+  viewedStage: TransactionStage;
+}) {
+  const t = useTranslations('transactions');
   return (
-    <ol className="flex flex-wrap gap-2" aria-label="progress">
+    <ol className="flex flex-wrap gap-2" aria-label={t('title')}>
       {TRANSACTION_STAGES.map((s, i) => {
         const state = i < stageIndex ? 'done' : i === stageIndex ? 'current' : 'todo';
+        const selected = s === viewedStage;
+        const className = cn(
+          'block rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
+          selected
+            ? 'border-primary bg-primary text-primary-foreground'
+            : state === 'done'
+              ? 'border-primary/30 bg-primary/10 text-primary hover:bg-primary/15'
+              : state === 'current'
+                ? 'border-primary/45 bg-primary/10 text-foreground hover:bg-primary/15'
+                : 'border-border bg-muted/50 text-muted-foreground',
+        );
         return (
-          <li
-            key={s}
-            aria-current={state === 'current' ? 'step' : undefined}
-            className={`rounded-full px-3 py-1 text-xs font-medium ${
-              state === 'done'
-                ? 'bg-primary/15 text-primary'
-                : state === 'current'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground'
-            }`}
-          >
-            {i + 1}. {t(s)}
+          <li key={s} aria-current={selected ? 'step' : undefined}>
+            {i <= stageIndex ? (
+              <Link href={`/transactions/${transactionId}/${slugForStage(s)}`} className={className}>
+                {i + 1}. {t(`stage.${s}`)}
+              </Link>
+            ) : (
+              <span className={className} aria-disabled="true">
+                {i + 1}. {t(`stage.${s}`)}
+              </span>
+            )}
           </li>
         );
       })}
@@ -73,7 +92,7 @@ export function ProgressTracker({ stageIndex }: { stageIndex: number }) {
  * word — the old "Your action required / Seller action required" repetition made
  * the two participants' identical task names look like duplicated rows.
  */
-export function TaskList({ d }: { d: Detail }) {
+export function TaskList({ d, stage }: { d: Detail; stage?: TransactionStage }) {
   const t = useTranslations('transactions');
   const ts = useTranslations('transactions.stage');
 
@@ -84,17 +103,17 @@ export function TaskList({ d }: { d: Detail }) {
     return task.actor === 'BUYER' ? t('whoBuyer') : t('whoSeller');
   }
 
-  const groups = TRANSACTION_STAGES.map((stage, index) => {
-    const tasks = d.tasks.filter((task) => task.stage === stage);
+  const groups = TRANSACTION_STAGES.map((groupStage, index) => {
+    const tasks = d.tasks.filter((task) => task.stage === groupStage);
     const done = tasks.filter((task) => task.status === 'COMPLETED_DEMO').length;
     return {
-      stage,
+      stage: groupStage,
       index,
       tasks,
       done,
       state: index < d.stageIndex ? 'done' : index === d.stageIndex ? 'current' : 'todo',
     };
-  }).filter((group) => group.tasks.length > 0);
+  }).filter((group) => group.tasks.length > 0 && (!stage || group.stage === stage));
 
   return (
     <Card className="bg-card/40">
@@ -181,6 +200,98 @@ export function TaskList({ d }: { d: Detail }) {
   );
 }
 
+/** A participant-first view of the current stage. It makes the shared nature of
+ * the transaction obvious: each side has one column, with completed/waiting/action
+ * states derived from the authoritative task rows. */
+export function ParticipantProgress({ d, stage }: { d: Detail; stage: TransactionStage }) {
+  const t = useTranslations('transactions');
+  const stageTasks = d.tasks.filter((task) => task.stage === stage);
+
+  const side = (actor: 'BUYER' | 'SELLER') => {
+    const tasks = stageTasks.filter((task) => task.actor === actor);
+    const completed = tasks.filter((task) => task.status === 'COMPLETED_DEMO').length;
+    const actionable = tasks.some((task) => task.status === 'ACTION_REQUIRED');
+    const complete = tasks.length > 0 && completed === tasks.length;
+    const isYou = d.perspective === actor;
+    return { actor, tasks, completed, actionable, complete, isYou };
+  };
+
+  return (
+    <section aria-labelledby="participant-progress-title" className="space-y-3">
+      <div>
+        <h2 id="participant-progress-title" className="font-display text-xl">
+          {t('participants.title')}
+        </h2>
+        <p className="text-muted-foreground mt-1 text-sm">{t('participants.body')}</p>
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        {(['BUYER', 'SELLER'] as const).map((actor) => {
+          const s = side(actor);
+          const status = s.complete
+            ? t('participants.complete')
+            : s.actionable
+              ? s.isYou
+                ? t('participants.yourAction')
+                : t('participants.theirAction')
+              : t('participants.waiting');
+          return (
+            <Card
+              key={actor}
+              className={cn(
+                'bg-card/50',
+                s.actionable && 'border-primary/45',
+                s.complete && 'border-success/40',
+              )}
+            >
+              <CardContent className="space-y-4 pt-6">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="flex items-center gap-3">
+                    <span className="border-primary/30 bg-primary/10 text-primary grid h-10 w-10 place-items-center rounded-full border">
+                      <UserRound className="h-4 w-4" aria-hidden />
+                    </span>
+                    <span>
+                      <span className="block font-semibold">
+                        {actor === 'BUYER' ? t('participants.buyer') : t('participants.seller')}
+                        {s.isYou ? ` · ${t('participants.you')}` : ''}
+                      </span>
+                      <span className="text-muted-foreground mt-0.5 block text-xs">{status}</span>
+                    </span>
+                  </span>
+                  {s.complete ? (
+                    <Check className="text-success h-5 w-5" aria-label={t('participants.complete')} />
+                  ) : (
+                    <Circle className="text-muted-foreground h-4 w-4" aria-hidden />
+                  )}
+                </div>
+                {s.tasks.length > 0 ? (
+                  <div className="space-y-2">
+                    {s.tasks.map((task) => (
+                      <div key={task.code} className="flex items-center justify-between gap-3 text-xs">
+                        <span dir="auto" className="text-muted-foreground truncate">
+                          {t(`taskLabel.${task.code}` as 'taskLabel.BUYER_CONFIRM_DETAILS')}
+                        </span>
+                        <span className="shrink-0">
+                          {task.status === 'COMPLETED_DEMO'
+                            ? t('task.completed')
+                            : task.status === 'ACTION_REQUIRED'
+                              ? t('participants.pending')
+                              : t('stageTodo')}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-xs">{t('participants.noAction')}</p>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 export function Timeline({ d }: { d: Detail }) {
   const t = useTranslations('transactions');
   const locale = useLocale();
@@ -189,13 +300,22 @@ export function Timeline({ d }: { d: Detail }) {
     <Card>
       <CardContent className="space-y-3 pt-6">
         <h2 className="font-semibold">{t('timeline.title')}</h2>
-        <ol className="space-y-3">
+        <ol>
           {d.timeline.map((e, i) => (
-            <li key={i} className="text-sm">
-              <p dir="auto">{t(`timeline.${e.type}` as 'timeline.TRANSACTION_CREATED')}</p>
-              <time dateTime={e.createdAt} dir="ltr" className="text-muted-foreground text-xs">
-                {formatDateTime(e.createdAt, locale)}
-              </time>
+            <li key={i} className="relative grid grid-cols-[1rem_1fr] gap-3 pb-5 text-sm last:pb-0">
+              {i < d.timeline.length - 1 ? (
+                <span
+                  aria-hidden
+                  className="bg-border absolute start-[0.4375rem] top-3 h-[calc(100%-0.25rem)] w-px"
+                />
+              ) : null}
+              <span className="border-primary bg-background relative z-10 mt-1 h-3 w-3 rounded-full border-2" aria-hidden />
+              <span>
+                <p dir="auto">{t(`timeline.${e.type}` as 'timeline.TRANSACTION_CREATED')}</p>
+                <time dateTime={e.createdAt} dir="ltr" className="text-muted-foreground text-xs">
+                  {formatDateTime(e.createdAt, locale)}
+                </time>
+              </span>
             </li>
           ))}
         </ol>

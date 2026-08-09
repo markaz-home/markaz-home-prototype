@@ -626,17 +626,61 @@ export const transactionEvents = pgTable(
   (t) => ({ txIdx: index('transaction_events_tx_idx').on(t.transactionId, t.createdAt) }),
 );
 
-export const notifications = pgTable('notifications', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  recipientId: uuid('recipient_id')
-    .notNull()
-    .references(() => profiles.id, { onDelete: 'cascade' }),
-  channel: text('channel').notNull().default('IN_APP'),
-  kind: text('kind').notNull(),
-  payload: jsonb('payload').notNull().default({}),
-  readAt: timestamp('read_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-});
+export const notifications = pgTable(
+  'notifications',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    recipientId: uuid('recipient_id')
+      .notNull()
+      .references(() => profiles.id, { onDelete: 'cascade' }),
+    channel: text('channel').notNull().default('IN_APP'),
+    kind: text('kind').notNull(),
+    payload: jsonb('payload').notNull().default({}),
+    dedupeKey: text('dedupe_key'),
+    readAt: timestamp('read_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    dedupeKeyIdx: uniqueIndex('notifications_dedupe_key_idx')
+      .on(t.dedupeKey)
+      .where(sql`${t.dedupeKey} is not null`),
+  }),
+);
+
+/** Trusted asynchronous delivery state. This private table is exposed to neither
+ * customer nor Admin roles; only the server-side notification worker reads it. */
+export const notificationEmailOutbox = privateSchema.table(
+  'notification_email_outbox',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    notificationId: uuid('notification_id')
+      .notNull()
+      .references(() => notifications.id, { onDelete: 'cascade' }),
+    recipientId: uuid('recipient_id')
+      .notNull()
+      .references(() => profiles.id, { onDelete: 'cascade' }),
+    kind: text('kind').notNull(),
+    status: text('status').notNull().default('PENDING'),
+    attempts: integer('attempts').notNull().default(0),
+    availableAt: timestamp('available_at', { withTimezone: true }).notNull().defaultNow(),
+    lockedAt: timestamp('locked_at', { withTimezone: true }),
+    sentAt: timestamp('sent_at', { withTimezone: true }),
+    providerMessageId: text('provider_message_id'),
+    lastError: text('last_error'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    notificationKey: uniqueIndex('notification_email_outbox_notification_key').on(
+      t.notificationId,
+    ),
+    pendingIdx: index('notification_email_outbox_pending_idx').on(
+      t.status,
+      t.availableAt,
+      t.createdAt,
+    ),
+  }),
+);
 
 export const auditEvents = pgTable('audit_events', {
   id: uuid('id').primaryKey().defaultRandom(),

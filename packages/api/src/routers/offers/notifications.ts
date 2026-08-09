@@ -1,8 +1,10 @@
 import { and, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { z } from 'zod';
-import { offerThreads, notifications } from '@markaz/db';
+import { offerThreads, offerProposals, transactions, notifications } from '@markaz/db';
 import { toSafeNotification } from '@markaz/domain';
+import { offerPropertySummary } from '../../offer-projection';
 import { router, customerProcedure } from '../../trpc';
+import { loadSummary, summaryToProperty } from './shared';
 
 export const notificationsOffersRouter = router({
   // ---- Notifications + badges -----------------------------------------------
@@ -40,7 +42,7 @@ export const notificationsOffersRouter = router({
         .where(eq(notifications.recipientId, ctx.user.id))
         .orderBy(desc(notifications.createdAt))
         .limit(input?.limit ?? 20);
-      return rows.map((n) => {
+      const projected = rows.map((n) => {
         // Validate {kind, payload} through the discriminated-union schema; an
         // unexpected kind or malformed payload degrades to a safe UNKNOWN/null.
         const safe = toSafeNotification(n.kind, n.payload);
@@ -50,10 +52,87 @@ export const notificationsOffersRouter = router({
           threadId: safe.threadId,
           transactionId: safe.transactionId,
           listingId: safe.listingId,
+          amountAed: safe.amountAed,
           read: n.readAt != null,
           createdAt: n.createdAt.toISOString(),
         };
       });
+
+      // Backfill context for notifications created before contextual payloads were
+      // introduced, then load each unique public-safe property summary once.
+      const threadIds = [...new Set(projected.flatMap((n) => (n.threadId ? [n.threadId] : [])))];
+      const transactionIds = [
+        ...new Set(projected.flatMap((n) => (n.transactionId ? [n.transactionId] : []))),
+      ];
+      const threadContext = new Map<string, { listingId: string; amountAed: number | null }>();
+      if (threadIds.length > 0) {
+        const threadRows = await ctx.tx
+          .select({
+            id: offerThreads.id,
+            listingId: offerThreads.listingId,
+            amountAed: offerProposals.amountAed,
+          })
+          .from(offerThreads)
+          .leftJoin(offerProposals, eq(offerProposals.id, offerThreads.currentProposalId))
+          .where(inArray(offerThreads.id, threadIds));
+        for (const row of threadRows) {
+          threadContext.set(row.id, {
+            listingId: row.listingId,
+            amountAed: row.amountAed == null ? null : Number(row.amountAed),
+          });
+        }
+      }
+      const transactionContext = new Map<
+        string,
+        { listingId: string; amountAed: number | null }
+      >();
+      if (transactionIds.length > 0) {
+        const transactionRows = await ctx.tx
+          .select({
+            id: transactions.id,
+            listingId: transactions.listingId,
+            amountAed: transactions.acceptedAmountAed,
+          })
+          .from(transactions)
+          .where(inArray(transactions.id, transactionIds));
+        for (const row of transactionRows) {
+          transactionContext.set(row.id, {
+            listingId: row.listingId,
+            amountAed: Number(row.amountAed),
+          });
+        }
+      }
+
+      const resolved = projected.map((n) => {
+        const fallback = n.threadId
+          ? threadContext.get(n.threadId)
+          : n.transactionId
+            ? transactionContext.get(n.transactionId)
+            : undefined;
+        return {
+          ...n,
+          listingId: n.listingId ?? fallback?.listingId ?? null,
+          amountAed: n.amountAed ?? fallback?.amountAed ?? null,
+        };
+      });
+      const listingIds = [
+        ...new Set(resolved.flatMap((n) => (n.listingId ? [n.listingId] : []))),
+      ];
+      const propertyByListing = new Map<
+        string,
+        ReturnType<typeof offerPropertySummary> | null
+      >();
+      for (const listingId of listingIds) {
+        const summary = await loadSummary(ctx.tx, listingId);
+        propertyByListing.set(
+          listingId,
+          summary ? offerPropertySummary(summaryToProperty(summary)) : null,
+        );
+      }
+      return resolved.map((n) => ({
+        ...n,
+        property: n.listingId ? (propertyByListing.get(n.listingId) ?? null) : null,
+      }));
     }),
 
   markNotificationRead: customerProcedure

@@ -12,7 +12,8 @@ transaction without duplicates, stale proposals, or unrelated actors.
 ## Decision
 
 `ensure_transaction(thread)` is **idempotent, automatic, and server-authoritative**. It is
-invoked from the accepted-offer handoff ("Continue to transaction"). It validates the thread is
+invoked by the accepted-offer database event before acceptance returns. The "Continue to
+transaction" action only navigates to the existing shared workspace. It validates the thread is
 `ACCEPTED`, derives buyer/seller/listing and `accepted_amount_aed` from the accepted proposal,
 and atomically inserts the transaction + 17 milestone tasks + `TRANSACTION_CREATED` event +
 both participant notifications + audit. Duplicate calls (either participant) return the existing

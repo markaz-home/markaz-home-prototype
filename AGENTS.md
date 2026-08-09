@@ -229,8 +229,8 @@ membership; anon has no access; cross-buyer/cross-seller reads denied; missing =
 index + locked `accept_offer` that atomically closes other threads → `CLOSED_OTHER_ACCEPTED`;
 ADR-0015). **`UNDER_OFFER` is derived** from an accepted offer on a still-`LIVE` listing —
 NOT a publication state (ADR-0016). The **seller threshold (`min_notification_price`) stays
-private** — classified server-side; the buyer DTO has no threshold field; below-threshold
-offers persist but raise no prominent notification (§27). Expiry is server-authoritative,
+private** — classified server-side and omitted from the buyer DTO. Every valid offer now
+notifies the seller; the classification remains available only to the seller. Expiry is server-authoritative,
 processed lazily on read (`expire_due_offers`; ADR-0017). Realtime (`useOfferThreadChannel`)
 **refetches authoritative state** on `offer_events`; RLS scopes delivery to participants
 (ADR-0018). Public DTOs use explicit allow-list mapping (`packages/api/src/offer-projection.ts`).
@@ -251,7 +251,8 @@ with one canonical **transaction per accepted `(offer_thread, accepted_proposal)
 `transactions` + `transaction_tasks` (17 milestones / 6 stages) + `transaction_documents`
 (private) + `transaction_events`. **Immutable identity** (thread/proposal/listing/buyer/seller/
 amount/reference `MKZ-TXN-{yr}-{6}`) via `guard_transaction`; DB-unique per thread AND per
-proposal (idempotent creation). **Customers read-only via RLS — every write goes through
+proposal (idempotent creation). Acceptance ensures the shared transaction immediately at the
+database boundary, so neither participant has to click the handoff to create it. **Customers read-only via RLS — every write goes through
 `SECURITY DEFINER` functions** (`ensure_transaction`, `tx_complete_task`, `tx_select_route`,
 `tx_set_financing`, `tx_confirm_deposit`, `tx_run_due_diligence`, `tx_propose_transfer_date`,
 `tx_create_appointment`, `tx_confirm_completion`, `tx_request_cancellation`,
@@ -262,18 +263,20 @@ and recompute `status`+`next_actor` from open tasks (`tx_recompute`/`tx_active_s
 **Completion is atomic**: both confirm → `COMPLETED_DEMO` + listing **`SOLD_DEMO`**. **Cancellation**
 → listing **`PAUSED`** (never auto-LIVE); `listing_has_accepted_offer` now excludes cancelled
 transactions so a resumed listing isn't wrongly `UNDER_OFFER`. Reuses `public.notifications`
-(`TRANSACTION_*` kinds, discriminated-union validated) + a participant-scoped `transaction:{id}`
-realtime channel (authoritative refetch). Raw enums never shown — mapped to i18n keys
+(`TRANSACTION_*` kinds, discriminated-union validated) + participant-scoped transaction and
+recipient-scoped notification Realtime channels. A private durable outbox delivers branded
+offer/transaction email and deduped 24-hour reminders. Raw enums never shown — mapped to i18n keys
 (`transactions.*`, EN/AR parity; **Arabic is draft**). Approved simulation wording only — never
 "payment received"/"escrow"/"ownership transferred"/"legally completed". UI: `(app)/transactions`
-(My Transactions) + `(app)/transactions/[transactionId]` (shared perspective-aware workspace);
+(My Transactions) + six focused `(app)/transactions/[transactionId]/[stage]` pages over one
+shared perspective-aware transaction;
 "Continue to transaction" handoff on the accepted offer. **Known gaps**: document file-upload
 API/control, Playwright E2E, axe. See `WEEK-5.md`, `docs/design/transaction-tracker-design-spec.md`,
 `docs/architecture/transactions.md`, ADR-0019…0023.
 
 ## Out of scope (next milestone+)
 
-Durable jobs, full admin surface (Week 6), any AWS provisioning,
+Full admin surface (Week 6), any AWS provisioning,
 real DLD/Trakheesi/Madmoun/payment integrations, free-form messaging/chat, contact
-exchange, email/SMS/push delivery, map search, the demo-auth fallback (disabled by default
+exchange, SMS/push delivery, map search, the demo-auth fallback (disabled by default
 — ADR-0007). The full plan is in the technical plan document; section 6A corrections govern.

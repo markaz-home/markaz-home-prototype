@@ -76,6 +76,10 @@ export const TRANSACTION_STAGES = [
 ] as const;
 export type TransactionStage = (typeof TRANSACTION_STAGES)[number];
 
+/** First reminder for an unchanged participant action. Delivery is idempotent per
+ * transaction version; deployments may override the worker window (1–168h). */
+export const TRANSACTION_REMINDER_HOURS = 24;
+
 /** Map a raw status to the stage index (0-based) for the progress tracker. */
 export function stageIndex(status: TransactionStatus): number {
   if (status === 'INITIATED') return 0;

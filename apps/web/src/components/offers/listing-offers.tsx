@@ -3,7 +3,7 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import { ArrowLeft } from 'lucide-react';
-import { Alert, Button, Card, CardContent, EmptyState, ErrorState, Skeleton } from '@markaz/ui';
+import { Alert, Badge, Button, Card, CardContent, EmptyState, ErrorState, Skeleton } from '@markaz/ui';
 import { Link } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import { formatAed, formatPct } from '@/lib/format';
@@ -15,6 +15,7 @@ export function ListingOffers({ listingId }: { listingId: string }) {
   const t = useTranslations('offers');
   const tl = useTranslations('offers.listingView');
   const tt = useTranslations('offers.threshold');
+  const tx = useTranslations('transactions');
   const locale = useLocale();
   const q = trpc.offers.getListingOffers.useQuery({ listingId });
 
@@ -105,6 +106,19 @@ export function ListingOffers({ listingId }: { listingId: string }) {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <OfferStatusBadge statusKey={th.statusKey} />
+                      {th.transaction ? (
+                        <Badge
+                          variant="outline"
+                          className={
+                            th.transaction.status === 'CANCELLED' ||
+                            th.transaction.status === 'FAILED'
+                              ? 'border-destructive/40 text-destructive'
+                              : 'border-primary/35 text-primary'
+                          }
+                        >
+                          {tx(th.transaction.statusKey as 'status.cancelled')}
+                        </Badge>
+                      ) : null}
                       <span className="text-sm font-medium">
                         {t('buyerLabel', { n: th.buyerLabel })}
                       </span>

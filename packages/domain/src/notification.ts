@@ -10,6 +10,7 @@ import { z } from 'zod';
  */
 export const OFFER_NOTIFICATION_KINDS = [
   'OFFER_RECEIVED',
+  'OFFER_VIEWED',
   'OFFER_COUNTER_SELLER',
   'OFFER_COUNTER_BUYER',
   'OFFER_ACCEPTED',
@@ -26,6 +27,7 @@ export type OfferNotificationKind = (typeof OFFER_NOTIFICATION_KINDS)[number];
 export const TRANSACTION_NOTIFICATION_KINDS = [
   'TRANSACTION_CREATED',
   'TRANSACTION_ACTION_REQUIRED',
+  'TRANSACTION_REMINDER',
   'TRANSACTION_DEPOSIT_CONFIRMED_DEMO',
   'TRANSACTION_TRANSFER_READY',
   'TRANSACTION_COMPLETED_DEMO',
@@ -48,15 +50,23 @@ export type AdminEffectNotificationKind = (typeof ADMIN_EFFECT_NOTIFICATION_KIND
 /** Every offer notification carries only a thread reference (+ optional listing). */
 const offerNotificationPayload = z.object({
   threadId: z.string().uuid(),
-  listingId: z.string().uuid().optional(),
+  listingId: z.string().uuid().nullish(),
+  amountAed: z.coerce.number().positive().nullish(),
 });
 
 /** Every transaction notification carries only a transaction reference. */
-const transactionNotificationPayload = z.object({ transactionId: z.string().uuid() });
+const transactionNotificationPayload = z.object({
+  transactionId: z.string().uuid(),
+  listingId: z.string().uuid().nullish(),
+  amountAed: z.coerce.number().positive().nullish(),
+  stage: z.string().max(40).optional(),
+  waitingFor: z.string().max(20).optional(),
+});
 
 /** Discriminated union over `kind`; each variant validates its payload shape. */
 export const notificationSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('OFFER_RECEIVED'), payload: offerNotificationPayload }),
+  z.object({ kind: z.literal('OFFER_VIEWED'), payload: offerNotificationPayload }),
   z.object({ kind: z.literal('OFFER_COUNTER_SELLER'), payload: offerNotificationPayload }),
   z.object({ kind: z.literal('OFFER_COUNTER_BUYER'), payload: offerNotificationPayload }),
   z.object({ kind: z.literal('OFFER_ACCEPTED'), payload: offerNotificationPayload }),
@@ -95,6 +105,7 @@ export interface SafeNotificationView {
   threadId: string | null;
   transactionId: string | null;
   listingId: string | null;
+  amountAed: number | null;
 }
 
 /**
@@ -105,16 +116,24 @@ export interface SafeNotificationView {
 export function toSafeNotification(kind: string, payload: unknown): SafeNotificationView {
   const parsed = notificationSchema.safeParse({ kind, payload: payload ?? {} });
   if (!parsed.success)
-    return { kind: 'UNKNOWN', threadId: null, transactionId: null, listingId: null };
+    return {
+      kind: 'UNKNOWN',
+      threadId: null,
+      transactionId: null,
+      listingId: null,
+      amountAed: null,
+    };
   const p = parsed.data.payload as {
     threadId?: string;
     transactionId?: string;
     listingId?: string;
+    amountAed?: number;
   };
   return {
     kind: parsed.data.kind,
     threadId: p.threadId ?? null,
     transactionId: p.transactionId ?? null,
     listingId: p.listingId ?? null,
+    amountAed: p.amountAed ?? null,
   };
 }

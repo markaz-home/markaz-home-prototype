@@ -4,11 +4,9 @@
  * storage paths, no other participant's private files, no raw internal ids in copy.
  */
 import {
-  completedStageCount,
   computeProgress,
   isBuyerDocumentType,
   nextActorKey,
-  stageIndex,
   taskOwnershipKey,
   TRANSACTION_STAGES,
   transactionStatusKey,
@@ -123,6 +121,20 @@ export function toTransactionListItem(
   const progress = computeProgress(
     tasks.map((t) => ({ code: t.code, status: t.status, required: t.required })),
   );
+  const firstOpenTask = [...tasks]
+    .sort((a, b) => a.sequence - b.sequence)
+    .find((task) => task.required && !['COMPLETED_DEMO', 'SKIPPED'].includes(task.status));
+  const activeStage: (typeof TRANSACTION_STAGES)[number] =
+    row.status === 'COMPLETED_DEMO'
+      ? 'COMPLETION'
+      : firstOpenTask?.stage &&
+          TRANSACTION_STAGES.includes(firstOpenTask.stage as (typeof TRANSACTION_STAGES)[number])
+        ? (firstOpenTask.stage as (typeof TRANSACTION_STAGES)[number])
+        : TRANSACTION_STAGES.includes(row.status as (typeof TRANSACTION_STAGES)[number])
+          ? (row.status as (typeof TRANSACTION_STAGES)[number])
+          : 'CONFIRMATION';
+  const activeStageIndex = TRANSACTION_STAGES.indexOf(activeStage);
+  const reminderAt = new Date(row.updatedAt.getTime() + 24 * 60 * 60 * 1000);
   return {
     id: row.id,
     reference: row.reference,
@@ -133,14 +145,17 @@ export function toTransactionListItem(
     perspective,
     property: mapProperty(property),
     acceptedAmountAed: num(row.acceptedAmountAed),
-    stageIndex: stageIndex(row.status),
-    completedStages: completedStageCount(row.status),
+    activeStage,
+    stageIndex: row.status === 'COMPLETED_DEMO' ? TRANSACTION_STAGES.length : activeStageIndex,
+    completedStages:
+      row.status === 'COMPLETED_DEMO' ? TRANSACTION_STAGES.length : Math.max(0, activeStageIndex),
     totalStages: TRANSACTION_STAGES.length,
     progress,
     // Distinct from `lastActivityAt`: the moment both parties confirmed, which a
     // later edit or admin action must not move.
     completedAt: row.completedAt?.toISOString() ?? null,
     lastActivityAt: row.updatedAt.toISOString(),
+    reminderAt: reminderAt.toISOString(),
   };
 }
 

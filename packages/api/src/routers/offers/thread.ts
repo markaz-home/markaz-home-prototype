@@ -11,6 +11,7 @@ import {
   perspectiveOf,
   loadSummary,
   currentProposal,
+  acceptedTransaction,
   toThreadInput,
   summaryToProperty,
 } from './shared';
@@ -33,6 +34,8 @@ export const threadOffersRouter = router({
     const s = await loadSummary(ctx.tx, t.listingId);
     if (!s) throw new TRPCError({ code: 'NOT_FOUND', message: 'NOT_FOUND' });
     const cur = await currentProposal(ctx.tx, t.currentProposalId);
+    const transaction =
+      t.status === 'ACCEPTED' ? await acceptedTransaction(ctx.tx, t.id) : null;
     const eventRows = await ctx.tx
       .select()
       .from(offerEvents)
@@ -53,13 +56,19 @@ export const threadOffersRouter = router({
 
     const thread =
       perspective === 'BUYER'
-        ? toBuyerThread({ thread: toThreadInput(t), current: cur, property: summaryToProperty(s) })
+        ? toBuyerThread({
+            thread: toThreadInput(t),
+            current: cur,
+            property: summaryToProperty(s),
+            transaction,
+          })
         : toSellerThread({
             thread: toThreadInput(t),
             current: cur,
             property: summaryToProperty(s),
             minNotificationPrice:
               s.minNotificationPrice == null ? null : Number(s.minNotificationPrice),
+            transaction,
           });
     return { thread, timeline };
   }),

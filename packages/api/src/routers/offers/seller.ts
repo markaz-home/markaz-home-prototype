@@ -10,6 +10,7 @@ import {
   versionedThread,
   loadSummary,
   currentProposal,
+  acceptedTransaction,
   toThreadInput,
   summaryToProperty,
   matchesSellerFilter,
@@ -48,8 +49,15 @@ export const sellerOffersRouter = router({
       const summaries = new Map<string, ListingSummaryRow | null>();
       const out = [];
       for (const t of rows) {
+        const transaction =
+          t.status === 'ACCEPTED' ? await acceptedTransaction(ctx.tx, t.id) : null;
         if (
-          !matchesSellerFilter(t.status as OfferThreadStatus, t.nextActor, input?.filter ?? 'all')
+          !matchesSellerFilter(
+            t.status as OfferThreadStatus,
+            t.nextActor,
+            input?.filter ?? 'all',
+            transaction?.status,
+          )
         )
           continue;
         if (!summaries.has(t.listingId))
@@ -63,6 +71,7 @@ export const sellerOffersRouter = router({
           property: summaryToProperty(s),
           minNotificationPrice:
             s.minNotificationPrice == null ? null : Number(s.minNotificationPrice),
+          transaction,
         });
         // Threshold-based seller filters.
         if (input?.filter === 'aboveThreshold' && view.threshold !== 'AT_OR_ABOVE') continue;
@@ -92,11 +101,14 @@ export const sellerOffersRouter = router({
       let activeCount = 0;
       for (const t of rows) {
         const cur = await currentProposal(ctx.tx, t.currentProposalId);
+        const transaction =
+          t.status === 'ACCEPTED' ? await acceptedTransaction(ctx.tx, t.id) : null;
         const view = toSellerThread({
           thread: toThreadInput(t),
           current: cur,
           property: summaryToProperty(s),
           minNotificationPrice: min,
+          transaction,
         });
         if (view.isActionable) actionNeeded += 1;
         if (t.status === 'AWAITING_SELLER' || t.status === 'AWAITING_BUYER') {
@@ -107,7 +119,10 @@ export const sellerOffersRouter = router({
       }
       const availability = resolveAvailability({
         listingState: s.state,
-        hasAcceptedOffer: rows.some((r) => r.status === 'ACCEPTED'),
+        hasAcceptedOffer: threads.some(
+          (thread) =>
+            thread.status === 'ACCEPTED' && thread.transaction?.status !== 'CANCELLED',
+        ),
       });
       return {
         listing: {

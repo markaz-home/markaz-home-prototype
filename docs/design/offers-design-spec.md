@@ -6,7 +6,7 @@
 **Applications:** MARKAZ Home customer web  
 **Primary languages:** English and Arabic  
 **Accessibility target:** WCAG 2.2 AA  
-**Last updated:** June 2026
+**Last updated:** 9 August 2026
 
 ---
 
@@ -53,8 +53,11 @@ The approved interaction model is:
 8. **Rejection reasons are seller-private:** buyer sees neutral rejection copy; no free-form rejection message.
 9. **Under Offer is derived:** do not add a new listing publication state. Derive `UNDER_OFFER` from an accepted offer attached to a `LIVE` listing.
 10. **Accepted listing remains publicly visible:** show `Under offer`; remove Make an Offer; keep Save and Share where otherwise allowed.
-11. **Threshold remains private:** below-threshold offers are listed but generate no prominent immediate notification.
+11. **Threshold remains private:** every valid offer notifies the seller; the below-threshold
+    classification is visible only in the seller experience and never disclosed to the buyer.
 12. **Server state is authoritative:** Realtime improves immediacy but never determines correctness.
+13. **Communications are event-specific:** offer, counter, reject, withdraw, and acceptance events
+    use detailed in-app cards; email-worthy events also create a durable branded email job.
 
 ---
 
@@ -102,6 +105,7 @@ The approved interaction model is:
 - Negotiation timeline
 - Realtime refresh
 - In-app notifications and action badges
+- Branded offer lifecycle email
 - Responsive desktop/tablet/mobile UI
 - English and draft Arabic
 - RTL
@@ -126,7 +130,7 @@ The approved interaction model is:
 - Full Admin Portal
 - Admin offer intervention
 - Disputes
-- Email, SMS, or push delivery
+- SMS or push delivery
 - Agent workflows
 - Premium Managed Service
 - Binding agreements
@@ -519,8 +523,9 @@ LIVE + AVAILABLE property
 Offer submitted
 → Threshold classification computed privately
 → Seller inbox
-→ Prominent notification only if at/above threshold
+→ Detailed notification and email to seller
 → Seller opens thread
+→ One in-app view receipt to buyer for that buyer-authored proposal
 → Review current proposal and history
 → Accept / Counter / Reject
 → If Counter:
@@ -541,7 +546,7 @@ Offer submitted
 | Offers tab                    | Cross-listing inbox                        |
 | Listing-specific route        | Comparison view for one listing            |
 | Notification                  | Deep link to relevant thread               |
-| Below-threshold manual review | Visible in All / Below threshold filter    |
+| Below-threshold offer         | Visible in filter and notifies normally   |
 | Return after sign-out         | Safe authenticated return                  |
 | Buyer counter                 | Thread opens with response needed          |
 
@@ -1560,8 +1565,8 @@ Below threshold:
 
 - store normally;
 - show in All and Below threshold filters;
-- no notification-menu item on initial submission;
-- do not increment prominent action badge solely for initial below-threshold submission;
+- create the same detailed in-app notification and branded email as any valid offer;
+- increment the action-needed Offers badge;
 - seller can respond normally when viewed.
 
 Buyer counters after seller has engaged always create a response notification, regardless of threshold, because the seller is already in an active negotiation.

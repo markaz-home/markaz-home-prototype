@@ -9,6 +9,8 @@ import {
   type OfferSide,
   type OfferProposalStatus,
   type OfferEventType,
+  transactionStatusKey,
+  type TransactionStatus,
 } from '@markaz/domain';
 import { publicPhotoUrl, buildHeadline } from './public-projection';
 
@@ -92,6 +94,13 @@ export interface EventInput {
   createdAt: Date;
 }
 
+/** Minimal shared-journey handoff state. The offer remains an immutable accepted
+ * record while this tells both participants what happened afterwards. */
+export interface OfferTransactionInput {
+  id: string;
+  status: TransactionStatus;
+}
+
 /** Map a proposal to its safe wire shape (amount is shared with both parties). */
 function mapProposal(p: ProposalInput, perspective: OfferSide) {
   return {
@@ -121,6 +130,7 @@ function baseThread(
   current: ProposalInput | null,
   property: OfferPropertyInput,
   perspective: OfferSide,
+  transaction?: OfferTransactionInput | null,
 ) {
   const asking = numOr(property.askingPrice) ?? 0;
   const currentAmount = current ? Number(current.amountAed) : null;
@@ -139,6 +149,13 @@ function baseThread(
     property: offerPropertySummary(property),
     currentProposal: current ? mapProposal(current, perspective) : null,
     comparison: currentAmount != null && asking > 0 ? offerComparison(currentAmount, asking) : null,
+    transaction: transaction
+      ? {
+          id: transaction.id,
+          status: transaction.status,
+          statusKey: transactionStatusKey(transaction.status),
+        }
+      : null,
   };
 }
 
@@ -150,9 +167,10 @@ export function toBuyerThread(args: {
   thread: ThreadInput;
   current: ProposalInput | null;
   property: OfferPropertyInput;
+  transaction?: OfferTransactionInput | null;
 }) {
   return {
-    ...baseThread(args.thread, args.current, args.property, 'BUYER'),
+    ...baseThread(args.thread, args.current, args.property, 'BUYER', args.transaction),
     perspective: 'BUYER' as const,
   };
 }
@@ -166,8 +184,15 @@ export function toSellerThread(args: {
   current: ProposalInput | null;
   property: OfferPropertyInput;
   minNotificationPrice: number | null;
+  transaction?: OfferTransactionInput | null;
 }) {
-  const base = baseThread(args.thread, args.current, args.property, 'SELLER');
+  const base = baseThread(
+    args.thread,
+    args.current,
+    args.property,
+    'SELLER',
+    args.transaction,
+  );
   const amount = args.current ? Number(args.current.amountAed) : null;
   return {
     ...base,
