@@ -66,6 +66,18 @@ describe('UAE PASS config (POC)', () => {
     expect(UAE_PASS_FORCE_AUTH).toBe('true');
     expect(cfg.authorizationParams.forceAuth).toBe('true');
     expect(cfg.authorizationParams.prompt).toBe('login');
+    // UAE PASS's email is verified but its UserInfo response omits the OIDC
+    // email_verified boolean. Keep the Auth identity email-less instead of
+    // triggering MARKAZ's password-account confirmation email.
+    expect(cfg.emailOptional).toBe(true);
+    expect(cfg.attributeMapping).toEqual({ email: null });
+    expect(cfg.customClaimsAllowlist).toEqual([
+      'email',
+      'fullnameEN',
+      'mobile',
+      'uuid',
+      'userType',
+    ]);
   });
 
   it('does not allow environment variables to widen the POC scope or change its ACR', () => {

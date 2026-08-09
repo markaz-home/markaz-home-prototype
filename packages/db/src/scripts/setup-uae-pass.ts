@@ -78,6 +78,7 @@ async function main() {
     authorization_params: cfg.authorizationParams,
     email_optional: cfg.emailOptional,
     attribute_mapping: cfg.attributeMapping,
+    custom_claims_allowlist: cfg.customClaimsAllowlist,
     enabled: true,
   };
 

@@ -3,7 +3,7 @@
 ## Authentication flow
 
 Authentication is **email + password or UAE PASS** via Supabase Auth
-(ADR 0009 / ADR 0033 / ADR 0034). A 6-digit email code is retained **only** for a new
+(ADR 0009 / ADR 0033 / ADR 0034 / ADR 0035). A 6-digit email code is retained **only** for a new
 email/password account's email verification; password
 recovery uses the **official Supabase recovery LINK** (not a code). Neither is the
 sign-in credential, and SMS is never used. Codes, links, and tokens are generated

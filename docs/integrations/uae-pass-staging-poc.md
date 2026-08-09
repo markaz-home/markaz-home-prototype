@@ -63,6 +63,16 @@ Existing authenticated Profile → "Link UAE PASS Staging"
 Endpoint **hosts are allow-listed in code** (`packages/auth/src/uae-pass.ts`) — never
 taken from an env var — to avoid an SSRF / token-disclosure risk.
 
+UAE PASS documents `email` and `mobile` as verified attributes, but its OAuth2
+UserInfo response does not include the OIDC `email_verified` boolean expected by
+Supabase Auth. The custom-provider configuration therefore removes the top-level
+Auth email before account resolution (`email_optional=true`) and preserves only
+`email`, `fullnameEN`, `mobile`, `uuid`, and `userType` as allow-listed custom
+claims. The callback synchronizes those values into the customer's application
+profile. This keeps email/password's mandatory 6-digit verification unchanged and
+prevents UAE PASS sign-in from sending a MARKAZ email-verification code. Emirates
+ID and all other KYC attributes are deliberately discarded.
+
 ## Local Supabase support
 
 The pinned local CLI bundles **GoTrue v2.191.0**, which **supports** custom OAuth
@@ -168,21 +178,21 @@ log them. Supabase does not persist provider tokens in the project database, but
 Supabase session access/refresh tokens are necessarily stored in SSR cookies to keep the
 customer signed in.
 
-Because direct generic OAuth does not provide a claim-minimization mapping, this POC
-must use staging/test identities only. Do not use production identities or claim that
-EID/mobile are never retained. A production design needs an approved minimal-attribute
-contract or a reviewed UserInfo-minimizing adapter before onboarding.
+The custom provider allow-lists only the five claims documented above before GoTrue
+persists identity metadata. This POC must still use staging/test identities only. A
+production design requires an approved minimal-attribute contract and formal UAE PASS
+onboarding before production identities are permitted.
 
 ## Staging limitations
 
 - Real authorize → token → userinfo round-trip requires a live UAE PASS **staging
   tester** and is a **manual** test; automated tests are fully mocked and never call
   UAE PASS.
-- The direct generic-provider design persists the returned identity metadata inside
-  Supabase Auth. This is acceptable only for staging/test identities in this POC.
-- UAE PASS's sample UserInfo does not advertise an `email_verified` field. Confirm the
-  actual GoTrue email-confirmation behavior during the manual staging round-trip; do
-  not claim the first-login journey is proven until that succeeds.
+- Supabase Auth persists only the explicitly allow-listed provider claims in identity
+  metadata. This remains acceptable only for staging/test identities in this POC.
+- UAE PASS's UserInfo response does not advertise `email_verified`; the provider strips
+  top-level Auth email and projects the allow-listed verified contact email only into
+  `public.profiles`. Email/password confirmation remains independently enabled.
 - GoTrue sets `pkce_enabled: true` on the provider. If the staging tenant rejects PKCE,
   disable it on the provider (re-register with `pkce_enabled:false`); the token
   `Content-Type` may also need `application/x-www-form-urlencoded` vs `multipart/form-data`
@@ -194,9 +204,9 @@ contract or a reviewed UserInfo-minimizing adapter before onboarding.
 ## Account-linking boundary
 
 - Repeat UAE PASS sign-ins resolve by provider **subject**, not by an app-supplied email.
-- The public UAE PASS response does not advertise `email_verified`; application code never
-  performs an email/phone merge. Supabase Auth remains responsible for its own provider
-  identity-resolution rules.
+- The public UAE PASS response does not advertise `email_verified`; the Auth identity is
+  intentionally email-less and MARKAZ never performs an Auth-account merge from contact
+  email or phone. Supabase Auth resolves repeat sign-ins by provider subject.
 - `auth.linkIdentity()` is available only to an already authenticated customer. The
   database sync independently verifies `auth.uid()` and `auth.identities`.
 - Provider identity conflicts fail safely; MARKAZ never moves an identity between users.

@@ -1,6 +1,6 @@
 # ADR-0033 — Provider-first customer onboarding
 
-- **Status:** Superseded in part by ADR-0034 (Google authentication removed)
+- **Status:** Superseded in part by ADR-0034 (Google removed); refined by ADR-0035
 - **Date:** 2026-08-06
 - **Supersedes:** ADR-0031's UAE PASS login-only restriction
 - **Refines:** ADR-0009 and ADR-0030

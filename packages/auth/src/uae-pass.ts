@@ -60,8 +60,10 @@ export interface UaePassProviderConfig {
   authorizationParams: Record<string, string>;
   /** UAE PASS returns an email only for some account levels; allow email-less logins. */
   emailOptional: boolean;
-  /** Map the UAE PASS UserInfo claims GoTrue must extract for a generic OAuth2 provider. */
-  attributeMapping: { keys: Record<string, { name: string }> };
+  /** Normalize claims before GoTrue decides whether it can create an Auth identity. */
+  attributeMapping: Record<string, string | number | boolean | null>;
+  /** Preserve only the UAE PASS attributes MARKAZ is allowed to project later. */
+  customClaimsAllowlist: string[];
 }
 
 /**
@@ -99,18 +101,14 @@ export function getUaePassProviderConfig(): UaePassProviderConfig {
       forceAuth: UAE_PASS_FORCE_AUTH,
       prompt: 'login',
     },
-    // UAE PASS may authenticate a tester by mobile/EID with no email; the profile
-    // trigger tolerates that (migration 08.17). Map only the approved attributes
-    // MARKAZ needs for account creation. Emirates ID is deliberately excluded.
+    // UAE PASS documents its email as verified, but its OAuth2 UserInfo response
+    // does not emit the OIDC `email_verified` boolean GoTrue requires. Keep Auth
+    // email-less so GoTrue does not start MARKAZ's password-signup confirmation
+    // flow. The verified contact claim is retained below for profile projection.
     emailOptional: true,
-    attributeMapping: {
-      keys: {
-        sub: { name: 'sub' },
-        email: { name: 'email' },
-        full_name: { name: 'fullnameEN' },
-        phone: { name: 'mobile' },
-        uae_pass_uuid: { name: 'uuid' },
-      },
-    },
+    attributeMapping: { email: null },
+    // GoTrue otherwise discards UAE PASS-specific claims while decoding the
+    // generic OAuth2 response. Emirates ID and all other KYC fields stay out.
+    customClaimsAllowlist: ['email', 'fullnameEN', 'mobile', 'uuid', 'userType'],
   };
 }

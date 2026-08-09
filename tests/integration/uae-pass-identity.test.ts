@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { randomUUID } from 'node:crypto';
 import { appRouter, createCallerFactory, type Context } from '@markaz/api';
 import { logger } from '@markaz/observability';
 import { getAppDb, closeConnections } from '@markaz/db';
@@ -125,6 +126,69 @@ d('UAE PASS Staging identity synchronization', () => {
     expect((profile as { status: string }).status).toBe('NOT_STARTED');
   });
 
+  it('projects allow-listed custom claims for an email-less UAE PASS account', async () => {
+    const providerUserId = randomUUID();
+    const providerEmail = `uae_pass_${providerUserId}@markaz.test`;
+    try {
+      await asService(async (tx) => {
+        await tx`insert into auth.users (
+                   id, email, aud, role, raw_app_meta_data, raw_user_meta_data,
+                   created_at, updated_at
+                 ) values (
+                   ${providerUserId}, null, 'authenticated', 'authenticated',
+                   ${tx.json({ provider: 'custom:uae-pass', providers: ['custom:uae-pass'] })},
+                   ${tx.json({
+                     custom_claims: {
+                       email: providerEmail,
+                       fullnameEN: 'UAE,,,,Pass,,Customer',
+                       mobile: '971501112222',
+                       uuid: providerUserId,
+                       userType: 'SOP3',
+                     },
+                   })},
+                   now(), now()
+                 )`;
+        await tx`insert into auth.identities
+                   (provider_id, user_id, identity_data, provider, last_sign_in_at,
+                    created_at, updated_at)
+                 values (
+                   ${`uae-pass-${providerUserId}`}, ${providerUserId},
+                   ${tx.json({
+                     sub: `uae-pass-${providerUserId}`,
+                     custom_claims: {
+                       email: providerEmail,
+                       fullnameEN: 'UAE,,,,Pass,,Customer',
+                       mobile: '971501112222',
+                       uuid: providerUserId,
+                       userType: 'SOP3',
+                     },
+                   })},
+                   'custom:uae-pass', now(), now(), now()
+                 )`;
+      });
+
+      await asUser(providerUserId, (tx) => tx`select public.sync_uae_pass_staging_identity()`);
+      const [profile] = await asService(
+        (tx) =>
+          tx`select email, full_name, phone_e164,
+                    phone_verification_source::text as phone_source,
+                    identity_verification_status::text as identity_status
+             from public.profiles
+             where id = ${providerUserId}`,
+      );
+
+      expect(profile).toMatchObject({
+        email: providerEmail,
+        full_name: 'UAE Pass Customer',
+        phone_e164: '+971501112222',
+        phone_source: 'UAE_PASS',
+        identity_status: 'VERIFIED_STAGING',
+      });
+    } finally {
+      await asService((tx) => tx`delete from auth.users where id = ${providerUserId}`);
+    }
+  });
+
   it('confirms auth.identities and records the staging result exactly once', async () => {
     await asService(
       (tx) =>
@@ -134,11 +198,13 @@ d('UAE PASS Staging identity synchronization', () => {
              (${`uae-pass-${userId}`}, ${userId},
               ${tx.json({
                 sub: `uae-pass-${userId}`,
-                uuid: userId,
-                email,
-                fullnameEN: 'Provider Name Must Not Overwrite',
-                mobile: '971501234567',
-                idn: '784000000000000',
+                custom_claims: {
+                  uuid: userId,
+                  email,
+                  fullnameEN: 'Provider Name Must Not Overwrite',
+                  mobile: '971501234567',
+                  userType: 'SOP3',
+                },
               })},
               'custom:uae-pass', now(), now(), now())`,
     );
