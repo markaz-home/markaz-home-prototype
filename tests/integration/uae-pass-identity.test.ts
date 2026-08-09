@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { appRouter, createCallerFactory, type Context } from '@markaz/api';
 import { logger } from '@markaz/observability';
 import { getAppDb, closeConnections } from '@markaz/db';
+import { createClient } from '@supabase/supabase-js';
 import {
   asService,
   asUser,
@@ -11,6 +12,7 @@ import {
   createNamedPrincipal,
   dbReachable,
 } from './helpers/db';
+import { storageEnv } from './helpers/storage';
 
 const reachable = await dbReachable();
 const d = reachable ? describe : describe.skip;
@@ -63,9 +65,56 @@ d('UAE PASS Staging identity synchronization', () => {
           ${tx.json({ user: { app_metadata: { provider: 'custom:uae-pass' } } })}::jsonb
         ) as result`,
     );
-
     expect((emailResult as { result: Record<string, unknown> }).result).toEqual({});
     expect((uaePassResult as { result: Record<string, unknown> }).result).toEqual({});
+  });
+
+  it('blocks a real password signup before creating a second Auth user', async () => {
+    const env = storageEnv();
+    if (!env) throw new Error('Local Supabase Auth environment is required for this proof');
+
+    const providerUserId = randomUUID();
+    const providerEmail = `uae_pass_duplicate_${providerUserId}@markaz.test`;
+    try {
+      await asService(async (tx) => {
+        await tx`insert into auth.users (
+                   id, email, aud, role, raw_app_meta_data, raw_user_meta_data,
+                   created_at, updated_at
+                 ) values (
+                   ${providerUserId}, null, 'authenticated', 'authenticated',
+                   ${tx.json({ provider: 'custom:uae-pass', providers: ['custom:uae-pass'] })},
+                   ${tx.json({ custom_claims: { email: providerEmail } })},
+                   now(), now()
+                 )`;
+        await tx`update public.profiles
+                 set email = ${providerEmail}
+                 where id = ${providerUserId}`;
+      });
+
+      const client = createClient(env.url, env.anonKey, { auth: { persistSession: false } });
+      const { error } = await client.auth.signUp({
+        email: providerEmail,
+        password: 'Duplicate!Pass1',
+      });
+
+      expect(error).toMatchObject({
+        status: 422,
+        message: 'MARKAZ_ACCOUNT_ALREADY_REGISTERED',
+      });
+
+      const [counts] = await asService(
+        (tx) =>
+          tx`select
+            count(*) filter (where u.email is not null)::int as auth_email_users,
+            count(distinct p.id)::int as profiles
+          from public.profiles p
+          join auth.users u on u.id = p.id
+          where lower(p.email) = lower(${providerEmail})`,
+      );
+      expect(counts).toMatchObject({ auth_email_users: 0, profiles: 1 });
+    } finally {
+      await asService((tx) => tx`delete from auth.users where id = ${providerUserId}`);
+    }
   });
 
   it('exposes the signup hook only to Supabase Auth', async () => {
@@ -89,6 +138,31 @@ d('UAE PASS Staging identity synchronization', () => {
           ) as anonymous`,
     );
     expect(permissions).toMatchObject({ auth_admin: true, customer: false, anonymous: false });
+  });
+
+  it('keeps the identity-reference table inaccessible to customer and anonymous roles', async () => {
+    const [permissions] = await asService(
+      (tx) =>
+        tx`select
+          has_schema_privilege('authenticated', 'private', 'USAGE') as customer_schema,
+          has_schema_privilege('anon', 'private', 'USAGE') as anonymous_schema,
+          has_table_privilege(
+            'authenticated',
+            'private.customer_identity_references',
+            'SELECT'
+          ) as customer_select,
+          has_table_privilege(
+            'anon',
+            'private.customer_identity_references',
+            'SELECT'
+          ) as anonymous_select`,
+    );
+    expect(permissions).toMatchObject({
+      customer_schema: false,
+      anonymous_schema: false,
+      customer_select: false,
+      anonymous_select: false,
+    });
   });
 
   it('bounds profile synchronization lock waits for callback recovery', async () => {
@@ -144,6 +218,7 @@ d('UAE PASS Staging identity synchronization', () => {
                        mobile: '971501112222',
                        uuid: providerUserId,
                        userType: 'SOP3',
+                       idn: '784-2000-1234567-1',
                      },
                    })},
                    now(), now()
@@ -161,6 +236,7 @@ d('UAE PASS Staging identity synchronization', () => {
                        mobile: '971501112222',
                        uuid: providerUserId,
                        userType: 'SOP3',
+                       idn: '784-2000-1234567-1',
                      },
                    })},
                    'custom:uae-pass', now(), now(), now()
@@ -184,6 +260,32 @@ d('UAE PASS Staging identity synchronization', () => {
         phone_source: 'UAE_PASS',
         identity_status: 'VERIFIED_STAGING',
       });
+
+      const [identityReference] = await asService(
+        (tx) =>
+          tx`select
+            provider,
+            emirates_id_hash <> ${'784200012345671'} as is_one_way,
+            extensions.crypt(${'784200012345671'}, emirates_id_hash) = emirates_id_hash
+              as matches
+          from private.customer_identity_references
+          where profile_id = ${providerUserId}`,
+      );
+      expect(identityReference).toMatchObject({
+        provider: 'UAE_PASS',
+        is_one_way: true,
+        matches: true,
+      });
+
+      const [publicColumn] = await asService(
+        (tx) =>
+          tx`select count(*)::int as count
+             from information_schema.columns
+             where table_schema = 'public'
+               and table_name = 'profiles'
+               and column_name in ('emirates_id', 'emirates_id_hash', 'idn')`,
+      );
+      expect((publicColumn as { count: number }).count).toBe(0);
     } finally {
       await asService((tx) => tx`delete from auth.users where id = ${providerUserId}`);
     }

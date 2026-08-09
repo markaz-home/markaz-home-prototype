@@ -3,7 +3,7 @@
 ## Authentication flow
 
 Authentication is **email + password or UAE PASS** via Supabase Auth
-(ADR 0009 / ADR 0033 / ADR 0034 / ADR 0035). A 6-digit email code is retained **only** for a new
+(ADR 0009 / ADR 0033 / ADR 0034 / ADR 0035 / ADR 0036). A 6-digit email code is retained **only** for a new
 email/password account's email verification; password
 recovery uses the **official Supabase recovery LINK** (not a code). Neither is the
 sign-in credential, and SMS is never used. Codes, links, and tokens are generated
@@ -38,7 +38,9 @@ straight to the dashboard.
 A customer may instead use UAE PASS Staging. A new provider subject creates
 one CUSTOMER profile and continues through MARKAZ profile/consent completion; a known
 subject returns to the same `auth.users` row. Application code never joins identities by
-phone, Emirates ID, or browser claims.
+phone, Emirates ID, or browser claims. When UAE PASS supplies `idn`, identity
+synchronization retains only a salted one-way match reference in the locked, non-API
+`private` schema; it is never shown or projected.
 
 ### Password recovery
 
@@ -55,11 +57,14 @@ set their first password this way. Sign-out-after-reset is deliberate (ADR 0009)
 
 ### Duplicate-email safety
 
-`signUp` for an already-confirmed email returns a user with **empty
-`identities[]`** and no error; `isLikelyExistingAccount` shows safe copy + Sign In
-/ Forgot Password. No profiles-existence query, no enumeration endpoint, no raw DB
-errors. Profile creation is idempotent (`handle_new_user`, `on conflict do
-nothing`).
+Native duplicate signup is handled through both GoTrue behaviours: empty
+`identities[]` or an explicit duplicate error. For email-less UAE PASS accounts, a
+Before User Created database hook rejects an incoming normalized email already present
+on a profile before a second Auth user is inserted. All cases map to the same safe copy
+
+- Sign In / Forgot Password; no browser-side existence query, enumeration endpoint, or
+  raw database error is exposed. Profile creation remains idempotent (`handle_new_user`,
+  `on conflict do nothing`).
 
 ### Password policy
 

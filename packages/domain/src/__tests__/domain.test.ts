@@ -272,6 +272,7 @@ describe('auth helpers', () => {
     expect(isExistingAccountError({ code: 'user_already_exists', status: 422 })).toBe(true);
     expect(isExistingAccountError({ code: 'email_exists' })).toBe(true);
     expect(isExistingAccountError({ message: 'User already registered' })).toBe(true);
+    expect(isExistingAccountError({ message: 'MARKAZ_ACCOUNT_ALREADY_REGISTERED' })).toBe(true);
     expect(isExistingAccountError({ message: 'Invalid login credentials' })).toBe(false);
     expect(isExistingAccountError(null)).toBe(false);
   });

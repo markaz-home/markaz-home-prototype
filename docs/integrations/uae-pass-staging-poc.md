@@ -67,11 +67,12 @@ UAE PASS documents `email` and `mobile` as verified attributes, but its OAuth2
 UserInfo response does not include the OIDC `email_verified` boolean expected by
 Supabase Auth. The custom-provider configuration therefore removes the top-level
 Auth email before account resolution (`email_optional=true`) and preserves only
-`email`, `fullnameEN`, `mobile`, `uuid`, and `userType` as allow-listed custom
+`email`, `fullnameEN`, `mobile`, `uuid`, `userType`, and `idn` as allow-listed custom
 claims. The callback synchronizes those values into the customer's application
 profile. This keeps email/password's mandatory 6-digit verification unchanged and
-prevents UAE PASS sign-in from sending a MARKAZ email-verification code. Emirates
-ID and all other KYC attributes are deliberately discarded.
+prevents UAE PASS sign-in from sending a MARKAZ email-verification code. `idn` is
+used only to derive a salted, one-way match reference in a locked non-API schema;
+the raw number and all other KYC attributes stay out of application profiles.
 
 ## Local Supabase support
 
@@ -170,15 +171,22 @@ also copy it into Auth user metadata. With UAE PASS's general-profile scope, tha
 metadata can include names, mobile, nationality, and Emirates ID for some account
 types. It is protected inside the Auth schema, but it is still persisted data.
 
+For Citizen/Resident SOP2/SOP3 identities that provide `idn`, MARKAZ derives a
+salted bcrypt reference in `private.customer_identity_references`. The private
+schema is not exposed through PostgREST and grants no access to customer, anonymous,
+or Admin application roles. The reference supports only a future equality check;
+it cannot be rendered or recovered as an Emirates ID number.
+
 ## What is deliberately **NOT** stored
 
-MARKAZ application tables do not copy Emirates ID, nationality, gender, provider access
+MARKAZ does not copy a raw Emirates ID into profiles or other public application tables,
+and does not copy nationality, gender, provider access
 tokens, provider refresh tokens, or authorization codes, and application code does not
 log them. Supabase does not persist provider tokens in the project database, but normal
 Supabase session access/refresh tokens are necessarily stored in SSR cookies to keep the
 customer signed in.
 
-The custom provider allow-lists only the five claims documented above before GoTrue
+The custom provider allow-lists only the six claims documented above before GoTrue
 persists identity metadata. This POC must still use staging/test identities only. A
 production design requires an approved minimal-attribute contract and formal UAE PASS
 onboarding before production identities are permitted.
@@ -210,6 +218,9 @@ onboarding before production identities are permitted.
 - `auth.linkIdentity()` is available only to an already authenticated customer. The
   database sync independently verifies `auth.uid()` and `auth.identities`.
 - Provider identity conflicts fail safely; MARKAZ never moves an identity between users.
+- A Supabase Before User Created hook rejects a password/provider signup whose normalized
+  email is already present on an application profile. It runs before `auth.users` insertion
+  and returns only a stable marker mapped to MARKAZ's anti-enumeration warning.
 
 ## UAE PASS does not prove property ownership
 

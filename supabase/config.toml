@@ -66,6 +66,12 @@ enable_manual_linking = true
 [auth.sessions]
 inactivity_timeout = "30m"
 
+# Reject cross-provider duplicate emails before GoTrue inserts a second Auth user.
+# The SQL function returns only a stable, non-identifying marker.
+[auth.hook.before_user_created]
+enabled = true
+uri = "pg-functions://postgres/public/hook_prevent_unlinked_uae_pass_signup"
+
 # Email + password is the normal sign-in method (Week 1.5, ADR-0009).
 # Email codes are used only for new-account verification; recovery uses the official link.
 [auth.email]

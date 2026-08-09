@@ -108,7 +108,8 @@ export function getUaePassProviderConfig(): UaePassProviderConfig {
     emailOptional: true,
     attributeMapping: { email: null },
     // GoTrue otherwise discards UAE PASS-specific claims while decoding the
-    // generic OAuth2 response. Emirates ID and all other KYC fields stay out.
-    customClaimsAllowlist: ['email', 'fullnameEN', 'mobile', 'uuid', 'userType'],
+    // generic OAuth2 response. `idn` is used only to derive a salted, one-way
+    // private match reference; it is never copied to a profile, API, log, or UI.
+    customClaimsAllowlist: ['email', 'fullnameEN', 'mobile', 'uuid', 'userType', 'idn'],
   };
 }

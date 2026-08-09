@@ -111,6 +111,21 @@ describe('SignUpForm', () => {
     expect(screen.getByRole('button', { name: 'Create account' })).toBeInTheDocument();
   });
 
+  it('maps the cross-provider duplicate hook to the same safe warning', async () => {
+    signUp.mockResolvedValue({
+      data: { user: null },
+      error: { status: 422, message: 'MARKAZ_ACCOUNT_ALREADY_REGISTERED' },
+    });
+    const user = userEvent.setup();
+    renderWithIntl(<SignUpForm />);
+    await fillValid(user);
+    await user.click(screen.getByRole('button', { name: 'Create account' }));
+
+    expect(await screen.findByText(/We could not create a new account/)).toBeInTheDocument();
+    expect(screen.getByText(/You may already have an account/)).toBeInTheDocument();
+    expect(push).not.toHaveBeenCalled();
+  });
+
   it('renders Arabic', () => {
     renderWithIntl(<SignUpForm />, 'ar');
     expect(screen.getByRole('heading', { name: 'أنشئ حسابك في Markaz' })).toBeInTheDocument();

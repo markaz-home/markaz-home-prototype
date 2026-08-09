@@ -77,6 +77,7 @@ describe('UAE PASS config (POC)', () => {
       'mobile',
       'uuid',
       'userType',
+      'idn',
     ]);
   });
 

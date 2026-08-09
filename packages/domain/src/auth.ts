@@ -173,5 +173,9 @@ export function isExistingAccountError(
   if (!err) return false;
   if (err.code === 'user_already_exists' || err.code === 'email_exists') return true;
   const m = (err.message ?? '').toLowerCase();
-  return m.includes('already registered') || m.includes('already been registered');
+  return (
+    m === 'markaz_account_already_registered' ||
+    m.includes('already registered') ||
+    m.includes('already been registered')
+  );
 }

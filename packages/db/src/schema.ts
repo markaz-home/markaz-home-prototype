@@ -2,6 +2,7 @@ import {
   pgEnum,
   pgTable,
   pgView,
+  pgSchema,
   uuid,
   text,
   timestamp,
@@ -201,6 +202,20 @@ export const profiles = pgTable(
     accountTypeIdx: index('profiles_account_type_idx').on(t.accountType),
   }),
 );
+
+// --- Private identity references --------------------------------------------
+// Not part of the PostgREST schema and granted to neither customer nor Admin.
+// The Emirates ID is represented only by a salted bcrypt match reference.
+export const privateSchema = pgSchema('private');
+export const customerIdentityReferences = privateSchema.table('customer_identity_references', {
+  profileId: uuid('profile_id')
+    .primaryKey()
+    .references(() => profiles.id, { onDelete: 'cascade' }),
+  provider: text('provider').notNull().default('UAE_PASS'),
+  emiratesIdHash: text('emirates_id_hash').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
 
 // --- Properties / Listings ---------------------------------------------------
 export const properties = pgTable(

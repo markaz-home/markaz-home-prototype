@@ -1,6 +1,6 @@
 # ADR-0035 — UAE PASS uses an email-less Auth identity with allow-listed profile claims
 
-- **Status:** Accepted
+- **Status:** Accepted; identity-retention detail refined by ADR-0036
 - **Date:** 2026-08-09
 - **Refines:** ADR-0033
 
@@ -23,9 +23,9 @@ normalize UAE PASS claims.
 - Configure `custom:uae-pass` with `email_optional=true` and map its top-level Auth
   email to `null`. UAE PASS Auth users are therefore email-less and never enter the
   password-account confirmation flow.
-- Preserve only `email`, `fullnameEN`, `mobile`, `uuid`, and `userType` through the
-  custom provider's claim allow-list. Emirates ID and all other KYC attributes are
-  discarded before identity metadata is persisted.
+- Preserve only `email`, `fullnameEN`, `mobile`, `uuid`, `userType`, and `idn` through
+  the custom provider's claim allow-list. Per ADR-0036, `idn` is used only to derive a
+  private one-way match reference and is never copied into the application profile.
 - Continue to resolve UAE PASS accounts by the provider subject, never by mutable email
   or mobile values.
 - Project valid allow-listed contact attributes into the customer's RLS-protected
