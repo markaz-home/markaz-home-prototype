@@ -66,7 +66,7 @@ describe('AccountProfile', () => {
     expect(screen.getByText('Tania Gole')).toBeInTheDocument();
     expect(screen.getAllByText('tania@example.com')).toHaveLength(2);
     expect(screen.getByText('Email and password')).toBeInTheDocument();
-    expect(screen.getAllByText('Verified')).toHaveLength(1);
+    expect(screen.getAllByText('Verified')).toHaveLength(2);
     expect(screen.getByText('UAE PASS Staging')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Link UAE PASS Staging' })).toBeInTheDocument();
     expect(screen.getByText('Not added')).toBeInTheDocument();
@@ -74,6 +74,16 @@ describe('AccountProfile', () => {
     expect(
       screen.queryByText('Your identities stay attached to one account'),
     ).not.toBeInTheDocument();
+  });
+
+  it('shows the verified badge for a provider-only UAE PASS email', () => {
+    renderWithIntl(
+      <AccountProfile {...baseProps} emailPasswordLinked={false} uaePassLinked emailVerified />,
+    );
+
+    expect(screen.getByText('tania@example.com')).toBeInTheDocument();
+    expect(screen.getByText('Verified')).toBeInTheDocument();
+    expect(screen.queryByText('Email and password')).not.toBeInTheDocument();
   });
 
   it('edits and normalizes optional mobile contact details', async () => {

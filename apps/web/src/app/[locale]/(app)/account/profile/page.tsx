@@ -1,7 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import { isUaePassStagingEnabled } from '@markaz/auth/uae-pass/server';
 import { AccountProfile } from '@/components/account-profile';
-import { resolveCustomerEmail } from '@/lib/customer-email';
+import { isCustomerEmailVerified, resolveCustomerEmail } from '@/lib/customer-email';
 import { parseUaePassProfileNotice } from '@/lib/uae-pass-link';
 import { getSession } from '@/server/session';
 
@@ -17,6 +17,13 @@ export default async function AccountProfilePage({
   setRequestLocale(locale);
   const session = await getSession();
   const profile = session?.profile;
+  const email = resolveCustomerEmail(session?.email, profile?.email);
+  const emailVerified = isCustomerEmailVerified({
+    email,
+    authEmailVerified: session?.emailVerified ?? false,
+    uaePassAuthenticated: session?.uaePassAuthenticated ?? false,
+    emailPasswordAuthenticated: session?.emailPasswordAuthenticated ?? false,
+  });
   const uaePassLinked =
     !!session?.uaePassAuthenticated || profile?.identityVerificationStatus === 'VERIFIED_STAGING';
   const uaePassSyncPending =
@@ -25,11 +32,11 @@ export default async function AccountProfilePage({
   return (
     <AccountProfile
       fullName={profile?.fullName ?? null}
-      email={resolveCustomerEmail(session?.email, profile?.email)}
+      email={email}
       phoneE164={profile?.phoneE164 ?? null}
       phoneVerified={!!profile?.phoneVerifiedAt}
       locale={locale}
-      emailVerified={session?.emailVerified ?? false}
+      emailVerified={emailVerified}
       emailPasswordLinked={session?.emailPasswordAuthenticated ?? false}
       uaePassLinked={uaePassLinked}
       uaePassSyncPending={uaePassSyncPending}

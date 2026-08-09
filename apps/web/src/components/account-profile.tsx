@@ -230,7 +230,13 @@ export function AccountProfile({
           ) : (
             <CardContent className="divide-border/70 divide-y p-0">
               <DetailRow label={t('nameLabel')} value={details.fullName ?? '—'} />
-              <DetailRow label={t('emailLabel')} value={email ?? '—'} dir="ltr" />
+              <DetailRow
+                label={t('emailLabel')}
+                value={email ?? '—'}
+                dir="ltr"
+                status={email ? t(emailVerified ? 'verified' : 'verificationRequired') : null}
+                statusTone={emailVerified ? 'success' : 'warning'}
+              />
               <DetailRow
                 label={t('phoneLabel')}
                 value={details.phoneE164 ?? t('phoneNotAdded')}
