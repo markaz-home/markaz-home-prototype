@@ -10,7 +10,8 @@
  *
  * Run from the monorepo root:
  *   ALLOW_HOSTED_CATALOG_SEED=YES_I_UNDERSTAND \
- *   CATALOG_TARGET_PROJECT_REF=<project-ref> pnpm db:seed:catalog
+ *   CATALOG_TARGET_PROJECT_REF=<project-ref> \
+ *   CATALOG_OWNER_EMAIL=<optional-existing-customer> pnpm db:seed:catalog
  */
 import { createHash } from 'node:crypto';
 import { readFile, stat } from 'node:fs/promises';
@@ -378,19 +379,29 @@ async function main(): Promise<void> {
   const repaired: string[] = [];
 
   try {
+    const requestedOwnerEmail = process.env.CATALOG_OWNER_EMAIL?.trim().toLowerCase();
+    const supportedOwnerEmails = [...new Set<string>(CATALOG.map((item) => item.ownerEmail))];
+    if (requestedOwnerEmail && !supportedOwnerEmails.includes(requestedOwnerEmail)) {
+      fail(`CATALOG_OWNER_EMAIL is not present in the approved catalog: ${requestedOwnerEmail}`);
+    }
+    const catalog = requestedOwnerEmail
+      ? CATALOG.filter((item) => item.ownerEmail === requestedOwnerEmail)
+      : CATALOG;
+    const requiredOwnerEmails = [...new Set(catalog.map((item) => item.ownerEmail))];
+
     const owners = await sql<{ id: string; email: string; account_type: string }[]>`
       select id::text, lower(email) as email, account_type::text as account_type
       from public.profiles
-      where lower(email) in ('taniagole@gmail.com', 'ngole71@gmail.com')`;
+      where lower(email) in ${sql(requiredOwnerEmails)}`;
     const ownerByEmail = new Map(owners.map((owner) => [owner.email, owner]));
-    for (const email of ['taniagole@gmail.com', 'ngole71@gmail.com'] as const) {
+    for (const email of requiredOwnerEmails) {
       const owner = ownerByEmail.get(email);
       if (!owner) fail(`Required existing customer was not found: ${email}`);
       if (owner.account_type !== 'CUSTOMER') fail(`Listing owner is not a CUSTOMER: ${email}`);
     }
 
-    for (let index = 0; index < CATALOG.length; index += 1) {
-      const item = CATALOG[index]!;
+    for (let index = 0; index < catalog.length; index += 1) {
+      const item = catalog[index]!;
       const owner = ownerByEmail.get(item.ownerEmail)!;
       const listingId = stableUuid(`${item.publicId}:listing`);
       const propertyId = stableUuid(`${item.publicId}:property`);
@@ -671,7 +682,9 @@ async function main(): Promise<void> {
       join public.profiles p on p.id = l.owner_id
       left join public.property_photos ph on ph.listing_id = l.id and ph.public_path is not null
       left join public.listing_publication_requests pr on pr.listing_id = l.id and pr.superseded_at is null
-      where l.public_id like 'MKZ-CATALOG-%' and l.state = 'LIVE'
+      where l.public_id like 'MKZ-CATALOG-%'
+        and l.state = 'LIVE'
+        and lower(p.email) in ${sql(requiredOwnerEmails)}
       group by p.email
       order by p.email`;
     console.log(`Catalog complete: ${created.length} created, ${repaired.length} refreshed.`);
