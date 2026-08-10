@@ -86,7 +86,7 @@ export default async function TransactionsPage({
       cell: (r) =>
         r.nextActor && t.has(`adminOffers.side.${r.nextActor}`)
           ? t(`adminOffers.side.${r.nextActor}`)
-          : '—',
+          : '-',
     },
     {
       id: 'activity',

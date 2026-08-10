@@ -3,7 +3,7 @@
 
 /** "AED 2,450,000" — whole dirhams, grouped. */
 export function formatAed(value: number | null | undefined, locale = 'en'): string {
-  if (value === null || value === undefined || Number.isNaN(value)) return '—';
+  if (value === null || value === undefined || Number.isNaN(value)) return '-';
   const digits = new Intl.NumberFormat(locale === 'ar' ? 'ar-AE' : 'en-US', {
     maximumFractionDigits: 0,
   }).format(value);
@@ -12,7 +12,7 @@ export function formatAed(value: number | null | undefined, locale = 'en'): stri
 
 /** "1,328 sq ft" — whole number + suffix (suffix supplied by caller for i18n). */
 export function formatNumber(value: number | null | undefined, locale = 'en'): string {
-  if (value === null || value === undefined || Number.isNaN(value)) return '—';
+  if (value === null || value === undefined || Number.isNaN(value)) return '-';
   return new Intl.NumberFormat(locale === 'ar' ? 'ar-AE' : 'en-US', {
     maximumFractionDigits: 0,
   }).format(value);
@@ -20,7 +20,7 @@ export function formatNumber(value: number | null | undefined, locale = 'en'): s
 
 /** "8.4%" — one decimal place (design spec §26.3). */
 export function formatPct(value: number | null | undefined, locale = 'en'): string {
-  if (value === null || value === undefined || Number.isNaN(value)) return '—';
+  if (value === null || value === undefined || Number.isNaN(value)) return '-';
   return `${new Intl.NumberFormat(locale === 'ar' ? 'ar-AE' : 'en-US', {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
@@ -33,9 +33,9 @@ export function formatPct(value: number | null | undefined, locale = 'en'): stri
  * ("7/26/2026, 6:30:36 PM") reads badly in a UAE product.
  */
 export function formatDateTime(value: string | Date | null | undefined, locale = 'en'): string {
-  if (!value) return '—';
+  if (!value) return '-';
   const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
+  if (Number.isNaN(date.getTime())) return '-';
   return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-AE' : 'en-GB', {
     day: 'numeric',
     month: 'short',

@@ -76,7 +76,8 @@ describe('FeaturedProperties', () => {
 
     renderFeatured();
 
-    expect(screen.getByText('Listed on Markaz')).toBeInTheDocument();
+    expect(screen.getAllByText('Listed on Markaz')).toHaveLength(2);
+    expect(screen.getByText('Selected from Bayut')).toBeInTheDocument();
     expect(screen.getByText('External via BayutAPI')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Two-bedroom apartment/i })).toHaveAttribute(
       'href',
@@ -139,5 +140,29 @@ describe('FeaturedProperties', () => {
 
     expect(screen.getByText('مصدر خارجي عبر BayutAPI')).toBeInTheDocument();
     expect(screen.getByText(/غير تابعة لـ Markaz/)).toBeInTheDocument();
+  });
+
+  it('shows a stable maximum of six external properties', () => {
+    h.Q.internal = { isLoading: false, data: [] };
+    h.Q.external = {
+      isLoading: false,
+      data: {
+        enabled: true,
+        available: true,
+        provider: 'BAYUT_API',
+        items: Array.from({ length: 7 }, (_, index) => ({
+          ...externalCard,
+          providerId: `bayut-${index + 1}`,
+          community: `Community ${index + 1}`,
+          externalUrl: `https://www.bayut.com/property/details-${index + 1}.html`,
+        })),
+      },
+    };
+
+    renderFeatured();
+
+    expect(screen.getAllByText('External via BayutAPI')).toHaveLength(6);
+    expect(screen.getByText('Villa in Community 6')).toBeInTheDocument();
+    expect(screen.queryByText('Villa in Community 7')).not.toBeInTheDocument();
   });
 });

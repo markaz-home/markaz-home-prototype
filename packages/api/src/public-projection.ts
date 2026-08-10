@@ -20,6 +20,15 @@ export function publicPhotoUrl(publicPath: string | null | undefined): string | 
   return `${SUPABASE_URL}/storage/v1/object/public/listing-photos/${publicPath}`;
 }
 
+/** Remove prototype-only suffixes from property names shown to customers. */
+export function cleanListingDisplayText(value: string | null | undefined): string | null {
+  if (!value) return null;
+  return value
+    .replace(/\s*\(demo listing\)\s*/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 /** Sentence-case public headline: "2-bedroom apartment in Marina Gate 2". */
 export function buildHeadline(input: {
   bedrooms: number | null;
@@ -29,7 +38,10 @@ export function buildHeadline(input: {
 }): string {
   const beds = bedroomLabel(input.bedrooms);
   const type = input.propertyType ? input.propertyType.toLowerCase() : 'property';
-  const place = input.buildingOrProject || input.community || 'the UAE';
+  const place =
+    cleanListingDisplayText(input.buildingOrProject) ||
+    cleanListingDisplayText(input.community) ||
+    'the UAE';
   const raw = `${beds} ${type} in ${place}`;
   return raw.charAt(0).toUpperCase() + raw.slice(1);
 }
@@ -104,7 +116,7 @@ export function toPublicDetail(row: PublicListingRow) {
     furnishingStatus: p?.furnishingStatus ?? null,
     completionStatus: p?.completionStatus ?? null,
     parkingSpaces: p?.parkingSpaces ?? null,
-    buildingOrProject: p?.buildingOrProject ?? null,
+    buildingOrProject: cleanListingDisplayText(p?.buildingOrProject),
     features: p?.features ?? [],
     photoUrls: row.photoPublicPaths.map(publicPhotoUrl).filter((u): u is string => !!u),
     publishedAt: row.publishedAt?.toISOString() ?? null,

@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "reviewRequired": "ترجمة أولية للنموذج — النصوص القانونية والمعاملات (الشروط، الخصوصية، التحقق من الهوية) تتطلب مراجعة قانونية معتمدة قبل الإطلاق. Machine-assisted Arabic; legal/transactional copy requires approved business review."
+    "reviewRequired": "ترجمة أولية للنموذج. النصوص القانونية والمعاملات (الشروط، الخصوصية، التحقق من الهوية) تتطلب مراجعة قانونية معتمدة قبل الإطلاق. Machine-assisted Arabic; legal/transactional copy requires approved business review."
   },
   "common": {
     "appName": "مركز هوم",
@@ -26,7 +26,7 @@
   "landing": {
     "eyebrow": "أهلًا بك",
     "title": "المنزل يبدأ <accent>من هنا.</accent>",
-    "subtitle": "اشترِ وبِع وأدِر العقارات في الإمارات، وكل خطوة في مكان واحد واضح.",
+    "subtitle": "اشترِ وبِع وأدِر العقارات في جميع أنحاء الإمارات.",
     "searchLabel": "البحث عن العقارات",
     "searchLocation": "بحث",
     "searchLocationPlaceholder": "الموقع أو المجتمع السكني",
@@ -49,6 +49,8 @@
     "featuredTitle": "عقارات مميزة",
     "featuredBody": "استكشف أحدث إعلانات Markaz ومجموعة مختارة من العقارات الخارجية.",
     "featuredViewAll": "عرض جميع العقارات",
+    "featuredMarkazTitle": "مدرج على Markaz",
+    "featuredExternalTitle": "مختارات من Bayut",
     "featuredGroupAPARTMENT": "شقق",
     "featuredGroupVILLA": "فلل",
     "featuredGroupTOWNHOUSE": "تاون هاوس",
@@ -353,7 +355,7 @@
     "continueTransaction": "متابعة المعاملة",
     "latestOfferTitle": "أحدث عرض",
     "offerMadeBy": "قدّمت عرضًا بقيمة {amount}",
-    "offerReceivedOn": "عرض مستلم — {amount}",
+    "offerReceivedOn": "عرض مستلم: {amount}",
     "recommendedTitle": "اكتشف عقارات على MARKAZ",
     "discoveryEmptyTitle": "عقارات MARKAZ جديدة قادمة قريبًا",
     "discoveryEmptyBody": "ستظهر هنا إعلانات العملاء الموثّقة فور نشرها. يمكنك تصفّح السوق الحالي أو العودة قريبًا.",
@@ -487,7 +489,7 @@
     "increment": "زيادة",
     "connected": "متصل",
     "disconnected": "جارٍ إعادة الاتصال…",
-    "note": "إثبات تقني فقط — يتصل Supabase Realtime مباشرة بقاعدة البيانات (وليس خلف مجمّع اتصالات)."
+    "note": "إثبات تقني فقط. يتصل Supabase Realtime مباشرة بقاعدة البيانات وليس خلف مجمّع اتصالات."
   },
   "storageProof": {
     "title": "إثبات حدود التخزين",
@@ -497,7 +499,7 @@
     "deniedLabel": "الوصول العام المباشر إلى كائن خاص مرفوض."
   },
   "admin": {
-    "appName": "مركز — الإدارة",
+    "appName": "مركز للإدارة",
     "loginTitle": "تسجيل دخول الإدارة",
     "loginSubtitle": "بوابة العمليات. سجّل الدخول باستخدام بريدك الإلكتروني وكلمة المرور.",
     "overviewTitle": "نظرة عامة",
@@ -550,7 +552,7 @@
     "view": "عرض",
     "viewDetail": "عرض التفاصيل",
     "none": "لا شيء",
-    "na": "—",
+    "na": "غير متاح",
     "actorYou": "أنت",
     "required": "مطلوب",
     "optional": "اختياري",
@@ -692,7 +694,7 @@
       "followUpLabel": "تاريخ المتابعة (اختياري)",
       "categoryLabel": "الفئة",
       "submit": "حفظ الملاحظة",
-      "privacyWarning": "الملاحظات سجلات تشغيلية داخلية — لا تلصق بيانات العملاء السرية أو محتويات المستندات.",
+      "privacyWarning": "الملاحظات سجلات تشغيلية داخلية. لا تلصق بيانات العملاء السرية أو محتويات المستندات.",
       "supersedes": "تصحيح ملاحظة سابقة",
       "category": {
         "REVIEW": "مراجعة",
@@ -879,12 +881,12 @@
         "SELLER": "البائع",
         "BOTH": "كلاهما",
         "SYSTEM": "النظام",
-        "NONE": "—"
+        "NONE": "غير متاح"
       },
       "nextActorValue": {
         "BUYER": "المشتري",
         "SELLER": "البائع",
-        "NONE": "—"
+        "NONE": "غير متاح"
       },
       "status": {
         "OPEN": "مفتوح",
@@ -2075,6 +2077,7 @@
     "actionBody": "أكمل الإجراء المميز لمواصلة تقدم هذه المعاملة.",
     "actionRequiredTag": "إجراء مطلوب",
     "moreOptions": "خيارات إضافية للمعاملة",
+    "moreOptionsHelp": "استخدم الإلغاء فقط عندما يتعذّر على المشتري أو البائع المتابعة. سيُطلب من الطرف الآخر مراجعة الطلب.",
     "stageLockedTitle": "هذه المرحلة غير جاهزة بعد",
     "stageLockedBody": "أكمل المرحلة الحالية مع الطرف الآخر قبل المتابعة.",
     "participants": {
@@ -2227,7 +2230,7 @@
       "incomplete": "غير مكتمل",
       "markComplete": "وضع علامة اكتمال القائمة",
       "summaryTitle": "ملخص المعاملة المحاكى",
-      "summaryDisclosure": "مراجعة المستند محاكاة — هذا ليس نموذج (F) رسميًا ولا اتفاقية ملزمة قانونًا.",
+      "summaryDisclosure": "مراجعة المستند محاكاة. هذا ليس نموذج (F) رسميًا ولا اتفاقية ملزمة قانونًا.",
       "reviewSummary": "أؤكد أنني راجعت الملخص التجريبي",
       "upload": "رفع ملف",
       "remove": "إزالة",
@@ -2244,7 +2247,7 @@
     },
     "checks": {
       "title": "الفحوصات التجريبية",
-      "disclosure": "فحوصات العناية الواجبة محاكاة — هذه الفحوصات النموذجية ليست نصيحة قانونية أو مالية أو إنشائية أو تنظيمية.",
+      "disclosure": "فحوصات العناية الواجبة محاكاة. هذه الفحوصات النموذجية ليست نصيحة قانونية أو مالية أو إنشائية أو تنظيمية.",
       "run": "تشغيل الفحوصات التجريبية",
       "completedTitle": "اكتملت العناية الواجبة في الوضع التجريبي",
       "completedBody": "اكتملت متطلبات النموذج الأولية. لم يتم إجراء أي تخليص قانوني أو تنظيمي."
@@ -2304,6 +2307,8 @@
     },
     "timeline": {
       "title": "الجدول الزمني",
+      "latestFirst": "أحدث الأنشطة أولاً",
+      "eventCount": "{count} أحداث",
       "TRANSACTION_CREATED": "تم إنشاء مساحة عمل المعاملة.",
       "DETAILS_CONFIRMED": "أكّد أحد الطرفين تفاصيل المعاملة.",
       "PURCHASE_ROUTE_SELECTED": "اختار المشتري طريقة الشراء.",
@@ -2336,7 +2341,7 @@
       "view": "عرض"
     },
     "realtime": {
-      "reconnecting": "إعادة الاتصال — قد تتأخر التحديثات.",
+      "reconnecting": "إعادة الاتصال. قد تتأخر التحديثات.",
       "refresh": "تحديث"
     },
     "goToAction": "انتقل إلى إجرائك",
@@ -2418,7 +2423,7 @@
     "bought": "مُشترى",
     "sold": "مُباع",
     "emptyTitle": "لا توجد معاملات مكتملة بعد",
-    "emptyBody": "تظهر العقارات هنا بعد اكتمال المعاملة — سواء اشتريت أو بعت.",
+    "emptyBody": "تظهر العقارات هنا بعد اكتمال المعاملة، سواء اشتريت أو بعت.",
     "browse": "تصفّح العقارات"
   },
   "customerAccessDenied": {

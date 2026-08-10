@@ -214,6 +214,24 @@ describe('TransactionWorkspace', () => {
     });
   });
 
+  it('shows a compact connected timeline with repeated activity grouped', async () => {
+    h.Q.get = detail({
+      timeline: [
+        { type: 'TRANSACTION_CREATED', actor: null, createdAt: '2026-07-10T00:00:00Z' },
+        { type: 'DOCUMENT_UPLOADED', actor: 'BUYER', createdAt: '2026-07-11T00:00:00Z' },
+        { type: 'DOCUMENT_UPLOADED', actor: 'BUYER', createdAt: '2026-07-11T00:01:00Z' },
+        { type: 'SUMMARY_REVIEWED', actor: 'BUYER', createdAt: '2026-07-12T00:00:00Z' },
+      ],
+    });
+
+    r(<TransactionWorkspace transactionId="tx1" />);
+    await userEvent.click(screen.getByText('View transaction activity'));
+
+    expect(screen.getByText('Latest activity first')).toBeInTheDocument();
+    expect(screen.getByText('2 events')).toBeInTheDocument();
+    expect(screen.getAllByText('A document was uploaded.')).toHaveLength(1);
+  });
+
   it('shows one specific waiting message instead of repeating it in a sidebar', () => {
     h.Q.get = detail({
       status: 'CONFIRMATION',

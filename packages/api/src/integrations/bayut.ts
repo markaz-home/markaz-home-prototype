@@ -229,8 +229,15 @@ export async function loadBayutFeaturedProperties({
   const timer = setTimeout(() => controller.abort(), 5_000);
   let response: Response;
   try {
-    response = await fetchImpl(url, {
+    const requestInit: RequestInit & {
+      cache: 'force-cache';
+      next: { revalidate: number };
+    } = {
       method: 'POST',
+      cache: 'force-cache',
+      // Next's shared data cache keeps every visitor on the same hourly Bayut
+      // snapshot, even when requests land on different server instances.
+      next: { revalidate: BAYUT_CACHE_TTL_MS / 1_000 },
       headers: {
         'Content-Type': 'application/json',
         'X-RapidAPI-Host': BAYUT_API_HOST,
@@ -243,7 +250,8 @@ export async function loadBayutFeaturedProperties({
         index: 'latest',
       }),
       signal: controller.signal,
-    });
+    };
+    response = await fetchImpl(url, requestInit);
   } catch {
     throw new BayutApiError('NETWORK_FAILURE');
   } finally {

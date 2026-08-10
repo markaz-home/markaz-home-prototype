@@ -69,7 +69,7 @@ export default async function AuditPage({
       id: 'result',
       header: t('audit.col.result'),
       priority: 'low',
-      cell: (r) => (r.metadata as { result?: string })?.result ?? '—',
+      cell: (r) => (r.metadata as { result?: string })?.result ?? '-',
     },
   ];
 

@@ -1,10 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import {
+  mapProperty,
   toTransactionDetail,
   type TxRow,
   type TaskRow,
   type DocRow,
 } from '../transaction-projection';
+import { buildHeadline } from '../public-projection';
 
 const BUYER = 'b0000000-0000-0000-0000-000000000000';
 const SELLER = 's0000000-0000-0000-0000-000000000000';
@@ -84,6 +86,23 @@ const sellerDoc: DocRow = {
 };
 
 describe('transaction projection privacy (§42)', () => {
+  it('removes prototype-only demo suffixes from customer-facing property names', () => {
+    expect(
+      buildHeadline({
+        bedrooms: 2,
+        propertyType: 'APARTMENT',
+        buildingOrProject: 'Marina Gate (Demo listing)',
+        community: 'Dubai Marina',
+      }),
+    ).toBe('2-bedroom apartment in Marina Gate');
+    expect(
+      mapProperty({
+        publicId: 'property-1',
+        headline: 'Marina Gate (Demo listing)',
+      })?.headline,
+    ).toBe('Marina Gate');
+  });
+
   it('reduces the other participant documents to per-type completeness only', () => {
     const view = toTransactionDetail({
       row: row(),

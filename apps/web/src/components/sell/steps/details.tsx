@@ -297,7 +297,7 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
                 value={form.furnishingStatus}
                 onChange={(v) => set('furnishingStatus', v)}
                 options={[
-                  { value: '', label: '—', disabled: true },
+                  { value: '', label: '-', disabled: true },
                   ...FURNISHING_STATUSES.map((s) => ({
                     value: s,
                     label: t(
@@ -313,7 +313,7 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
                 value={form.occupancyStatus}
                 onChange={(v) => set('occupancyStatus', v)}
                 options={[
-                  { value: '', label: '—', disabled: true },
+                  { value: '', label: '-', disabled: true },
                   ...OCCUPANCY_STATUSES.map((s) => ({
                     value: s,
                     label: t(
@@ -334,7 +334,7 @@ function DetailsForm({ listingId, data }: { listingId: string; data: GetData }) 
                 value={form.completionStatus}
                 onChange={(v) => set('completionStatus', v)}
                 options={[
-                  { value: '', label: '—', disabled: true },
+                  { value: '', label: '-', disabled: true },
                   ...COMPLETION_STATUSES.map((s) => ({
                     value: s,
                     label: t(s === 'READY' ? 'completionReady' : 'completionOffPlan'),

@@ -92,7 +92,7 @@ function PortfolioRow({ item, locale }: { item: Item; locale: string }) {
           </span>
         </div>
         <p dir="auto" className="mt-2 truncate font-medium">
-          {item.property?.headline ?? '—'}
+          {item.property?.headline ?? '-'}
         </p>
         <p className="text-muted-foreground mt-0.5 text-sm">
           {[item.property?.community, item.property?.emirate].filter(Boolean).join(' · ')}

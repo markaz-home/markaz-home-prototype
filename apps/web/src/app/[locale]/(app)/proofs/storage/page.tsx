@@ -30,7 +30,7 @@ export default async function StorageProofPage({
               <CardTitle className="text-base">{t('privateLabel')}</CardTitle>
               <StatusBadge tone="primary">private</StatusBadge>
             </div>
-            <CardDescription>ownership-documents bucket — signed URLs only.</CardDescription>
+            <CardDescription>Ownership documents bucket. Signed URLs only.</CardDescription>
           </CardHeader>
           <CardContent className="text-muted-foreground text-sm">{t('deniedLabel')}</CardContent>
         </Card>
@@ -40,7 +40,7 @@ export default async function StorageProofPage({
               <CardTitle className="text-base">{t('publicLabel')}</CardTitle>
               <StatusBadge tone="success">public</StatusBadge>
             </div>
-            <CardDescription>listing-photos bucket — safe public delivery.</CardDescription>
+            <CardDescription>Listing photos bucket. Safe public delivery.</CardDescription>
           </CardHeader>
           <CardContent className="text-muted-foreground text-sm">
             listing-photos/demo/*.jpg

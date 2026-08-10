@@ -23,7 +23,7 @@
   "landing": {
     "eyebrow": "Welcome",
     "title": "Home starts <accent>here.</accent>",
-    "subtitle": "Buy, sell and manage property across the UAE, with every step in one clear place.",
+    "subtitle": "Buy, sell and manage property across the UAE.",
     "searchLabel": "Property search",
     "searchLocation": "Search",
     "searchLocationPlaceholder": "Location or community",
@@ -46,6 +46,8 @@
     "featuredTitle": "Featured properties",
     "featuredBody": "Explore recently published Markaz listings and selected external properties.",
     "featuredViewAll": "View all properties",
+    "featuredMarkazTitle": "Listed on Markaz",
+    "featuredExternalTitle": "Selected from Bayut",
     "featuredGroupAPARTMENT": "Apartments",
     "featuredGroupVILLA": "Villas",
     "featuredGroupTOWNHOUSE": "Townhouses",
@@ -350,7 +352,7 @@
     "continueTransaction": "Continue transaction",
     "latestOfferTitle": "Latest offer",
     "offerMadeBy": "You offered {amount}",
-    "offerReceivedOn": "Offer received — {amount}",
+    "offerReceivedOn": "Offer received: {amount}",
     "recommendedTitle": "Discover on MARKAZ",
     "discoveryEmptyTitle": "New MARKAZ homes are coming soon",
     "discoveryEmptyBody": "Verified customer listings will appear here as they go live. You can browse the current marketplace or check back soon.",
@@ -484,7 +486,7 @@
     "increment": "Increment",
     "connected": "Connected",
     "disconnected": "Reconnecting…",
-    "note": "Technical proof only — Supabase Realtime connects directly to the database (never behind a pooler)."
+    "note": "Technical proof only. Supabase Realtime connects directly to the database and never through a pooler."
   },
   "storageProof": {
     "title": "Storage boundary proof",
@@ -547,7 +549,7 @@
     "view": "View",
     "viewDetail": "View detail",
     "none": "None",
-    "na": "—",
+    "na": "Not available",
     "actorYou": "You",
     "required": "Required",
     "optional": "Optional",
@@ -689,7 +691,7 @@
       "followUpLabel": "Follow-up date (optional)",
       "categoryLabel": "Category",
       "submit": "Save note",
-      "privacyWarning": "Notes are internal operational records — do not paste customer secrets or document contents.",
+      "privacyWarning": "Notes are internal operational records. Do not paste customer secrets or document contents.",
       "supersedes": "Correction of an earlier note",
       "category": {
         "REVIEW": "Review",
@@ -876,12 +878,12 @@
         "SELLER": "Seller",
         "BOTH": "Both",
         "SYSTEM": "System",
-        "NONE": "—"
+        "NONE": "Not available"
       },
       "nextActorValue": {
         "BUYER": "Buyer",
         "SELLER": "Seller",
-        "NONE": "—"
+        "NONE": "Not available"
       },
       "status": {
         "OPEN": "Open",
@@ -2072,6 +2074,7 @@
     "actionBody": "Complete the highlighted action to keep this transaction moving.",
     "actionRequiredTag": "Action required",
     "moreOptions": "More transaction options",
+    "moreOptionsHelp": "Use cancellation only when the buyer or seller cannot continue. The other participant will be asked to review the request.",
     "stageLockedTitle": "This stage is not ready yet",
     "stageLockedBody": "Complete the current stage with the other participant before continuing.",
     "participants": {
@@ -2224,7 +2227,7 @@
       "incomplete": "Incomplete",
       "markComplete": "Mark checklist complete",
       "summaryTitle": "Simulated transaction summary",
-      "summaryDisclosure": "Document review simulated — this is not an official Form F or legally binding agreement.",
+      "summaryDisclosure": "Document review is simulated. This is not an official Form F or legally binding agreement.",
       "reviewSummary": "Confirm I reviewed the demo summary",
       "upload": "Upload file",
       "remove": "Remove",
@@ -2241,7 +2244,7 @@
     },
     "checks": {
       "title": "Demo checks",
-      "disclosure": "Due-diligence checks simulated — these prototype checks are not legal, financial, structural, title, or regulatory advice.",
+      "disclosure": "Due-diligence checks are simulated. These prototype checks are not legal, financial, structural, title, or regulatory advice.",
       "run": "Run demo checks",
       "completedTitle": "Due diligence completed in demo",
       "completedBody": "The prototype prerequisites are complete. No legal or regulatory clearance has been performed."
@@ -2301,6 +2304,8 @@
     },
     "timeline": {
       "title": "Timeline",
+      "latestFirst": "Latest activity first",
+      "eventCount": "{count} events",
       "TRANSACTION_CREATED": "The transaction workspace was created.",
       "DETAILS_CONFIRMED": "A participant confirmed the transaction details.",
       "PURCHASE_ROUTE_SELECTED": "The buyer selected a purchase route.",
@@ -2333,7 +2338,7 @@
       "view": "View"
     },
     "realtime": {
-      "reconnecting": "Reconnecting — updates may be delayed.",
+      "reconnecting": "Reconnecting. Updates may be delayed.",
       "refresh": "Refresh"
     },
     "goToAction": "Go to your action",
@@ -2415,7 +2420,7 @@
     "bought": "Bought",
     "sold": "Sold",
     "emptyTitle": "Nothing completed yet",
-    "emptyBody": "Properties appear here once a transaction is complete — whether you bought or sold.",
+    "emptyBody": "Properties appear here once a transaction is complete, whether you bought or sold.",
     "browse": "Browse Properties"
   },
   "customerAccessDenied": {

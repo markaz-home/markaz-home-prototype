@@ -97,20 +97,20 @@ export function actorTypeTone(actorType: 'ADMIN' | 'CUSTOMER' | 'SYSTEM'): Statu
 
 /** Format a whole-AED amount for LTR display inside possibly-RTL text (spec §40.2). */
 export function formatAed(amount: number | null): string {
-  if (amount == null) return '—';
+  if (amount == null) return '-';
   return `AED ${amount.toLocaleString('en-AE')}`;
 }
 
 /** ISO → short readable timestamp; locale-agnostic, stable for tests. */
 export function formatWhen(iso: string | null): string {
-  if (!iso) return '—';
+  if (!iso) return '-';
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '—';
+  if (Number.isNaN(d.getTime())) return '-';
   return d.toISOString().slice(0, 16).replace('T', ' ');
 }
 
 export function formatBytes(bytes: number | null): string {
-  if (bytes == null) return '—';
+  if (bytes == null) return '-';
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;

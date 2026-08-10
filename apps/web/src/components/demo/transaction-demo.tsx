@@ -77,7 +77,7 @@ export function TransactionDemo() {
   return (
     <div className="container max-w-3xl py-8">
       <Alert variant="warning" className="mb-6">
-        <p className="font-medium">Week 5 preview — demo only</p>
+        <p className="font-medium">Week 5 preview. Demo only.</p>
         <p className="text-sm">
           A visual walkthrough of what happens after an offer is accepted. No real payment,
           document, or legal process occurs.
@@ -283,9 +283,9 @@ function Deposit({ locale, onNext }: { locale: string; onNext: () => void }) {
       <CardContent className="space-y-5 pt-6">
         <div className="text-success flex items-center gap-2">
           <CheckCircle2 className="h-5 w-5" aria-hidden />
-          <span className="text-sm font-medium">Deposit confirmed — Demo</span>
+          <span className="text-sm font-medium">Deposit confirmed (Demo)</span>
         </div>
-        <StepHeader title="Deposit confirmed — Demo" badge />
+        <StepHeader title="Deposit confirmed (Demo)" badge />
         <div>
           <Row label="Simulated deposit" value={formatAed(DEPOSIT_AMOUNT, locale)} strong />
           <Row label="Confirmed on" value={ACCEPTED_DATE} />
@@ -347,9 +347,9 @@ function Transfer({ onNext }: { onNext: () => void }) {
   return (
     <Card>
       <CardContent className="space-y-5 pt-6">
-        <StepHeader title="Transfer scheduled — Demo" badge />
+        <StepHeader title="Transfer scheduled (Demo)" badge />
         <div>
-          <Row label="Location" value="Dubai Land Department (Demo) — Trade Centre 1" />
+          <Row label="Location" value="Dubai Land Department (Demo), Trade Centre 1" />
           <Row label="Date and time" value="Sunday, 12 July 2026 · 11:00" />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -378,7 +378,7 @@ function Completed({ amount }: { amount: string }) {
         <div className="bg-success/15 text-success mx-auto flex h-14 w-14 items-center justify-center rounded-full">
           <CheckCircle2 className="h-8 w-8" aria-hidden />
         </div>
-        <StepHeader title="Transaction completed — Demo" />
+        <StepHeader title="Transaction completed (Demo)" />
         <div className="mx-auto max-w-sm text-start">
           <Row label="Property" value={PROPERTY.headline} />
           <Row label="Final accepted amount" value={amount} strong />

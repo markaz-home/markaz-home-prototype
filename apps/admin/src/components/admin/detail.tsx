@@ -8,7 +8,7 @@ export function Field({ label, value, ltr }: { label: string; value: ReactNode; 
     <div className="space-y-0.5">
       <dt className="text-muted-foreground text-xs uppercase tracking-wide">{label}</dt>
       <dd className={cn('text-sm font-medium', ltr && 'font-mono')} dir={ltr ? 'ltr' : undefined}>
-        {value ?? '—'}
+        {value ?? '-'}
       </dd>
     </div>
   );

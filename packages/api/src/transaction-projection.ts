@@ -16,7 +16,7 @@ import {
   type TransactionStatus,
   type TransactionTaskStatus,
 } from '@markaz/domain';
-import { publicPhotoUrl } from './public-projection';
+import { cleanListingDisplayText, publicPhotoUrl } from './public-projection';
 
 export interface TxPropertyJson {
   publicId: string | null;
@@ -35,7 +35,11 @@ export interface TxPropertyJson {
 export function mapProperty(p: TxPropertyJson | null) {
   if (!p) return null;
   const headline =
-    p.headline ?? [p.buildingOrProject, p.community].filter(Boolean).join(' · ') ?? 'Property';
+    cleanListingDisplayText(p.headline) ??
+    [cleanListingDisplayText(p.buildingOrProject), cleanListingDisplayText(p.community)]
+      .filter(Boolean)
+      .join(' · ') ??
+    'Property';
   return {
     publicId: p.publicId ?? null,
     slug: p.slug ?? null,

@@ -109,7 +109,7 @@ export default async function OverviewPage({ params }: { params: Promise<{ local
                 <Icon className="text-muted-foreground h-4 w-4" aria-hidden />
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-semibold tabular-nums">{m ? m[key] : '—'}</p>
+                <p className="text-3xl font-semibold tabular-nums">{m ? m[key] : '-'}</p>
               </CardContent>
             </Card>
           </Link>

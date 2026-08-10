@@ -47,7 +47,7 @@ export function DocumentChecklist({
   return (
     <div className="space-y-3">
       <Alert>
-        <span className="font-medium">{t('notice')}</span> — {t('noticeBody')}
+        <span className="font-medium">{t('notice')}</span>. {t('noticeBody')}
       </Alert>
       <ul className="space-y-2">
         {types.map((d) => (

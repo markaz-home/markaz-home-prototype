@@ -225,7 +225,7 @@ export function PropertyDetail({
           <p className="text-muted-foreground border-border/60 flex items-start gap-2 border-t pt-5 text-xs leading-relaxed">
             <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
             <span>
-              <span className="text-foreground font-medium">{t('directTitle')}</span> —{' '}
+              <span className="text-foreground font-medium">{t('directTitle')}</span>.{' '}
               {t('directBody')}
             </span>
           </p>
@@ -304,7 +304,7 @@ function Metric({
       ) : (
         // Keep the row's rhythm: a dash in the value slot, the reason as a title.
         <dd className="text-muted-foreground text-lg" title={unavailableLabel}>
-          —
+          -
         </dd>
       )}
     </div>

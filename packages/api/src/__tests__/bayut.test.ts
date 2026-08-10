@@ -98,6 +98,7 @@ describe('BayutAPI featured-property adapter', () => {
     expect(url.searchParams.get('page')).toBe('0');
     expect(url.searchParams.get('langs')).toBe('en');
     expect(init?.method).toBe('POST');
+    expect(init).toMatchObject({ cache: 'force-cache', next: { revalidate: 3600 } });
     expect(headers.get('X-RapidAPI-Host')).toBe(BAYUT_API_HOST);
     expect(headers.get('X-RapidAPI-Key')).toBe('test-secret');
     expect(JSON.parse(String(init?.body))).toMatchObject({

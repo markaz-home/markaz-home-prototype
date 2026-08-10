@@ -71,7 +71,7 @@ function escapeHtml(value: string): string {
 }
 
 function formatAed(value: number | null, locale: string): string {
-  if (value == null || !Number.isFinite(value)) return '—';
+  if (value == null || !Number.isFinite(value)) return '-';
   return new Intl.NumberFormat(locale === 'ar' ? 'ar-AE' : 'en-AE', {
     style: 'currency',
     currency: 'AED',

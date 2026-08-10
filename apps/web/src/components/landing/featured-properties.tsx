@@ -15,8 +15,6 @@ interface FeaturedCard {
   href: string;
   /** Direct listings use the seller's headline; external ones are composed. */
   title: string;
-  /** Category enum — groups the cards into one-type-per-row sections. */
-  category: (typeof CATEGORY_ORDER)[number];
   askingPriceAed: number | null;
   emirate: string | null;
   community: string | null;
@@ -26,32 +24,9 @@ interface FeaturedCard {
   coverUrl: string | null;
 }
 
-/** Display order of the type sections; one row of cards each. */
-const CATEGORY_ORDER = ['APARTMENT', 'VILLA', 'TOWNHOUSE', 'PENTHOUSE', 'OTHER'] as const;
-
-type FeaturedCategory = (typeof CATEGORY_ORDER)[number];
-
-/** Anything the catalogue does not name explicitly groups under "more". */
-function toCategory(value: string | null | undefined): FeaturedCategory {
-  return CATEGORY_ORDER.find((category) => category === value) ?? 'OTHER';
-}
 const CARDS_PER_ROW = 3;
-const MAX_ROWS = 2;
-const MAX_CARDS = CARDS_PER_ROW * MAX_ROWS;
 const MAX_INTERNAL_CARDS = 3;
-
-/**
- * Group the cards one property type per row so each row reads consistently,
- * keeping direct MARKAZ listings ahead of external ones inside a group.
- */
-function groupByCategory(cards: FeaturedCard[]) {
-  return CATEGORY_ORDER.map((category) => ({
-    category,
-    cards: cards.filter((card) => card.category === category).slice(0, CARDS_PER_ROW),
-  }))
-    .filter((group) => group.cards.length > 0)
-    .slice(0, MAX_ROWS);
-}
+const MAX_EXTERNAL_CARDS = CARDS_PER_ROW * 2;
 
 export function FeaturedProperties() {
   const locale = useLocale();
@@ -61,7 +36,7 @@ export function FeaturedProperties() {
   const apiLocale = locale === 'ar' ? 'ar' : 'en';
   const internal = trpc.marketplace.featured.useQuery(undefined, { staleTime: 60_000 });
   const external = trpc.externalProperties.featured.useQuery(
-    { locale: apiLocale, limit: MAX_CARDS },
+    { locale: apiLocale, limit: MAX_EXTERNAL_CARDS },
     { staleTime: 60 * 60 * 1_000 },
   );
 
@@ -75,7 +50,6 @@ export function FeaturedProperties() {
           id: card.publicId,
           href: `/properties/${card.publicId}/${card.slug ?? ''}`,
           title: card.headline,
-          category: toCategory(card.propertyType),
           askingPriceAed: card.askingPriceAed,
           emirate: card.emirate,
           community: card.community,
@@ -88,7 +62,7 @@ export function FeaturedProperties() {
     })
     .slice(0, MAX_INTERNAL_CARDS);
   const externalCards: FeaturedCard[] = (external.data?.items ?? [])
-    .slice(0, MAX_CARDS - internalCards.length)
+    .slice(0, MAX_EXTERNAL_CARDS)
     .map((card) => ({
       kind: 'external',
       source: card.source,
@@ -96,7 +70,6 @@ export function FeaturedProperties() {
       href: card.externalUrl,
       // The provider headline is agent marketing copy; compose our own instead.
       title: externalHeadline(card, filterT, propertyT),
-      category: toCategory(card.category),
       askingPriceAed: card.askingPriceAed,
       emirate: card.emirate,
       // Named in the headline above, so it is not repeated on the location line.
@@ -106,7 +79,12 @@ export function FeaturedProperties() {
       sizeSqft: card.sizeSqft,
       coverUrl: card.coverUrl,
     }));
-  const groups = groupByCategory([...internalCards, ...externalCards]);
+  // Source-based groups keep the homepage predictable: one row of first-party
+  // homes followed by at most two rows from the shared Bayut snapshot.
+  const groups = [
+    { key: 'markaz', title: t('featuredMarkazTitle'), cards: internalCards },
+    { key: 'external', title: t('featuredExternalTitle'), cards: externalCards },
+  ].filter((group) => group.cards.length > 0);
   const cardCount = groups.reduce((total, group) => total + group.cards.length, 0);
   const isInitialLoading = internal.isLoading || external.isLoading;
   const isUnavailable =
@@ -145,12 +123,12 @@ export function FeaturedProperties() {
           </p>
         </Card>
       ) : (
-        // One property type per row, so each row reads consistently.
+        // Source groups keep the number and order of rows stable for every user.
         <div className="mt-8 space-y-10">
           {groups.map((group) => (
-            <div key={group.category}>
+            <div key={group.key}>
               <h3 className="text-muted-foreground text-xs font-semibold uppercase tracking-[0.18em]">
-                {t(`featuredGroup${group.category}` as 'featuredGroupAPARTMENT')}
+                {group.title}
               </h3>
               <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {group.cards.map((card) => (

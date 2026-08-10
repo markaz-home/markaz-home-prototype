@@ -114,7 +114,7 @@ function TransactionCard({ item }: { item: Item }) {
             <Badge>{t(item.statusKey)}</Badge>
           </div>
           <p dir="auto" className="truncate font-medium">
-            {item.property?.headline ?? '—'}
+            {item.property?.headline ?? '-'}
           </p>
           <p className="text-muted-foreground text-sm">
             {[item.property?.community, item.property?.emirate].filter(Boolean).join(' · ')}

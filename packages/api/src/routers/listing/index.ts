@@ -21,7 +21,7 @@ import {
   classifyLiveEdit,
 } from '@markaz/domain';
 import { router, customerProcedure } from '../../trpc';
-import { buildHeadline } from '../../public-projection';
+import { buildHeadline, cleanListingDisplayText } from '../../public-projection';
 import { num, audit, loadOwned, buildSnapshot, invalidateDownstream } from './shared';
 import { documentRouter } from './document';
 import { verificationRouter } from './verification';
@@ -523,7 +523,9 @@ export function toPublicProjection(snap: Awaited<ReturnType<typeof buildSnapshot
   // Public-safe title derived from public fields only — never the stored owner
   // title, which may contain the PRIVATE unit identifier (§11.2 vs §21.5).
   const publicTitle =
-    [p?.buildingOrProject, p?.community].filter(Boolean).join(' · ') || 'Property listing';
+    [cleanListingDisplayText(p?.buildingOrProject), cleanListingDisplayText(p?.community)]
+      .filter(Boolean)
+      .join(' · ') || 'Property listing';
   return {
     id: snap.listing.id,
     isLive: false as const,
@@ -535,7 +537,7 @@ export function toPublicProjection(snap: Awaited<ReturnType<typeof buildSnapshot
           propertyType: p.propertyType,
           emirate: p.emirate,
           community: p.community,
-          buildingOrProject: p.buildingOrProject,
+          buildingOrProject: cleanListingDisplayText(p.buildingOrProject),
           bedrooms: p.bedrooms,
           bathrooms: p.bathrooms,
           sizeSqft: p.sizeSqft ? Number(p.sizeSqft) : null,

@@ -36,7 +36,7 @@ export function RealtimeProof() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-5xl font-semibold tabular-nums" data-testid="counter-value">
-            {value ?? '—'}
+            {value ?? '-'}
           </p>
           <Button onClick={() => increment.mutate()} loading={increment.isPending}>
             {t('increment')}

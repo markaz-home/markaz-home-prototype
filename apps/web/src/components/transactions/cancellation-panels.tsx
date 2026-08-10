@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { CircleX } from 'lucide-react';
 import {
   Button,
   Card,
@@ -144,11 +145,8 @@ export function CancellationControl({ d, refresh }: { d: Detail; refresh: () => 
   if (d.status === 'CANCELLATION_PENDING') return null;
   return (
     <>
-      <Button
-        variant="ghost"
-        className="text-muted-foreground hover:text-destructive h-auto w-auto px-0 py-1.5 text-xs hover:bg-transparent"
-        onClick={() => setOpen(true)}
-      >
+      <Button variant="destructive" size="sm" onClick={() => setOpen(true)}>
+        <CircleX className="h-4 w-4" aria-hidden />
         {t('cancellation.request')}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -177,6 +175,7 @@ export function CancellationControl({ d, refresh }: { d: Detail; refresh: () => 
               {t('cancellation.keep')}
             </Button>
             <Button
+              variant="destructive"
               loading={request.isPending}
               onClick={() =>
                 request.mutate({ transactionId: d.id, expectedVersion: d.version, reason })

@@ -288,10 +288,47 @@
   * {
     @apply border-border;
   }
+  html {
+    overflow-x: clip;
+    overscroll-behavior: none;
+  }
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+    overscroll-behavior: none;
+  }
+
+  @keyframes route-content-in {
+    from {
+      opacity: 0;
+      transform: translateY(2px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes route-loading-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .route-content {
+    animation: route-content-in 150ms ease-out both;
+  }
+
+  /* Fast navigations finish before the fallback becomes visible, preventing a
+     one-frame skeleton flash. Slow routes still get an intentional loading UI. */
+  .route-loading {
+    opacity: 0;
+    animation: route-loading-in 120ms ease-out 180ms forwards;
   }
   [dir='rtl'] body {
     font-family: var(--font-arabic);

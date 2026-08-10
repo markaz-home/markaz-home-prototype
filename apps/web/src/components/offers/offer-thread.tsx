@@ -762,7 +762,7 @@ function RejectDialog({
               onChange={setReason}
               classNames={{ button: TALL_TRIGGER }}
               options={[
-                { value: '', label: '—' },
+                { value: '', label: '-', disabled: true },
                 ...REJECT_REASON_CODES.map((c) => ({
                   value: c,
                   label: t(`reject.reason${c}` as 'reject.reasonOTHER'),

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Menu, UserCircle2, X } from 'lucide-react';
+import { Menu, Plus, UserCircle2, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
   Button,
@@ -53,7 +53,7 @@ export function MarketplaceHeader({
     item.match ? pathname === item.match || pathname.startsWith(`${item.match}/`) : false;
 
   return (
-    <header className="bg-background/85 sticky top-0 z-40 border-b backdrop-blur-xl">
+    <header className="bg-background/90 sticky top-0 z-40 border-b backdrop-blur-xl [transform:translateZ(0)]">
       <div className="container flex h-16 items-center gap-4">
         <div className="flex flex-1 items-center justify-start">
           <Link href={isAuthenticated ? '/dashboard' : '/'} aria-label={t('home')}>
@@ -84,7 +84,10 @@ export function MarketplaceHeader({
           {isAuthenticated ? (
             <>
               <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
-                <Link href="/sell">{t('listProperty')}</Link>
+                <Link href="/sell">
+                  <Plus className="h-4 w-4" aria-hidden />
+                  {t('listProperty')}
+                </Link>
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -155,6 +158,7 @@ export function MarketplaceHeader({
                   className="text-foreground rounded-md px-3 py-2 text-sm font-medium"
                   onClick={() => setOpen(false)}
                 >
+                  <Plus className="me-2 inline h-4 w-4" aria-hidden />
                   {t('listProperty')}
                 </Link>
                 <div className="px-3 py-2">

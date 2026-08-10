@@ -77,7 +77,7 @@ export function ListingOffers({ listingId }: { listingId: string }) {
                 value={
                   listing.highestProposalAed != null
                     ? formatAed(listing.highestProposalAed, locale)
-                    : '—'
+                    : '-'
                 }
               />
               <Stat label={tl('responsesNeeded')} value={String(listing.actionNeeded)} />

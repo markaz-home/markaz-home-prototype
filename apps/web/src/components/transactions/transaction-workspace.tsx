@@ -1,7 +1,16 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { ArrowLeft, ArrowRight, CheckCircle2, Clock3, LockKeyhole } from 'lucide-react';
+import {
+  Activity,
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  ChevronDown,
+  Clock3,
+  LockKeyhole,
+  TriangleAlert,
+} from 'lucide-react';
 import { Alert, Badge, Button, Skeleton } from '@markaz/ui';
 import { TRANSACTION_STAGES, isTerminal, type TransactionStage } from '@markaz/domain';
 import { useTransactionChannel } from '@markaz/realtime';
@@ -9,7 +18,13 @@ import { Link } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import type { RouterOutputs } from '@/trpc/types';
 import { formatAed } from '@/lib/format';
-import { MobileActionBar, ProgressTracker, StageRail, TaskList, Timeline } from './workspace-panels';
+import {
+  MobileActionBar,
+  ProgressTracker,
+  StageRail,
+  TaskList,
+  Timeline,
+} from './workspace-panels';
 import { NextActionPanel } from './next-action-panel';
 import { TerminalPanel, CancellationControl, CancellationPending } from './cancellation-panels';
 import { slugForStage, stageFromSlug } from '@/lib/transaction-routes';
@@ -98,7 +113,7 @@ function Loaded({ d, rt, viewedStage }: { d: Detail; rt: string; viewedStage: Tr
           <Badge>{t(d.statusKey)}</Badge>
         </div>
         <h1 dir="auto" className="text-2xl font-semibold tracking-tight">
-          {d.property?.headline ?? '—'}
+          {d.property?.headline ?? '-'}
         </h1>
         <p className="text-muted-foreground text-sm">
           {[d.property?.community, d.property?.emirate].filter(Boolean).join(' · ')} ·{' '}
@@ -112,9 +127,9 @@ function Loaded({ d, rt, viewedStage }: { d: Detail; rt: string; viewedStage: Tr
           <ProgressTracker stageIndex={d.stageIndex} />
           <section
             id="tx-actions"
-            className="platform-gold-panel border-border/70 bg-card/40 scroll-mt-20 rounded-lg border p-6 md:p-7"
+            className="platform-gold-panel border-border/70 bg-card/40 scroll-mt-20 rounded-lg border p-5 md:p-6"
           >
-            <p className="text-primary mb-6 text-[11px] font-semibold uppercase tracking-[0.18em]">
+            <p className="text-primary mb-4 text-[11px] font-semibold uppercase tracking-[0.18em]">
               {t('stageProgress', {
                 current: viewedIndex + 1,
                 total: TRANSACTION_STAGES.length,
@@ -156,22 +171,43 @@ function Loaded({ d, rt, viewedStage }: { d: Detail; rt: string; viewedStage: Tr
 
           <TaskList d={d} stage={viewedStage} />
 
-          <details className="border-border/70 group rounded-xl border px-4 py-3 sm:px-5">
-            <summary className="text-primary flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium underline-offset-4 hover:underline">
-              {t('activityToggle')}
-              <span className="text-muted-foreground text-xs">{d.timeline.length}</span>
+          <details className="border-border/70 bg-card/25 group rounded-xl border">
+            <summary className="hover:bg-foreground/[0.025] flex cursor-pointer list-none items-center gap-3 rounded-xl px-4 py-3.5 transition-colors sm:px-5">
+              <span className="border-primary/25 bg-primary/10 text-primary grid h-8 w-8 shrink-0 place-items-center rounded-full border">
+                <Activity className="h-4 w-4" aria-hidden />
+              </span>
+              <span className="min-w-0 flex-1 text-sm font-semibold">{t('activityToggle')}</span>
+              <span className="text-muted-foreground text-xs tabular-nums">
+                {d.timeline.length}
+              </span>
+              <ChevronDown
+                className="text-muted-foreground h-4 w-4 shrink-0 transition-transform group-open:rotate-180"
+                aria-hidden
+              />
             </summary>
-            <div className="mt-4">
+            <div className="border-border/70 border-t px-4 py-4 sm:px-5">
               <Timeline d={d} />
             </div>
           </details>
 
           {!done ? (
-            <details className="group border-t pt-2">
-              <summary className="text-muted-foreground hover:text-foreground cursor-pointer list-none py-2 text-xs font-medium">
-                {t('moreOptions')}
+            <details className="border-border/70 bg-card/20 group rounded-xl border">
+              <summary className="hover:bg-foreground/[0.025] flex cursor-pointer list-none items-center gap-3 rounded-xl px-4 py-3.5 transition-colors sm:px-5">
+                <span className="border-destructive/30 bg-destructive/10 text-destructive grid h-8 w-8 shrink-0 place-items-center rounded-full border">
+                  <TriangleAlert className="h-4 w-4" aria-hidden />
+                </span>
+                <span className="min-w-0 flex-1 text-sm font-semibold">{t('moreOptions')}</span>
+                <ChevronDown
+                  className="text-muted-foreground h-4 w-4 shrink-0 transition-transform group-open:rotate-180"
+                  aria-hidden
+                />
               </summary>
-              <CancellationControl d={d} refresh={refresh} />
+              <div className="border-border/70 border-t px-4 py-4 sm:px-5">
+                <p className="text-muted-foreground mb-3 max-w-2xl text-xs leading-5">
+                  {t('moreOptionsHelp')}
+                </p>
+                <CancellationControl d={d} refresh={refresh} />
+              </div>
             </details>
           ) : null}
         </div>
@@ -194,16 +230,16 @@ function WaitingPanel({ d }: { d: Detail }) {
           ? 'waiting.system'
           : 'waiting.both';
   return (
-    <div className="flex gap-4">
-      <span className="border-primary/35 bg-primary/10 text-primary grid h-11 w-11 shrink-0 place-items-center rounded-full border">
-        <Clock3 className="h-5 w-5" aria-hidden />
+    <div className="flex max-w-2xl gap-3">
+      <span className="border-primary/35 bg-primary/10 text-primary grid h-10 w-10 shrink-0 place-items-center rounded-full border">
+        <Clock3 className="h-4 w-4" aria-hidden />
       </span>
       <div>
-        <h2 className="font-display text-2xl" role="status">
+        <h2 className="font-display text-xl" role="status">
           {t(d.nextActorKey)}
         </h2>
-        <p className="text-muted-foreground mt-1 text-sm leading-6">{t(bodyKey)}</p>
-        <p className="text-primary mt-3 text-xs font-medium">
+        <p className="text-muted-foreground mt-1 text-sm leading-5">{t(bodyKey)}</p>
+        <p className="text-primary mt-2 text-xs font-medium">
           {t(reminderDue ? 'waiting.reminderDue' : 'waiting.reminder')}
         </p>
       </div>

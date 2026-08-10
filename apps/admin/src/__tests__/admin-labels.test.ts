@@ -65,19 +65,19 @@ describe('admin label maps (spec §35 — no raw enums in UI)', () => {
 
   it('formats amounts LTR with thousands separators and a dash for null', () => {
     expect(formatAed(1250000)).toBe('AED 1,250,000');
-    expect(formatAed(null)).toBe('—');
+    expect(formatAed(null)).toBe('-');
   });
 
   it('formats timestamps deterministically and guards bad input', () => {
     expect(formatWhen('2026-07-01T09:30:00.000Z')).toBe('2026-07-01 09:30');
-    expect(formatWhen(null)).toBe('—');
-    expect(formatWhen('not-a-date')).toBe('—');
+    expect(formatWhen(null)).toBe('-');
+    expect(formatWhen('not-a-date')).toBe('-');
   });
 
   it('formats byte sizes', () => {
     expect(formatBytes(512)).toBe('512 B');
     expect(formatBytes(2048)).toBe('2 KB');
     expect(formatBytes(3 * 1024 * 1024)).toBe('3.0 MB');
-    expect(formatBytes(null)).toBe('—');
+    expect(formatBytes(null)).toBe('-');
   });
 });

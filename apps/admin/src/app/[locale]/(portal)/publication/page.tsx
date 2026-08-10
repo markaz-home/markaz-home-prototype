@@ -42,7 +42,7 @@ export default async function PublicationPage({
       id: 'title',
       header: t('publication.col.title'),
       priority: 'primary',
-      cell: (r) => r.title ?? '—',
+      cell: (r) => r.title ?? '-',
     },
     {
       id: 'reference',
@@ -50,7 +50,7 @@ export default async function PublicationPage({
       priority: 'secondary',
       cell: (r) => (
         <span dir="ltr" className="font-mono text-xs">
-          {r.publicId ?? '—'}
+          {r.publicId ?? '-'}
         </span>
       ),
     },

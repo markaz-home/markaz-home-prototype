@@ -60,7 +60,7 @@ export default async function OfferDetailPage({
                 value={
                   o.nextActor && t.has(`adminOffers.side.${o.nextActor}`)
                     ? t(`adminOffers.side.${o.nextActor}`)
-                    : '—'
+                    : '-'
                 }
               />
               {o.closedReason ? (

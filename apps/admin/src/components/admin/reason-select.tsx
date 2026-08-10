@@ -32,7 +32,7 @@ export function ReasonSelect({
         onChange={(e) => onChange(e.target.value)}
         className="border-input bg-background focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm focus-visible:outline-none focus-visible:ring-2"
       >
-        <option value="">{`— ${t('reasonLabel')} —`}</option>
+        <option value="">{t('reasonLabel')}</option>
         {values.map((v) => (
           <option key={v} value={v}>
             {t(`${basePath}.${v}`)}

@@ -82,7 +82,7 @@ export default async function CustomerDetailPage({
                 <Field
                   label={t('customers.restrictionReason')}
                   value={
-                    c.restrictionReason ? t(`customer.restrict.reason.${c.restrictionReason}`) : '—'
+                    c.restrictionReason ? t(`customer.restrict.reason.${c.restrictionReason}`) : '-'
                   }
                 />
                 <Field label={t('customers.restrictedSince')} value={formatWhen(c.restrictedAt)} />

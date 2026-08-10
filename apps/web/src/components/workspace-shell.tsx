@@ -32,6 +32,7 @@ import { LanguageSwitcher } from './language-switcher';
 import { SignOutButton } from './sign-out-button';
 import { NotificationBell, OffersNavBadge } from './offers/notification-bell';
 import { TransactionsNavBadge } from './transactions/shared';
+import { RouteTransition } from './route-transition';
 
 const NAV_ITEMS = [
   { href: '/dashboard', key: 'dashboard', icon: LayoutDashboard },
@@ -161,8 +162,8 @@ export function WorkspaceShell({
   };
 
   return (
-    <div className="flex min-h-dvh">
-      <aside className="border-border/70 bg-card/40 hidden w-[15rem] shrink-0 flex-col border-e pb-4 md:flex">
+    <div className="flex min-h-dvh min-w-0">
+      <aside className="border-border/70 bg-card/40 sticky top-0 hidden h-dvh w-[15rem] shrink-0 flex-col overflow-y-auto border-e pb-4 md:flex">
         <Link href="/dashboard" className="px-5 pt-6">
           <BrandLogo className="h-11 w-auto md:h-11" />
         </Link>
@@ -174,7 +175,7 @@ export function WorkspaceShell({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="border-border/65 bg-background/85 sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b px-4 backdrop-blur-xl md:px-8">
+        <header className="border-border/65 bg-background/90 sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b px-4 backdrop-blur-xl [transform:translateZ(0)] md:px-8">
           <div className="flex items-center gap-2 md:hidden">
             <Button
               variant="ghost"
@@ -215,8 +216,8 @@ export function WorkspaceShell({
           </div>
         ) : null}
 
-        <main id="main" className={cn('flex-1', padded && 'px-4 py-6 md:px-8 md:py-8')}>
-          {children}
+        <main id="main" className={cn('min-w-0 flex-1', padded && 'px-4 py-6 md:px-8 md:py-8')}>
+          <RouteTransition>{children}</RouteTransition>
         </main>
       </div>
     </div>

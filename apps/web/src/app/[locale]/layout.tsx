@@ -30,7 +30,7 @@ const notoSansArabic = Noto_Sans_Arabic({
 
 export const metadata: Metadata = {
   title: 'Markaz Home',
-  description: 'Buy and sell property in the UAE — one account does both.',
+  description: 'Buy, sell and manage property across the UAE.',
 };
 
 export function generateStaticParams() {
@@ -56,7 +56,7 @@ export default async function LocaleLayout({
       className={`${manrope.variable} ${sourceSerif.variable} ${notoSansArabic.variable}`}
       suppressHydrationWarning
     >
-      <body className="theme-platform-gold bg-background text-foreground min-h-dvh antialiased">
+      <body className="theme-platform-gold bg-background text-foreground min-h-dvh overflow-x-clip overscroll-none antialiased">
         <NextIntlClientProvider messages={messages}>
           <SessionInactivityGuard redirectTo={`/${locale}/sign-in?notice=session-expired`} />
           <TRPCProvider>{children}</TRPCProvider>

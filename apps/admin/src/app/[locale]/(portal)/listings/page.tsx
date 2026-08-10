@@ -45,7 +45,7 @@ export default async function ListingsPage({
       priority: 'secondary',
       cell: (r) => (
         <span dir="ltr" className="font-mono text-xs">
-          {r.publicId ?? '—'}
+          {r.publicId ?? '-'}
         </span>
       ),
     },
@@ -62,7 +62,7 @@ export default async function ListingsPage({
       id: 'location',
       header: t('listings.col.location'),
       priority: 'low',
-      cell: (r) => [r.community, r.emirate].filter(Boolean).join(', ') || '—',
+      cell: (r) => [r.community, r.emirate].filter(Boolean).join(', ') || '-',
     },
     {
       id: 'activity',

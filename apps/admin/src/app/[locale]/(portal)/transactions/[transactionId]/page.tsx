@@ -82,13 +82,13 @@ export default async function TransactionDetailPage({
                 value={
                   x.nextActor && t.has(`adminOffers.side.${x.nextActor}`)
                     ? t(`adminOffers.side.${x.nextActor}`)
-                    : '—'
+                    : '-'
                 }
               />
-              <Field label={t('adminTransactions.route')} value={x.purchaseRoute ?? '—'} />
+              <Field label={t('adminTransactions.route')} value={x.purchaseRoute ?? '-'} />
               <Field label={t('adminTransactions.version')} value={x.version} />
               {x.paused ? (
-                <Field label={t('adminTransactions.pauseReason')} value={x.pauseReason ?? '—'} />
+                <Field label={t('adminTransactions.pauseReason')} value={x.pauseReason ?? '-'} />
               ) : null}
               {x.failureCategory ? (
                 <Field label={t('adminTransactions.failureCategory')} value={x.failureCategory} />

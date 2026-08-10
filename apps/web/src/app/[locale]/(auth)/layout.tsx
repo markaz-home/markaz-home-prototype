@@ -4,6 +4,7 @@ import { House } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { BrandLogo } from '@/components/brand-logo';
+import { RouteTransition } from '@/components/route-transition';
 
 const LEGAL = { terms: '#terms', privacy: '#privacy' };
 
@@ -44,7 +45,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </header>
 
       <main id="main" className="flex flex-1 flex-col">
-        {children}
+        <RouteTransition className="flex flex-1 flex-col">{children}</RouteTransition>
       </main>
 
       <footer className="bg-card/30 border-t">

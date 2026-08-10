@@ -59,7 +59,7 @@ export function PropertyGallery({ photos, headline }: { photos: string[]; headli
         >
           <PhotoImg
             src={photos[0]!}
-            alt={`${headline} — 1`}
+            alt={`${headline}, 1`}
             failed={failed.has(0)}
             onError={() => markFailed(0)}
           />
@@ -76,7 +76,7 @@ export function PropertyGallery({ photos, headline }: { photos: string[]; headli
             >
               <PhotoImg
                 src={src}
-                alt={`${headline} — ${realIndex + 1}`}
+                alt={`${headline}, ${realIndex + 1}`}
                 failed={failed.has(realIndex)}
                 onError={() => markFailed(realIndex)}
               />
@@ -105,7 +105,7 @@ export function PropertyGallery({ photos, headline }: { photos: string[]; headli
           <div className="relative flex aspect-[3/2] items-center justify-center">
             <PhotoImg
               src={photos[index]!}
-              alt={`${headline} — ${index + 1}`}
+              alt={`${headline}, ${index + 1}`}
               failed={failed.has(index)}
               onError={() => markFailed(index)}
               contain

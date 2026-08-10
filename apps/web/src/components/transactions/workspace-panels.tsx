@@ -1,8 +1,19 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { Check, ChevronDown, Circle, Lock } from 'lucide-react';
-import { Badge, Card, CardContent, cn } from '@markaz/ui';
+import {
+  CalendarClock,
+  Check,
+  CheckCircle2,
+  ChevronDown,
+  Circle,
+  CircleX,
+  FileText,
+  Lock,
+  Sparkles,
+  WalletCards,
+} from 'lucide-react';
+import { Badge, cn } from '@markaz/ui';
 import { TRANSACTION_STAGES, type TransactionStage } from '@markaz/domain';
 import { formatDateTime } from '@/lib/format';
 import type { RouterOutputs } from '@/trpc/types';
@@ -40,11 +51,7 @@ export function MobileActionBar({ d }: { d: Detail }) {
   );
 }
 
-export function ProgressTracker({
-  stageIndex,
-}: {
-  stageIndex: number;
-}) {
+export function ProgressTracker({ stageIndex }: { stageIndex: number }) {
   return (
     <div className="flex items-center gap-1.5" aria-hidden>
       {TRANSACTION_STAGES.map((stage, index) => (
@@ -239,33 +246,80 @@ export function Timeline({ d }: { d: Detail }) {
   const t = useTranslations('transactions');
   const locale = useLocale();
   if (d.timeline.length === 0) return null;
+  const events = groupTimelineEvents(d.timeline).reverse();
   return (
-    <Card>
-      <CardContent className="space-y-3 pt-6">
-        <h2 className="font-semibold">{t('timeline.title')}</h2>
-        <ol>
-          {d.timeline.map((e, i) => (
-            <li key={i} className="relative grid grid-cols-[1rem_1fr] gap-3 pb-5 text-sm last:pb-0">
-              {i < d.timeline.length - 1 ? (
+    <div>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="text-sm font-semibold">{t('timeline.title')}</h2>
+        <p className="text-muted-foreground text-xs">{t('timeline.latestFirst')}</p>
+      </div>
+      <ol className="max-h-[30rem] overflow-y-auto pe-2">
+        {events.map((event, index) => {
+          const Icon = timelineIcon(event.type);
+          return (
+            <li
+              key={`${event.type}-${event.createdAt}-${index}`}
+              className="relative grid grid-cols-[2rem_1fr] gap-3 pb-4 text-sm last:pb-0"
+            >
+              {index < events.length - 1 ? (
                 <span
                   aria-hidden
-                  className="bg-border absolute start-[0.4375rem] top-3 h-[calc(100%-0.25rem)] w-px"
+                  className="bg-border absolute start-[0.9375rem] top-8 h-[calc(100%-1rem)] w-px"
                 />
               ) : null}
               <span
-                className="border-primary bg-background relative z-10 mt-1 h-3 w-3 rounded-full border-2"
+                className="border-primary/35 bg-primary/10 text-primary relative z-10 grid h-8 w-8 place-items-center rounded-full border"
                 aria-hidden
-              />
-              <span>
-                <p dir="auto">{t(`timeline.${e.type}` as 'timeline.TRANSACTION_CREATED')}</p>
-                <time dateTime={e.createdAt} dir="ltr" className="text-muted-foreground text-xs">
-                  {formatDateTime(e.createdAt, locale)}
+              >
+                <Icon className="h-3.5 w-3.5" />
+              </span>
+              <span className="min-w-0 pt-0.5">
+                <span className="flex flex-wrap items-center gap-2">
+                  <p dir="auto">{t(`timeline.${event.type}` as 'timeline.TRANSACTION_CREATED')}</p>
+                  {event.count > 1 ? (
+                    <Badge variant="outline" className="text-muted-foreground text-[10px]">
+                      {t('timeline.eventCount', { count: event.count })}
+                    </Badge>
+                  ) : null}
+                </span>
+                <time
+                  dateTime={event.createdAt}
+                  dir="ltr"
+                  className="text-muted-foreground mt-0.5 block text-xs"
+                >
+                  {formatDateTime(event.createdAt, locale)}
                 </time>
               </span>
             </li>
-          ))}
-        </ol>
-      </CardContent>
-    </Card>
+          );
+        })}
+      </ol>
+    </div>
   );
+}
+
+function groupTimelineEvents(events: Detail['timeline']) {
+  return events.reduce<Array<Detail['timeline'][number] & { count: number }>>((groups, event) => {
+    const previous = groups.at(-1);
+    if (previous?.type === event.type) {
+      previous.count += 1;
+      previous.createdAt = event.createdAt;
+      return groups;
+    }
+    groups.push({ ...event, count: 1 });
+    return groups;
+  }, []);
+}
+
+function timelineIcon(type: string) {
+  if (type.includes('DOCUMENT')) return FileText;
+  if (type.includes('CANCEL') || type === 'FAILED') return CircleX;
+  if (type.includes('TRANSFER') || type.includes('APPOINTMENT')) return CalendarClock;
+  if (type.includes('DEPOSIT') || type.includes('FINANCING') || type.includes('PURCHASE_ROUTE')) {
+    return WalletCards;
+  }
+  if (type.includes('CONFIRMED') || type.includes('COMPLETED') || type.includes('REVIEWED')) {
+    return CheckCircle2;
+  }
+  return Sparkles;
 }

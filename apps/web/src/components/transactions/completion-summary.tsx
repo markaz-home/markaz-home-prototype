@@ -32,7 +32,7 @@ export function CompletionSummary({ d }: { d: Detail }) {
   const rows: Array<{ label: string; value: string }> = [
     // The headline already carries the community, and the page header repeats
     // the location — so this row is the headline alone.
-    { label: ts('property'), value: d.property?.headline ?? '—' },
+    { label: ts('property'), value: d.property?.headline ?? '-' },
     { label: ts('side'), value: d.perspective === 'BUYER' ? t('buying') : t('selling') },
     { label: ts('amount'), value: formatAed(d.acceptedAmountAed, locale) },
   ];

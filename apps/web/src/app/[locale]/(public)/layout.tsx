@@ -2,6 +2,7 @@ import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { MarketplaceHeader } from '@/components/marketplace/marketplace-header';
 import { PublicFooter } from '@/components/marketplace/public-footer';
 import { getSession } from '@/server/session';
+import { RouteTransition } from '@/components/route-transition';
 
 /**
  * Public marketplace chrome (design spec §11). No auth guard — anonymous
@@ -34,7 +35,7 @@ export default async function PublicLayout({
         displayName={session?.profile?.fullName ?? null}
       />
       <main id="main" className="flex-1">
-        {children}
+        <RouteTransition>{children}</RouteTransition>
       </main>
       <PublicFooter isAuthenticated={!!session && session.profile?.accountType !== 'ADMIN'} />
     </div>

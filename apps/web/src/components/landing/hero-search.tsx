@@ -282,7 +282,7 @@ function HeroPlaceField({
         classNames={{
           panel: cn(
             panelCls,
-            'inset-e-auto w-[min(20rem,calc(100vw-3rem))] text-[hsl(var(--hero-search-foreground))]',
+            'inset-e-auto -start-6 w-[min(20rem,calc(100vw-1.5rem))] text-[hsl(var(--hero-search-foreground))]',
           ),
           option: 'px-3 py-2 text-start text-sm',
           optionActive: 'bg-[hsl(var(--hero-search-foreground)/0.06)]',

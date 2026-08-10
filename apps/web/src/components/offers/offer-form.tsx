@@ -124,7 +124,7 @@ export function OfferForm({ publicId, slug }: { publicId: string; slug: string }
           className="hover:text-foreground inline-flex items-center gap-1.5"
         >
           <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden />
-          {property?.headline ?? '—'}
+          {property?.headline ?? '-'}
         </Link>
         <span>· {step === 'review' ? t('review.title') : t('form.title')}</span>
       </nav>

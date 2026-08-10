@@ -304,6 +304,6 @@ export function ListingUnavailable() {
 
 /** AED formatting helper (whole dirhams, grouped, value bidi-isolated in RTL). */
 export function formatAed(value: number | null | undefined): string {
-  if (value === null || value === undefined) return '—';
+  if (value === null || value === undefined) return '-';
   return `AED ${new Intl.NumberFormat('en-US').format(value)}`;
 }

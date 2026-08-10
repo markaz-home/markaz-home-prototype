@@ -3,6 +3,11 @@ import { MarketplaceHeader } from '@/components/marketplace/marketplace-header';
 import { PublicFooter } from '@/components/marketplace/public-footer';
 import { WorkspaceShell } from '@/components/workspace-shell';
 import { getSession } from '@/server/session';
+import { RouteTransition } from '@/components/route-transition';
+
+// The chrome depends on the current Supabase cookie. Never reuse an anonymous
+// marketplace layout for a customer who has since signed in.
+export const dynamic = 'force-dynamic';
 
 /**
  * Marketplace chrome. The pages are public (anonymous visitors may browse), but a
@@ -50,7 +55,7 @@ export default async function MarketplaceLayout({
       {skipLink}
       <MarketplaceHeader isAuthenticated={false} displayName={null} />
       <main id="main" className="flex-1">
-        {children}
+        <RouteTransition>{children}</RouteTransition>
       </main>
       <PublicFooter isAuthenticated={false} />
     </div>

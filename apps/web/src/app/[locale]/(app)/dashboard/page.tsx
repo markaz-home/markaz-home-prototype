@@ -7,6 +7,7 @@ import {
   Heart,
   Receipt,
   ArrowLeftRight,
+  Plus,
 } from 'lucide-react';
 import { Alert, Badge, Button, Card, CardContent, cn } from '@markaz/ui';
 import { isThreadActionable, isTerminal } from '@markaz/domain';
@@ -137,7 +138,10 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
             <Link href="/properties">{t('browseCta')}</Link>
           </Button>
           <Button asChild variant="outline" className="rounded-full">
-            <Link href="/sell">{t('listCta')}</Link>
+            <Link href="/sell">
+              <Plus className="h-4 w-4" aria-hidden />
+              {t('listCta')}
+            </Link>
           </Button>
         </div>
       </div>
@@ -179,7 +183,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
                 )}
               </h2>
               <p dir="auto" className="mt-2 truncate text-sm font-medium">
-                {activeTx.property?.headline ?? '—'} ·{' '}
+                {activeTx.property?.headline ?? '-'} ·{' '}
                 <span dir="ltr">{formatAed(activeTx.acceptedAmountAed, locale)}</span>
               </p>
               <p className="text-muted-foreground mt-1 text-xs">{t('transactionBannerBody')}</p>

@@ -134,7 +134,7 @@ function InvestmentInner({ listingId, data }: { listingId: string; data: GetData
                   <dt className="text-muted-foreground">{t('estimatedGain')}</dt>
                   <dd>{formatAed(ic.estimatedGainAed)}</dd>
                   <dt className="text-muted-foreground">{t('estimatedRoi')}</dt>
-                  <dd>{ic.estimatedRoiPct != null ? `${ic.estimatedRoiPct}%` : '—'}</dd>
+                  <dd>{ic.estimatedRoiPct != null ? `${ic.estimatedRoiPct}%` : '-'}</dd>
                   <dt className="text-muted-foreground">{t('annualised')}</dt>
                   <dd>
                     {ic.estimatedAnnualisedReturnPct != null

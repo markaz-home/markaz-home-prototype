@@ -136,7 +136,7 @@ describe('ActionDialog (spec §37 — confirmation shell)', () => {
 describe('Field (detail primitive)', () => {
   it('renders a dash for a null value and sets LTR dir for references', () => {
     const { container } = renderWithIntl(<Field label="Reference" value={null} ltr />);
-    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.getByText('-')).toBeInTheDocument();
     expect(container.querySelector('[dir="ltr"]')).toBeTruthy();
   });
 });

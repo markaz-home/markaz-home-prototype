@@ -109,7 +109,7 @@ export function PreviewScreen({ listingId }: { listingId: string }) {
                   value={
                     d.investmentCase.estimatedRoiPct != null
                       ? `${d.investmentCase.estimatedRoiPct}%`
-                      : '—'
+                      : '-'
                   }
                 />
                 <Stat
@@ -117,7 +117,7 @@ export function PreviewScreen({ listingId }: { listingId: string }) {
                   value={
                     d.investmentCase.estimatedAnnualisedReturnPct != null
                       ? `${d.investmentCase.estimatedAnnualisedReturnPct}%`
-                      : '—'
+                      : '-'
                   }
                 />
               </dl>
