@@ -9,7 +9,6 @@ import { Link } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import type { RouterOutputs } from '@/trpc/types';
 import { formatAed } from '@/lib/format';
-import { SimulationDisclosure } from './shared';
 import { transactionStageHref } from '@/lib/transaction-routes';
 
 type Filter = 'all' | 'action' | 'waiting' | 'completed' | 'closed';
@@ -27,8 +26,6 @@ export function TransactionsHub() {
         <h1 className="text-2xl font-semibold tracking-tight">{t('title')}</h1>
         <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
       </div>
-      <SimulationDisclosure />
-
       {list.isLoading ? (
         <div className="space-y-3">
           {[0, 1, 2].map((i) => (

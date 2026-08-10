@@ -1,7 +1,5 @@
 'use client';
 
-import { Info } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import { trpc } from '@/trpc/react';
 
 /** Nav action-needed badge — derives from authoritative task state (spec §34.4). */
@@ -16,20 +14,5 @@ export function TransactionsNavBadge() {
     >
       {n > 99 ? '99+' : n}
     </span>
-  );
-}
-
-/** Persistent simulation disclosure — information treatment, not a warning (spec §4). */
-export function SimulationDisclosure() {
-  const t = useTranslations('transactions.disclosure');
-  return (
-    <div className="border-primary/20 bg-primary/5 flex items-start gap-3 rounded-lg border p-4 text-sm">
-      <Info className="text-primary mt-0.5 h-5 w-5 shrink-0" aria-hidden />
-      <p>
-        <span className="font-medium">{t('title')}</span>
-        {' — '}
-        <span className="text-muted-foreground">{t('body')}</span>
-      </p>
-    </div>
   );
 }

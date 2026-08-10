@@ -141,7 +141,7 @@ describe('TransactionsHub', () => {
     h.Q.listMine = { isLoading: false, isError: false, data: [] };
     r(<TransactionsHub />);
     expect(screen.getByText('No transactions yet')).toBeInTheDocument();
-    expect(screen.getByText(/Transaction process simulated/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Transaction process simulated/i)).not.toBeInTheDocument();
   });
 
   it('renders a transaction card with perspective and CTA', () => {
@@ -189,10 +189,10 @@ describe('TransactionWorkspace', () => {
     expect(screen.getByText('This transaction is not available')).toBeInTheDocument();
   });
 
-  it('renders the disclosure, progress tracker and the buyer confirm-details action', async () => {
+  it('renders the progress tracker and the buyer confirm-details action without the old disclosure', async () => {
     h.Q.get = detail();
     r(<TransactionWorkspace transactionId="tx1" />);
-    expect(screen.getByText(/Transaction process simulated/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Transaction process simulated/i)).not.toBeInTheDocument();
     expect(screen.getByText('Stage 1 of 6')).toBeInTheDocument();
     expect(screen.getByRole('list', { name: 'Transactions' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Your next steps' })).toBeInTheDocument();

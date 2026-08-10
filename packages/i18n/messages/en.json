@@ -2098,10 +2098,6 @@
       "reminderDue": "This step has been waiting for more than 24 hours. A reminder is being sent."
     },
     "backToList": "Back to My Transactions",
-    "disclosure": {
-      "title": "Transaction process simulated",
-      "body": "This prototype does not process real payments, create legally binding documents, or perform an official property transfer."
-    },
     "empty": {
       "title": "No transactions yet",
       "body": "Transactions appear here after an offer is accepted.",

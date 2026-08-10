@@ -9,7 +9,6 @@ import { Link } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import type { RouterOutputs } from '@/trpc/types';
 import { formatAed } from '@/lib/format';
-import { SimulationDisclosure } from './shared';
 import {
   MobileActionBar,
   ParticipantProgress,
@@ -113,7 +112,6 @@ function Loaded({ d, rt, viewedStage }: { d: Detail; rt: string; viewedStage: Tr
         </p>
       </header>
 
-      <SimulationDisclosure />
       <ProgressTracker stageIndex={d.stageIndex} transactionId={d.id} viewedStage={viewedStage} />
 
       <div className="mx-auto max-w-5xl space-y-5">
