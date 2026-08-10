@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { Check, ChevronDown, Circle, UserRound } from 'lucide-react';
+import { Check, ChevronDown, Circle } from 'lucide-react';
 import { Badge, Card, CardContent, cn } from '@markaz/ui';
 import { TRANSACTION_STAGES, type TransactionStage } from '@markaz/domain';
 import { formatDateTime } from '@/lib/format';
@@ -230,90 +230,6 @@ export function TaskList({ d, stage }: { d: Detail; stage?: TransactionStage }) 
         })}
       </ul>
     </details>
-  );
-}
-
-/** A participant-first view of the current stage. It makes the shared nature of
- * the transaction obvious: each side has one column, with completed/waiting/action
- * states derived from the authoritative task rows. */
-export function ParticipantProgress({ d, stage }: { d: Detail; stage: TransactionStage }) {
-  const t = useTranslations('transactions');
-  const stageTasks = d.tasks.filter((task) => task.stage === stage);
-
-  const side = (actor: 'BUYER' | 'SELLER') => {
-    const tasks = stageTasks.filter((task) => task.actor === actor);
-    const completed = tasks.filter((task) => task.status === 'COMPLETED_DEMO').length;
-    const actionable = tasks.some((task) => task.status === 'ACTION_REQUIRED');
-    const complete = tasks.length > 0 && completed === tasks.length;
-    const isYou = d.perspective === actor;
-    return { actor, tasks, completed, actionable, complete, isYou };
-  };
-
-  return (
-    <section
-      aria-labelledby="participant-progress-title"
-      className="border-border/70 bg-card/25 space-y-3 rounded-xl border p-4 sm:p-5"
-    >
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="participant-progress-title" className="font-semibold">
-          {t('participants.title')}
-        </h2>
-        <p className="text-muted-foreground text-xs">{t('participants.body')}</p>
-      </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        {(['BUYER', 'SELLER'] as const).map((actor) => {
-          const s = side(actor);
-          const status =
-            s.tasks.length === 0
-              ? t('participants.noAction')
-              : s.complete
-                ? t('participants.complete')
-                : s.actionable
-                  ? s.isYou
-                    ? t('participants.yourAction')
-                    : t('participants.theirAction')
-                  : t('participants.waiting');
-          return (
-            <Card
-              key={actor}
-              className={cn(
-                'bg-card/50',
-                s.actionable && 'border-primary/45',
-                s.complete && 'border-success/40',
-              )}
-            >
-              <CardContent className="flex items-center justify-between gap-3 p-3.5 sm:p-4">
-                <span className="flex min-w-0 items-center gap-3">
-                  <span className="border-primary/30 bg-primary/10 text-primary grid h-9 w-9 shrink-0 place-items-center rounded-full border">
-                    <UserRound className="h-4 w-4" aria-hidden />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="flex items-center gap-2 text-sm font-semibold">
-                      {actor === 'BUYER' ? t('participants.buyer') : t('participants.seller')}
-                      {s.isYou ? (
-                        <Badge variant="outline" className="border-primary/40 text-primary">
-                          {t('participants.you')}
-                        </Badge>
-                      ) : null}
-                    </span>
-                  </span>
-                </span>
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    'shrink-0',
-                    s.complete && 'border-success/35 bg-success/10 text-success',
-                    s.actionable && !s.complete && 'border-primary/40 bg-primary/10 text-primary',
-                  )}
-                >
-                  {status}
-                </Badge>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-    </section>
   );
 }
 

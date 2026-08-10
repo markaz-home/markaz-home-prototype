@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Badge, Button, Card, CardContent } from '@markaz/ui';
+import { Badge, Button } from '@markaz/ui';
 import { PURCHASE_ROUTES, type TransactionStage } from '@markaz/domain';
 import { trpc } from '@/trpc/react';
 import type { RouterOutputs } from '@/trpc/types';
@@ -255,11 +255,9 @@ export function NextActionPanel({
 
   if (controls.length === 0) {
     return (
-      <Card>
-        <CardContent className="text-muted-foreground pt-6 text-sm" role="status">
-          {t(d.nextActorKey)}
-        </CardContent>
-      </Card>
+      <p className="text-muted-foreground text-sm" role="status">
+        {t(d.nextActorKey)}
+      </p>
     );
   }
   return (
@@ -282,12 +280,10 @@ export function NextActionPanel({
 
 function ActionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <Card className="border-primary/45 from-primary/10 via-card/70 to-card/40 bg-gradient-to-br">
-      <CardContent className="space-y-4 pt-6 [&_button]:min-h-11">
-        <h3 className="text-lg font-semibold">{title}</h3>
-        {children}
-      </CardContent>
-    </Card>
+    <div className="border-border/70 bg-background/35 space-y-4 rounded-lg border p-5 [&_button]:min-h-11">
+      <h3 className="text-lg font-semibold">{title}</h3>
+      {children}
+    </div>
   );
 }
 

@@ -2075,18 +2075,10 @@
     "stageLockedTitle": "This stage is not ready yet",
     "stageLockedBody": "Complete the current stage with the other participant before continuing.",
     "participants": {
-      "title": "People in this stage",
-      "body": "Live buyer and seller status",
       "buyer": "Buyer",
       "seller": "Seller",
-      "you": "You",
       "otherParticipant": "The other participant",
-      "complete": "Completed this stage",
-      "yourAction": "Your action is required",
-      "theirAction": "Action required",
-      "waiting": "Waiting for this stage",
-      "pending": "Pending",
-      "noAction": "No action this stage"
+      "pending": "Pending"
     },
     "waiting": {
       "title": "Waiting for the other participant",

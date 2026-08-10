@@ -2,20 +2,14 @@
 
 import { useTranslations } from 'next-intl';
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock3, LockKeyhole } from 'lucide-react';
-import { Alert, Badge, Button, Card, CardContent, Skeleton } from '@markaz/ui';
+import { Alert, Badge, Button, Skeleton } from '@markaz/ui';
 import { TRANSACTION_STAGES, isTerminal, type TransactionStage } from '@markaz/domain';
 import { useTransactionChannel } from '@markaz/realtime';
 import { Link } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import type { RouterOutputs } from '@/trpc/types';
 import { formatAed } from '@/lib/format';
-import {
-  MobileActionBar,
-  ParticipantProgress,
-  ProgressTracker,
-  TaskList,
-  Timeline,
-} from './workspace-panels';
+import { MobileActionBar, ProgressTracker, TaskList, Timeline } from './workspace-panels';
 import { NextActionPanel } from './next-action-panel';
 import { TerminalPanel, CancellationControl, CancellationPending } from './cancellation-panels';
 import { slugForStage, stageFromSlug } from '@/lib/transaction-routes';
@@ -75,7 +69,7 @@ function Loaded({ d, rt, viewedStage }: { d: Detail; rt: string; viewedStage: Tr
   );
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-6 pb-24 lg:pb-0">
+    <div className="mx-auto w-full max-w-5xl space-y-5 pb-24 lg:pb-0">
       <nav
         aria-label={t('title')}
         className="text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm"
@@ -114,8 +108,11 @@ function Loaded({ d, rt, viewedStage }: { d: Detail; rt: string; viewedStage: Tr
 
       <ProgressTracker stageIndex={d.stageIndex} transactionId={d.id} viewedStage={viewedStage} />
 
-      <div className="mx-auto max-w-5xl space-y-5">
-        <div id="tx-actions" className="scroll-mt-20 space-y-5">
+      <div className="space-y-4">
+        <section
+          id="tx-actions"
+          className="platform-gold-panel border-border/70 bg-card/40 scroll-mt-20 rounded-lg border p-6 md:p-7"
+        >
           {done ? (
             <TerminalPanel d={d} />
           ) : d.status === 'CANCELLATION_PENDING' ? (
@@ -147,9 +144,8 @@ function Loaded({ d, rt, viewedStage }: { d: Detail; rt: string; viewedStage: Tr
           ) : (
             <NextActionPanel d={d} stage={viewedStage} refresh={refresh} />
           )}
-        </div>
+        </section>
 
-        <ParticipantProgress d={d} stage={viewedStage} />
         <TaskList d={d} stage={viewedStage} />
 
         <details className="border-border/70 group rounded-xl border px-4 py-3 sm:px-5">
@@ -189,22 +185,20 @@ function WaitingPanel({ d }: { d: Detail }) {
           ? 'waiting.system'
           : 'waiting.both';
   return (
-    <Card className="border-primary/35 from-primary/10 via-card/70 to-card/40 bg-gradient-to-br">
-      <CardContent className="flex gap-4 pt-6">
-        <span className="border-primary/35 bg-primary/10 text-primary grid h-11 w-11 shrink-0 place-items-center rounded-full border">
-          <Clock3 className="h-5 w-5" aria-hidden />
-        </span>
-        <div>
-          <h2 className="font-display text-xl" role="status">
-            {t(d.nextActorKey)}
-          </h2>
-          <p className="text-muted-foreground mt-1 text-sm leading-6">{t(bodyKey)}</p>
-          <p className="text-primary mt-3 text-xs font-medium">
-            {t(reminderDue ? 'waiting.reminderDue' : 'waiting.reminder')}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="flex gap-4">
+      <span className="border-primary/35 bg-primary/10 text-primary grid h-11 w-11 shrink-0 place-items-center rounded-full border">
+        <Clock3 className="h-5 w-5" aria-hidden />
+      </span>
+      <div>
+        <h2 className="font-display text-2xl" role="status">
+          {t(d.nextActorKey)}
+        </h2>
+        <p className="text-muted-foreground mt-1 text-sm leading-6">{t(bodyKey)}</p>
+        <p className="text-primary mt-3 text-xs font-medium">
+          {t(reminderDue ? 'waiting.reminderDue' : 'waiting.reminder')}
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -220,20 +214,18 @@ function StageStateCard({
   action?: React.ReactNode;
 }) {
   return (
-    <Card>
-      <CardContent className="flex items-start gap-4 pt-6">
-        <span className="border-primary/30 bg-primary/10 text-primary grid h-10 w-10 shrink-0 place-items-center rounded-full border">
-          {icon}
-        </span>
-        <div className="space-y-3">
-          <div>
-            <h2 className="font-semibold">{title}</h2>
-            <p className="text-muted-foreground mt-1 text-sm">{body}</p>
-          </div>
-          {action}
+    <div className="flex items-start gap-4">
+      <span className="border-primary/30 bg-primary/10 text-primary grid h-10 w-10 shrink-0 place-items-center rounded-full border">
+        {icon}
+      </span>
+      <div className="space-y-3">
+        <div>
+          <h2 className="font-semibold">{title}</h2>
+          <p className="text-muted-foreground mt-1 text-sm">{body}</p>
         </div>
-      </CardContent>
-    </Card>
+        {action}
+      </div>
+    </div>
   );
 }
 

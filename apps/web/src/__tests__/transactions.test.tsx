@@ -195,7 +195,10 @@ describe('TransactionWorkspace', () => {
     expect(screen.queryByText(/Transaction process simulated/i)).not.toBeInTheDocument();
     expect(screen.getByText('Stage 1 of 6')).toBeInTheDocument();
     expect(screen.getByRole('list', { name: 'Transactions' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Your next steps' })).toBeInTheDocument();
+    const actionHeading = screen.getByRole('heading', { name: 'Your next steps' });
+    expect(actionHeading).toBeInTheDocument();
+    expect(actionHeading.closest('#tx-actions')).toHaveClass('platform-gold-panel');
+    expect(screen.queryByText('People in this stage')).not.toBeInTheDocument();
     const stageDetails = screen.getByText('Stage details').closest('details');
     expect(stageDetails).not.toHaveAttribute('open');
     // The buyer's confirm-details control is offered.
@@ -243,7 +246,48 @@ describe('TransactionWorkspace', () => {
     r(<TransactionWorkspace transactionId="tx1" />);
 
     expect(screen.getAllByText('Waiting for the seller')).toHaveLength(1);
+    expect(screen.getByText('Waiting for the seller').closest('#tx-actions')).toHaveClass(
+      'platform-gold-panel',
+    );
     expect(screen.getByText('Seller confirms transaction details')).toBeInTheDocument();
+    expect(screen.queryByText('People in this stage')).not.toBeInTheDocument();
+  });
+
+  it('replaces a completed seller action with one waiting-for-buyer state', () => {
+    h.Q.get = detail({
+      perspective: 'SELLER',
+      status: 'CONFIRMATION',
+      statusKey: 'status.confirmation',
+      nextActor: 'BUYER',
+      nextActorKey: 'nextActor.waitingBuyer',
+      reminderAt: '2026-07-15T09:00:00Z',
+      tasks: [
+        {
+          code: 'BUYER_CONFIRM_DETAILS',
+          stage: 'CONFIRMATION',
+          actor: 'BUYER',
+          status: 'ACTION_REQUIRED',
+          required: true,
+          mine: false,
+          ownershipKey: 'task.buyer',
+        },
+        {
+          code: 'SELLER_CONFIRM_DETAILS',
+          stage: 'CONFIRMATION',
+          actor: 'SELLER',
+          status: 'COMPLETED_DEMO',
+          required: true,
+          mine: true,
+          ownershipKey: 'task.you',
+        },
+      ],
+    });
+
+    r(<TransactionWorkspace transactionId="tx1" />);
+
+    expect(screen.getAllByText('Waiting for the buyer')).toHaveLength(1);
+    expect(screen.queryByRole('heading', { name: 'Your next steps' })).not.toBeInTheDocument();
+    expect(screen.queryByText('People in this stage')).not.toBeInTheDocument();
   });
 
   it('shows the completed-in-demo state without transaction workflow buttons', () => {
