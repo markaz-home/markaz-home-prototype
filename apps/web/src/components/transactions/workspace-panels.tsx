@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { Check, ChevronDown, Circle } from 'lucide-react';
+import { Check, ChevronDown, Circle, Lock } from 'lucide-react';
 import { Badge, Card, CardContent, cn } from '@markaz/ui';
 import { TRANSACTION_STAGES, type TransactionStage } from '@markaz/domain';
 import { formatDateTime } from '@/lib/format';
@@ -42,6 +42,26 @@ export function MobileActionBar({ d }: { d: Detail }) {
 
 export function ProgressTracker({
   stageIndex,
+}: {
+  stageIndex: number;
+}) {
+  return (
+    <div className="flex items-center gap-1.5" aria-hidden>
+      {TRANSACTION_STAGES.map((stage, index) => (
+        <span
+          key={stage}
+          className={cn(
+            'h-1 flex-1 rounded-full transition-colors',
+            index <= stageIndex ? 'bg-primary' : 'bg-foreground/20',
+          )}
+        />
+      ))}
+    </div>
+  );
+}
+
+export function StageRail({
+  stageIndex,
   transactionId,
   viewedStage,
 }: {
@@ -50,77 +70,59 @@ export function ProgressTracker({
   viewedStage: TransactionStage;
 }) {
   const t = useTranslations('transactions');
-  const total = TRANSACTION_STAGES.length;
-  const current = Math.min(stageIndex + 1, total);
   return (
-    <section className="space-y-3" aria-labelledby="transaction-stage-progress">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <p
-            id="transaction-stage-progress"
-            className="text-primary text-xs font-semibold uppercase tracking-[0.16em]"
-          >
-            {t('stageProgress', { current, total })}
-          </p>
-          <p className="mt-1 text-sm font-medium">{t(`stage.${viewedStage}`)}</p>
-        </div>
-        <p className="text-muted-foreground text-xs">
-          {t(stageIndex >= total ? 'stageDone' : 'stageCurrent')}
-        </p>
-      </div>
-      <ol className="grid grid-cols-6 gap-2" aria-label={t('title')}>
-        {TRANSACTION_STAGES.map((s, i) => {
-          const state = i < stageIndex ? 'done' : i === stageIndex ? 'current' : 'todo';
-          const selected = s === viewedStage;
-          const className = cn(
-            'group flex min-w-0 flex-col gap-2 text-start outline-none',
-            i <= stageIndex && 'cursor-pointer',
-          );
+    <nav aria-label={t('title')} className="hidden lg:block">
+      <ol className="space-y-1" aria-label={t('title')}>
+        {TRANSACTION_STAGES.map((stage, index) => {
+          const accessible = index <= stageIndex;
+          const selected = stage === viewedStage;
+          const complete = index < stageIndex;
           const content = (
-            <>
+            <span
+              className={cn(
+                'flex items-center gap-2 rounded-md px-3 py-2 text-sm',
+                selected && 'bg-primary/15 text-foreground font-medium',
+                !selected && accessible && 'text-foreground hover:bg-muted',
+                !accessible && 'text-muted-foreground',
+              )}
+              aria-current={selected ? 'step' : undefined}
+            >
               <span
                 aria-hidden
                 className={cn(
-                  'h-1.5 w-full rounded-full transition-colors',
-                  state === 'done' || state === 'current' ? 'bg-primary' : 'bg-foreground/15',
-                  selected && 'ring-primary/45 ring-offset-background ring-2 ring-offset-2',
-                  i <= stageIndex && 'group-hover:bg-primary/80',
-                )}
-              />
-              <span
-                className={cn(
-                  'hidden truncate text-xs sm:block',
+                  'grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[11px] font-medium',
                   selected
-                    ? 'text-foreground font-semibold'
-                    : state === 'done'
-                      ? 'text-primary'
-                      : 'text-muted-foreground',
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : complete
+                      ? 'border-primary/60 text-primary'
+                      : 'border-foreground/25 text-muted-foreground',
                 )}
               >
-                {i + 1}. {t(`stage.${s}`)}
+                {complete ? (
+                  <Check className="h-3.5 w-3.5" />
+                ) : accessible ? (
+                  index + 1
+                ) : (
+                  <Lock className="h-3 w-3" />
+                )}
               </span>
-            </>
+              <span>{t(`stage.${stage}`)}</span>
+            </span>
           );
           return (
-            <li key={s} className="min-w-0">
-              {i <= stageIndex ? (
-                <Link
-                  href={`/transactions/${transactionId}/${slugForStage(s)}`}
-                  className={className}
-                  aria-current={selected ? 'step' : undefined}
-                >
+            <li key={stage}>
+              {accessible && !selected ? (
+                <Link href={`/transactions/${transactionId}/${slugForStage(stage)}`}>
                   {content}
                 </Link>
               ) : (
-                <span className={className} aria-disabled="true">
-                  {content}
-                </span>
+                content
               )}
             </li>
           );
         })}
       </ol>
-    </section>
+    </nav>
   );
 }
 

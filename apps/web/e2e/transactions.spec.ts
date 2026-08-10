@@ -38,7 +38,7 @@ test('buyer confirms transaction details from the workspace', async ({ page }) =
   const txId = await acceptedTransaction(buyer.id, seller.id, listingId);
   await signIn(page, buyer);
   await page.goto(`/en/transactions/${txId}`);
-  await expect(page.getByText('Stage 1 of 6')).toBeVisible();
+  await expect(page.getByText(/Stage 1 of 6/)).toBeVisible();
 
   await page.getByRole('checkbox').first().check();
   await page.getByRole('button', { name: 'Confirm transaction details' }).click();

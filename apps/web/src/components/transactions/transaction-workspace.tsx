@@ -9,7 +9,7 @@ import { Link } from '@/i18n/navigation';
 import { trpc } from '@/trpc/react';
 import type { RouterOutputs } from '@/trpc/types';
 import { formatAed } from '@/lib/format';
-import { MobileActionBar, ProgressTracker, TaskList, Timeline } from './workspace-panels';
+import { MobileActionBar, ProgressTracker, StageRail, TaskList, Timeline } from './workspace-panels';
 import { NextActionPanel } from './next-action-panel';
 import { TerminalPanel, CancellationControl, CancellationPending } from './cancellation-panels';
 import { slugForStage, stageFromSlug } from '@/lib/transaction-routes';
@@ -106,66 +106,75 @@ function Loaded({ d, rt, viewedStage }: { d: Detail; rt: string; viewedStage: Tr
         </p>
       </header>
 
-      <ProgressTracker stageIndex={d.stageIndex} transactionId={d.id} viewedStage={viewedStage} />
+      <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
+        <StageRail stageIndex={d.stageIndex} transactionId={d.id} viewedStage={viewedStage} />
+        <div className="min-w-0 space-y-4">
+          <ProgressTracker stageIndex={d.stageIndex} />
+          <section
+            id="tx-actions"
+            className="platform-gold-panel border-border/70 bg-card/40 scroll-mt-20 rounded-lg border p-6 md:p-7"
+          >
+            <p className="text-primary mb-6 text-[11px] font-semibold uppercase tracking-[0.18em]">
+              {t('stageProgress', {
+                current: viewedIndex + 1,
+                total: TRANSACTION_STAGES.length,
+              })}{' '}
+              · {t(`stage.${viewedStage}`)}
+            </p>
+            {done ? (
+              <TerminalPanel d={d} />
+            ) : d.status === 'CANCELLATION_PENDING' ? (
+              <CancellationPending d={d} refresh={refresh} />
+            ) : futureStage ? (
+              <StageStateCard
+                icon={<LockKeyhole className="h-5 w-5" aria-hidden />}
+                title={t('stageLockedTitle')}
+                body={t('stageLockedBody')}
+              />
+            ) : completedStage ? (
+              <StageStateCard
+                icon={<CheckCircle2 className="h-5 w-5" aria-hidden />}
+                title={t('stageCompleteTitle')}
+                body={t('stageCompleteBody')}
+                action={
+                  <Button asChild>
+                    <Link
+                      href={`/transactions/${d.id}/${slugForStage(TRANSACTION_STAGES[currentIndex]!)}`}
+                    >
+                      {t('continueCurrentStage')}
+                      <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden />
+                    </Link>
+                  </Button>
+                }
+              />
+            ) : !mineNow && !systemNow ? (
+              <WaitingPanel d={d} />
+            ) : (
+              <NextActionPanel d={d} stage={viewedStage} refresh={refresh} />
+            )}
+          </section>
 
-      <div className="space-y-4">
-        <section
-          id="tx-actions"
-          className="platform-gold-panel border-border/70 bg-card/40 scroll-mt-20 rounded-lg border p-6 md:p-7"
-        >
-          {done ? (
-            <TerminalPanel d={d} />
-          ) : d.status === 'CANCELLATION_PENDING' ? (
-            <CancellationPending d={d} refresh={refresh} />
-          ) : futureStage ? (
-            <StageStateCard
-              icon={<LockKeyhole className="h-5 w-5" aria-hidden />}
-              title={t('stageLockedTitle')}
-              body={t('stageLockedBody')}
-            />
-          ) : completedStage ? (
-            <StageStateCard
-              icon={<CheckCircle2 className="h-5 w-5" aria-hidden />}
-              title={t('stageCompleteTitle')}
-              body={t('stageCompleteBody')}
-              action={
-                <Button asChild>
-                  <Link
-                    href={`/transactions/${d.id}/${slugForStage(TRANSACTION_STAGES[currentIndex]!)}`}
-                  >
-                    {t('continueCurrentStage')}
-                    <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden />
-                  </Link>
-                </Button>
-              }
-            />
-          ) : !mineNow && !systemNow ? (
-            <WaitingPanel d={d} />
-          ) : (
-            <NextActionPanel d={d} stage={viewedStage} refresh={refresh} />
-          )}
-        </section>
+          <TaskList d={d} stage={viewedStage} />
 
-        <TaskList d={d} stage={viewedStage} />
-
-        <details className="border-border/70 group rounded-xl border px-4 py-3 sm:px-5">
-          <summary className="text-primary flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium underline-offset-4 hover:underline">
-            {t('activityToggle')}
-            <span className="text-muted-foreground text-xs">{d.timeline.length}</span>
-          </summary>
-          <div className="mt-4">
-            <Timeline d={d} />
-          </div>
-        </details>
-
-        {!done ? (
-          <details className="group border-t pt-2">
-            <summary className="text-muted-foreground hover:text-foreground cursor-pointer list-none py-2 text-xs font-medium">
-              {t('moreOptions')}
+          <details className="border-border/70 group rounded-xl border px-4 py-3 sm:px-5">
+            <summary className="text-primary flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium underline-offset-4 hover:underline">
+              {t('activityToggle')}
+              <span className="text-muted-foreground text-xs">{d.timeline.length}</span>
             </summary>
-            <CancellationControl d={d} refresh={refresh} />
+            <div className="mt-4">
+              <Timeline d={d} />
+            </div>
           </details>
-        ) : null}
+
+          {!done ? (
+            <details className="group border-t pt-2">
+              <summary className="text-muted-foreground hover:text-foreground cursor-pointer list-none py-2 text-xs font-medium">
+                {t('moreOptions')}
+              </summary>
+              <CancellationControl d={d} refresh={refresh} />
+            </details>
+          ) : null}
+        </div>
       </div>
 
       {!done && !futureStage && !completedStage ? <MobileActionBar d={d} /> : null}

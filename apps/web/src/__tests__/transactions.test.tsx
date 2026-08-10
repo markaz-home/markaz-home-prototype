@@ -193,7 +193,7 @@ describe('TransactionWorkspace', () => {
     h.Q.get = detail();
     r(<TransactionWorkspace transactionId="tx1" />);
     expect(screen.queryByText(/Transaction process simulated/i)).not.toBeInTheDocument();
-    expect(screen.getByText('Stage 1 of 6')).toBeInTheDocument();
+    expect(screen.getByText(/Stage 1 of 6/)).toBeInTheDocument();
     expect(screen.getByRole('list', { name: 'Transactions' })).toBeInTheDocument();
     const actionHeading = screen.getByRole('heading', { name: 'Your next steps' });
     expect(actionHeading).toBeInTheDocument();
