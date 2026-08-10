@@ -144,7 +144,11 @@ export function CancellationControl({ d, refresh }: { d: Detail; refresh: () => 
   if (d.status === 'CANCELLATION_PENDING') return null;
   return (
     <>
-      <Button variant="ghost" className="text-destructive w-full" onClick={() => setOpen(true)}>
+      <Button
+        variant="ghost"
+        className="text-muted-foreground hover:text-destructive h-auto w-auto px-0 py-1.5 text-xs hover:bg-transparent"
+        onClick={() => setOpen(true)}
+      >
         {t('cancellation.request')}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>

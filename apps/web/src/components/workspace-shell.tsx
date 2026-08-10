@@ -174,10 +174,7 @@ export function WorkspaceShell({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* No background at all — any tint over the theme's gradient glow reads as
-            a band. Blur alone is invisible at rest (blurring a smooth gradient
-            reproduces it) and frosts scrolled content under the icons. */}
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 px-4 backdrop-blur-xl md:px-8">
+        <header className="border-border/65 bg-background/85 sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b px-4 backdrop-blur-xl md:px-8">
           <div className="flex items-center gap-2 md:hidden">
             <Button
               variant="ghost"
@@ -192,14 +189,17 @@ export function WorkspaceShell({
               <BrandLogo className="h-8 w-auto md:h-8" />
             </Link>
           </div>
-          <div className="ms-auto flex items-center gap-1">
+          <p className="text-muted-foreground hidden text-xs font-semibold uppercase tracking-[0.16em] md:block">
+            {t('workspace')}
+          </p>
+          <div className="border-border/70 bg-card/55 ms-auto flex shrink-0 items-center gap-1.5 rounded-full border p-1 shadow-sm">
             <LanguageSwitcher />
             <NotificationBell />
             <Button
               variant="ghost"
               size="icon"
               asChild
-              className="border-primary/55 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary rounded-full border"
+              className="border-primary/55 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary h-10 w-10 shrink-0 rounded-full border"
             >
               <Link href="/account/profile" aria-label={t('profile')} title={t('profile')}>
                 <UserRound className="h-4 w-4" aria-hidden />

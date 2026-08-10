@@ -193,7 +193,11 @@ describe('TransactionWorkspace', () => {
     h.Q.get = detail();
     r(<TransactionWorkspace transactionId="tx1" />);
     expect(screen.getByText(/Transaction process simulated/i)).toBeInTheDocument();
+    expect(screen.getByText('Stage 1 of 6')).toBeInTheDocument();
     expect(screen.getByRole('list', { name: 'Transactions' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Your next steps' })).toBeInTheDocument();
+    const stageDetails = screen.getByText('Stage details').closest('details');
+    expect(stageDetails).not.toHaveAttribute('open');
     // The buyer's confirm-details control is offered.
     const btn = screen.getByRole('button', { name: 'Confirm transaction details' });
     const ack = screen.getByRole('checkbox');
@@ -205,6 +209,41 @@ describe('TransactionWorkspace', () => {
       transactionId: 'tx1',
       expectedVersion: 1,
     });
+  });
+
+  it('shows one specific waiting message instead of repeating it in a sidebar', () => {
+    h.Q.get = detail({
+      status: 'CONFIRMATION',
+      statusKey: 'status.confirmation',
+      nextActor: 'SELLER',
+      nextActorKey: 'nextActor.waitingSeller',
+      reminderAt: '2026-07-15T09:00:00Z',
+      tasks: [
+        {
+          code: 'BUYER_CONFIRM_DETAILS',
+          stage: 'CONFIRMATION',
+          actor: 'BUYER',
+          status: 'COMPLETED_DEMO',
+          required: true,
+          mine: true,
+          ownershipKey: 'task.you',
+        },
+        {
+          code: 'SELLER_CONFIRM_DETAILS',
+          stage: 'CONFIRMATION',
+          actor: 'SELLER',
+          status: 'ACTION_REQUIRED',
+          required: true,
+          mine: false,
+          ownershipKey: 'task.seller',
+        },
+      ],
+    });
+
+    r(<TransactionWorkspace transactionId="tx1" />);
+
+    expect(screen.getAllByText('Waiting for the seller')).toHaveLength(1);
+    expect(screen.getByText('Seller confirms transaction details')).toBeInTheDocument();
   });
 
   it('shows the completed-in-demo state without transaction workflow buttons', () => {

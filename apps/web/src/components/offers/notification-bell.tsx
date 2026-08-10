@@ -48,18 +48,18 @@ export function NotificationBell() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative"
+          className="border-border/70 bg-background/35 hover:border-primary/40 relative h-10 w-10 shrink-0 rounded-full border"
           aria-label={`${t('title')}${unread > 0 ? ` (${unread})` : ''}`}
         >
           <Bell className="h-5 w-5" aria-hidden />
           {unread > 0 ? (
-            <span className="bg-primary text-primary-foreground absolute -end-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold">
+            <span className="bg-primary text-primary-foreground ring-background absolute -end-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold ring-2">
               {unread > 99 ? '99+' : unread}
             </span>
           ) : null}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[min(25rem,calc(100vw-1.5rem))] p-0">
+      <DropdownMenuContent className="w-[min(28rem,calc(100vw-1.5rem))] p-0">
         <div className="flex items-center justify-between">
           <DropdownMenuLabel>{t('title')}</DropdownMenuLabel>
           {unread > 0 ? (

@@ -50,39 +50,77 @@ export function ProgressTracker({
   viewedStage: TransactionStage;
 }) {
   const t = useTranslations('transactions');
+  const total = TRANSACTION_STAGES.length;
+  const current = Math.min(stageIndex + 1, total);
   return (
-    <ol className="flex flex-wrap gap-2" aria-label={t('title')}>
-      {TRANSACTION_STAGES.map((s, i) => {
-        const state = i < stageIndex ? 'done' : i === stageIndex ? 'current' : 'todo';
-        const selected = s === viewedStage;
-        const className = cn(
-          'block rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
-          selected
-            ? 'border-primary bg-primary text-primary-foreground'
-            : state === 'done'
-              ? 'border-primary/30 bg-primary/10 text-primary hover:bg-primary/15'
-              : state === 'current'
-                ? 'border-primary/45 bg-primary/10 text-foreground hover:bg-primary/15'
-                : 'border-border bg-muted/50 text-muted-foreground',
-        );
-        return (
-          <li key={s} aria-current={selected ? 'step' : undefined}>
-            {i <= stageIndex ? (
-              <Link
-                href={`/transactions/${transactionId}/${slugForStage(s)}`}
-                className={className}
+    <section className="space-y-3" aria-labelledby="transaction-stage-progress">
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <p
+            id="transaction-stage-progress"
+            className="text-primary text-xs font-semibold uppercase tracking-[0.16em]"
+          >
+            {t('stageProgress', { current, total })}
+          </p>
+          <p className="mt-1 text-sm font-medium">{t(`stage.${viewedStage}`)}</p>
+        </div>
+        <p className="text-muted-foreground text-xs">
+          {t(stageIndex >= total ? 'stageDone' : 'stageCurrent')}
+        </p>
+      </div>
+      <ol className="grid grid-cols-6 gap-2" aria-label={t('title')}>
+        {TRANSACTION_STAGES.map((s, i) => {
+          const state = i < stageIndex ? 'done' : i === stageIndex ? 'current' : 'todo';
+          const selected = s === viewedStage;
+          const className = cn(
+            'group flex min-w-0 flex-col gap-2 text-start outline-none',
+            i <= stageIndex && 'cursor-pointer',
+          );
+          const content = (
+            <>
+              <span
+                aria-hidden
+                className={cn(
+                  'h-1.5 w-full rounded-full transition-colors',
+                  state === 'done' || state === 'current' ? 'bg-primary' : 'bg-foreground/15',
+                  selected && 'ring-primary/45 ring-offset-background ring-2 ring-offset-2',
+                  i <= stageIndex && 'group-hover:bg-primary/80',
+                )}
+              />
+              <span
+                className={cn(
+                  'hidden truncate text-xs sm:block',
+                  selected
+                    ? 'text-foreground font-semibold'
+                    : state === 'done'
+                      ? 'text-primary'
+                      : 'text-muted-foreground',
+                )}
               >
                 {i + 1}. {t(`stage.${s}`)}
-              </Link>
-            ) : (
-              <span className={className} aria-disabled="true">
-                {i + 1}. {t(`stage.${s}`)}
               </span>
-            )}
-          </li>
-        );
-      })}
-    </ol>
+            </>
+          );
+          return (
+            <li key={s} className="min-w-0">
+              {i <= stageIndex ? (
+                <Link
+                  href={`/transactions/${transactionId}/${slugForStage(s)}`}
+                  className={className}
+                  aria-current={selected ? 'step' : undefined}
+                >
+                  {content}
+                </Link>
+              ) : (
+                <span className={className} aria-disabled="true">
+                  {content}
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </section>
   );
 }
 
@@ -118,88 +156,80 @@ export function TaskList({ d, stage }: { d: Detail; stage?: TransactionStage }) 
     };
   }).filter((group) => group.tasks.length > 0 && (!stage || group.stage === stage));
 
+  const group = groups[0];
+  if (!group) return null;
+
   return (
-    <Card className="bg-card/40">
-      <CardContent className="pt-6">
-        <h2 className="font-semibold">{t('checklistTitle')}</h2>
-        <div className="mt-4 space-y-2">
-          {groups.map((group) => (
-            <details
-              key={group.stage}
-              open={group.state === 'current'}
-              className="border-border/70 group rounded-lg border"
+    <details className="border-border/70 bg-card/30 group rounded-xl border">
+      <summary className="hover:bg-foreground/[0.025] flex cursor-pointer list-none items-center gap-3 rounded-xl px-4 py-4 transition-colors sm:px-5">
+        <span
+          aria-hidden
+          className={cn(
+            'grid h-7 w-7 shrink-0 place-items-center rounded-full border text-xs font-semibold',
+            group.state === 'current'
+              ? 'border-primary bg-primary text-primary-foreground'
+              : group.state === 'done'
+                ? 'border-primary/60 text-primary'
+                : 'border-foreground/25 text-muted-foreground',
+          )}
+        >
+          {group.state === 'done' ? <Check className="h-3.5 w-3.5" /> : group.index + 1}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-semibold">{t('checklistTitle')}</span>
+          <span className="text-muted-foreground mt-0.5 block truncate text-xs">
+            {ts(group.stage)} · {t('checklistHelp')}
+          </span>
+        </span>
+        <span className="text-muted-foreground text-xs tabular-nums">
+          {t('stageCount', { completed: group.done, total: group.tasks.length })}
+        </span>
+        <ChevronDown
+          className="text-muted-foreground h-4 w-4 shrink-0 transition-transform group-open:rotate-180"
+          aria-hidden
+        />
+      </summary>
+      <ul className="border-border/70 divide-border/60 divide-y border-t">
+        {group.tasks.map((task) => {
+          const complete = task.status === 'COMPLETED_DEMO';
+          return (
+            <li
+              key={task.code}
+              className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm sm:px-5"
             >
-              <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3 text-sm">
-                <span
-                  aria-hidden
+              <span className="flex min-w-0 flex-1 items-center gap-2.5">
+                {complete ? (
+                  <Check className="text-primary h-3.5 w-3.5 shrink-0" aria-hidden />
+                ) : (
+                  <Circle className="text-muted-foreground h-3.5 w-3.5 shrink-0" aria-hidden />
+                )}
+                <span dir="auto" className={cn('min-w-0', complete && 'text-muted-foreground')}>
+                  {t(`taskLabel.${task.code}` as 'taskLabel.BUYER_CONFIRM_DETAILS')}
+                </span>
+              </span>
+              <span className="flex shrink-0 items-center gap-2">
+                <Badge
+                  variant="outline"
+                  className={cn(task.mine && 'border-primary/40 bg-primary/10 text-primary')}
+                >
+                  {who(task)}
+                </Badge>
+                <Badge
+                  variant="outline"
                   className={cn(
-                    'grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[11px] font-medium',
-                    group.state === 'current'
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : group.state === 'done'
-                        ? 'border-primary/60 text-primary'
-                        : 'border-foreground/25 text-muted-foreground',
+                    complete
+                      ? 'border-success/35 bg-success/10 text-success'
+                      : 'text-muted-foreground',
                   )}
                 >
-                  {group.state === 'done' ? <Check className="h-3 w-3" /> : group.index + 1}
-                </span>
-                <span className="flex-1 font-medium">{ts(group.stage)}</span>
-                <span className="text-muted-foreground text-xs tabular-nums">
-                  {t('stageCount', { completed: group.done, total: group.tasks.length })}
-                </span>
-                <ChevronDown
-                  className="text-muted-foreground h-4 w-4 shrink-0 transition-transform group-open:rotate-180"
-                  aria-hidden
-                />
-              </summary>
-              <ul className="border-border/70 divide-border/60 divide-y border-t">
-                {group.tasks.map((task) => {
-                  const complete = task.status === 'COMPLETED_DEMO';
-                  return (
-                    <li
-                      key={task.code}
-                      className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm"
-                    >
-                      <span className="flex min-w-0 items-center gap-2.5">
-                        {complete ? (
-                          <Check className="text-primary h-3.5 w-3.5 shrink-0" aria-hidden />
-                        ) : (
-                          <span
-                            aria-hidden
-                            className="border-foreground/30 h-3.5 w-3.5 shrink-0 rounded-full border"
-                          />
-                        )}
-                        <span
-                          dir="auto"
-                          className={cn('truncate', complete && 'text-muted-foreground')}
-                        >
-                          {t(`taskLabel.${task.code}` as 'taskLabel.BUYER_CONFIRM_DETAILS')}
-                        </span>
-                      </span>
-                      {complete ? (
-                        <span className="text-muted-foreground shrink-0 text-xs">
-                          {t('task.completed')}
-                        </span>
-                      ) : (
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            'shrink-0',
-                            task.mine && 'border-primary/40 bg-primary/10 text-primary',
-                          )}
-                        >
-                          {who(task)}
-                        </Badge>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </details>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+                  {complete ? t('task.completed') : t('participants.pending')}
+                </Badge>
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </details>
   );
 }
 
@@ -220,23 +250,29 @@ export function ParticipantProgress({ d, stage }: { d: Detail; stage: Transactio
   };
 
   return (
-    <section aria-labelledby="participant-progress-title" className="space-y-3">
-      <div>
-        <h2 id="participant-progress-title" className="font-display text-xl">
+    <section
+      aria-labelledby="participant-progress-title"
+      className="border-border/70 bg-card/25 space-y-3 rounded-xl border p-4 sm:p-5"
+    >
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="participant-progress-title" className="font-semibold">
           {t('participants.title')}
         </h2>
-        <p className="text-muted-foreground mt-1 text-sm">{t('participants.body')}</p>
+        <p className="text-muted-foreground text-xs">{t('participants.body')}</p>
       </div>
       <div className="grid gap-3 md:grid-cols-2">
         {(['BUYER', 'SELLER'] as const).map((actor) => {
           const s = side(actor);
-          const status = s.complete
-            ? t('participants.complete')
-            : s.actionable
-              ? s.isYou
-                ? t('participants.yourAction')
-                : t('participants.theirAction')
-              : t('participants.waiting');
+          const status =
+            s.tasks.length === 0
+              ? t('participants.noAction')
+              : s.complete
+                ? t('participants.complete')
+                : s.actionable
+                  ? s.isYou
+                    ? t('participants.yourAction')
+                    : t('participants.theirAction')
+                  : t('participants.waiting');
           return (
             <Card
               key={actor}
@@ -246,52 +282,32 @@ export function ParticipantProgress({ d, stage }: { d: Detail; stage: Transactio
                 s.complete && 'border-success/40',
               )}
             >
-              <CardContent className="space-y-4 pt-6">
-                <div className="flex items-start justify-between gap-3">
-                  <span className="flex items-center gap-3">
-                    <span className="border-primary/30 bg-primary/10 text-primary grid h-10 w-10 place-items-center rounded-full border">
-                      <UserRound className="h-4 w-4" aria-hidden />
-                    </span>
-                    <span>
-                      <span className="block font-semibold">
-                        {actor === 'BUYER' ? t('participants.buyer') : t('participants.seller')}
-                        {s.isYou ? ` · ${t('participants.you')}` : ''}
-                      </span>
-                      <span className="text-muted-foreground mt-0.5 block text-xs">{status}</span>
+              <CardContent className="flex items-center justify-between gap-3 p-3.5 sm:p-4">
+                <span className="flex min-w-0 items-center gap-3">
+                  <span className="border-primary/30 bg-primary/10 text-primary grid h-9 w-9 shrink-0 place-items-center rounded-full border">
+                    <UserRound className="h-4 w-4" aria-hidden />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="flex items-center gap-2 text-sm font-semibold">
+                      {actor === 'BUYER' ? t('participants.buyer') : t('participants.seller')}
+                      {s.isYou ? (
+                        <Badge variant="outline" className="border-primary/40 text-primary">
+                          {t('participants.you')}
+                        </Badge>
+                      ) : null}
                     </span>
                   </span>
-                  {s.complete ? (
-                    <Check
-                      className="text-success h-5 w-5"
-                      aria-label={t('participants.complete')}
-                    />
-                  ) : (
-                    <Circle className="text-muted-foreground h-4 w-4" aria-hidden />
+                </span>
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    'shrink-0',
+                    s.complete && 'border-success/35 bg-success/10 text-success',
+                    s.actionable && !s.complete && 'border-primary/40 bg-primary/10 text-primary',
                   )}
-                </div>
-                {s.tasks.length > 0 ? (
-                  <div className="space-y-2">
-                    {s.tasks.map((task) => (
-                      <div
-                        key={task.code}
-                        className="flex items-center justify-between gap-3 text-xs"
-                      >
-                        <span dir="auto" className="text-muted-foreground truncate">
-                          {t(`taskLabel.${task.code}` as 'taskLabel.BUYER_CONFIRM_DETAILS')}
-                        </span>
-                        <span className="shrink-0">
-                          {task.status === 'COMPLETED_DEMO'
-                            ? t('task.completed')
-                            : task.status === 'ACTION_REQUIRED'
-                              ? t('participants.pending')
-                              : t('stageTodo')}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground text-xs">{t('participants.noAction')}</p>
-                )}
+                >
+                  {status}
+                </Badge>
               </CardContent>
             </Card>
           );

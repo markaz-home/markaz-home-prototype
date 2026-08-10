@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Card, CardContent } from '@markaz/ui';
+import { Badge, Button, Card, CardContent } from '@markaz/ui';
 import { PURCHASE_ROUTES, type TransactionStage } from '@markaz/domain';
 import { trpc } from '@/trpc/react';
 import type { RouterOutputs } from '@/trpc/types';
@@ -262,14 +262,29 @@ export function NextActionPanel({
       </Card>
     );
   }
-  return <>{controls}</>;
+  return (
+    <section aria-labelledby="transaction-next-step" className="space-y-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 id="transaction-next-step" className="font-display text-2xl">
+            {t('actionHeading')}
+          </h2>
+          <p className="text-muted-foreground mt-1 text-sm">{t('actionBody')}</p>
+        </div>
+        <Badge variant="outline" className="border-primary/45 bg-primary/10 text-primary">
+          {t('actionRequiredTag')}
+        </Badge>
+      </div>
+      <div className="space-y-4">{controls}</div>
+    </section>
+  );
 }
 
 function ActionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <Card>
-      <CardContent className="space-y-3 pt-6">
-        <h2 className="font-semibold">{title}</h2>
+    <Card className="border-primary/45 from-primary/10 via-card/70 to-card/40 bg-gradient-to-br">
+      <CardContent className="space-y-4 pt-6 [&_button]:min-h-11">
+        <h3 className="text-lg font-semibold">{title}</h3>
         {children}
       </CardContent>
     </Card>
@@ -286,12 +301,12 @@ function Ack({
   label: string;
 }) {
   return (
-    <label className="flex items-start gap-2 text-sm">
+    <label className="border-border/70 bg-background/35 flex cursor-pointer items-start gap-3 rounded-lg border p-3 text-sm leading-6">
       <input
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-1"
+        className="mt-1.5 shrink-0"
       />
       <span>{label}</span>
     </label>
