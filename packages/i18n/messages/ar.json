@@ -2438,7 +2438,6 @@
     "body": "سجّل الخروج وتابع باستخدام حساب عميل."
   },
   "notificationEmail": {
-    "brandLine": "طريقة أوضح للمضي في رحلتك العقارية.",
     "greeting": "مرحبًا {name}،",
     "recipientFallback": "بك",
     "propertyFallback": "تحديث عقاري",

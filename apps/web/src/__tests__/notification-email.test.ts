@@ -21,7 +21,8 @@ describe('branded notification email', () => {
 
     expect(email.subject).toContain('offer');
     expect(email.html).toContain('MARKAZ HOME');
-    expect(email.html).toContain('markaz-logo-gold.png');
+    expect(email.html).toContain('src="https://markazhome.com/markaz-logo-gold.png"');
+    expect(email.html).not.toContain('A clearer way to move property forward.');
     expect(email.html).toContain('https://example.test/property.jpg');
     expect(email.html).toContain('2,500,000');
     expect(email.html).toContain(base.actionUrl);
@@ -61,6 +62,7 @@ describe('branded notification email', () => {
 
     expect(email.html).toContain('lang="ar" dir="rtl"');
     expect(email.html).toContain(base.actionUrl);
+    expect(email.html).not.toContain('طريقة أوضح للمضي في رحلتك العقارية.');
     expect(email.subject.length).toBeGreaterThan(0);
   });
 });

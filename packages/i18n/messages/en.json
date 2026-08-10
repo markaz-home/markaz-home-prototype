@@ -2435,7 +2435,6 @@
     "body": "Sign out and continue with a customer account."
   },
   "notificationEmail": {
-    "brandLine": "A clearer way to move property forward.",
     "greeting": "Hello {name},",
     "recipientFallback": "there",
     "propertyFallback": "Property update",

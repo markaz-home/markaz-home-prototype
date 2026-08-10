@@ -217,7 +217,6 @@ export function renderNotificationEmail(input: NotificationEmailInput): Rendered
         <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%">
           <tr><td style="padding:0 0 22px;text-align:center">
             <img src="${escapeHtml(logoUrl)}" alt="MARKAZ Home" width="196" style="display:inline-block;width:196px;height:auto" />
-            <div style="margin-top:8px;color:#b7b0aa;font-size:12px;letter-spacing:.04em">${escapeHtml(messages.brandLine)}</div>
           </td></tr>
           <tr><td style="border:1px solid #3d352d;border-radius:11px;background:#12100f;overflow:hidden">
             ${cover}
